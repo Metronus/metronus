@@ -1,0 +1,1 @@
+web: cd Metronus-Project/ && gunicorn metronus.wsgi --log-file -
