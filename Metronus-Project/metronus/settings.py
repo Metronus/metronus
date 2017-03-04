@@ -26,7 +26,7 @@ SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = "METRONUS_PRODUCTION" not in os.environ
 
-ALLOWED_HOSTS = [".metronus.es", "localhost", "127.0.0.1"] 
+ALLOWED_HOSTS = [".metronus.es", "metronus.herokuapp.com", "localhost", "127.0.0.1"] 
 
 
 # Application definition
@@ -124,6 +124,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(PROJECT_PATH, 'staticfiles')
 STATICFILES_DIRS = (
     os.path.join(PROJECT_PATH,'static'),
 )
+
+
+# Simplified static file serving.
+# https://warehouse.python.org/project/whitenoise/
+
+STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
