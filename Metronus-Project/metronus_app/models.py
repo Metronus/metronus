@@ -9,3 +9,10 @@ class Department(models.Model):
 	def __unicode__(self):
 		return self.name
 	
+class Project(modelsModel):
+	companyId 	= models.ForeignKey(Company)
+	name 		= models.CharField(max_length=30)
+	registryDate	= models.DateTimeField(auto_now=True)
+
+	def __unicode__(self):
+		return self.name
