@@ -1,0 +1,27 @@
+language: python
+python: 3.5.2
+
+services:
+  - postgresql
+
+env:
+  - DJANGO=1.10.4
+
+before_install:
+  - export DJANGO_SETTINGS_MODULE=metronus.settings
+  - export PYTHONPATH=$HOME/builds/Metronus/metronus
+  - export PIP_USE_MIRRORS=true
+  - export METRONUS_DB_NAME=travisci
+  - export METRONUS_DB_USER=postgres
+  - export METRONUS_DB_PASS=''
+  - export DJANGO_SECRET_KEY=travistravistravistravistravistravistravis
+
+install:
+  - pip install -r requirements.txt
+
+before_script:
+  - psql -c "CREATE DATABASE travisci;" -U postgres
+
+script:
+  - python3 manage.py makemigrations --noinput && python3 manage.py migrate --noinput
+  - python3 manage.py test
