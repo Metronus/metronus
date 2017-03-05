@@ -13,16 +13,19 @@ before_install:
   - export DJANGO_SETTINGS_MODULE=metronus.settings
   - export PYTHONPATH=$HOME/builds/Metronus/metronus
   - export PIP_USE_MIRRORS=true
-  - export METRONUS_DB_NAME=travisci
-  - export METRONUS_DB_USER=postgres
-  - export METRONUS_DB_PASS=''
+  - export METRONUS_DB_NAME=metronus_db_travis
+  - export METRONUS_DB_USER=metronus_user_travis
+  - export METRONUS_DB_PASS='metronus_pass_travis'
   - export DJANGO_SECRET_KEY=travistravistravistravistravistravistravis
 
 install:
   - pip install -r requirements.txt
 
 before_script:
-  - psql -c "CREATE DATABASE travisci;" -U postgres
+  - psql -c "CREATE USER metronus_user_travis WITH PASSWORD 'metronus_pass_travis';" -U postgres
+  - psql -c "ALTER USER metronus_user_travis CREATEDB;" -U postgres
+  - psql -c "CREATE DATABASE metronus_db_travis;" -U postgres
+  - psql -c "GRANT ALL PRIVILEGES ON DATABASE metronus_db_travis TO metronus_user_travis;" -U postgres 
 
 script:
   - cd $TRAVIS_BUILD_DIR/Metronus-Project/
