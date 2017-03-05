@@ -19,7 +19,7 @@ def create(request):
             # ...
             # redirect to a new URL:
             createDepartment(form)
-            return HttpResponseRedirect('/department/retrieve')
+            return HttpResponseRedirect('/department/list')
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -42,6 +42,11 @@ def list(request):
 
 def update(request):
     """
+    get request
+    parameters:
+    department_id: the department id to delete
+
+    post request
     parameters/returns:
     form: el formulario con los datos del departamento
 
@@ -58,14 +63,20 @@ def update(request):
             # ...
             # redirect to a new URL:
             department=Department.objects.get(pk=form.cleaned_data['department_id'])
-            if checkCompanyDepartment(department):
+            if checkCompanyDepartmentSession(department):
                 updateDepartment(department,form)
 
-            return HttpResponseRedirect('/department/retrieve')
+            return HttpResponseRedirect('/department/list')
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = DepartmentForm()
+        department=Department.objects.get(pk=request.GET.get('department_id'))
+        if checkCompanyDepartmentSession(department):
+            form = DepartmentForm()
+            form['name']=department.name
+            form['department_id']=department.id
+        else:
+            return HttpResponseRedirect('/department/list')
 
 
     return render(request, 'department_form.html', {'form': form})
@@ -83,9 +94,9 @@ def delete(request):
     """
     department_id=request.GET.get('department_id')
     department=Department.objects.get(pk=department_id)
-    if checkCompanyDepartment(department):
+    if checkCompanyDepartmentSession(department):
         deleteDepartment(department)
-    return HttpResponseRedirect('/department/retrieve')
+    return HttpResponseRedirect('/department/list')
 
 #Auxiliar methods, containing the operation logic
 
