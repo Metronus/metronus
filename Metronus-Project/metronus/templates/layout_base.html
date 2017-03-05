@@ -3,55 +3,57 @@
 <head>
 	<meta charset="UTF-8">
 
-<!-- Ajax -->
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<!-- Bootstrap zone -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+	<!-- Bootstrap end -->
 
-<!-- Vue.js -->
-	<script src="https://unpkg.com/vue"></script>
+	<!-- Element zone -->
+  	<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-default/index.css">
+	<!-- Element end -->
 
-<!-- Bootstrap zone -->
-
-	<!-- Latest compiled and minified CSS -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-
-	<!-- Optional theme -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-
-	<!-- Latest compiled and minified JavaScript -->
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-
-<!-- Bootstrap end -->
-
-<!-- Element zone -->
-
-	<!-- import CSS -->
-	<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-default/index.css">
-	<!-- import JavaScript -->
-	<script src="https://unpkg.com/element-ui/lib/index.js"></script>
-
-<!-- Element end -->
-
-<title>
-	
-	{% block title %}	{% endblock %}
-
-</title>
-
+	<title>
+		{% block title %}{% endblock %}
+	</title>
 </head>
 
 <body>
 
+	<!-- Django's templates example -->
+	<div class="container">
+		{% block content %}{% endblock %}
+	</div>
 
 
-<div class="container">
-    {% block content %}{% endblock %}
-</div>
+	<!-- Boostrap example -->
+	<div>
+		<div class="pager panel-footer">
+			<p>Metronus - <strong>{{current_date}}</strong>.</p>
+		</div>
+	</div>
 
-<div>
-    <div class="pager panel-footer">
-        <p>Metronus - <strong>{{current_date}}</strong>.</p>
-    </div>
-</div>
+
+	<!-- Vue + Element example -->
+	<div id="metronus-app">
+		<el-card class="box-card" style="text-align:center">
+			<p>Metronus - <strong>${currentTime}</strong>.</p>
+		</el-card>
+	</div>
+
+
+	<!-- Vue Zone -->
+	<script src="https://unpkg.com/vue/dist/vue.js"></script>
+	<script src="/static/app.js"></script>
+	<!-- Vue end -->
+	<!-- Element zone-->
+	<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+	<!-- Element end -->
+	<!-- jQuery zone -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<!-- jQuery end -->
+	<!-- Bootstrap zone -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<!-- Bootstrap end -->
 
 </body>
 
