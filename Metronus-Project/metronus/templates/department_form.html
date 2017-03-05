@@ -1,0 +1,16 @@
+{% extends "layout_base.html" %}
+
+{% block title %}Create department{% endblock %}
+
+{% block content %}
+
+<h1> Create department </h1></br>
+
+    <form id="form" method="POST" action="">{% csrf_token %}
+	    {{form.as_p}}
+	    </br>
+	    <p><input type="submit" value="Confirmar" /></p>
+    </form>
+
+
+{% endblock %}

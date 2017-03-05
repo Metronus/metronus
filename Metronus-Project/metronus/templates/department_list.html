@@ -1,0 +1,15 @@
+{% extends "layout_base.html" %}
+
+{% block title %}Department list{% endblock %}
+
+{% block content %}
+<ul class="list-group">
+{% for department in departments %}
+	
+	<li class="list-group-item">{{department.name}} <a class="btn btn-outline-primary" href="/department/update?department_id={{department.id}}">Update</a><a class="btn btn-outline-primary" href="/department/delete?department_id={{department.id}}">Delete</a></li>
+
+{% endfor %}
+</ul>
+
+<a class="btn btn-outline-primary" href="/department/create">Create</a>
+{% endblock %}
