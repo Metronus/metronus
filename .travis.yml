@@ -25,9 +25,9 @@ before_script:
   - psql -c "CREATE USER metronus_user_travis WITH PASSWORD 'metronus_pass_travis';" -U postgres
   - psql -c "ALTER USER metronus_user_travis CREATEDB;" -U postgres
   - psql -c "CREATE DATABASE metronus_db_travis;" -U postgres
-  - psql -c "GRANT ALL PRIVILEGES ON DATABASE metronus_db_travis TO metronus_user_travis;" -U postgres 
+  - psql -c "GRANT ALL PRIVILEGES ON DATABASE metronus_db_travis TO metronus_user_travis;" -U postgres
+  - cd $TRAVIS_BUILD_DIR/Metronus-Project/
 
 script:
-  - cd $TRAVIS_BUILD_DIR/Metronus-Project/
   - python3 manage.py makemigrations --noinput && python3 manage.py migrate --noinput
   - python3 manage.py test
