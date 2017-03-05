@@ -16,7 +16,7 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_PATH = os.path.dirname(os.path.realpath(__file__))
 
-    
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
@@ -26,7 +26,7 @@ SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = "METRONUS_PRODUCTION" not in os.environ
 
-ALLOWED_HOSTS = [".metronus.es", "metronus.herokuapp.com", "localhost", "127.0.0.1"] 
+ALLOWED_HOSTS = [".metronus.es", "metronus.herokuapp.com", "localhost", "127.0.0.1"]
 
 
 # Application definition
@@ -134,4 +134,3 @@ STATICFILES_DIRS = (
 # https://warehouse.python.org/project/whitenoise/
 
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
-
