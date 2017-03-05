@@ -1,5 +1,6 @@
 from metronus_app.model.department import Department
-import metronus_app.view.departmentView
+from metronus_app.model.company import Company
+from metronus_app.controllers.departmentController import *
 
 from django.test import TestCase
 
@@ -17,19 +18,57 @@ class DepartmentTestCase(TestCase):
             email= "company2@gmail.com",
             phone= "987654321",
             pswd= "algomas")
+        company=Company.objects.get(cif="124")
+        Department.objects.create(name="dep3",active=True,company_id=company)
+
 
     def test_create_department(self):
-        company=Company.objects.get(name="124")
-        Department.objects.create(name="dep1",active=True,company_id=company.id)
+        """
+        checks the number of departments increased
+        """
+        cuenta=Department.objects.count()
+        company=Company.objects.get(cif="124")
+        Department.objects.create(name="dep1",active=True,company_id=company)
+        cuenta2=Department.objects.count()
+        self.assertTrue(cuenta+1,cuenta2)
 
     def test_update_department(self):
-        dep=Department.objects.get(name="dep1")
-        dep['name']="dep1new"
+        dep=Department.objects.get(name="dep3")
+        dep.name="dep1new"
         dep.save()
+
+
     def test_delete_department(self):
-        dep=Department.objects.get(name="dep1")
-        deleteDepartment(department)
+        """
+        checks the number of active departments increased
+        """
+        company=Company.objects.get(cif="124")
+        cuenta=Department.objects.filter(company_id=company,active=True).count()
+        dep=Department.objects.get(name="dep3")
+        deleteDepartment(dep)
+        cuenta2=Department.objects.filter(company_id=company,active=True).count()
+        self.assertEqual(cuenta,cuenta2+1)
+
+    def test_list_department(self):
+        """
+        checks the number of departments
+        """
+        company=Company.objects.get(cif="124")
+        lista=Department.objects.filter(company_id=company,active=True)
+        self.assertEqual(lista.count(),1)
 
     def test_check_valid_company_department(self):
-        company=Company.objects.get(name="124")
-        checkCompanyDepartment(department,company.id)
+        """
+        checks the company is valid
+        """
+        department=Department.objects.get(name="dep3")
+        company=Company.objects.get(cif="124")
+        self.assertTrue(checkCompanyDepartment(department,company.id))
+
+    def test_check_valid_company_department(self):
+        """
+        checks the company is NOT valid
+        """
+        department=Department.objects.get(name="dep3")
+        company=Company.objects.get(cif="123")
+        self.assertFalse(checkCompanyDepartment(department,company.id))

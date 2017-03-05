@@ -87,16 +87,19 @@ def delete(request):
         deleteDepartment(department)
     return HttpResponseRedirect('/department/retrieve')
 
+#Auxiliar methods, containing the operation logic
+
 def createDepartment(form):
     dname=form.cleaned_data['name']
-    Department.objects.create(name=dname,active=True,company_id=request.session['id'])
+    company=Company.objects.get(pk=request.session['id'])
+    Department.objects.create(name=dname,active=True,company_id=company)
 
 def updateDepartment(department,form):
-    department['name'] = form.cleaned_data['name']
+    department.name = form.cleaned_data['name']
     department.save()
 
 def deleteDepartment(department):
-    department['active']=False
+    department.active=False
     department.save()
 
 def checkCompanyDepartmentSession(department):

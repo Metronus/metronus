@@ -16,12 +16,12 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 from metronus_app import views
-from metronus_app.view import departmentView
+from metronus_app.controllers import departmentController
 urlpatterns = [
     url(r'^$', views.index),
 	url(r'^index.html/$', views.index),
-    url(r'^department/create.html/$', departmentView.create),
-    url(r'^department/retrieve.html/$', departmentView.list),
-    url(r'^department/update.html/$', departmentView.update),
-    url(r'^department/delete.html/$', departmentView.delete),
+    url(r'^department/create$', departmentController.create),
+    url(r'^department/list$', departmentController.list),
+    url(r'^department/update$', departmentController.update),
+    url(r'^department/delete$', departmentController.delete),
 ]
