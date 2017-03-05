@@ -25,5 +25,6 @@ before_script:
   - psql -c "CREATE DATABASE travisci;" -U postgres
 
 script:
+  - cd $TRAVIS_BUILD_DIR/Metronus-Project/
   - python3 manage.py makemigrations --noinput && python3 manage.py migrate --noinput
   - python3 manage.py test
