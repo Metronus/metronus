@@ -17,6 +17,8 @@ from django.conf.urls import url
 from django.contrib import admin
 from metronus_app import views
 from metronus_app.controllers import departmentController
+from metronus_app.controllers import projectController
+
 urlpatterns = [
     url(r'^$', views.index),
 	url(r'^index.html/$', views.index),
@@ -24,4 +26,10 @@ urlpatterns = [
     url(r'^department/list$', departmentController.list),
     url(r'^department/update$', departmentController.update),
     url(r'^department/delete$', departmentController.delete),
+
+    url(r'^project/list$', projectController.list),
+    url(r'^project/edit$', projectController.edit),
+    #url(r'^project/view$', projectController.view), A la espera de ver si es necesario o no
+    url(r'^project/delete$', projectController.delete),
+    url(r'^project/create$', projectController.create),
 ]

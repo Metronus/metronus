@@ -1,5 +1,6 @@
 from django.shortcuts import render
 import metronus_app.controllers.departmentController
+import metronus_app.controllers.projectController
 import time
 
 # Create your views here.
