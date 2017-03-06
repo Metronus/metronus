@@ -18,7 +18,7 @@
     <form id="form" method="POST" action="">{% csrf_token %}
 	    {{form.as_p}}
 	    </br>
-	    <p><input type="submit" value="Confirmar" /></p>
+	    <p><input type="submit" value="{% trans 'confirm' %}" /></p>
     </form>
 <p>{{form.id}}</p>
 
