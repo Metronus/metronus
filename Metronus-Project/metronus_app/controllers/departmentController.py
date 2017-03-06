@@ -19,11 +19,12 @@ def create(request):
             # ...
             # redirect to a new URL:
             createDepartment(form)
-            return HttpResponseRedirect('/department/retrieve')
+            return HttpResponseRedirect('/department/list')
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = DepartmentForm()
+        form = DepartmentForm(initial={"department_id":0})
+
 
     return render(request, 'department_form.html', {'form': form})
 
@@ -61,11 +62,13 @@ def update(request):
             if checkCompanyDepartment(department):
                 updateDepartment(department,form)
 
-            return HttpResponseRedirect('/department/retrieve')
+            return HttpResponseRedirect('/department/list')
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = DepartmentForm()
+        department_id=request.GET.get('department_id')
+        department=Department.objects.get(pk=department_id)
+        form = DepartmentForm(initial={"name":deparment.name,"department_id":department.id})
 
 
     return render(request, 'department_form.html', {'form': form})
@@ -85,7 +88,7 @@ def delete(request):
     department=Department.objects.get(pk=department_id)
     if checkCompanyDepartment(department):
         deleteDepartment(department)
-    return HttpResponseRedirect('/department/retrieve')
+    return HttpResponseRedirect('/department/list')
 
 #Auxiliar methods, containing the operation logic
 
