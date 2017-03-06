@@ -13,14 +13,16 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.contrib import admin
+from django.conf.urls.i18n import i18n_patterns
 from metronus_app import views
 from metronus_app.controllers import departmentController
 from metronus_app.controllers import projectController
 
-urlpatterns = [
+urlpatterns = i18n_patterns(
     url(r'^$', views.index),
+    url(r'^i18n/', include('django.conf.urls.i18n')),
 	url(r'^index.html/$', views.index),
     url(r'^department/create$', departmentController.create),
     url(r'^department/list$', departmentController.list),
@@ -32,4 +34,4 @@ urlpatterns = [
     #url(r'^project/view$', projectController.view), A la espera de ver si es necesario o no
     url(r'^project/delete$', projectController.delete),
     url(r'^project/create$', projectController.create),
-]
+)

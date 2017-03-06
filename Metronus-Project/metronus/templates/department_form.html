@@ -1,16 +1,25 @@
 {% extends "layout_base.html" %}
-
-{% block title %}Create department{% endblock %}
+{% load i18n %}
+{% load l10n %}
+{% block title %}
+{% if  form.id == 0 %}
+{% trans 'editDepartment' %}
+{% else %}
+{% trans 'editDepartment' %}
+{% endif %}
+{% endblock %}
 
 {% block content %}
-
-<h1> Create department </h1></br>
-
+{% if  form.id == 0 %}
+<h1> {% trans 'editDepartment' %} </h1></br>
+{% else %}
+<h1> {% trans 'editDepartment' %} </h1></br>
+{% endif %}
     <form id="form" method="POST" action="">{% csrf_token %}
 	    {{form.as_p}}
 	    </br>
 	    <p><input type="submit" value="Confirmar" /></p>
     </form>
-
+<p>{{form.id}}</p>
 
 {% endblock %}
