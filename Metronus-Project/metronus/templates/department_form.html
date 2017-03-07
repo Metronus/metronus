@@ -2,16 +2,16 @@
 {% load i18n %}
 {% load l10n %}
 {% block title %}
-{% if  form.id == 0 %}
-{% trans 'editDepartment' %}
+{% if  form.department_id.value == 0 %}
+{% trans 'createDepartment' %}
 {% else %}
 {% trans 'editDepartment' %}
 {% endif %}
 {% endblock %}
 
 {% block content %}
-{% if  form.id == 0 %}
-<h1> {% trans 'editDepartment' %} </h1></br>
+{% if  form.department_id.value == 0 %}
+<h1> {% trans 'createDepartment' %} </h1></br>
 {% else %}
 <h1> {% trans 'editDepartment' %} </h1></br>
 {% endif %}
@@ -20,6 +20,6 @@
 	    </br>
 	    <p><input type="submit" value="{% trans 'confirm' %}" /></p>
     </form>
-<p>{{form.id}}</p>
+<p>{{form.department_id.value}}</p>
 
 {% endblock %}
