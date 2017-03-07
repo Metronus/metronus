@@ -1,3 +1,15 @@
+switch (lang = 'en') {
+  case 'en':
+    requiredField = 'Field required'
+    passLength = 'Length should be 5 to 25'
+    break
+  default:
+    requiredField = 'Campo obligatorio'
+    passLength = 'Longitud permitida entre 5 y 20'
+    break
+}
+
+
 var vm = new Vue({
 	delimiters: ['${', '}'],
 	el: '#metronus-app',

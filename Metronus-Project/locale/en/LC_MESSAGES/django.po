@@ -25,6 +25,10 @@ msgstr ""
 msgid "Spanish"
 msgstr ""
 
+#: Info
+msgid "lang"
+msgstr "en"
+
 
 #: Generic
 msgid "name"
@@ -61,10 +65,6 @@ msgid "createEmployee"
 msgstr "Create"
 msgid "reset"
 msgstr "Reset"
-msgid "requiredField"
-msgstr "Field required"
-msgid "passLength"
-msgstr "Length should be 5 to 25"
 
 
 #: Project

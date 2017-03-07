@@ -26,6 +26,9 @@ msgstr ""
 msgid "Spanish"
 msgstr ""
 
+#: Info
+msgid "lang"
+msgstr "es"
 
 #: Generic
 msgid "name"
@@ -60,10 +63,6 @@ msgid "registerEmployee"
 msgstr "Register employee"
 msgid "reset"
 msgstr "Vaciar"
-msgid "requiredField"
-msgstr "Campo obligatorio"
-msgid "passLength"
-msgstr "Longitud permitida entre 5 y 20"
 
 
 #: Project
