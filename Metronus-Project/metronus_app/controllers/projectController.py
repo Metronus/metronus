@@ -116,13 +116,13 @@ def checkCompanyProject(project,company_id):
     """
     return project is not None and company_id==project.company_id and project.deleted==False
 
-def checkCompanyIdProjectSession(projectId):
+def checkCompanyProjectIdSession(projectId):
     """
     checks if the project belongs to the logged company
     """
-    return checkCompanyIdProject(projectId,request.session['id'])
+    return checkCompanyProjectId(projectId,request.session['id'])
 
-def checkCompanyIdProject(projectId, companyId):
+def checkCompanyProjectId(projectId, companyId):
     """
     checks if the project belongs to the specified company
     """
