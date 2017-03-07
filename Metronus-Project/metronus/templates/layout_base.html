@@ -18,6 +18,7 @@
 </head>
 
 <body>
+	<div id="metronus-app">
 
 	<!-- Django's templates example -->
 	<div class="container">
@@ -28,25 +29,19 @@
 	<!-- Boostrap example -->
 	<div>
 		<div class="pager panel-footer">
-			<p>Metronus - <strong>{{current_date}}</strong>.</p>
+			<p>Metronus - <strong>${currentTime}</strong>.</p>
 		</div>
 	</div>
 
-
-	<!-- Vue + Element example -->
-	<div id="metronus-app">
-		<el-card class="box-card" style="text-align:center">
-			<p>Metronus - <strong>${currentTime}</strong>.</p>
-		</el-card>
 	</div>
 
 
 	<!-- Vue Zone -->
 	<script src="https://unpkg.com/vue/dist/vue.js"></script>
-	<script src="/static/app.js"></script>
 	<!-- Vue end -->
 	<!-- Element zone-->
 	<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+	<script src="/static/app.js"></script>
 	<!-- Element end -->
 	<!-- jQuery zone -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
