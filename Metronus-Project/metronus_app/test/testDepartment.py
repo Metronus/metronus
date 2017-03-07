@@ -8,16 +8,16 @@ class DepartmentTestCase(TestCase):
     def setUp(self):
         Company.objects.create(
             cif="123",
-            name = "company1",
+            company_name = "company1",
+            short_name="cosa",
             email= "company1@gmail.com",
-            phone= "123456789",
-            pswd= "algo")
+            phone= "123456789")
         Company.objects.create(
             cif="124",
-            name = "company2",
+            company_name="company2",
+            short_name="cosa",
             email= "company2@gmail.com",
-            phone= "987654321",
-            pswd= "algomas")
+            phone= "987654321")
         company=Company.objects.get(cif="124")
         Department.objects.create(name="dep3",active=True,company_id=company)
 

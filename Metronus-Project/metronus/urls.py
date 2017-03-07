@@ -19,6 +19,8 @@ from django.conf.urls.i18n import i18n_patterns
 from metronus_app import views
 from metronus_app.controllers import departmentController
 from metronus_app.controllers import projectController
+from django.core.urlresolvers import reverse_lazy
+from django.contrib.auth.views import login, logout
 
 urlpatterns = i18n_patterns(
     url(r'^$', views.index),
@@ -34,4 +36,8 @@ urlpatterns = i18n_patterns(
     #url(r'^project/view$', projectController.view), A la espera de ver si es necesario o no
     url(r'^project/delete$', projectController.delete),
     url(r'^project/create$', projectController.create),
+
+    # Register & Login
+    url(r'^login/$', login, {'template_name': 'login.html', }, name="login"),
+    url(r'^logout/$', logout, {'next_page': reverse_lazy('home'), }, name="logout"),
 )

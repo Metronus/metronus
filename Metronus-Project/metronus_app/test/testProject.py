@@ -8,16 +8,16 @@ class ProjectTestCase(TestCase):
 	def setUp(self):
 		Company.objects.create(
 			cif="123",
-			name = "company1",
-			email= "company1@gmail.com",
-			phone= "123456789",
-			pswd= "algo")
+			company_name="company1",
+			short_name="cosa",
+			email="company1@gmail.com",
+			phone="123456789")
 		Company.objects.create(
 			cif="124",
-			name = "company2",
-			email= "company2@gmail.com",
-			phone= "987654321",
-			pswd= "algomas")
+			company_name="company2",
+			short_name="cosa",
+			email="company2@gmail.com",
+			phone="987654321")
 		company=Company.objects.get(cif="124")
 		Project.objects.create(name="TestProject",deleted=False,company_id=company)
 	

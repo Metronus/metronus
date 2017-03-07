@@ -90,3 +90,6 @@ ENV/
 
 # Django migrations
 Metronus-Project/metronus_app/migrations/
+
+# PyCharm
+.idea
