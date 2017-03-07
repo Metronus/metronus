@@ -1,6 +1,9 @@
 from django.shortcuts import render
 from metronus_app.forms.projectForm import ProjectForm
-from metronus_app.model.project import Project
+from metronus_app.model.project import Project,Company
+from django.http import HttpResponseRedirect
+
+
 def create(request):
     """
     parameters/returns:
@@ -18,20 +21,20 @@ def create(request):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-            createProject(form)
+            createProject(form, request)
             return HttpResponseRedirect('/project/list')
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = ProjectForm()
+        form = ProjectForm(initial={"project_id":0})
 
-    return render(request, 'proyect_form.html', {'form': form})
+    return render(request, 'project_form.html', {'form': form})
 
 
 def list(request):
     """
     returns:
-    departments: lista de proyectos de la compañía logeada
+    projectos: lista de proyectos de la compañía logeada
 
     template:
     project_list.html
@@ -59,13 +62,15 @@ def edit(request):
             # redirect to a new URL:
             project=Project.objects.get(pk=form.cleaned_data['project_id'])
             if checkCompanyProject(project):
-                updateDepartment(project,form)
+                updateProject(project,form)
 
             return HttpResponseRedirect('/project/list')
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = ProjectForm()
+        project_id=request.GET.get('project_id')
+        project=Project.objects.get(pk=project_id)
+        form = ProjectForm(initial={"name":project.name,"project_id":project.id})
 
 
     return render(request, 'project_form.html', {'form': form})
@@ -82,14 +87,14 @@ def delete(request):
     project_list.html
     """
     project_id=request.GET.get('project_id')
-    project=Project.objects.get(pk=department_id)
+    project=Project.objects.get(pk=project_id)
     if checkCompanyProject(project):
         deleteProject(project)
     return HttpResponseRedirect('/project/list')
 
 #Auxiliar methods, containing the operation logic
 
-def createProject(form):
+def createProject(form, request):
     pname=form.cleaned_data['name']
     company=Company.objects.get(pk=request.session['id'])
     Project.objects.create(name=pname,deleted=False,company_id=company)
@@ -113,3 +118,17 @@ def checkCompanyProject(project,company_id):
     checks if the project belongs to the specified company
     """
     return project is not None and company_id==project.company_id and project.deleted==False
+
+def checkCompanyProjectIdSession(projectId):
+    """
+    checks if the project belongs to the logged company
+    """
+    return checkCompanyProjectId(projectId,request.session['id'])
+
+def checkCompanyProjectId(projectId, companyId):
+    """
+    checks if the project belongs to the specified company
+    """
+    project = Project.objects.get(id = projectId, company_id=companyId, deleted=False)
+    
+    return project is not None

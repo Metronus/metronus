@@ -115,3 +115,17 @@ def checkCompanyDepartment(department,company_id):
     checks if the department belongs to the specified company
     """
     return department is not None and company_id==department.company_id and department.active
+
+def checkCompanyDepartmentIdSession(departmentId):
+    """
+    checks if the department belongs to the logged company
+    """
+    return checkCompanyDepartmentId(departmentId,request.session['id'])
+
+def checkCompanyDepartmentId(departmentId,companyId):
+    """
+    checks if the department belongs to the specified company
+    """
+    department = Department.objects.get(id = departmentId, company_id=companyId, active=True)
+    
+    return department is not None

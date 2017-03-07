@@ -65,6 +65,14 @@ class ProjectTestCase(TestCase):
 		company=Company.objects.get(cif="124")
 		self.assertTrue(checkCompanyProject(project,company.id))
 
+	def test_check_valid_company_project_id(self):
+		"""
+		#checks the company is valid
+		"""
+		project=Project.objects.get(name="TestProject")
+		company=Company.objects.get(cif="124")
+		self.assertTrue(checkCompanyProjectId(project.id,company.id))
+
 	def test_check_valid_company_project(self):
 		"""
 		#checks the company is NOT valid

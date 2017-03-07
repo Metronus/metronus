@@ -65,6 +65,14 @@ class DepartmentTestCase(TestCase):
         company=Company.objects.get(cif="124")
         self.assertTrue(checkCompanyDepartment(department,company.id))
 
+    def test_check_valid_company_department_id(self):
+        """
+        checks the company is valid given a department id
+        """
+        department=Department.objects.get(name="dep3")
+        company=Company.objects.get(cif="124")
+        self.assertTrue(checkCompanyDepartmentId(department.id,company.id))
+
     def test_check_valid_company_department(self):
         """
         checks the company is NOT valid

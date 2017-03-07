@@ -26,25 +26,10 @@ msgstr ""
 msgid "Spanish"
 msgstr ""
 
-#: Department
-msgid "createDepartment"
-msgstr "Crear departamento"
-msgid "editDepartment"
-msgstr "Editar departamento"
+
+#: Generic
 msgid "name"
 msgstr "Nombre"
-msgid "update"
-msgstr "Actualizar"
-msgid "delete"
-msgstr "Eliminar"
-msgid "departmentList"
-msgstr "Lista de departamentos"
-msgid "create"
-msgstr "Crear un nuevo departamento"
-
-#: Employee
-msgid "registerEmployee"
-msgstr "Register employee"
 msgid "surname"
 msgstr "Apellidos"
 msgid "email"
@@ -53,11 +38,38 @@ msgid "phone"
 msgstr "Teléfono"
 msgid "password"
 msgstr "Contraseña"
-msgid "createEmployee"
+msgid "confirm"
+msgstr "Confirmar"
+msgid "update"
+msgstr "Actualizar"
+msgid "delete"
+msgstr "Eliminar"
+msgid "create"
 msgstr "Crear"
+
+#: Department
+msgid "createDepartment"
+msgstr "Crear departamento"
+msgid "editDepartment"
+msgstr "Editar departamento"
+msgid "departmentList"
+msgstr "Lista de departamentos"
+
+#: Employee
+msgid "registerEmployee"
+msgstr "Register employee"
 msgid "reset"
 msgstr "Vaciar"
 msgid "requiredField"
 msgstr "Campo obligatorio"
 msgid "passLength"
 msgstr "Longitud permitida entre 5 y 20"
+
+
+#: Project
+msgid "createProject"
+msgstr "Crear proyecto"
+msgid "editProject"
+msgstr "Editar proyecto"
+msgid "projectList"
+msgstr "Lista de proyectos"
