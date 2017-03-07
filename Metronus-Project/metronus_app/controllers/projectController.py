@@ -115,3 +115,17 @@ def checkCompanyProject(project,company_id):
     checks if the project belongs to the specified company
     """
     return project is not None and company_id==project.company_id and project.deleted==False
+
+def checkCompanyIdProjectSession(projectId):
+    """
+    checks if the project belongs to the logged company
+    """
+    return checkCompanyIdProject(projectId,request.session['id'])
+
+def checkCompanyIdProject(projectId, companyId):
+    """
+    checks if the project belongs to the specified company
+    """
+    project = Project.objects.get(id = projectId, company_id=companyId, deleted=False)
+    
+    return project is not None
