@@ -26,18 +26,32 @@ msgstr ""
 msgid "Spanish"
 msgstr ""
 
+
+#: Generic
+msgid "name"
+msgstr "Nombre"
+msgid "confirm"
+msgstr "Confirmar"
+msgid "update"
+msgstr "Actualizar"
+msgid "delete"
+msgstr "Eliminar"
+msgid "create"
+msgstr "Crear"
+
 #: Department
 msgid "createDepartment"
 msgstr "Crear departamento"
 msgid "editDepartment"
 msgstr "Editar departamento"
-msgid "name"
-msgstr "Nombre"
-msgid "update"
-msgstr "Actualizar"
-msgid "delete"
-msgstr "Eliminar"
 msgid "departmentList"
 msgstr "Lista de departamentos"
-msgid "create"
-msgstr "Crear un nuevo departamento"
+
+
+#: Project
+msgid "createProject"
+msgstr "Crear proyecto"
+msgid "editProject"
+msgstr "Editar proyecto"
+msgid "projectList"
+msgstr "Lista de proyectos"

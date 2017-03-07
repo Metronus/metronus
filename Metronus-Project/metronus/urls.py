@@ -31,11 +31,11 @@ urlpatterns = i18n_patterns(
     url(r'^department/update$', departmentController.update),
     url(r'^department/delete$', departmentController.delete),
 
-    url(r'^project/list$', projectController.list),
-    url(r'^project/edit$', projectController.edit),
+    url(r'^project/list$', projectController.list, name='project_list'),
+    url(r'^project/edit$', projectController.edit, name='project_edit'),
     #url(r'^project/view$', projectController.view), A la espera de ver si es necesario o no
-    url(r'^project/delete$', projectController.delete),
-    url(r'^project/create$', projectController.create),
+    url(r'^project/delete$', projectController.delete, name='project_delete'),
+    url(r'^project/create$', projectController.create, name='project_create'),
 
     # Register & Login
     url(r'^login/$', login, {'template_name': 'login.html', }, name="login"),

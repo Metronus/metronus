@@ -1,6 +1,9 @@
 from django.shortcuts import render
 from metronus_app.forms.projectForm import ProjectForm
-from metronus_app.model.project import Project
+from metronus_app.model.project import Project,Company
+from django.http import HttpResponseRedirect
+
+
 def create(request):
     """
     parameters/returns:
@@ -18,14 +21,14 @@ def create(request):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-            createProject(form)
+            createProject(form, request)
             return HttpResponseRedirect('/project/list')
 
     # if a GET (or any other method) we'll create a blank form
     else:
         form = ProjectForm(initial={"project_id":0})
 
-    return render(request, 'proyect_form.html', {'form': form})
+    return render(request, 'project_form.html', {'form': form})
 
 
 def list(request):
@@ -91,7 +94,7 @@ def delete(request):
 
 #Auxiliar methods, containing the operation logic
 
-def createProject(form):
+def createProject(form, request):
     pname=form.cleaned_data['name']
     company=Company.objects.get(pk=request.session['id'])
     Project.objects.create(name=pname,deleted=False,company_id=company)

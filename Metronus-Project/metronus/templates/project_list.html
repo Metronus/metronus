@@ -1,0 +1,22 @@
+{% extends "layout_base.html" %}
+{% load i18n %}
+{% load l10n %}
+
+{% block title %}{% trans 'projectList' %}{% endblock %}
+
+{% block content %}
+    <ul class="list-group">
+    {% for project in projects %}
+
+        <li class="list-group-item">
+            {{project.name}}
+
+            <a class="btn btn-outline-primary" href="{% url 'project_edit' project.id %}">{% trans 'update' %}</a>
+            <a class="btn btn-outline-primary" href="{% url 'project_delete' project.id %}">{% trans 'delete' %}</a>
+        </li>
+
+    {% endfor %}
+    </ul>
+
+    <a class="btn btn-outline-primary" href="{% url 'project_create' %}">{% trans 'create' %}</a>
+{% endblock %}
