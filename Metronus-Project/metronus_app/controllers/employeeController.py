@@ -3,8 +3,7 @@ from django.shortcuts                   import render_to_response, get_object_or
 from django.core.urlresolvers           import reverse
 from django.http                        import HttpResponseRedirect
 from django.template.context            import RequestContext
-from django.core.exceptions             import ObjectDoesNotExist
-from django.http                        import HttpResponseForbidden
+from django.core.exceptions             import ObjectDoesNotExist, PermissionDenied
 
 from metronus_app.forms.employeeRegisterForm     import EmployeeRegisterForm
 from metronus_app.forms.employeeEditForm         import EmployeeEditForm
@@ -21,15 +20,8 @@ def create(request):
     employee_register.html
     """
 
-    # Check that the user is logged in
-    if not request.user.is_authenticated():
-        return HttpResponseForbidden()
-
-    # Check that the current user is an administrator
-    admin = get_current_admin(request)
-
-    if admin == None:
-        return HttpResponseForbidden()
+    # Check that the user is logged in and it's an administrator
+    admin = get_current_admin_or_403(request)
 
     # If it's a GET request, return an empty form
     if request.method == "GET":
@@ -43,7 +35,7 @@ def create(request):
             employee = createEmployee(employeeUser, admin, form)
             return render_to_response('employee_register.html', {'form': EmployeeRegisterForm(), 'success': True})
     else:
-        return HttpResponseForbidden()
+        raise PermissionDenied
 
     return render_to_response('employee_register.html', {'form': form})
 
@@ -52,19 +44,11 @@ def list(request):
     parameters/returns:
     employees: lista de objetos employee a los que tiene acceso el administrador (los que están en su empresa)
 
-    template: employee_list.html ?
+    template: employee_list.html
     """
 
-    # Check that the user is logged in
-    if not request.user.is_authenticated():
-        return HttpResponseForbidden()
-
-    # Check that the current user is an administrator
-    admin = get_current_admin(request)
-
-    if admin == None:
-        return HttpResponseForbidden()
-
+    # Check that the user is logged in and it's an administrator
+    admin = get_current_admin_or_403(request)
     employees = Employee.objects.filter(company_id=admin.company_id)
     return render_to_response('employee_list.html', {'employees': employees})
 
@@ -75,24 +59,16 @@ def view(request, username):
     parameters/returns:
     employee: datos del empleado
 
-    template: employee_view.html ?
+    template: employee_view.html
     """
 
-    # Check that the user is logged in
-    if not request.user.is_authenticated():
-        return HttpResponseForbidden()
-
-    # Check that the current user is an administrator
-    admin = get_current_admin(request)
-
-    if admin == None:
-        return HttpResponseForbidden()
-
+    # Check that the user is logged in and it's an administrator
+    admin = get_current_admin_or_403(request)
     employee = get_object_or_404(Employee, user__username=username)
 
     # Check that the admin has permission to view that employee
     if employee.company_id != admin.company_id:
-        return HttpResponseForbidden()
+        raise PermissionDenied
 
     return render_to_response('employee_view.html', {'employee': employee})
 
@@ -103,24 +79,16 @@ def edit(request, username):
     parameters/returns:
     form: formulario de edicion de datos de empleado
 
-    template: employee_edit.html ?
+    template: employee_edit.html
     """
 
-    # Check that the user is logged in
-    if not request.user.is_authenticated():
-        return HttpResponseForbidden()
-
-    # Check that the current user is an administrator
-    admin = get_current_admin(request)
-
-    if admin == None:
-        return HttpResponseForbidden()
-
+    # Check that the user is logged in and it's an administrator
+    admin = get_current_admin_or_403(request)
     employee = get_object_or_404(Employee, user__username=username)
 
     # Check that the admin has permission to view that employee
     if employee.company_id != admin.company_id:
-        return HttpResponseForbidden()
+        raise PermissionDenied
 
     if request.method == "GET":
         # Return a form filled with the employee's data
@@ -158,13 +126,21 @@ def edit(request, username):
             return HttpResponseRedirect('/employee/view/' + username + '/')
 
     else:
-        return HttpResponseForbidden()
+        raise PermissionDenied
 
     return render_to_response('employee_edit.html', {'form': form})
 
 ########################################################################################################################################
 ########################################################################################################################################
 ########################################################################################################################################
+
+def get_current_admin_or_403(request):
+    if not request.user.is_authenticated():
+        raise PermissionDenied
+    try:
+        return Administrator.objects.get(user=request.user)
+    except ObjectDoesNotExist:
+        raise PermissionDenied
 
 def createEmployeeUser(form):
     username = form.cleaned_data['username']
@@ -183,12 +159,6 @@ def createEmployee(employeeUser, admin, form):
     company = admin.company_id
 
     return Employee.objects.create(user=user, user_type=user_type, identifier=identifier, phone=phone, company_id=company)
-
-def get_current_admin(request):
-    try:
-        return Administrator.objects.get(user=request.user)
-    except ObjectDoesNotExist:
-        return None
 
 def checkPasswords(form):
     return form.cleaned_data['password1'] == form.cleaned_data['password2']
