@@ -6,26 +6,24 @@ services:
 
 env:
   - DJANGO=1.10.4
+  - DJANGO_SETTINGS_MODULE=metronus.settings
+  - PYTHONPATH=$HOME/builds/Metronus/metronus
+  - PIP_USE_MIRRORS=true
+  - METRONUS_DB_NAME=metronus_db_travis
+  - METRONUS_DB_USER=metronus_user_travis
+  - METRONUS_DB_PASS=metronus_pass_travis
+  - DJANGO_SECRET_KEY=travistravistravistravistravistravistravis
 
 cache: pip3
-
-before_install:
-  - export DJANGO_SETTINGS_MODULE=metronus.settings
-  - export PYTHONPATH=$HOME/builds/Metronus/metronus
-  - export PIP_USE_MIRRORS=true
-  - export METRONUS_DB_NAME=metronus_db_travis
-  - export METRONUS_DB_USER=metronus_user_travis
-  - export METRONUS_DB_PASS='metronus_pass_travis'
-  - export DJANGO_SECRET_KEY=travistravistravistravistravistravistravis
 
 install:
   - pip install -r requirements.txt
 
 before_script:
-  - psql -c "CREATE USER metronus_user_travis WITH PASSWORD 'metronus_pass_travis';" -U postgres
-  - psql -c "ALTER USER metronus_user_travis CREATEDB;" -U postgres
-  - psql -c "CREATE DATABASE metronus_db_travis;" -U postgres
-  - psql -c "GRANT ALL PRIVILEGES ON DATABASE metronus_db_travis TO metronus_user_travis;" -U postgres
+  - psql -c "CREATE USER $METRONUS_DB_USER WITH PASSWORD '$METRONUS_DB_PASS';" -U postgres
+  - psql -c "ALTER USER $METRONUS_DB_USER CREATEDB;" -U postgres
+  - psql -c "CREATE DATABASE $METRONUS_DB_NAME;" -U postgres
+  - psql -c "GRANT ALL PRIVILEGES ON DATABASE $METRONUS_DB_NAME TO $METRONUS_DB_USER;" -U postgres
   - cd $TRAVIS_BUILD_DIR/Metronus-Project/
 
 script:
