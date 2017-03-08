@@ -52,4 +52,9 @@ urlpatterns = i18n_patterns(
     # Register & Login
     url(r'^login/$', login, {'template_name': 'login.html', }, name="login"),
     url(r'^logout/$', logout, {'next_page': reverse_lazy('home'), }, name="logout"),
+
+    url(r'^company/create$', companyController.create),
+    url(r'^company/companyregister$', companyController.create),
+
+    url(r'^ajax/validate_cif/$', companyController.validateCIF, name='validate_cif'),
 )

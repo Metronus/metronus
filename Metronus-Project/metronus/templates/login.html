@@ -1,0 +1,41 @@
+{% extends "layout_base.html" %}
+
+{% block title %}Login{% endblock %}
+
+
+{% block content %}
+
+    <br>
+    <form method="POST" class="form-horizontal" action="" accept-charset="utf-8">
+        {% csrf_token %}
+
+        <div class="col-md-6 col-md-offset-2" >
+            {% for field in form %}
+                <div class="form-group">
+                    <label class="control-label col-sm-4" for="id_{{ field.name }}">{{ field.label }}</label>
+                    <div class="col-sm-6">
+                        {% if field.label == 'Password' %}
+                            <input type="password" class="form-control col-md-6"
+                                   name="{{ field.name }}"
+                                   id="id_{{ field.name }}" >
+                        {% else%}
+                            <input type="text" class="form-control col-md-6"
+                                   name="{{ field.name }}"
+                                   id="id_{{ field.name }}" >
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+
+        {% csrf_token %}
+
+        <input type="hidden" name="next" value="{{ next }}"/><br/>
+            <div class="form-group">
+                <div class="col-sm-offset-4 col-sm-10">
+                    <button type="submit" class="btn btn-default">Inicia sesión</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+{% endblock %}
