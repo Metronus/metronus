@@ -2,7 +2,7 @@ from django.shortcuts import render
 from metronus_app.forms.departmentForm import DepartmentForm
 from metronus_app.model.department import Department
 from metronus_app.model.administrator import Administrator
-from load import basicLoad
+from populate_database import basicLoad
 
 from django.http import HttpResponseRedirect
 from django.core.exceptions             import ObjectDoesNotExist
@@ -11,7 +11,7 @@ from django.contrib.auth import authenticate,login
 
 def littleLoad(request):
     #TODO:ojo que esto es de prueba, hay que quitarlo cuando se puedan cargar cosas
-    basicLoad()
+    populate_database()
     print("si se cargo no es culpa mia")
     return HttpResponseRedirect('/littleAuth')
 def littleAuth(request):
