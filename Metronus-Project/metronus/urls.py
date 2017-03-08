@@ -43,6 +43,7 @@ urlpatterns = i18n_patterns(
     url(r'^employee/list$', employeeController.list, name='employee_list'),
     url(r'^employee/view/(?P<username>\w{0,50})/$', employeeController.view, name='employee_view'),
     url(r'^employee/edit/(?P<username>\w{0,50})/$', employeeController.edit, name='employee_edit'),
+    url(r'^employee/delete/(?P<username>\w{0,50})/$', employeeController.delete, name='employee_delete'),
 
     # Register & Login
     url(r'^login/$', login, {'template_name': 'login.html', }, name="login"),

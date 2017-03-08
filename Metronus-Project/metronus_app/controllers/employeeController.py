@@ -8,6 +8,7 @@ from django.core.exceptions             import ObjectDoesNotExist, PermissionDen
 from metronus_app.forms.employeeRegisterForm     import EmployeeRegisterForm
 from metronus_app.forms.employeeEditForm         import EmployeeEditForm
 from metronus_app.model.employee                 import Employee
+from metronus_app.model.employeeLog              import EmployeeLog
 from metronus_app.model.administrator            import Administrator
 
 def create(request):
@@ -33,6 +34,7 @@ def create(request):
         if form.is_valid() and checkPasswords(form):
             employeeUser = createEmployeeUser(form)
             employee = createEmployee(employeeUser, admin, form)
+            EmployeeLog.objects.create(employee_id=employee, event="A")
             return render_to_response('employee_register.html', {'form': EmployeeRegisterForm(), 'success': True})
     else:
         raise PermissionDenied
@@ -49,7 +51,7 @@ def list(request):
 
     # Check that the user is logged in and it's an administrator
     admin = get_current_admin_or_403(request)
-    employees = Employee.objects.filter(company_id=admin.company_id)
+    employees = Employee.objects.filter(company_id=admin.company_id, user__is_active=True)
     return render_to_response('employee_list.html', {'employees': employees})
 
 def view(request, username):
@@ -64,7 +66,7 @@ def view(request, username):
 
     # Check that the user is logged in and it's an administrator
     admin = get_current_admin_or_403(request)
-    employee = get_object_or_404(Employee, user__username=username)
+    employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
 
     # Check that the admin has permission to view that employee
     if employee.company_id != admin.company_id:
@@ -84,7 +86,7 @@ def edit(request, username):
 
     # Check that the user is logged in and it's an administrator
     admin = get_current_admin_or_403(request)
-    employee = get_object_or_404(Employee, user__username=username)
+    employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
 
     # Check that the admin has permission to view that employee
     if employee.company_id != admin.company_id:
@@ -129,6 +131,31 @@ def edit(request, username):
         raise PermissionDenied
 
     return render_to_response('employee_edit.html', {'form': form})
+
+def delete(request, username):
+    """
+    url = employee/delete/<username>
+
+    parameters/returns:
+    Nada, redirecciona a la vista de listado de empleados
+
+    template: ninguna
+    """
+
+    admin = get_current_admin_or_403(request)
+    employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
+
+    # Check that the admin has permission to edit that employee
+    if employee.company_id != admin.company_id:
+        raise PermissionDenied
+
+    employee_user = employee.user
+    employee_user.is_active = False
+    employee_user.save()
+
+    EmployeeLog.objects.create(employee_id=employee, event="B")
+    return HttpResponseRedirect('/employee/list/')
+
 
 ########################################################################################################################################
 ########################################################################################################################################

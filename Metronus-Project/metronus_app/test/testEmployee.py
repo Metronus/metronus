@@ -4,6 +4,7 @@ from metronus_app.model.company                  import Company
 from metronus_app.model.employee                 import Employee
 from metronus_app.model.administrator            import Administrator
 from django.contrib.auth.models                  import User
+from metronus_app.model.employeeLog              import EmployeeLog
 
 class EmployeeTestCase(TestCase):
 
@@ -77,6 +78,8 @@ class EmployeeTestCase(TestCase):
         c = Client()
         c.login(username="admin1", password="123456")
 
+        logs_before = EmployeeLog.objects.all().count()
+
         response = c.post("/en/employee/create", {
             "username": "employee1",
             "password1": "ihatemyboss",
@@ -100,6 +103,11 @@ class EmployeeTestCase(TestCase):
         self.assertEquals(employee.user.first_name, "Francisco")
         self.assertEquals(employee.user.last_name, "Romualdo")
         self.assertEquals(employee.user.email, "frc@empresa.com")
+
+        logs_after = EmployeeLog.objects.all().count()
+
+        self.assertEquals(logs_before + 1, logs_after)
+
 
     def test_list_employees_positive(self):
         c = Client()
@@ -219,3 +227,17 @@ class EmployeeTestCase(TestCase):
         c.login(username="admin1", password="123456")
         response = c.get("/en/employee/edit/diana/")
         self.assertEquals(response.status_code, 404)
+
+    def test_delete_employee_positive(self):
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        logs_before = EmployeeLog.objects.all().count()
+        self.assertTrue(User.objects.get(username="emp1").is_active)
+
+        response = c.get("/en/employee/delete/emp1/")
+        self.assertRedirects(response, "/employee/list/", fetch_redirect_response=False)
+
+        self.assertFalse(User.objects.get(username="emp1").is_active)
+        logs_after = EmployeeLog.objects.all().count()
+        self.assertEquals(logs_before + 1, logs_after)

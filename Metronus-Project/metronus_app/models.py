@@ -8,3 +8,4 @@ from metronus_app.model.role import Role
 from metronus_app.model.administrator import Administrator
 from metronus_app.model.employee import Employee
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
+from metronus_app.model.employeeLog import EmployeeLog
