@@ -31,6 +31,10 @@ msgstr "en"
 
 
 #: Generic
+msgid "identifier"
+msgstr "ID"
+msgid "username"
+msgstr "Username"
 msgid "name"
 msgstr "Name"
 msgid "surname"
@@ -41,6 +45,8 @@ msgid "phone"
 msgstr "Phone"
 msgid "password"
 msgstr "Password"
+msgid "repeatPassword"
+msgstr "Repeat password"
 msgid "confirm"
 msgstr "Confirm"
 msgid "update"
@@ -60,9 +66,9 @@ msgstr "Department list"
 
 #: Employee
 msgid "registerEmployee"
-msgstr "Registrar empleado"
-msgid "createEmployee"
-msgstr "Create"
+msgstr "Register new employee"
+msgid "editEmployee"
+msgstr "Edit employee"
 msgid "reset"
 msgstr "Reset"
 

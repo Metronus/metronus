@@ -1,17 +1,18 @@
 from django import forms
 from django.forms import Form
+from django.utils.translation import ugettext_lazy as _
 
 
 class EmployeeRegisterForm(Form):
 
     # User (Account data)
-    username = forms.CharField()
-    password1 = forms.CharField(label="password1", widget=forms.PasswordInput)
-    password2 = forms.CharField(label="password2", widget=forms.PasswordInput)
-    first_name = forms.CharField(max_length=50)
-    last_name = forms.CharField(max_length=50)
-    email = forms.EmailField()
+    username = forms.CharField(label=_("username"))
+    password1 = forms.CharField(label=_("password"), widget=forms.PasswordInput)
+    password2 = forms.CharField(label=_("repeatPassword"), widget=forms.PasswordInput)
+    first_name = forms.CharField(label=_("name"), max_length=50)
+    last_name = forms.CharField(label=_("surname"), max_length=50)
+    email = forms.EmailField(label=_("email"))
 
     # Employee (Actor) data
-    identifier = forms.CharField(max_length=15)
-    phone = forms.CharField(max_length=15)
+    phone = forms.CharField(label=_("phone"), max_length=15)
+    identifier = forms.CharField(label=_("identifier"), max_length=15)

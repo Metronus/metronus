@@ -1,49 +1,26 @@
 {% extends "layout_base.html" %}
-
 {% load i18n %}
 {% load l10n %}
 
 {% block title %}
-	{% trans 'registerEmployee' %}
+    {% if  form.employee_id.value == 0 %}
+        {% trans 'createEmployee' %}
+    {% else %}
+        {% trans 'editEmployee' %}
+    {% endif %}
 {% endblock %}
 
+{% load static }
+
 {% block content %}
-
-{% load static %}
-
-<el-row :gutter="20">
-	<el-col :span="12" :offset="6">
-		<el-card class="box-card" style="text-align:center">
-			<el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="120px" class="demo-ruleForm">
-
-				<el-form-item label="{% trans 'name' %}" prop="name">
-					<el-input v-model="ruleForm.name"/>
-				</el-form-item>
-
-				<el-form-item label="{% trans 'surname' %}" prop="surname">
-					<el-input v-model="ruleForm.surname"/>
-				</el-form-item>
-
-				<el-form-item label="{% trans 'email' %}" prop="email">
-					<el-input v-model="ruleForm.email"/>
-				</el-form-item>
-
-				<el-form-item label="{% trans 'phone' %}" prop="phone">
-					<el-input v-model="ruleForm.phone"/>
-				</el-form-item>
-
-				<el-form-item label="{% trans 'password' %}" prop="password">
-					<el-input v-model="ruleForm.password"/>
-				</el-form-item>
-
-				<el-form-item>
-					<el-button type="primary" @click="submitForm('ruleForm')">{% trans 'create' %}</el-button>
-					<el-button @click="resetForm('ruleForm')">{% trans 'reset' %}</el-button>
-				</el-form-item>
-
-			</el-form>
-		</el-card>
-	</el-col>
-</el-row>
-
+    {% if  form.proyect_id.value == 0 %}
+        <h1> {% trans 'createEmployee' %} </h1></br>
+    {% else %}
+        <h1> {% trans 'editEmployee' %} </h1></br>
+    {% endif %}
+    <form id="form" method="POST" action="">{% csrf_token %}
+        {{form.as_p}}
+        </br>
+        <p><input type="submit" value="{% trans 'confirm' %}" /></p>
+    </form>
 {% endblock %}
