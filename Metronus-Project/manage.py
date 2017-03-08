@@ -19,4 +19,15 @@ if __name__ == "__main__":
                 "forget to activate a virtual environment?"
             )
         raise
-    execute_from_command_line(sys.argv)
+    
+    import django
+    django.setup()
+    
+    argv = sys.argv[1]
+
+    if argv == 'populate':
+        #Load the data into the database
+        from populate_database import populate_database
+        populate_database()
+    else:
+        execute_from_command_line(sys.argv)
