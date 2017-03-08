@@ -139,6 +139,16 @@ STATICFILES_DIRS = (
     os.path.join(PROJECT_PATH,'static'),
 )
 
+# Login static configuration
+LOGIN_REDIRECT_URL = "/"
+LOGIN_URL = '/login'
+LOGOUT_URL = '/'
+
+# File storage
+
+MEDIA_ROOT = (
+    os.path.join(BASE_DIR, 'media'),
+)
 
 # Simplified static file serving.
 # https://warehouse.python.org/project/whitenoise/
