@@ -4,8 +4,9 @@ from metronus_app.model.project                       import Project
 from metronus_app.model.department                    import Department
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 
-from django.core.exceptions                           import PermissionDenied
+from django.core.exceptions                           import PermissionDenied, ObjectDoesNotExist
 from django.shortcuts                                 import render_to_response
+from django.http                                      import JsonResponse
  
 from metronus_app.common_utils                        import get_current_admin_or_403
 
@@ -33,9 +34,35 @@ def manage(request):
     else:
         raise PermissionDenied
 
+def ajax_get_employees_and_roles(request):
+    """
+    roles/get_info?project_id=XXX&department_id=YYY
+
+    parameters/returns:
+    tbd
+    
+    template:
+    ninguna
+    """
+    admin = get_current_admin_or_403(request)
+    company = admin.company_id
+
+    try:
+        project = Project.objects.get(id=request.GET["project_id"], company_id=company)
+    except ObjectDoesNotExist:
+        raise PermissionDenied
+
+    try:
+        department = Department.objects.get(id=request.GET["department_id"], company_id=company)
+    except ObjectDoesNotExist:
+        raise PermissionDenied
+
 ########################################################################################################################################
 ########################################################################################################################################
 ########################################################################################################################################
 
 def process_post_roles(request):
+    pass #TODO
+
+def get_roles_for_epd(employee, project, department):
     pass #TODO
