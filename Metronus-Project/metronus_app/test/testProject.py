@@ -79,4 +79,5 @@ class ProjectTestCase(TestCase):
 		"""
 		project=Project.objects.get(name="TestProject")
 		company=Company.objects.get(cif="123")
+		self.assertFalse(checkCompanyProject(project,company.id))
 	
