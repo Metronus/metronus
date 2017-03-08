@@ -24,6 +24,8 @@ from metronus_app.controllers       import departmentController
 from metronus_app.controllers       import projectController
 from metronus_app.controllers       import employeeController
 from metronus_app.controllers       import roleController
+from metronus_app.controllers       import companyController
+
 
 urlpatterns = i18n_patterns(
     url(r'^$', views.index),
@@ -53,8 +55,6 @@ urlpatterns = i18n_patterns(
     url(r'^login/$', login, {'template_name': 'login.html', }, name="login"),
     url(r'^logout/$', logout, {'next_page': reverse_lazy('home'), }, name="logout"),
 
-    url(r'^company/create$', companyController.create),
-    url(r'^company/companyregister$', companyController.create),
-
+    url(r'^register$', companyController.create),
     url(r'^ajax/validate_cif/$', companyController.validateCIF, name='validate_cif'),
 )
