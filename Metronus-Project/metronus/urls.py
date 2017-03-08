@@ -23,6 +23,7 @@ from django.contrib.auth.views      import login, logout
 from metronus_app.controllers       import departmentController
 from metronus_app.controllers       import projectController
 from metronus_app.controllers       import employeeController
+from metronus_app.controllers       import roleController
 
 urlpatterns = i18n_patterns(
     url(r'^$', views.index),
@@ -44,6 +45,8 @@ urlpatterns = i18n_patterns(
     url(r'^employee/view/(?P<username>\w{0,50})/$', employeeController.view, name='employee_view'),
     url(r'^employee/edit/(?P<username>\w{0,50})/$', employeeController.edit, name='employee_edit'),
     url(r'^employee/delete/(?P<username>\w{0,50})/$', employeeController.delete, name='employee_delete'),
+
+    url(r'^roles/manage$', roleController.manage, name='roles_manage'),
 
     # Register & Login
     url(r'^login/$', login, {'template_name': 'login.html', }, name="login"),

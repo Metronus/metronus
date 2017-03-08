@@ -1,15 +1,17 @@
-from django.contrib.auth.models         import User
-from django.shortcuts                   import render_to_response, get_object_or_404
-from django.core.urlresolvers           import reverse
-from django.http                        import HttpResponseRedirect
-from django.template.context            import RequestContext
-from django.core.exceptions             import ObjectDoesNotExist, PermissionDenied
+from django.contrib.auth.models                  import User
+from django.shortcuts                            import render_to_response, get_object_or_404
+from django.core.urlresolvers                    import reverse
+from django.http                                 import HttpResponseRedirect
+from django.template.context                     import RequestContext
+from django.core.exceptions                      import ObjectDoesNotExist, PermissionDenied
 
 from metronus_app.forms.employeeRegisterForm     import EmployeeRegisterForm
 from metronus_app.forms.employeeEditForm         import EmployeeEditForm
 from metronus_app.model.employee                 import Employee
 from metronus_app.model.employeeLog              import EmployeeLog
 from metronus_app.model.administrator            import Administrator
+
+from metronus_app.common_utils                   import get_current_admin_or_403
 
 def create(request):
     """
@@ -160,14 +162,6 @@ def delete(request, username):
 ########################################################################################################################################
 ########################################################################################################################################
 ########################################################################################################################################
-
-def get_current_admin_or_403(request):
-    if not request.user.is_authenticated():
-        raise PermissionDenied
-    try:
-        return Administrator.objects.get(user=request.user)
-    except ObjectDoesNotExist:
-        raise PermissionDenied
 
 def createEmployeeUser(form):
     username = form.cleaned_data['username']
