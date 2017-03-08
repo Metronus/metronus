@@ -1,6 +1,29 @@
 from django.shortcuts import render
 from metronus_app.forms.departmentForm import DepartmentForm
 from metronus_app.model.department import Department
+from metronus_app.model.administrator import Administrator
+from load import basicLoad
+
+from django.http import HttpResponseRedirect
+from django.core.exceptions             import ObjectDoesNotExist
+from django.http                        import HttpResponseForbidden
+from django.contrib.auth import authenticate,login
+
+def littleLoad(request):
+    #TODO:ojo que esto es de prueba, hay que quitarlo cuando se puedan cargar cosas
+    basicLoad()
+    print("si se cargo no es culpa mia")
+    return HttpResponseRedirect('/littleAuth')
+def littleAuth(request):
+    #TODO:ojo que esto es de prueba, hay que quitarlo cuando se puedan cargar cosas
+    user = authenticate(username='admin', password='admin')
+    if user is not None:
+        login(request, user)
+    print (user)
+    print(request.user)
+    print(Administrator.objects.all())
+    return HttpResponseRedirect('/department/list')
+
 def create(request):
     """
     parameters/returns:
@@ -9,6 +32,15 @@ def create(request):
     template:
     department_form.html
     """
+    # Check that the user is logged in
+    if not request.user.is_authenticated():
+        return HttpResponseForbidden()
+
+    # Check that the current user is an administrator
+    admin = get_current_admin(request)
+
+    if admin == None:
+        return HttpResponseForbidden()
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -18,7 +50,7 @@ def create(request):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-            createDepartment(form)
+            createDepartment(form,admin)
             return HttpResponseRedirect('/department/list')
 
     # if a GET (or any other method) we'll create a blank form
@@ -30,6 +62,7 @@ def create(request):
 
 
 def list(request):
+
     """
     returns:
     departments: lista de departamentos de la compañía logeada
@@ -37,7 +70,16 @@ def list(request):
     template:
     department_list.html
     """
-    lista=Department.objects.filter(company_id=request.session['id'],active=True)
+    # Check that the user is logged in
+    if not request.user.is_authenticated():
+        return HttpResponseForbidden()
+
+    # Check that the current user is an administrator
+    admin = get_current_admin(request)
+
+    if admin == None:
+        return HttpResponseForbidden()
+    lista=Department.objects.filter(company_id=admin.company_id,active=True)
     return render(request, "department_list.html", {"departments": lista})
 
 
@@ -49,6 +91,15 @@ def update(request):
     template:
     department_form.html
     """
+    # Check that the user is logged in
+    if not request.user.is_authenticated():
+        return HttpResponseForbidden()
+
+    # Check that the current user is an administrator
+    admin = get_current_admin(request)
+
+    if admin == None:
+        return HttpResponseForbidden()
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -59,16 +110,17 @@ def update(request):
             # ...
             # redirect to a new URL:
             department=Department.objects.get(pk=form.cleaned_data['department_id'])
-            if checkCompanyDepartment(department):
+            if checkCompanyDepartment(department,admin.company_id):
                 updateDepartment(department,form)
 
             return HttpResponseRedirect('/department/list')
 
     # if a GET (or any other method) we'll create a blank form
     else:
+
         department_id=request.GET.get('department_id')
         department=Department.objects.get(pk=department_id)
-        form = DepartmentForm(initial={"name":deparment.name,"department_id":department.id})
+        form = DepartmentForm(initial={"name":department.name,"department_id":department.id})
 
 
     return render(request, 'department_form.html', {'form': form})
@@ -84,17 +136,27 @@ def delete(request):
     template:
     deparment_list.html
     """
+
+    # Check that the user is logged in
+    if not request.user.is_authenticated():
+        return HttpResponseForbidden()
+
+    # Check that the current user is an administrator
+    admin = get_current_admin(request)
+
+    if admin == None:
+        return HttpResponseForbidden()
     department_id=request.GET.get('department_id')
     department=Department.objects.get(pk=department_id)
-    if checkCompanyDepartment(department):
+    if checkCompanyDepartment(department,admin.company_id):
         deleteDepartment(department)
     return HttpResponseRedirect('/department/list')
 
 #Auxiliar methods, containing the operation logic
 
-def createDepartment(form):
+def createDepartment(form,admin):
     dname=form.cleaned_data['name']
-    company=Company.objects.get(pk=request.session['id'])
+    company=admin.company_id
     Department.objects.create(name=dname,active=True,company_id=company)
 
 def updateDepartment(department,form):
@@ -105,27 +167,32 @@ def deleteDepartment(department):
     department.active=False
     department.save()
 
-def checkCompanyDepartmentSession(department):
+def checkCompanyDepartmentSession(department,admin):
     """
     checks if the department belongs to the logged company
     """
-    return checkCompanyDepartment(department,request.session['id'])
+    return checkCompanyDepartment(department,admin.company_id)
 def checkCompanyDepartment(department,company_id):
     """
     checks if the department belongs to the specified company
     """
     return department is not None and company_id==department.company_id and department.active
 
-def checkCompanyDepartmentIdSession(departmentId):
+def checkCompanyDepartmentIdSession(departmentId,admin):
     """
     checks if the department belongs to the logged company
     """
-    return checkCompanyDepartmentId(departmentId,request.session['id'])
+    return checkCompanyDepartmentId(departmentId,admin.company_id)
 
 def checkCompanyDepartmentId(departmentId,companyId):
     """
     checks if the department belongs to the specified company
     """
     department = Department.objects.get(id = departmentId, company_id=companyId, active=True)
-    
+
     return department is not None
+def get_current_admin(request):
+    try:
+        return Administrator.objects.get(user=request.user)
+    except ObjectDoesNotExist:
+        return None
