@@ -5,14 +5,15 @@ services:
   - postgresql
 
 env:
-  - DJANGO=1.10.4
-  - DJANGO_SETTINGS_MODULE=metronus.settings
-  - PYTHONPATH=$HOME/builds/Metronus/metronus
-  - PIP_USE_MIRRORS=true
-  - METRONUS_DB_NAME=metronus_db_travis
-  - METRONUS_DB_USER=metronus_user_travis
-  - METRONUS_DB_PASS=metronus_pass_travis
-  - DJANGO_SECRET_KEY=travistravistravistravistravistravistravis
+  global:
+    - DJANGO=1.10.4
+    - DJANGO_SETTINGS_MODULE=metronus.settings
+    - PYTHONPATH=$HOME/builds/Metronus/metronus
+    - PIP_USE_MIRRORS=true
+    - METRONUS_DB_NAME=metronus_db_travis
+    - METRONUS_DB_USER=metronus_user_travis
+    - METRONUS_DB_PASS=metronus_pass_travis
+    - DJANGO_SECRET_KEY=travistravistravistravistravistravistravis
 
 cache: pip3
 
