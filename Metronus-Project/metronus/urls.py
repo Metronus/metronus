@@ -13,14 +13,16 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url, include
-from django.contrib import admin
-from django.conf.urls.i18n import i18n_patterns
-from metronus_app import views
-from metronus_app.controllers import departmentController
-from metronus_app.controllers import projectController
-from django.core.urlresolvers import reverse_lazy
-from django.contrib.auth.views import login, logout
+from django.conf.urls               import url, include
+from django.contrib                 import admin
+from django.conf.urls.i18n          import i18n_patterns
+from metronus_app                   import views
+from django.core.urlresolvers       import reverse_lazy
+from django.contrib.auth.views      import login, logout
+
+from metronus_app.controllers       import departmentController
+from metronus_app.controllers       import projectController
+from metronus_app.controllers       import employeeController
 
 urlpatterns = i18n_patterns(
     url(r'^$', views.index),
@@ -36,6 +38,8 @@ urlpatterns = i18n_patterns(
     #url(r'^project/view$', projectController.view), A la espera de ver si es necesario o no
     url(r'^project/delete$', projectController.delete, name='project_delete'),
     url(r'^project/create$', projectController.create, name='project_create'),
+
+    url(r'^employee/create$', employeeController.create, name='employee_create'),
 
     # Register & Login
     url(r'^login/$', login, {'template_name': 'login.html', }, name="login"),
