@@ -1,6 +1,7 @@
 from django.db import models
 
 class Role(models.Model):
-    name=models.CharField(max_length=30)
+    name=models.CharField(max_length=30, unique=True)
+
     def __unicode__(self):
         return self.name
