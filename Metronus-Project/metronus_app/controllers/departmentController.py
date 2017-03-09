@@ -135,7 +135,7 @@ def delete(request):
     department=Department.objects.get(pk=department_id)
     if checkCompanyDepartment(department,admin.company_id):
         deleteDepartment(department)
-    return HttpResponseRedirect('/department/list')
+    return HttpResponseRedirect('/'+request.LANGUAGE_CODE+'/department/list')
 
 #Auxiliar methods, containing the operation logic
 
