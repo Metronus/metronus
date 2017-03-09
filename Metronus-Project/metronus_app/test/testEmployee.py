@@ -26,50 +26,50 @@ class EmployeeTestCase(TestCase):
         )
 
         admin_user = User.objects.create_user(
-            username="admin1", 
-            password="123456", 
-            email="admin1@metronus.es", 
-            first_name="Pepito", 
+            username="admin1",
+            password="123456",
+            email="admin1@metronus.es",
+            first_name="Pepito",
             last_name="Pérez"
         )
 
         admin = Administrator.objects.create(
-            user=admin_user, 
-            user_type="A", 
-            identifier="adm01", 
-            phone="666555444", 
+            user=admin_user,
+            user_type="A",
+            identifier="adm01",
+            phone="666555444",
             company_id=company1
         )
 
         employee1_user = User.objects.create_user(
-            username="emp1", 
-            password="123456", 
-            email="emp1@metronus.es", 
-            first_name="Álvaro", 
+            username="emp1",
+            password="123456",
+            email="emp1@metronus.es",
+            first_name="Álvaro",
             last_name="Varo"
         )
 
         employee2_user = User.objects.create_user(
-            username="emp2", 
-            password="123456", 
-            email="emp2@metronus.es", 
-            first_name="Alberto", 
+            username="emp2",
+            password="123456",
+            email="emp2@metronus.es",
+            first_name="Alberto",
             last_name="Berto"
         )
 
         employee1 = Employee.objects.create(
-            user=employee1_user, 
-            user_type="E", 
-            identifier="emp01", 
-            phone="666555444", 
+            user=employee1_user,
+            user_type="E",
+            identifier="emp01",
+            phone="666555444",
             company_id=company1
         )
 
         employee2 = Employee.objects.create(
-            user=employee2_user, 
-            user_type="E", 
-            identifier="emp02", 
-            phone="666555444", 
+            user=employee2_user,
+            user_type="E",
+            identifier="emp02",
+            phone="666555444",
             company_id=company2
         )
 
@@ -80,7 +80,7 @@ class EmployeeTestCase(TestCase):
 
         logs_before = EmployeeLog.objects.all().count()
 
-        response = c.post("/en/employee/create", {
+        response = c.post("/employee/create", {
             "username": "employee1",
             "password1": "ihatemyboss",
             "password2": "ihatemyboss",
@@ -113,7 +113,7 @@ class EmployeeTestCase(TestCase):
         c = Client()
         c.login(username="admin1", password="123456")
 
-        response = c.get("/en/employee/list")
+        response = c.get("/employee/list")
 
         self.assertEquals(response.status_code, 200)
         self.assertEquals(len(response.context["employees"]), 1)
@@ -121,14 +121,14 @@ class EmployeeTestCase(TestCase):
 
     def test_list_employees_not_logged(self):
         c = Client()
-        response = c.get("/en/employee/list")
+        response = c.get("/employee/list")
         self.assertEquals(response.status_code, 403)
 
     def test_view_employee_positive(self):
         c = Client()
         c.login(username="admin1", password="123456")
 
-        response = c.get("/en/employee/view/emp1/")
+        response = c.get("/employee/view/emp1/")
 
         self.assertEquals(response.status_code, 200)
         employee = response.context["employee"]
@@ -140,21 +140,21 @@ class EmployeeTestCase(TestCase):
         c = Client()
         c.login(username="admin1", password="123456")
 
-        response = c.get("/en/employee/view/emp2/")
+        response = c.get("/employee/view/emp2/")
         self.assertEquals(response.status_code, 403)
 
     def test_view_employee_404(self):
         c = Client()
         c.login(username="admin1", password="123456")
 
-        response = c.get("/en/employee/view/marta/")
+        response = c.get("/employee/view/marta/")
         self.assertEquals(response.status_code, 404)
 
     def test_edit_employee_get(self):
         c = Client()
         c.login(username="admin1", password="123456")
 
-        response = c.get("/en/employee/edit/emp1/")
+        response = c.get("/employee/edit/emp1/")
         self.assertEquals(response.status_code, 200)
         form = response.context["form"]
 
@@ -170,7 +170,7 @@ class EmployeeTestCase(TestCase):
 
         initialpass = User.objects.get(username="emp1").password
 
-        response = c.post("/en/employee/edit/emp1/", {
+        response = c.post("/employee/edit/emp1/", {
             "password1": "",
             "password2": "",
             "first_name": "NuevoNombre",
@@ -196,7 +196,7 @@ class EmployeeTestCase(TestCase):
 
         initialpass = User.objects.get(username="emp1").password
 
-        response = c.post("/en/employee/edit/emp1/", {
+        response = c.post("/employee/edit/emp1/", {
             "password1": "nuevapassword",
             "password2": "nuevapassword",
             "first_name": "NuevoNombre2",
@@ -219,13 +219,13 @@ class EmployeeTestCase(TestCase):
     def test_edit_employee_not_allowed(self):
         c = Client()
         c.login(username="admin1", password="123456")
-        response = c.get("/en/employee/edit/emp2/")
+        response = c.get("/employee/edit/emp2/")
         self.assertEquals(response.status_code, 403)
 
     def test_edit_employee_404(self):
         c = Client()
         c.login(username="admin1", password="123456")
-        response = c.get("/en/employee/edit/diana/")
+        response = c.get("/employee/edit/diana/")
         self.assertEquals(response.status_code, 404)
 
     def test_delete_employee_positive(self):
@@ -235,7 +235,7 @@ class EmployeeTestCase(TestCase):
         logs_before = EmployeeLog.objects.all().count()
         self.assertTrue(User.objects.get(username="emp1").is_active)
 
-        response = c.get("/en/employee/delete/emp1/")
+        response = c.get("/employee/delete/emp1/")
         self.assertRedirects(response, "/employee/list/", fetch_redirect_response=False)
 
         self.assertFalse(User.objects.get(username="emp1").is_active)

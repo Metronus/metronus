@@ -3,7 +3,7 @@
 {% load l10n %}
 
 {% block title %}
-    {% if  form.proyect_id.value == 0 %}
+    {% if  form.project_id.value == 0 %}
         {% trans 'createProject' %}
     {% else %}
         {% trans 'editProject' %}
@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block content %}
-    {% if  form.proyect_id.value == 0 %}
+    {% if  form.project_id.value == 0 %}
         <h1> {% trans 'createProject' %} </h1></br>
     {% else %}
         <h1> {% trans 'editProject' %} </h1></br>
