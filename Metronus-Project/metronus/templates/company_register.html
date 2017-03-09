@@ -6,11 +6,54 @@
 
 
 {% block javascript %}
+
+<script type="text/javascript">
+  function toggle_form(){
+    $('.collapse').collapse('toggle');
+
+  };
+</script>
+
+<script type="text/javascript">
+//ESTE SCRIPT COMPRUEBA LOS VALORES DEL FORM DE LA COMPAÑÍA PARA NO DEJAR PASAR AL DEL ADMIN SI NO ESTAN CORRECTOS
+  $('#div_company_info').change(function() {
+    formIsValid = true;
+    $('.company_class',$(this)).each( function() {
+        formIsValid = formIsValid && $(this).hasClass('has-success');
+    });
+
+    if(formIsValid) {
+        $('.next_button', $(this)).attr('disabled', false);
+    } else {
+
+        $('.next_button', $(this)).attr('disabled', true);
+    }
+});
+</script>
+
+<script type="text/javascript">
+//ESTE SCRIPT COMPRUEBA LOS VALORES DEL FORM COMPLETO PARA NO DEJAR PULSAR SOBRE "REGISTRAR" SI NO ESTAN TODOS CORRECTOS
+  $('#register_form').change(function() {
+    formIsValid = true;
+    $('.form-class',$(this)).each( function() {
+        formIsValid = formIsValid && $(this).hasClass('has-success');
+    });
+    if(formIsValid) {
+        $('.submit-button', $(this)).attr('disabled', false);
+    } else {
+
+        $('.submit-button', $(this)).attr('disabled', true);
+    }
+});
+
+
+</script>
+
 <script>
 //Validación Ajax
-   /* $("#id_company_email").change(function () {
-
-		 var cif = $(this).val();
+   $("#id_company_email").change(function () {
+     // $('.collapse').collapse('toggle');
+		 /*var cif = $(this).val();
 		 console.log(cif);
 
       $.ajax({
@@ -24,15 +67,15 @@
             //alert("A user with this username already exists.");
           }
         }
-      });
+      });*/
 
-    });*/
+    });
 </script>
 
 <script>
 //Esto es para validar en cliente de forma bonita con bootstrap :)
 $(document).ready(function() {
-    $('#myform').bootstrapValidator({
+    $('#register_form').bootstrapValidator({
         feedbackIcons: {
             valid: 'glyphicon glyphicon-ok',
             invalid: 'glyphicon glyphicon-remove',
@@ -90,7 +133,64 @@ $(document).ready(function() {
                         message: 'The gender is required'
                     }
                 }
-            }
+            },
+            username: {
+                validators: {
+                    notEmpty: {
+                        message: 'The gender is required'
+                    }
+                }
+            },
+            user_email: {
+                validators: {
+                    notEmpty: {
+                        message: 'The gender is required'
+                    }
+                }
+            },
+            password1: {
+                validators: {
+                    notEmpty: {
+                        message: 'The gender is required'
+                    }
+                }
+            },
+            password2: {
+                validators: {
+                    notEmpty: {
+                        message: 'The gender is required'
+                    }
+                }
+            },
+            first_name: {
+                validators: {
+                    notEmpty: {
+                        message: 'The gender is required'
+                    }
+                }
+            },
+            last_name: {
+                validators: {
+                    notEmpty: {
+                        message: 'The gender is required'
+                    }
+                }
+            },
+            identifier: {
+                validators: {
+                    notEmpty: {
+                        message: 'The gender is required'
+                    }
+                }
+            },
+            phone: {
+                validators: {
+                    notEmpty: {
+                        message: 'The gender is required'
+                    }
+                }
+            },
+
         },
     });
 });
@@ -117,47 +217,138 @@ $(document).ready(function() {
 {% if form.errors %}
         <p>{{ form.errors }}</p>
 {% endif %}
-
+ 
 <h1> Registrar Compañía</h1></br>
 
-   <form id="myform" method="POST" class="form-horizontal" data-toggle="validator" role="form" action="" enctype="multipart/form-data">
+   <form id="register_form" method="POST" class="form-horizontal" data-toggle="validator" role="form" action="" enctype="multipart/form-data">
+
+
     	{% csrf_token %}
-	    <div class="col-md-6 col-md-offset-2" >
-        {% for field in form %}
-            <div class="form-group">
-                <label class="control-label col-sm-4" for="id_{{ field.name }}">{{ field.label }}</label>
-                <div class="col-sm-6">
-                    {% if field.label == 'password1' or field.label == 'password2' %}
-                        <input type="password" class="form-control col-md-6"
-                               name="{{ field.name }}"
-                               id="id_{{ field.name }}" >                     
 
-                    {% elif field.label == 'Company email' %}
+      <!-- AQUI COMIENZA LA INFO DE LA COMPAÑIA -->
 
-                     <input type="email" class="form-control col-md-6"
-                               name="{{ field.label }}"
-                               id="id_{{ field.name }}" placeholder="Email" data-error="really nigga?" >
-                     <div class="help-block with-errors"></div>
+	    <div id="div_company_info" class="col-md-6 col-md-offset-2 collapse in" >
 
-                    {% elif field.label == 'logo'%}
-                      <input type="file"
-                               name="{{ field.label }}"
-                               id="id_{{ field.name }}">
-                     <div class="help-block with-errors"></div>
-                    {% else%}
-                        <input type="text" class="form-control col-md-6"
-                               name="{{ field.name }}"
-                               id="id_{{ field.name }}" data-odd="odd" >
-                    {% endif %}
-                </div>
+        <div class="form-group company_class form-class">
+          <label class="control-label col-sm-4" for="id_{{ form.cif.name }}">{{ form.cif.label }}</label>
+            <div class="col-sm-6">
+              <input type="text" class="form-control col-md-6" name="{{ form.cif.name }}" id="id_{{ form.cif.name }}">
             </div>
-        {% endfor %}
+        </div>
+
+        <div class="form-group company_class form-class">
+          <label class="control-label col-sm-4" for="id_{{ form.company_name.name }}">{{ form.company_name.label }}</label>
+            <div class="col-sm-6">
+              <input type="text" class="form-control col-md-6" name="{{ form.company_name.name }}" id="id_{{ form.company_name.label }}">
+            </div>
+        </div>
+
+        <div class="form-group company_class form-class">
+          <label class="control-label col-sm-4" for="id_{{ form.short_name.name }}">{{ form.short_name.label }}</label>
+            <div class="col-sm-6">
+              <input type="text" class="form-control col-md-6" name="{{ form.short_name.name }}" id="id_{{ form.short_name.label }}">
+            </div>
+        </div>
+
+        <div class="form-group company_class form-class">
+          <label class="control-label col-sm-4" for="id_{{ form.company_email.name }}">{{ form.company_email.label }}</label>
+            <div class="col-sm-6">
+              <input type="email" class="form-control col-md-6" name="{{ form.company_email.name }}" id="id_{{ form.company_email.label }}">
+            </div>
+        </div>
+
+        <div class="form-group company_class form-class">
+          <label class="control-label col-sm-4" for="id_{{ form.company_phone.name }}">{{ form.company_phone.label }}</label>
+            <div class="col-sm-6">
+            <input type="text" class="form-control col-md-6" name="{{ form.company_phone.name }}" id="id_{{ form.company_phone.label }}">
+            </div>
+        </div>
+
+        <div class="form-group">
+          <label class="control-label col-sm-4" for="id_{{ form.logo.name }}">{{ form.logo.label }}</label>
+            <div class="col-sm-6">
+              <input type="file" name="{{ form.logo.name }}" id="id_{{ form.logo.label }}">
+            </div>
+        </div>
+                   
         <br/>
         <div class="form-group">
             <div class="col-sm-offset-4 col-sm-10">
-                <button type="submit" class="btn btn-default">Registrate</button>
+              <button onclick="toggle_form()"class="btn btn-default next_button" disabled="true">Siguiente</button>
             </div>
         </div>
+
+        </div>
+
+        <!-- AQUI COMIENZA LA INFO DEL ADMIN-->
+
+        <div id="div_admin_info" class="col-md-6 col-md-offset-2 collapse" >
+
+        <div class="form-group form-class">
+          <label class="control-label col-sm-4" for="id_{{ form.username.name }}">{{ form.username.label }}</label>
+            <div class="col-sm-6">
+              <input type="text" class="form-control col-md-6" name="{{ form.username.name }}" id="id_{{ form.username.name }}">
+            </div>
+        </div>
+
+        <div class="form-group form-class">
+          <label class="control-label col-sm-4" for="id_{{ form.user_email.name }}">{{ form.user_email.label }}</label>
+            <div class="col-sm-6">
+              <input type="email" class="form-control col-md-6" name="{{ form.user_email.name }}" id="id_{{ form.user_email.label }}">
+            </div>
+        </div>
+
+        <div class="form-group form-class">
+          <label class="control-label col-sm-4" for="id_{{ form.password1.name }}">{{ form.password1.label }}</label>
+            <div class="col-sm-6">
+              <input type="password" class="form-control col-md-6" name="{{ form.password1.name }}" id="id_{{ form.password1.label }}">
+            </div>
+        </div>
+
+        <div class="form-group form-class">
+          <label class="control-label col-sm-4" for="id_{{ form.password2.name }}">{{ form.password2.label }}</label>
+            <div class="col-sm-6">
+              <input type="password" class="form-control col-md-6" name="{{ form.password2.name }}" id="id_{{ form.password2.label }}">
+            </div>
+        </div>
+
+        <div class="form-group form-class">
+          <label class="control-label col-sm-4" for="id_{{ form.first_name.name }}">{{ form.first_name.label }}</label>
+            <div class="col-sm-6">
+              <input type="text" class="form-control col-md-6" name="{{ form.first_name.name }}" id="id_{{ form.first_name.label }}">
+            </div>
+        </div>
+
+        <div class="form-group form-class">
+          <label class="control-label col-sm-4" for="id_{{ form.last_name.name }}">{{ form.last_name.label }}</label>
+            <div class="col-sm-6">
+              <input type="text" class="form-control col-md-6" name="{{ form.last_name.name }}" id="id_{{ form.last_name.label }}">
+            </div>
+        </div>
+
+        <div class="form-group form-class">
+          <label class="control-label col-sm-4" for="id_{{ form.identifier.name }}">{{ form.identifier.label }}</label>
+            <div class="col-sm-6">
+              <input type="text" class="form-control col-md-6" name="{{ form.identifier.name }}" id="id_{{ form.identifier.label }}">
+            </div>
+        </div>
+
+        <div class="form-group form-class">
+          <label class="control-label col-sm-4" for="id_{{ form.phone.name }}">{{ form.phone.label }}</label>
+            <div class="col-sm-6">
+              <input type="text" class="form-control col-md-6" name="{{ form.phone.name }}" id="id_{{ form.phone.label }}">
+            </div>
+        </div>
+                   
+        <br/>
+
+        <div class="form-group">
+            <div class="col-sm-offset-4 col-sm-10">
+                <button type="submit" class="btn btn-success submit-button" disabled="true">Registrate</button>
+            </div>
+        </div>
+
+
         </div>
 
     </form>
