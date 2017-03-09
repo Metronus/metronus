@@ -11,10 +11,11 @@ class CompanyRegistrationForm(Form):
     short_name = forms.CharField(label=_("short_name"),max_length=50)
     company_email = forms.EmailField(label=_("company_email"))
     company_phone = forms.CharField(label=_("company_phone"),max_length=15)
-    #logo = forms.FileInput()
-
+    logo = forms.FileField(label=_('logo'))
+    
     # User (Account data)
     username = forms.CharField()
+    user_email = forms.EmailField(label=_("user_email"))
     password1 = forms.CharField(label="password1", widget=forms.PasswordInput)
     password2 = forms.CharField(label="password2", widget=forms.PasswordInput)
     first_name = forms.CharField(max_length=50)

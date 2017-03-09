@@ -44,7 +44,21 @@ $(document).ready(function() {
                     notEmpty: {
                         message: 'The last name is required and cannot be empty'
                     },
-                }
+                },
+               /* custom: {
+                    "uniquecif": function(el) {
+                      $.ajax({
+                        url:'/ajax/validate_cif/',
+                        type:'POST',
+                        data: {username: $(el).val()},
+                            }).done(result => {
+                                console.log(Boolean(result))
+                                return Boolean(!result)
+                              }).fail(err => {
+                                console.log('Error:', err)
+                      })
+                    }
+                },*/
             },
             company_name: {
                 validators: {
@@ -80,6 +94,20 @@ $(document).ready(function() {
         },
     });
 });
+
+
+</script>
+
+<script>
+/*
+  $("#id_cif").validator({
+    
+    errors: {
+        "uniquecif":"Username in use",
+    }
+});
+*/
+
 </script>
 
 {% endblock %}
@@ -92,7 +120,7 @@ $(document).ready(function() {
 
 <h1> Registrar Compañía</h1></br>
 
-   <form id="myform" method="POST" class="form-horizontal" data-toggle="validator" role="form" action="">
+   <form id="myform" method="POST" class="form-horizontal" data-toggle="validator" role="form" action="" enctype="multipart/form-data">
     	{% csrf_token %}
 	    <div class="col-md-6 col-md-offset-2" >
         {% for field in form %}
@@ -102,19 +130,20 @@ $(document).ready(function() {
                     {% if field.label == 'password1' or field.label == 'password2' %}
                         <input type="password" class="form-control col-md-6"
                                name="{{ field.name }}"
-                               id="id_{{ field.name }}" >
+                               id="id_{{ field.name }}" >                     
+
                     {% elif field.label == 'Company email' %}
+
                      <input type="email" class="form-control col-md-6"
                                name="{{ field.label }}"
                                id="id_{{ field.name }}" placeholder="Email" data-error="really nigga?" >
                      <div class="help-block with-errors"></div>
 
                     {% elif field.label == 'logo'%}
-                      <input type="file" class="form-control col-md-6"
+                      <input type="file" class="col-md-6"
                                name="{{ field.label }}"
                                id="id_{{ field.name }}">
                      <div class="help-block with-errors"></div>
-
                     {% else%}
                         <input type="text" class="form-control col-md-6"
                                name="{{ field.name }}"

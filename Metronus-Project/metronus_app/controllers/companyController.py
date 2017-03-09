@@ -12,7 +12,6 @@ from django.template.context import RequestContext
 
 
 def create(request):
-    print("create")
     """
     parameters/returns:
     form: el formulario con los datos de la compañía y el administrador de la compañía
@@ -25,12 +24,10 @@ def create(request):
         # create a form instance and populate it with data from the request:
         form = CompanyRegistrationForm(request.POST)
         # check whether it's valid:
-        print("lets check")
         if form.is_valid() and checkPasswords(form):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-            print("ES valido")
             company = createCompany(form)
             registerAdministrator(form, company)
             return HttpResponseRedirect(reverse('login'))
@@ -50,9 +47,9 @@ def createCompany(form):
     short_name = form.cleaned_data['short_name']
     email = form.cleaned_data['company_email']
     phone = form.cleaned_data['company_phone']
-    #logo = form.cleaned_data['logo']
+    logo = form.cleaned_data['logo']
 
-    company = Company.objects.create(cif=cif, company_name=company_name, short_name=short_name, email=email, phone=phone)
+    company = Company.objects.create(cif=cif, company_name=company_name, short_name=short_name, email=email, phone=phone, logo=logo)
     return company
 
 
@@ -61,8 +58,9 @@ def registerAdministrator(form, company):
     password = form.cleaned_data['password1']
     first_name = form.cleaned_data['first_name']
     last_name = form.cleaned_data['last_name']
+    user_email = form.cleaned_data['user_email']
 
-    admin = User.objects.create_user(username=username, password=password, first_name=first_name, last_name=last_name)
+    admin = User.objects.create_user(username=username, password=password, email=user_email, first_name=first_name, last_name=last_name)
 
     identifier = form.cleaned_data['identifier']
     phone = form.cleaned_data['phone']
@@ -78,9 +76,9 @@ def checkPasswords(form):
 
 def validateCIF(request):
     cif = request.GET.get('cif', None)
-    if cif != "1234":
-        raise ValidationError("Email already exists")
     data = {
-        'is_taken': cif != "1234"
+        'is_taken': 1 == 1
     }
+    if data['is_taken']:
+        data['error_message'] = 'A user with this username already exists.'
     return JsonResponse(data)
