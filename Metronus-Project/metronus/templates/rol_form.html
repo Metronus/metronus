@@ -1,0 +1,24 @@
+{% extends "layout_base.html" %}
+{% load i18n %}
+{% load l10n %}
+{% block title %}
+{% if  form.rol_id.value == 0 %}
+{% trans 'addRol' %}
+{% else %}
+{% trans 'editRol' %}
+{% endif %}
+{% endblock %}
+
+{% block content %}
+{% if  form.rol_id.value == 0 %}
+<h1> {% trans 'addRol' %} </h1></br>
+{% else %}
+<h1> {% trans 'editRol' %} </h1></br>
+{% endif %}
+    <form id="form" method="POST" action="">{% csrf_token %}
+	    {{form.as_p}}
+	    </br>
+	    <p><input type="submit" value="{% trans 'confirm' %}" /></p>
+    </form>
+
+{% endblock %}
