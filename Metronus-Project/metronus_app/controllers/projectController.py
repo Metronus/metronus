@@ -9,20 +9,6 @@ from django.core.exceptions             import ObjectDoesNotExist
 from django.http                        import HttpResponseForbidden
 from django.contrib.auth import authenticate,login
 
-def littleLoad(request):
-    #TODO:ojo que esto es de prueba, hay que quitarlo cuando se puedan cargar cosas
-    populate_database()
-    print("si se cargo no es culpa mia")
-    return HttpResponseRedirect('/littleAuth')
-def littleAuth(request):
-    #TODO:ojo que esto es de prueba, hay que quitarlo cuando se puedan cargar cosas
-    user = authenticate(username='admin', password='admin')
-    if user is not None:
-        login(request, user)
-    print (user)
-    print(request.user)
-    print(Administrator.objects.all())
-    return HttpResponseRedirect('/project/list')
 
 
 def create(request):
@@ -159,7 +145,7 @@ def checkCompanyProjectId(projectId, companyId):
     checks if the project belongs to the specified company
     """
     project = Project.objects.get(id = projectId, company_id=companyId, deleted=False)
-    
+
     return project is not None
 
 def get_current_admin(request):

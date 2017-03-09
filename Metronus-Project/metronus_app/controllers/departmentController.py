@@ -9,21 +9,6 @@ from django.core.exceptions             import ObjectDoesNotExist
 from django.http                        import HttpResponseForbidden
 from django.contrib.auth import authenticate,login
 
-def littleLoad(request):
-    #TODO:ojo que esto es de prueba, hay que quitarlo cuando se puedan cargar cosas
-    populate_database()
-    print("si se cargo no es culpa mia")
-    return HttpResponseRedirect('/littleAuth')
-def littleAuth(request):
-    #TODO:ojo que esto es de prueba, hay que quitarlo cuando se puedan cargar cosas
-    user = authenticate(username='admin', password='admin')
-    if user is not None:
-        login(request, user)
-    print (user)
-    print(request.user)
-    print(Administrator.objects.all())
-    return HttpResponseRedirect('/department/list')
-
 def create(request):
     """
     parameters/returns:
