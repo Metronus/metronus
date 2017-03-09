@@ -150,7 +150,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(PROJECT_PATH, 'staticfiles')
 STATICFILES_DIRS = (
-    os.path.join(PROJECT_PATH, 'static')
+    os.path.join(PROJECT_PATH, 'static'),
 )
 
 # Login static configuration
