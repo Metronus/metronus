@@ -22,7 +22,7 @@ def create(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = CompanyRegistrationForm(request.POST)
+        form = CompanyRegistrationForm(request.POST, request.FILES)
         # check whether it's valid:
         if form.is_valid() and checkPasswords(form):
             # process the data in form.cleaned_data as required
