@@ -65,8 +65,12 @@ msgid "departmentList"
 msgstr "Department list"
 
 #: Employee
+msgid "registryDate"
+msgstr "Registry Date"
 msgid "registerEmployee"
 msgstr "Register new employee"
+msgid "employeeList"
+msgstr "Employee List"
 msgid "editEmployee"
 msgstr "Edit employee"
 msgid "reset"

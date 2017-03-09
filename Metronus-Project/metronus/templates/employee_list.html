@@ -1,0 +1,58 @@
+{% extends "layout_base.html" %}
+{% load i18n %}
+{% load l10n %}
+
+{% block title %}{% trans 'employeeList' %}{% endblock %}
+{% block contentTitle %}{% trans 'employeeList' %}{% endblock %}
+
+{% block content %}
+
+<div class="row">
+        <div class="col-xs-12">
+          <div class="box">
+            <!-- /.box-header -->
+            <div class="box-body table-responsive no-padding">
+              <table id="employeeTable" class="table table-hover">
+              <thead>
+                <tr>
+                  <th>{% trans 'username' %}</th>
+                  <th>{% trans 'identifier' %}</th>
+                  <th>{% trans 'phone' %}</th>
+                  <th>{% trans 'registryDate' %}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for employee in employees %}
+                <tr>
+                    <td>{{employee.user}}</td>
+
+                    <td>{{employee.identifier}}</td>
+
+                    <td>{{employee.phone}}</td>
+
+                    <td>{{employee.registryDate}}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+{% endblock %}
+
+{% block javascript %}
+<script>
+  $(function () {
+    $('#employeeTable').DataTable({
+      "paging": true,
+      "lengthChange": true,
+      "searching": true,
+      "ordering": true,
+      "info": false,
+      "autoWidth": true
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "layout_base.html" %}
+{% load i18n %}
+{% load l10n %}
+
+{% block title %}
+    {% trans 'editEmployee' %}
+{% endblock %}
+{% block contentTitle %}
+    {% trans 'editEmployee' %}
+{% endblock %}
+
+{% load static }
+
+{% block content %}
+    <form id="form" method="POST" action="">{% csrf_token %}
+        {{form.as_p}}
+        </br>
+        <p><input type="submit" value="{% trans 'confirm' %}" /></p>
+    </form>
+{% endblock %}
