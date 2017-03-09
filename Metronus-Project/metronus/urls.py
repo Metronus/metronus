@@ -26,10 +26,10 @@ from metronus_app.controllers       import employeeController
 from metronus_app.controllers       import roleController
 from metronus_app.controllers       import companyController
 
-
-urlpatterns = i18n_patterns(
+urlpatterns=[url(r'^i18n/', include('django.conf.urls.i18n')),]
+urlpatterns += [#i18n_patterns(
     url(r'^$', views.index),
-    url(r'^i18n/', include('django.conf.urls.i18n')),
+
 	url(r'^index.html/$', views.index),
     url(r'^department/create$', departmentController.create),
     url(r'^department/list$', departmentController.list),
@@ -57,4 +57,5 @@ urlpatterns = i18n_patterns(
 
     url(r'^register$', companyController.create),
     url(r'^ajax/validate_cif/$', companyController.validateCIF, name='validate_cif'),
-)
+#)
+]
