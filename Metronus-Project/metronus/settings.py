@@ -92,8 +92,8 @@ DATABASES = {
         'NAME': os.environ["METRONUS_DB_NAME"],
         'USER': os.environ["METRONUS_DB_USER"],
         'PASSWORD': os.environ["METRONUS_DB_PASS"],
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'HOST': os.environ["METRONUS_DB_HOST"],
+        'PORT': os.environ["METRONUS_DB_PORT"],
     }
 }
 
