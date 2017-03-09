@@ -1,45 +1,8 @@
-switch (lang = 'en') {
-  case 'en':
-    requiredField = 'Field required'
-    passLength = 'Length should be 5 to 25'
-    break
-  default:
-    requiredField = 'Campo obligatorio'
-    passLength = 'Longitud permitida entre 5 y 20'
-    break
-}
-
-
 var vm = new Vue({
 	delimiters: ['${', '}'],
 	el: '#metronus-app',
 	data: {
-		timestamp: Date.now(),
-        ruleForm: {
-          name: '',
-          surname: '',
-          email: '',
-          phone: '',
-          password: ''
-        },
-        rules: {
-          name: [
-            { required: true, message: requiredField, trigger: 'blur' }
-          ],
-          surname: [
-            { required: true, message: requiredField, trigger: 'blur' }
-          ],
-          email: [
-            { required: true, message: requiredField, trigger: 'blur' }
-          ],
-          phone: [
-            { required: true, message: requiredField, trigger: 'blur' }
-          ],
-          password: [
-            { required: true, message: requiredField, trigger: 'blur' },
-            { min: 5, max: 25, message: passLength, trigger: 'blur' }
-          ]
-        }
+		timestamp: Date.now()
 	},
 
 	mounted:function(){
@@ -59,21 +22,6 @@ var vm = new Vue({
 			var ss=d.getSeconds()
 			return (yyyy+'-'+mn+'-'+dd+' '+hh+':'+mm+':'+ss)
 		}
-	},
-	methods: {
-      submitForm(formName) {
-        this.$refs[formName].validate((valid) => {
-          if (valid) {
-          	// Hacer POST al backend
-            console.log('Hacer POST al backend')
-          } else {
-            return false
-          }
-        });
-      },
-      resetForm(formName) {
-        this.$refs[formName].resetFields()
-      }
-    }
+	}
 })
 

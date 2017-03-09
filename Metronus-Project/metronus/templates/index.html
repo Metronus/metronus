@@ -2,12 +2,15 @@
 {% load i18n %}
 {% load l10n %}
 
-{% block title %}Login{% endblock %}
+{% block title %}Index{% endblock %}
 
 {% block content %}
 
 {% load static %}
 
-Metronus Project - Running - <img src="{% static "clock.png" %}"> {{current_date}}
+
+{% block contentTitle %}Index{% endblock %}
+
+Metronus Project - Running - <img src="{% static "clock.png" %}"> ${currentTime}
 
 {% endblock %}

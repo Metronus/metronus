@@ -5,59 +5,69 @@
 <head>
 	<meta charset="UTF-8">
 
-	<!-- Bootstrap zone -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
-	<!-- Bootstrap end -->
+	<!-- Bootstrap -->
+	<link rel="stylesheet" href="/static/css/bootstrap.min.css">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
+	<!-- Bootstrap theme -->
+	<link rel="stylesheet" href="/static/css/AdminLTE.min.css">
+	<link rel="stylesheet" href="/static/css/skin-blue.css">
 
-	<!-- Element zone -->
+	<!-- Element -->
   	<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-default/index.css">
-	<!-- Element end -->
 
 	<title>
 		{% block title %}{% endblock %}
 	</title>
 </head>
 
-<body>
-	<div id="metronus-app">
+<body class="hold-transition skin-blue sidebar-mini">
+<div class="wrapper">
 
-	<!-- Django's templates example -->
-	<div class="container">
-		{% block content %}{% endblock %}
+	{% include './theme/header.html' %}
+
+	{% include './theme/navbar.html' %}
+
+	<!-- Contains page content -->
+	<div class="content-wrapper">
+		<section class="content-header">
+			<h1>{% block contentTitle %}{% endblock %}</h1>
+		</section>
+
+		<section class="content">
+			<div id="metronus-app">
+				{% block content %}{% endblock %}
+			</div>
+		</section>
 	</div>
 
+	{% include './theme/footer.html' %}
 
-	<!-- Boostrap example -->
-	<div>
-		<div class="pager panel-footer">
-			<p>Metronus - <strong>${currentTime}</strong>.</p>
-		</div>
-	</div>
+	{% include './theme/sidebar.html' %}
 
-	</div>
-
-
-	<script type="text/javascript">var lang = "{% trans 'lang' %}"</script>
-
-	<!-- Vue Zone -->
+	<!-- Vue -->
 	<script src="https://unpkg.com/vue/dist/vue.js"></script>
-	<!-- Vue end -->
-	<!-- Element zone-->
+
+	<!-- Element -->
 	<script src="https://unpkg.com/element-ui/lib/index.js"></script>
 	<script src="/static/app.js"></script>
-	<!-- Element end -->
-	<!-- jQuery zone -->
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-	<!-- jQuery end -->
-	<!-- Bootstrap zone -->
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-	<!-- Bootstrap end -->
+
+	<!-- jQuery -->
+	<script src="/static/js/jquery-3.1.1.min.js"></script>
+
+	<!-- Bootstrap -->
+	<script src="/static/js/bootstrap.min.js"></script>
+
+	<!-- Boostrap Theme -->
+	<script src="/static/js/app.min.js"></script>
+
+	<!-- Bootstrap validator -->
 	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/css/bootstrapvalidator.min.css "/>
 
 	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/js/bootstrapvalidator.min.js"></script>
 	{% block javascript %} {% endblock %}
 
+</div>
 </body>
 
 </html>
