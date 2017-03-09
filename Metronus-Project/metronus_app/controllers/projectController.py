@@ -54,7 +54,7 @@ def list(request):
     return render(request, "project_list.html", {"projects": lista})
 
 
-def edit(request):
+def edit(request,project_id):
     """
     parameters/returns:
     form: el formulario con los datos del proyecto
@@ -81,14 +81,13 @@ def edit(request):
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        project_id=request.GET.get('project_id')
         project=Project.objects.get(pk=project_id)
         form = ProjectForm(initial={"name":project.name,"project_id":project.id})
 
 
     return render(request, 'project_form.html', {'form': form})
 
-def delete(request):
+def delete(request,project_id):
     """
     parameters:
     project_id: the project id to delete
@@ -101,7 +100,6 @@ def delete(request):
     """
      # Check that the user is logged in
     admin = get_current_admin_or_403(request)
-    project_id=request.GET.get('project_id')
     project=Project.objects.get(pk=project_id)
     if checkCompanyProject(project,company_id=admin.company_id):
         deleteProject(project)
