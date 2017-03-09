@@ -7,16 +7,22 @@
 {% block content %}
     <ul class="list-group">
     {% for project in projects %}
-
         <li class="list-group-item">
-            {{project.name}}
-
-            <a class="btn btn-outline-primary" href="{% url 'project_edit' project.id %}">{% trans 'update' %}</a>
-            <a class="btn btn-outline-primary" href="{% url 'project_delete' project.id %}">{% trans 'delete' %}</a>
+            <div class="row">
+                <div class="col-xs-6">
+                    {{project.name}}
+                </div>
+                <div class="col-xs-6">
+                    <div class="pull-right">
+                        <a class="btn btn-primary" href="{% url 'project_edit' project.id %}">{% trans 'update' %}</a>
+                        <a class="btn btn-danger" href="{% url 'project_delete' project.id %}">{% trans 'delete' %}</a>
+                    </div>
+                </div>
+            </div>
         </li>
 
     {% endfor %}
     </ul>
 
-    <a class="btn btn-outline-primary" href="{% url 'project_create' %}">{% trans 'create' %}</a>
+    <a class="btn btn-primary" href="{% url 'project_create' %}">{% trans 'create' %}</a>
 {% endblock %}

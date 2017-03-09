@@ -36,7 +36,7 @@ def create(request):
             # ...
             # redirect to a new URL:
             createDepartment(form,admin)
-            return HttpResponseRedirect('/department/list')
+            return HttpResponseRedirect('/'+request.LANGUAGE_CODE+'/department/list')
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -98,7 +98,7 @@ def update(request):
             if checkCompanyDepartment(department,admin.company_id):
                 updateDepartment(department,form)
 
-            return HttpResponseRedirect('/department/list')
+            return HttpResponseRedirect('/'+request.LANGUAGE_CODE+'/department/list')
 
     # if a GET (or any other method) we'll create a blank form
     else:

@@ -37,9 +37,9 @@ urlpatterns = i18n_patterns(
     url(r'^department/delete$', departmentController.delete),
 
     url(r'^project/list$', projectController.list, name='project_list'),
-    url(r'^project/edit$', projectController.edit, name='project_edit'),
+    url(r'^project/edit/(?P<project_id>\w{0,50})/$', projectController.edit, name='project_edit'),
     #url(r'^project/view$', projectController.view), A la espera de ver si es necesario o no
-    url(r'^project/delete$', projectController.delete, name='project_delete'),
+    url(r'^project/delete/(?P<project_id>\w{0,50})/$', projectController.delete, name='project_delete'),
     url(r'^project/create$', projectController.create, name='project_create'),
 
     url(r'^employee/create$', employeeController.create, name='employee_create'),
