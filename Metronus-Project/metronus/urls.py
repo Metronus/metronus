@@ -26,6 +26,7 @@ from metronus_app.controllers       import projectDepartmentController
 from metronus_app.controllers       import employeeController
 from metronus_app.controllers       import roleController
 from metronus_app.controllers       import companyController
+from metronus_app.controllers       import administratorController
 
 urlpatterns=[url(r'^i18n/', include('django.conf.urls.i18n')),]
 urlpatterns += [#i18n_patterns(
@@ -53,6 +54,12 @@ urlpatterns += [#i18n_patterns(
 
     url(r'^roles/manage$', roleController.manage, name='roles_manage'),
     url(r'^roles/get_info$', roleController.ajax_get_employees_and_roles, name='roles_get_info'),
+
+    # Administrator
+    url(r'^administrator/edit/(?P<username>\w{0,50})/$', administratorController.edit, name='administrator_edit'),
+
+    # Company
+    url(r'^company/edit/(?P<cif>\w{9})/$', companyController.edit, name='company_edit'),
 
     # Register & Login
     url(r'^login/$', login, {'template_name': 'login.html', }, name="login"),
