@@ -35,7 +35,7 @@ urlpatterns += [#i18n_patterns(
 	url(r'^index.html/$', views.index),
     url(r'^department/create$', departmentController.create),
     url(r'^department/list$', departmentController.list),
-    url(r'^department/update$', departmentController.update),
+    url(r'^department/edit$', departmentController.edit),
     url(r'^department/delete$', departmentController.delete),
 
     url(r'^project/list$', projectController.list, name='project_list'),

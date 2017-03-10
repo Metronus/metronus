@@ -7,3 +7,6 @@ class Department(models.Model):
 	active=models.BooleanField(default=True)
 	def __unicode__(self):
 		return self.name
+		
+	class Meta:
+		unique_together = ('name', 'company_id')
