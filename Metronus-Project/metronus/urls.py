@@ -22,6 +22,7 @@ from django.contrib.auth.views      import login, logout
 
 from metronus_app.controllers       import departmentController
 from metronus_app.controllers       import projectController
+from metronus_app.controllers       import projectDepartmentController
 from metronus_app.controllers       import employeeController
 from metronus_app.controllers       import roleController
 from metronus_app.controllers       import companyController
@@ -41,6 +42,8 @@ urlpatterns += [#i18n_patterns(
     #url(r'^project/view$', projectController.view), A la espera de ver si es necesario o no
     url(r'^project/delete/(?P<project_id>\w{0,50})/$', projectController.delete, name='project_delete'),
     url(r'^project/create$', projectController.create, name='project_create'),
+
+    url(r'^projectdepartment/create$', projectDepartmentController.create, name='projectdepartment_create'),
 
     url(r'^employee/create$', employeeController.create, name='employee_create'),
     url(r'^employee/list$', employeeController.list, name='employee_list'),

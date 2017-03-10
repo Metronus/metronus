@@ -1,8 +1,11 @@
 from django.shortcuts import render
 from metronus_app.forms.projectDepartmentForm import ProjectDepartmentForm
 from metronus_app.model.projectDepartment import ProjectDepartment
-from metronus_app.controllers.projectController import checkCompanyProjectIdSession
-from metronus_app.controllers.departmentController import checkCompanyDepartmentIdSession
+from metronus_app.controllers.projectController import checkCompanyProjectSession
+from metronus_app.controllers.departmentController import checkCompanyDepartmentSession
+
+from django.http                                 import HttpResponseRedirect
+from metronus_app.common_utils                   import get_current_admin_or_403
 
 def create(request):
     """
@@ -12,19 +15,22 @@ def create(request):
     template:
     proyectdepartment_form.html
     """
+
+    admin = get_current_admin_or_403(request)
+
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = ProjectDepartmentForm(request.POST)
+        form = ProjectDepartmentForm(data=request.POST, user=admin)
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
 
-            projectId = form.cleaned_data['project_id']
-            departmentId = form.cleaned_data['department_id']
-            legalForm = checkCompanyProjectIdSession(projectId) and checkCompanyDepartmentIdSession(departmentId)
+            project = form.cleaned_data['project_id']
+            department = form.cleaned_data['department_id']
+            legalForm = checkCompanyProjectSession(project, admin) and checkCompanyDepartmentSession(department, admin)
             
             if (legalForm):
                 createProjectDepartment(form)
@@ -32,9 +38,9 @@ def create(request):
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = ProjectDepartmentForm(initial={"project_id":0, "department_id":0})
+        form = ProjectDepartmentForm(initial={"project_id":0, "department_id":0, "projectDepartment_id":0}, user=admin)
 
-    return render(request, 'proyectdepartment_form.html', {'form': form})
+    return render(request, 'projectdepartment_form.html', {'form': form})
 
 
 def list(request):
@@ -71,10 +77,11 @@ def edit(request):
     template:
     projectdepartment_form.html
     """
+    admin = get_current_admin_or_403(request)
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = ProjectForm(request.POST)
+        form = ProjectForm(data=request.POST, user=admin)
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
@@ -82,7 +89,7 @@ def edit(request):
             # redirect to a new URL:
             projectDepartment=ProjectDepartment.objects.get(pk=form.cleaned_data['projectDepartment_id'])
 
-            if checkCompanyProjectDepartmentSession(project):
+            if checkCompanyProjectDepartmentSession(project, admin):
                 updateProjectDepartment(projectDepartment,form)
 
             return HttpResponseRedirect('/project/list')
@@ -92,7 +99,7 @@ def edit(request):
         projectDepartment_id=request.GET.get('projectDepartment_id')
         projectDepartment_id=ProjectDepartment.objects.get(pk=projectDepartment_id)
         form = ProjectDepartmentForm(
-            initial={"department_id":projectDepartment.department_id, "project_id":projectDepartment.project_id})
+            initial={"department_id":projectDepartment.department_id, "project_id":projectDepartment.project_id}, user=admin)
 
     return render(request, 'projectdepartment_form.html', {'form': form})
 
@@ -101,19 +108,21 @@ def edit(request):
 
 def createProjectDepartment(form):
     if form.is_valid():
-        projectId=form.cleaned_data['project_id']
-        departmentId = form.cleaned_data['department_id']
+        project=form.cleaned_data['project_id']
+        department = form.cleaned_data['department_id']
 
-        if(checkCompanyProjectIdSession(projectId) and checkCompanyDepartmentIdSession(departmentId)):
-            ProjectDepartment.objects.create(project_id = projectId, department_id = departmentId)
+        ProjectDepartment.objects.create(project_id = project, department_id = department)
 
+#Se permitirán los updates de projectDepartment?
 def updateProjectDepartment(projectDepartment,form):
-    projectDepartment.project_id = form.cleaned_data['project_id']
-    projectDepartment.department_id = form.cleaned_data['department_id']
+    if form.is_valid():
+        projectDepartment.project_id = form.cleaned_data['project_id']
+        projectDepartment.department_id = form.cleaned_data['department_id']
 
-    checkCompanyProjectDepartmentSession(projectDepartment)
+        checkCompanyProjectDepartmentSession(projectDepartment)
 
-    projectDepartment.save()
+        projectDepartment.save()
+        return projectDepartment
 
 #TODO: Delete
 

@@ -1,7 +1,11 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
+from metronus_app.model.projectDepartment import Project, Department
 
 class ProjectDepartmentForm(forms.Form):
     projectDepartment_id = forms.IntegerField(widget=forms.HiddenInput())
-    project_id = forms.IntegerField(label=_("project"), widget=forms.Select())
-    department_id = forms.IntegerField(label=_("department"), widget=forms.Select())
+
+    def __init__(self, user, *args, **kwargs):
+        super(ProjectDepartmentForm, self).__init__(*args, **kwargs)
+        self.fields['project_id'] = forms.ModelChoiceField(queryset=Project.objects.filter(company_id=user.company_id))
+        self.fields['department_id'] = forms.ModelChoiceField(queryset=Department.objects.filter(company_id=user.company_id))

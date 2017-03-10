@@ -21,8 +21,12 @@ class ProjectDepartmentTestCase(TestCase):
 			email="company2@gmail.com",
 			phone="987654321")
 
-		Project.objects.create(name="TestProject",deleted=False,company_id=company124)
-		Department.objects.create(name="Departamento1",active=True,company_id=company124)
+		proj1 = Project.objects.create(name="TestProject",deleted=False,company_id=company124)
+		proj2 = Project.objects.create(name="TestProject2",deleted=False,company_id=company124)
+		dep1 = Department.objects.create(name="Departamento1",active=True,company_id=company124)
+		dep2 = Department.objects.create(name="Departamento2",active=True,company_id=company124)
+		pd = ProjectDepartment.objects.create(project_id = proj1, department_id = dep2)
+		print(pd)
 	
 
 	def test_create_projectDepartment(self):
@@ -33,9 +37,8 @@ class ProjectDepartmentTestCase(TestCase):
 		company=Company.objects.get(cif="124")
 		project = Project.objects.get(name="TestProject")
 		department = Department.objects.get(name="Departamento1")
-		form = ProjectDepartmentForm(initial=[{"project_id":project.id, "department_id":department.id}])
-
-		createProjectDepartment(form)
+		ProjectDepartment.objects.create(project_id = project, department_id = department)
 
 		cuenta2=Project.objects.count()
 		self.assertTrue(count+1,count)
+
