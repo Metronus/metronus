@@ -40,7 +40,7 @@ def create(request):
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = DepartmentForm(initial={"department_id":0})
+        form = DepartmentForm(initial={"department_id":0, "name":""})
 
 
     return render(request, 'department_form.html', {'form': form})
