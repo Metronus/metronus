@@ -10,6 +10,7 @@ from metronus_app.forms.employeeEditForm         import EmployeeEditForm
 from metronus_app.model.employee                 import Employee
 from metronus_app.model.employeeLog              import EmployeeLog
 from metronus_app.model.administrator            import Administrator
+from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 
 from metronus_app.common_utils                   import get_current_admin_or_403
 
@@ -62,19 +63,23 @@ def view(request, username):
 
     parameters/returns:
     employee: datos del empleado
+    employee_roles: objetos ProjectDepartmentEmployeeRole (bibah) con todos los roles del empleado
 
     template: employee_view.html
     """
 
     # Check that the user is logged in and it's an administrator
     admin = get_current_admin_or_403(request)
+
     employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
 
     # Check that the admin has permission to view that employee
     if employee.company_id != admin.company_id:
         raise PermissionDenied
 
-    return render_to_response('employee_view.html', {'employee': employee})
+    employee_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee)
+
+    return render_to_response('employee_view.html', {'employee': employee, 'employee_roles': employee_roles})
 
 def edit(request, username):
     """
