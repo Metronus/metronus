@@ -65,6 +65,8 @@ msgid "editDepartment"
 msgstr "Editar departamento"
 msgid "departmentList"
 msgstr "Lista de departamentos"
+msgid "departmentNameNotNull"
+msgstr "El nombre del departamento no puede estar vacío"
 
 #: Employee
 msgid "registryDate"

@@ -133,7 +133,10 @@ def delete(request):
     department=get_object_or_404(Department,pk=department_id)
     if checkCompanyDepartment(department,admin.company_id):
         deleteDepartment(department)
+<<<<<<< HEAD
 
+=======
+>>>>>>> 918bf6dc29681b3935a5fd3cd14066ec31c72543
     return HttpResponseRedirect('/department/list')
 
 #Auxiliar methods, containing the operation logic

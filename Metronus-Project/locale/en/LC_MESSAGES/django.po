@@ -63,6 +63,8 @@ msgid "editDepartment"
 msgstr "Edit department"
 msgid "departmentList"
 msgstr "Department list"
+msgid "departmentNameNotNull"
+msgstr "Department's name can't be empty"
 
 #: Employee
 msgid "registryDate"

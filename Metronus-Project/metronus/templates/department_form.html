@@ -9,16 +9,71 @@
 {% endif %}
 {% endblock %}
 
+{% block javascript %}
+{#}
+<script type="text/javascript">
+//ESTE SCRIPT COMPRUEBA LOS VALORES DEL FORM COMPLETO PARA NO DEJAR PULSAR SOBRE "REGISTRAR" SI NO ESTAN TODOS CORRECTOS
+  $('#register_form').change(function() {
+    formIsValid = true;
+    $('.form-class',$(this)).each( function() {
+        formIsValid = formIsValid && $(this).hasClass('has-success');
+    });
+    if(formIsValid) {
+        $('.submit-button', $(this)).attr('disabled', false);
+    } else {
+
+        $('.submit-button', $(this)).attr('disabled', true);
+    }
+});
+
+
+</script>
+
+<script>
+//Esto es para validar en cliente de forma bonita con bootstrap :)
+$(document).ready(function() {
+    $('#register_form').bootstrapValidator({
+        feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+          
+            name: {
+                validators: {
+                    notEmpty: {
+                        message: '{% trans 'departmentNameNotNull' %}'
+                    }
+                }
+            },
+            
+
+        },
+    });
+});
+
+
+</script>
+#}
+{% endblock %}
+
 {% block content %}
 {% if  form.department_id.value == 0 %}
 <h1> {% trans 'createDepartment' %} </h1></br>
 {% else %}
 <h1> {% trans 'editDepartment' %} </h1></br>
 {% endif %}
-    <form id="form" method="POST" action="">{% csrf_token %}
-	    {{form.as_p}}
+    <form id="register_form" method="POST" action="" class="form-horizontal">{% csrf_token %}
+	    <div class="form-group company_class form-class">
+          <label class="control-label col-sm-4" for="id_{{ form.name.name }}">{{ form.name.label }}</label>
+            <div class="col-sm-6">
+              <input type="text" class="form-control col-md-6" name="{{ form.name.name }}" id="id_{{ form.name.name }}" value="{{ form.name.value }}">
+            </div>
+            <input type="text" hidden="true" name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}" value="{{ form.department_id.value|default:'' }}">
+        </div>
 	    </br>
-	    <p><input type="submit" value="{% trans 'confirm' %}" /></p>
+	    <p><input type="submit" class="submit-button" disabled="true" value="{% trans 'confirm' %}" /></p>
     </form>
 
 {% endblock %}
