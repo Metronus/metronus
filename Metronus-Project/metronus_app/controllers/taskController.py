@@ -5,6 +5,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from metronus_app.common_utils import get_current_admin_or_403,get_current_employee_or_403
 from django.http import HttpResponseRedirect
 from metronus_app.model.administrator import Administrator
+from metronus_app.model.project import Project
 from metronus_app.model.department import Department
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
@@ -30,8 +31,9 @@ def create(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = TaskForm(request.POST)
+        form = TaskForm(employee,request.POST)
         # check whether it's valid:
+
         if form.is_valid():
             # process the data in form.cleaned_data as required
             # ...
@@ -39,7 +41,7 @@ def create(request):
             pname=form.cleaned_data['name']
             ppro=form.cleaned_data['project_id']
             pdep=form.cleaned_data['department_id']
-            pdtuple=find_tuple(project_id,department_id,employee)
+            pdtuple=find_tuple(ppro.id,pdep.id,employee)
             pro=find_name(pname,pdtuple)
             if pro is not None:
                 if not pro.active:
@@ -56,7 +58,7 @@ def create(request):
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = TaskForm(initial={"task_id":0})
+        form = TaskForm(employee,initial={"task_id":0})
 
     return render(request, 'task_form.html', {'form': form,'repeated_name':repeated_name})
 
@@ -88,12 +90,11 @@ def list_department(request):
     department_id=request.GET.get("department_id")
     checkRoleForList(employee,department_id,False)
     lista=Task.objects.filter(active=True, projectDepartment_id__department_id__id=department_id)
-    print(Task.objects.filter(active=True, projectDepartment_id__department_id__id=department_id).values())
-    print (Department.objects.filter(projectdepartment__id=2).values())
+
     return render(request, "task_list.html", {"tasks": lista})
 
 
-def edit(request,task_id):
+def edit(request):
     """
     parameters/returns:
     form: el formulario con los datos de la tarea
@@ -107,7 +108,7 @@ def edit(request,task_id):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = TaskForm(request.POST)
+        form = TaskForm(employee,request.POST)
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
@@ -126,14 +127,13 @@ def edit(request,task_id):
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        task=get_object_or_404(Task,pk=task_id)
-        form = TaskForm(initial={"name":task.name,"description":task.description,
-                "task_id":task.id,"project_id":task.projectDepartment_id.project_id,
-                "department_id":task.projectDepartment_id.department_id})
+        task=get_object_or_404(Task,pk=request.GET.get("task_id"))
+        form = TaskForm(employee,initial={"name":task.name,"description":task.description,
+                "task_id":task.id})
 
     return render(request, 'task_form.html', {'form': form,'repeated_name':repeated_name})
 
-def delete(request,task_id):
+def delete(request):
     """
     parameters:
     task_id: the task id to delete
@@ -146,7 +146,7 @@ def delete(request,task_id):
     """
      # Check that the user is logged in
     employee = get_current_employee_or_403(request)
-    task=get_object_or_404(Task,pk=task_id,active=True)
+    task=get_object_or_404(Task,pk=request.GET.get("task_id"),active=True)
     checkTask(task,employee)
     deleteTask(task)
 
@@ -218,4 +218,4 @@ def find_tuple(project_id,department_id,employee):
 
     if project.company_id!=department.company_id or  project.company_id!=employee.company_id :
         raise PermissionDenied
-    return ProjectDepartment.objects.filter(project_id=project,department_id=department)
+    return ProjectDepartment.objects.get(project_id=project,department_id=department)

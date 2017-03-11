@@ -90,12 +90,12 @@ def basicLoad():
     #Frontend
     pd1 = ProjectDepartment.objects.create(
 		project_id = proj1,
-		department_id = dep2)
+		department_id = dep1)
 
     #Backend
     pd2 = ProjectDepartment.objects.create(
 		project_id = proj1,
-		department_id = dep1)
+		department_id = dep2)
 
     populate_roles()
 
@@ -104,54 +104,54 @@ def basicLoad():
     pm_role=Role.objects.get(name="Project manager")
 
     ProjectDepartmentEmployeeRole.objects.create(
-        projectDepartment_id=pd2,
+        projectDepartment_id=pd1,
         employee_id=emp1,
         role_id= emp_role)
     ProjectDepartmentEmployeeRole.objects.create(
-        projectDepartment_id=pd2,
+        projectDepartment_id=pd1,
         employee_id=emp2,
         role_id=emp_role )
     ProjectDepartmentEmployeeRole.objects.create(
-        projectDepartment_id=pd1,
+        projectDepartment_id=pd2,
         employee_id=emp3,
         role_id=emp_role )
 
     ProjectDepartmentEmployeeRole.objects.create(
-        projectDepartment_id=pd2,
+        projectDepartment_id=pd1,
         employee_id=emp4,
         role_id=pm_role )
     ProjectDepartmentEmployeeRole.objects.create(
-        projectDepartment_id=pd1,
+        projectDepartment_id=pd2,
         employee_id=emp4,
         role_id=pm_role )
 
     ProjectDepartmentEmployeeRole.objects.create(
-        projectDepartment_id=pd2,
+        projectDepartment_id=pd1,
         employee_id=emp5,
         role_id=coor_role )
     ProjectDepartmentEmployeeRole.objects.create(
-        projectDepartment_id=pd1,
+        projectDepartment_id=pd2,
         employee_id=emp6,
         role_id= emp_role)
     ProjectDepartmentEmployeeRole.objects.create(
-        projectDepartment_id=pd2,
+        projectDepartment_id=pd1,
         employee_id=emp7,
         role_id=emp_role )
     ProjectDepartmentEmployeeRole.objects.create(
-        projectDepartment_id=pd1,
+        projectDepartment_id=pd2,
         employee_id=emp8,
         role_id=coor_role )
     ProjectDepartmentEmployeeRole.objects.create(
-        projectDepartment_id=pd1,
+        projectDepartment_id=pd2,
         employee_id=emp9,
         role_id=emp_role )
     ProjectDepartmentEmployeeRole.objects.create(
-        projectDepartment_id=pd2,
+        projectDepartment_id=pd1,
         employee_id=emp10,
         role_id=emp_role )
 
     ProjectDepartmentEmployeeRole.objects.create(
-        projectDepartment_id=pd2,
+        projectDepartment_id=pd1,
         employee_id=emp4,
         role_id=Role.objects.get(name="Administrator") )
 
@@ -173,6 +173,13 @@ def basicLoad():
         description  = "nada",
         actor_id = emp8,
         projectDepartment_id = pd2
+    )
+    Task.objects.create(
+        name  ="Hacer cosas de cua",
+        description  = "nada",
+        actor_id = emp8,
+        projectDepartment_id = pd1,
+        active=False
     )
 def create_user(nombre,company2):
     User.objects.create_user(
