@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block javascript %}
-{#}
+
 <script type="text/javascript">
 //ESTE SCRIPT COMPRUEBA LOS VALORES DEL FORM COMPLETO PARA NO DEJAR PULSAR SOBRE "REGISTRAR" SI NO ESTAN TODOS CORRECTOS
   $('#register_form').change(function() {
@@ -55,25 +55,28 @@ $(document).ready(function() {
 
 
 </script>
-#}
+
 {% endblock %}
 
 {% block content %}
-{% if  form.department_id.value == 0 %}
-<h1> {% trans 'createDepartment' %} </h1></br>
-{% else %}
-<h1> {% trans 'editDepartment' %} </h1></br>
-{% endif %}
+		{% if  form.department_id.value == 0 %}
+			<h1 align="center"> {% trans 'createDepartment' %} </h1></br>
+		{% else %}
+			<h1 align="center"> {% trans 'editDepartment' %} </h1></br>
+		{% endif %}
+
     <form id="register_form" method="POST" action="" class="form-horizontal">{% csrf_token %}
+
+	    
 	    <div class="form-group company_class form-class">
           <label class="control-label col-sm-4" for="id_{{ form.name.name }}">{{ form.name.label }}</label>
             <div class="col-sm-6">
               <input type="text" class="form-control col-md-6" name="{{ form.name.name }}" id="id_{{ form.name.name }}" value="{{ form.name.value }}">
             </div>
-            <input type="text" hidden="true" name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}" value="{{ form.department_id.value|default:'' }}">
+            <input type="text" hidden="true" name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}" value="{{ form.department_id.value}}">
         </div>
 	    </br>
-	    <p><input type="submit" class="submit-button" disabled="true" value="{% trans 'confirm' %}" /></p>
+	    <div align="center" ><p><input type="submit" class="btn btn-success submit-button" disabled="true" value="{% trans 'confirm' %}" /></p></div>
     </form>
 
 {% endblock %}
