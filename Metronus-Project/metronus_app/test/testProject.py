@@ -1,83 +1,213 @@
 from metronus_app.model.project import Project
 from metronus_app.model.company import Company
 from metronus_app.controllers.projectController import *
-
-from django.test import TestCase
+from django.contrib.auth.models                  import User
+from django.test import TestCase, Client
+from metronus_app.model.employee         import Employee
+from django.core.exceptions                      import ObjectDoesNotExist, PermissionDenied
 
 class ProjectTestCase(TestCase):
 	def setUp(self):
-		Company.objects.create(
+		company1 = Company.objects.create(
 			cif="123",
 			company_name="company1",
-			short_name="cosa",
+			short_name="mplp",
 			email="company1@gmail.com",
-			phone="123456789")
-		Company.objects.create(
-			cif="124",
+			phone="123456789"
+		)
+
+		company2 = Company.objects.create(
+			cif="456",
 			company_name="company2",
-			short_name="cosa",
+			short_name="lmao",
 			email="company2@gmail.com",
-			phone="987654321")
-		company=Company.objects.get(cif="124")
-		Project.objects.create(name="TestProject",deleted=False,company_id=company)
-	
+			phone="1987654321"
+		)
 
-	def test_create_project(self):
-		"""
-		#checks the number of projects increased
-		"""
-		cuenta=Project.objects.count()
-		company=Company.objects.get(cif="124")
-		Project.objects.create(name="Project",deleted=False,company_id=company)
-		cuenta2=Project.objects.count()
-		self.assertTrue(cuenta+1,cuenta2)
+		admin_user = User.objects.create_user(
+			username="admin1",
+			password="123456",
+			email="admin1@metronus.es",
+			first_name="Pepito",
+			last_name="Pérez"
+		)
 
-	def test_update_project(self):
-		projct=Project.objects.get(name="TestProject")
-		projct.name="Project_Edited"
-		projct.save()
+		admin = Administrator.objects.create(
+			user=admin_user,
+			user_type="A",
+			identifier="adm01",
+			phone="666555444",
+			company_id=company1
+		)
 
+		employee1_user = User.objects.create_user(
+			username="emp1",
+			password="123456",
+			email="emp1@metronus.es",
+			first_name="Álvaro",
+			last_name="Varo"
+		)
 
-	def test_delete_project(self):
-		"""
-		#checks the number of active projects increased
-		"""
-		company=Company.objects.get(cif="124")
-		cuenta=Project.objects.filter(company_id=company,deleted=False).count()
-		projct=Project.objects.get(name="TestProject")
-		deleteProject(projct)
-		cuenta2=Project.objects.filter(company_id=company,deleted=False).count()
-		self.assertEqual(cuenta,cuenta2+1)
+		employee2_user = User.objects.create_user(
+			username="emp2",
+			password="123456",
+			email="emp2@metronus.es",
+			first_name="Alberto",
+			last_name="Berto"
+		)
 
-	def test_list_project(self):
-		"""
-		#checks the number of projects
-		"""
-		company=Company.objects.get(cif="124")
-		lista=Project.objects.filter(company_id=company,deleted=False)
-		self.assertEqual(lista.count(),1)
+		employee1 = Employee.objects.create(
+			user=employee1_user,
+			user_type="E",
+			identifier="emp01",
+			phone="666555444",
+			company_id=company1
+		)
+
+		employee2 = Employee.objects.create(
+			user=employee2_user,
+			user_type="E",
+			identifier="emp02",
+			phone="666555444",
+			company_id=company2
+		)
+		pro1 = Project.objects.create(name="pro1", deleted=False, company_id=company1)
+		pro2 = Project.objects.create(name="pro2", deleted=False, company_id=company1)
+		pro3 = Project.objects.create(name="pro3", deleted=True, company_id=company1)
+		pro4 = Project.objects.create(name="pro3", deleted=False, company_id=company2)
+
+	def test_create_project_positive(self):
+		# Logged in as an administrator, try to create an project
+		c = Client()
+		c.login(username="admin1", password="123456")
+
+		logs_before = Project.objects.all().count()
+
+		response = c.post("/project/create", {
+			"project_id": "0",
+			"name": "pro4",
+		})
+
+		self.assertEquals(response.status_code, 302)
+
+		# Check that the department has been successfully created
+
+		pro = Project.objects.all().last()
+		self.assertEquals(pro.name, "pro4")
+		self.assertEquals(pro.company_id, Administrator.objects.get(identifier="adm01").company_id)
+		self.assertEquals(pro.deleted, False)
+		logs_after = Project.objects.all().count()
+
+		self.assertEquals(logs_before + 1, logs_after)
+
+	def test_create_project_duplicate(self):
+		# Logged in as an administrator, try to create an project with the name of an existing company
+		c = Client()
+		c.login(username="admin1", password="123456")
+
+		logs_before = Project.objects.all().count()
+
+		response = c.post("/project/create", {
+			"project_id": "0",
+			"name": "pro1",
+		})
+
+		self.assertEquals(response.status_code, 200)
+		self.assertEquals(response.context["repeated_name"], True)
+
+	def test_create_project_not_logged(self):
+		c = Client()
+		response = c.get("/project/create")
+		self.assertEquals(response.status_code, 403)
+
+	def test_create_project_not_allowed(self):
+		c = Client()
+		c.login(username="emp1", password="123456")
+		response = c.get("/project/create")
+		self.assertEquals(response.status_code, 403)
+
+	def test_list_projects_positive(self):
+		c = Client()
+		c.login(username="admin1", password="123456")
+
+		response = c.get("/project/list")
+
+		self.assertEquals(response.status_code, 200)
+		self.assertEquals(len(response.context["projects"]), 2)
+		self.assertEquals(response.context["projects"][0].name, "pro1")
+
+	def test_list_projects_not_logged(self):
+		c = Client()
+		response = c.get("/project/list")
+		self.assertEquals(response.status_code, 403)
+
+	def test_list_projects_not_allowed(self):
+		c = Client()
+		c.login(username="emp1", password="123456")
+		response = c.get("/project/list")
+		self.assertEquals(response.status_code, 403)
+
+	def test_edit_project_get(self):
+		c = Client()
+		c.login(username="admin1", password="123456")
+		response = c.get("/project/list")
+		pro_id = response.context["projects"][0].id
+		response = c.get("/project/edit/" + str(pro_id) + "/")
+		self.assertEquals(response.status_code, 200)
+		form = response.context["form"]
+
+		self.assertEquals(form.initial["name"], "pro1")
+		self.assertEquals(form.initial["project_id"], pro_id)
+
+	def test_edit_project_404(self):
+		c = Client()
+		c.login(username="admin1", password="123456")
+
+		response = c.get("/project/edit/9000/")
+		self.assertEquals(response.status_code, 404)
+
+	def test_delete_project_positive(self):
+		c = Client()
+		c.login(username="admin1", password="123456")
+
+		response = c.get("/project/list")
+		pro_id = response.context["projects"][0].id
+		response = c.get("/project/delete/" + str(pro_id) + "/")
+		self.assertRedirects(response, "/project/list", fetch_redirect_response=False)
+
+		self.assertTrue(Project.objects.get(pk=pro_id).deleted)
+
+	def test_delete_project_not_allowed(self):
+		c = Client()
+		c.login(username="admin1", password="123456")
+
+		response = c.get("/project/list")
+		pro_id = response.context["projects"][0].id
+		c.logout()
+		c.login(username="admin2", password="123456")
+		response = c.get("/project/delete/" + str(pro_id) + "/")
+		self.assertEquals(response.status_code, 403)
+
+	def test_delete_project_not_active(self):
+		c = Client()
+		c.login(username="admin1", password="123456")
+
+		pro_id = Project.objects.get(deleted=True).id
+		response = c.get("/project/delete/" + str(pro_id) + "/")
+		self.assertEquals(response.status_code, 403)
 
 	def test_check_valid_company_project(self):
 		"""
-		#checks the company is valid
-		"""
-		project=Project.objects.get(name="TestProject")
-		company=Company.objects.get(cif="124")
-		self.assertTrue(checkCompanyProject(project,company.id))
+        checks the company is valid
+        """
+		project = Project.objects.get(name="pro1")
+		company = Company.objects.get(cif="123")
+		self.assertTrue(checkCompanyProject(project, company))
 
-	def test_check_valid_company_project_id(self):
+	def test_check_not_valid_company_project(self):
 		"""
-		#checks the company is valid
-		"""
-		project=Project.objects.get(name="TestProject")
-		company=Company.objects.get(cif="124")
-		self.assertTrue(checkCompanyProjectId(project.id,company.id))
-
-	def test_check_valid_company_project(self):
-		"""
-		#checks the company is NOT valid
-		"""
-		project=Project.objects.get(name="TestProject")
-		company=Company.objects.get(cif="123")
-		self.assertFalse(checkCompanyProject(project,company.id))
-	
+        checks the company is NOT valid
+        """
+		project = Project.objects.get(name="pro1")
+		company = Company.objects.get(cif="456")
+		self.assertRaises(PermissionDenied, checkCompanyProject, project, company)

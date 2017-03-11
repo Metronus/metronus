@@ -8,3 +8,6 @@ class Project(models.Model):
 	deleted = models.BooleanField(default=False)
 	def __unicode__(self):
 		return self.name
+
+	class Meta:
+		unique_together = ('name', 'company_id')

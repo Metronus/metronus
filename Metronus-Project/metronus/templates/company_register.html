@@ -2,16 +2,22 @@
 {% load i18n %}
 {% load l10n %}
 
-{% block title %}Registro Compañía{% endblock %}
+{% block title %}{% trans 'registerCompany' %}{% endblock %}
 
 
 {% block javascript %}
 
 <script type="text/javascript">
-  function toggle_form(){
-    $('.collapse').collapse('toggle');
+    function toggle_form(){
+      var elem = document.getElementById('toggle_button_id');
+      if(elem.textContent == "{% trans 'company_info'%}"){
+        document.getElementById('toggle_button_id').textContent = "{% trans 'admin_info' %}";
+      }else{
+        document.getElementById('toggle_button_id').textContent = "{% trans 'company_info' %}";
+      }
 
-  };
+    };
+
 </script>
 
 <script type="text/javascript">
@@ -23,7 +29,7 @@
     });
 
     if(formIsValid) {
-        $('.next_button', $(this)).attr('disabled', false);
+       $('.next_button', $(this)).attr('disabled', false);
     } else {
 
         $('.next_button', $(this)).attr('disabled', true);
@@ -85,7 +91,7 @@ $(document).ready(function() {
           cif: {
                 validators: {
                     notEmpty: {
-                        message: 'The last name is required and cannot be empty'
+                        message: '{% trans 'cif_error'%}'
                     },
                 },
                /* custom: {
@@ -106,87 +112,90 @@ $(document).ready(function() {
             company_name: {
                 validators: {
                     notEmpty: {
-                        message: 'The last name is required and cannot be empty'
+                        message: '{% trans 'company_name_error' %}'
                     }
                 }
             },
             company_email: {
                 validators: {
                     notEmpty: {
-                        message: 'The email address is required'
+                        message: '{% trans 'company_email_error#1' %}'
                     },
                     emailAddress: {
-                        message: 'The input is not a valid email address'
+                        message: '{% trans 'company_email_error#2' %}'
                     }
                 }
             },
             short_name: {
                 validators: {
                     notEmpty: {
-                        message: 'The gender is required'
+                        message: '{% trans 'company_short_name_error' %}'
                     }
                 }
             },
             company_phone: {
                 validators: {
                     notEmpty: {
-                        message: 'The gender is required'
+                        message: '{% trans 'company_phone_error' %}'
                     }
                 }
-            },
+            },           
             username: {
                 validators: {
                     notEmpty: {
-                        message: 'The gender is required'
+                        message: '{% trans 'username_error' %}'
                     }
                 }
             },
-            user_email: {
+            admin_email: {
                 validators: {
                     notEmpty: {
-                        message: 'The gender is required'
+                        message: '{% trans 'admin_email_error#1' %}'
+                    },
+                    emailAddress: {
+                        message: '{% trans 'admin_email_error#2' %}'
                     }
                 }
             },
-            password1: {
+            password: {
                 validators: {
                     notEmpty: {
-                        message: 'The gender is required'
+                        message: '{% trans 'password_error' %}'
                     }
                 }
             },
-            password2: {
+            repeatPassword: {
                 validators: {
                     notEmpty: {
-                        message: 'The gender is required'
+                        message: '{% trans 'passwordRepeat_error' %}'
                     }
                 }
             },
             first_name: {
                 validators: {
                     notEmpty: {
-                        message: 'The gender is required'
+                        message: '{% trans 'first_name_error' %}'
                     }
                 }
             },
             last_name: {
                 validators: {
                     notEmpty: {
-                        message: 'The gender is required'
+                        message: '{% trans 'last_name_error' %}'
                     }
                 }
             },
-            identifier: {
+            admin_identifier: {
                 validators: {
                     notEmpty: {
-                        message: 'The gender is required'
+                        message: '{% trans 'admin_identifier_error' %}'
                     }
                 }
             },
-            phone: {
+            admin_phone: {
                 validators: {
                     notEmpty: {
-                        message: 'The gender is required'
+                        message: '{% trans 'admin_phone_error' %}'
                     }
                 }
             },
@@ -218,65 +227,77 @@ $(document).ready(function() {
         <p>{{ form.errors }}</p>
 {% endif %}
  
-<h1> Registrar Compañía</h1></br>
+<h1> {% trans 'registerCompany' %}</h1></br>
+
+
+
 
    <form id="register_form" method="POST" class="form-horizontal" data-toggle="validator" role="form" action="" enctype="multipart/form-data">
 
+    {% csrf_token %}
 
-    	{% csrf_token %}
+
+        <div class="form-group control-buttons">
+            <div class="col-sm-offset-4 col-sm-10">
+                <button id="toggle_button_id"type="button" onclick="toggle_form()"class="btn btn-info" data-toggle="collapse" data-target="#div_company_info, #div_admin_info">{% trans 'admin_info'%}</button>
+
+                <button type="submit" class="btn btn-success submit-button" disabled="true">{% trans 'register' %}</button>
+
+            </div>
+          
+        </div>
+
+
+
+
 
       <!-- AQUI COMIENZA LA INFO DE LA COMPAÑIA -->
 
 	    <div id="div_company_info" class="col-md-6 col-md-offset-2 collapse in" >
 
         <div class="form-group company_class form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.cif.name }}">{{ form.cif.label }}</label>
+          <label class="control-label col-sm-4" for="id_{{ form.cif.name }}">{% trans 'cif' %}</label>
             <div class="col-sm-6">
               <input type="text" class="form-control col-md-6" name="{{ form.cif.name }}" id="id_{{ form.cif.name }}">
             </div>
         </div>
 
         <div class="form-group company_class form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.company_name.name }}">{{ form.company_name.label }}</label>
+          <label class="control-label col-sm-4" for="id_{{ form.company_name.name }}">{% trans 'companyName' %}</label>
             <div class="col-sm-6">
               <input type="text" class="form-control col-md-6" name="{{ form.company_name.name }}" id="id_{{ form.company_name.label }}">
             </div>
         </div>
 
         <div class="form-group company_class form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.short_name.name }}">{{ form.short_name.label }}</label>
+          <label class="control-label col-sm-4" for="id_{{ form.short_name.name }}">{% trans 'short_name'%}</label>
             <div class="col-sm-6">
               <input type="text" class="form-control col-md-6" name="{{ form.short_name.name }}" id="id_{{ form.short_name.label }}">
             </div>
         </div>
 
         <div class="form-group company_class form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.company_email.name }}">{{ form.company_email.label }}</label>
+          <label class="control-label col-sm-4" for="id_{{ form.company_email.name }}">{% trans 'company_email' %}</label>
             <div class="col-sm-6">
               <input type="email" class="form-control col-md-6" name="{{ form.company_email.name }}" id="id_{{ form.company_email.label }}">
             </div>
         </div>
 
         <div class="form-group company_class form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.company_phone.name }}">{{ form.company_phone.label }}</label>
+          <label class="control-label col-sm-4" for="id_{{ form.company_phone.name }}">{% trans 'company_phone' %}</label>
             <div class="col-sm-6">
             <input type="text" class="form-control col-md-6" name="{{ form.company_phone.name }}" id="id_{{ form.company_phone.label }}">
             </div>
         </div>
 
         <div class="form-group">
-          <label class="control-label col-sm-4" for="id_{{ form.logo.name }}">{{ form.logo.label }}</label>
+          <label class="control-label col-sm-4" for="id_{{ form.logo.name }}">{% trans 'logo' %}</label>
             <div class="col-sm-6">
               <input type="file" name="{{ form.logo.name }}" id="id_{{ form.logo.label }}">
             </div>
         </div>
                    
         <br/>
-        <div class="form-group">
-            <div class="col-sm-offset-4 col-sm-10">
-              <button onclick="toggle_form()"class="btn btn-default next_button" disabled="true">Siguiente</button>
-            </div>
-        </div>
 
         </div>
 
@@ -284,69 +305,65 @@ $(document).ready(function() {
 
         <div id="div_admin_info" class="col-md-6 col-md-offset-2 collapse" >
 
+
         <div class="form-group form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.username.name }}">{{ form.username.label }}</label>
+          <label class="control-label col-sm-4" for="id_{{ form.username.label }}">{% trans 'username' %}</label>
             <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.username.name }}" id="id_{{ form.username.name }}">
+              <input type="text" class="form-control col-md-6" name="{{ form.username.name }}" id="id_{{ form.username.label }}">
             </div>
         </div>
 
         <div class="form-group form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.user_email.name }}">{{ form.user_email.label }}</label>
+          <label class="control-label col-sm-4" for="id_{{ form.admin_email.label }}">{% trans 'admin_email' %}</label>
             <div class="col-sm-6">
-              <input type="email" class="form-control col-md-6" name="{{ form.user_email.name }}" id="id_{{ form.user_email.label }}">
+              <input type="email" class="form-control col-md-6" name="{{ form.admin_email.name }}" id="id_{{ form.admin_email.label }}">
             </div>
         </div>
 
         <div class="form-group form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.password1.name }}">{{ form.password1.label }}</label>
+          <label class="control-label col-sm-4" for="id_{{ form.password.label }}">{% trans 'password' %}</label>
             <div class="col-sm-6">
-              <input type="password" class="form-control col-md-6" name="{{ form.password1.name }}" id="id_{{ form.password1.label }}">
+              <input type="password" class="form-control col-md-6" name="{{ form.password.name }}" id="id_{{ form.password.label }}">
             </div>
         </div>
 
         <div class="form-group form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.password2.name }}">{{ form.password2.label }}</label>
+          <label class="control-label col-sm-4" for="id_{{ form.repeatPassword.label }}">{% trans 'repeatPassword' %}</label>
             <div class="col-sm-6">
-              <input type="password" class="form-control col-md-6" name="{{ form.password2.name }}" id="id_{{ form.password2.label }}">
+              <input type="password" class="form-control col-md-6" name="{{ form.repeatPassword.name }}" id="id_{{ form.repeatPassword.label }}">
             </div>
         </div>
 
         <div class="form-group form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.first_name.name }}">{{ form.first_name.label }}</label>
+          <label class="control-label col-sm-4" for="id_{{ form.first_name.label }}">{% trans 'first_name' %}</label>
             <div class="col-sm-6">
               <input type="text" class="form-control col-md-6" name="{{ form.first_name.name }}" id="id_{{ form.first_name.label }}">
             </div>
         </div>
 
         <div class="form-group form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.last_name.name }}">{{ form.last_name.label }}</label>
+          <label class="control-label col-sm-4" for="id_{{ form.last_name.label }}">{% trans 'last_name'%}</label>
             <div class="col-sm-6">
               <input type="text" class="form-control col-md-6" name="{{ form.last_name.name }}" id="id_{{ form.last_name.label }}">
             </div>
         </div>
 
         <div class="form-group form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.identifier.name }}">{{ form.identifier.label }}</label>
+          <label class="control-label col-sm-4" for="id_{{ form.admin_identifier.label }}">{% trans 'admin_identifier' %}</label>
             <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.identifier.name }}" id="id_{{ form.identifier.label }}">
+              <input type="text" class="form-control col-md-6" name="{{ form.admin_identifier.name }}" id="id_{{ form.admin_identifier.label }}">
             </div>
         </div>
 
         <div class="form-group form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.phone.name }}">{{ form.phone.label }}</label>
+          <label class="control-label col-sm-4" for="id_{{ form.admin_phone.label }}">{% trans 'admin_phone'%}</label>
             <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.phone.name }}" id="id_{{ form.phone.label }}">
+              <input type="text" class="form-control col-md-6" name="{{ form.admin_phone.name }}" id="id_{{ form.admin_phone.label }}">
             </div>
         </div>
                    
         <br/>
 
-        <div class="form-group">
-            <div class="col-sm-offset-4 col-sm-10">
-                <button type="submit" class="btn btn-success submit-button" disabled="true">Registrate</button>
-            </div>
-        </div>
 
 
         </div>

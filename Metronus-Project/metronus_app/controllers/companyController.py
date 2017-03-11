@@ -40,7 +40,7 @@ def create(request):
     else:
         # form = DepartmentForm(initial={"department_id":0})
         form = RegistrationForm()
-    return render_to_response('company_register.html', {'form': form})
+    return render(request,'company_register.html', {'form': form})
 
 
 def edit(request, cif):
@@ -113,15 +113,15 @@ def createCompany(form):
 
 def registerAdministrator(form, company):
     username = form.cleaned_data['username']
-    password = form.cleaned_data['password1']
+    password = form.cleaned_data['password']
     first_name = form.cleaned_data['first_name']
     last_name = form.cleaned_data['last_name']
-    user_email = form.cleaned_data['user_email']
+    user_email = form.cleaned_data['admin_email']
 
     admin = User.objects.create_user(username=username, password=password, email=user_email, first_name=first_name, last_name=last_name)
 
-    identifier = form.cleaned_data['identifier']
-    phone = form.cleaned_data['phone']
+    identifier = form.cleaned_data['admin_identifier']
+    phone = form.cleaned_data['admin_phone']
 
     Administrator.objects.create(user=admin, user_type="A", identifier=identifier, phone=phone, company_id=company)
 
@@ -130,7 +130,7 @@ def checkPasswords(form):
     """
     checks if two passwords are the same
     """
-    return form.cleaned_data['password1'] == form.cleaned_data['password2']
+    return form.cleaned_data['password'] == form.cleaned_data['repeatPassword']
 
 def validateCIF(request):
     cif = request.GET.get('cif', None)
