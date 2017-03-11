@@ -1,0 +1,48 @@
+{% extends "layout_base.html" %}
+{% load i18n %}
+{% load l10n %}
+{% block title %}
+{{employee.user}}
+{% endblock %}
+
+{% block content %}
+<h1>{% trans 'profile' %}{{employee.user}}</h1>
+
+<div>
+	{# Información de la persona #}
+</div>
+<div>
+	{# ¿Foto? #}
+</div>
+<div>
+<h2>{% trans 'roles' %}</h2>
+{% if employee_roles %}
+<table>
+  <thead class="table">
+    <tr>
+      <th class="col-xs-3">{% trans 'department' %}</th>
+      <th class="col-xs-3">{% trans 'project' %}</th>
+      <th class="col-xs-3">{% trans 'rol' %}</th>
+      <th class="col-xs-3"></th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for rol in employee_roles %}
+    <tr>
+      <td>{{rol.projectDepartment.department.name}}</td>
+      <td>{{rol.projectDepartment.project.name}}</td>
+      <td>{{rol.role_id}}</td>
+      <td><div align="right"><a align="right" class="btn btn-primary" href="/rol/update?rol_id={{rol.id}}">{% trans 'update' %}</a>
+		<a align="right" class="btn btn-danger" href="/rol/delete?rol_id={{rol.id}}">{% trans 'delete' %}</a></div></td>
+    </tr>
+	{% endfor %}
+	</tbody>
+</table>
+{% else %}
+{% trans 'noRoles' %}
+{% endif %}
+</div>
+</br>
+<a class="btn btn-primary" href="/rol/create?employee_id={{employee.id}}">{% trans 'addRole' %}</a>
+
+{% endblock %}

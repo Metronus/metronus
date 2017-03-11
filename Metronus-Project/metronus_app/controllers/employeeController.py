@@ -1,4 +1,5 @@
 from django.contrib.auth.models                  import User
+from django.shortcuts import render
 from django.shortcuts                            import render_to_response, get_object_or_404
 from django.core.urlresolvers                    import reverse
 from django.http                                 import HttpResponseRedirect
@@ -79,7 +80,7 @@ def view(request, username):
 
     employee_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee)
 
-    return render_to_response('employee_view.html', {'employee': employee, 'employee_roles': employee_roles})
+    return render(request, 'employee_view.html', {'employee': employee, 'employee_roles': employee_roles})
 
 def edit(request, username):
     """

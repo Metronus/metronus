@@ -57,6 +57,8 @@ msgid "create"
 msgstr "Create"
 
 #: Department
+msgid "department"
+msgstr "Department"
 msgid "createDepartment"
 msgstr "Create department"
 msgid "editDepartment"
@@ -77,12 +79,26 @@ msgid "editEmployee"
 msgstr "Edit employee"
 msgid "reset"
 msgstr "Reset"
+msgid "profile"
+msgstr "Profile: "
 
 
 #: Project
+msgid "project"
+msgstr "Project"
 msgid "createProject"
 msgstr "Create project"
 msgid "editProject"
 msgstr "Edit project"
 msgid "projectList"
 msgstr "Project list"
+
+#: Roles
+msgid "rol"
+msgstr "Role"
+msgid "roles"
+msgstr "Roles"
+msgid "noRoles"
+msgstr "This employee has no roles"
+msgid "addRole"
+msgstr "Add role"
