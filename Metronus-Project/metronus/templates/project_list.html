@@ -5,6 +5,10 @@
 {% block title %}{% trans 'projectList' %}{% endblock %}
 
 {% block content %}
+    <h1>{% trans 'projectList' %}</h1>
+
+    <br><br>
+
     <ul class="list-group">
     {% for project in projects %}
         <li class="list-group-item">
