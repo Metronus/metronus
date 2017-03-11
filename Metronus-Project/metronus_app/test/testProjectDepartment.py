@@ -221,7 +221,7 @@ class ProjectDepartmentTestCase(TestCase):
         self.assertEquals(count, count2)
 
 
-    def test_list_admin1(self):
+    def test_list_admin1_positive(self):
         #Logged as admin1, his company has 2 projectDepartments
         c = Client()
         c.login(username="admin", password="1234")
@@ -232,7 +232,31 @@ class ProjectDepartmentTestCase(TestCase):
         self.assertEquals(len(response.context["projectDepartments"]), 2)
 
 
-    def test_list_admin1(self):
+    def test_list_admin1_dep1_positive(self):
+        #Logged as admin1, list the projectDepartments of Departamento1
+        c = Client()
+        c.login(username="admin", password="1234")
+
+        dep = Department.objects.get(name="Departamento1")
+        response = c.get("/projectdepartment/list", {"department_id" : dep.id})
+
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(len(response.context["projectDepartments"]), 1)
+
+
+    def test_list_admin1_proj2_positive(self):
+        #Logged as admin1, list the projectDepartments of TestProject2
+        c = Client()
+        c.login(username="admin", password="1234")
+
+        proj = Project.objects.get(name="TestProject2")
+        response = c.get("/projectdepartment/list", {"project_id" : proj.id})
+
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(len(response.context["projectDepartments"]), 0)
+
+
+    def test_list_admin2_positive(self):
         #Logged as admin2, his company has 0 projectDepartments
         c = Client()
         c.login(username="admin2", password="4321")
@@ -241,3 +265,4 @@ class ProjectDepartmentTestCase(TestCase):
 
         self.assertEquals(response.status_code, 200)
         self.assertEquals(len(response.context["projectDepartments"]), 0)
+

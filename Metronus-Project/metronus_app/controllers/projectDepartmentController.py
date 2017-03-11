@@ -2,6 +2,8 @@ from django.shortcuts import render, render_to_response, get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from metronus_app.forms.projectDepartmentForm import ProjectDepartmentForm
 from metronus_app.model.projectDepartment import ProjectDepartment
+from metronus_app.model.project import Project
+from metronus_app.model.department import Department
 from metronus_app.controllers.projectController import checkCompanyProjectSession
 from metronus_app.controllers.departmentController import checkCompanyDepartmentSession
 
@@ -70,16 +72,19 @@ def list(request):
 
     admin = get_current_admin_or_403(request)
 
-    project = request.GET.get('project_id')
-    department = request.GET.get('department_id')
+    project_id = request.GET.get('project_id')
+    department_id = request.GET.get('department_id')
 
-    if (project is not None):
+    if project_id is not None:
+        project = Project.objects.get(id=project_id)
         checkCompanyProjectSession(project, admin)
         lista = ProjectDepartment.objects.filter(project_id=project)
 
-    elif (department is not None):
+    elif department_id is not None:
+        department = Department.objects.get(id=department_id)
         checkCompanyDepartmentSession(department, admin)
         lista = ProjectDepartment.objects.filter(department_id=department)
+
     else:
         lista = ProjectDepartment.objects.filter(project_id__company_id = admin.company_id)
 
