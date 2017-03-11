@@ -7,5 +7,5 @@ class ProjectDepartmentForm(forms.Form):
 
     def __init__(self, user, *args, **kwargs):
         super(ProjectDepartmentForm, self).__init__(*args, **kwargs)
-        self.fields['project_id'] = forms.ModelChoiceField(queryset=Project.objects.filter(company_id=user.company_id))
-        self.fields['department_id'] = forms.ModelChoiceField(queryset=Department.objects.filter(company_id=user.company_id))
+        self.fields['project_id'] = forms.ModelChoiceField(queryset=Project.objects.filter(company_id=user.company_id, deleted=False))
+        self.fields['department_id'] = forms.ModelChoiceField(queryset=Department.objects.filter(company_id=user.company_id ,active=True))
