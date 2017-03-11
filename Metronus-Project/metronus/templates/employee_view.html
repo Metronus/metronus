@@ -6,14 +6,63 @@
 {% endblock %}
 
 {% block content %}
-<h1>{% trans 'profile' %}{{employee.user}}</h1>
+<h1>{% trans 'profile' %}</h1>
 
-<div>
-	{# Información de la persona #}
+<!-- Employee's profile card -->
+<div class="row row-centered">
+  <div class="col-md-5 col-centered">
+    <div class="box box-widget widget-user">
+      <!-- Background can be changed to a custom one -->
+      <div class="widget-user-header " style="background: #1a2226 center center; color: white">
+        <h3 class="widget-user-username">{{employee.user}}</h3>
+        <h5 class="widget-user-desc">{{employee.identifier}}</h5>
+      </div>
+      <div class="widget-user-image">
+        <img class="img-circle" src="/static/img/profile-picture.jpg" alt="User Avatar">
+      </div>
+
+      <!-- Roles/Departments/Projects Summary -->
+      <div class="box-footer">
+        <div class="row">
+          <div class="col-sm-4 border-right">
+            <div class="description-block">
+              <h5 class="description-header">0</h5>
+              <span class="description-text">{% trans 'roles' %}</span>
+            </div>
+          </div>
+          <div class="col-sm-4 border-right">
+            <div class="description-block">
+              <h5 class="description-header">0</h5>
+              <span class="description-text">{% trans 'departments' %}</span>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="description-block">
+              <h5 class="description-header">0</h5>
+              <span class="description-text">{% trans 'projects' %}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- More self info -->
+      <div class="box-body box-profile">
+        <ul class="list-group list-group-unbordered">
+          <li class="list-group-item">
+            <b>{% trans 'phone' %}</b> <span class="pull-right">{{employee.phone}}</span>
+          </li>
+          <li class="list-group-item">
+            <b>{% trans 'registryDate' %}</b> <span class="pull-right">{{employee.registryDate}}</span>
+          </li>
+        </ul>
+        <a href="/employee/list" class="btn bg-olive btn-flat margin"><b>{% trans 'backToList' %}</b></a>
+      </div>
+
+    </div>
+  </div>
 </div>
-<div>
-	{# ¿Foto? #}
-</div>
+
+
 <div>
 <h2>{% trans 'roles' %}</h2>
 {% if employee_roles %}

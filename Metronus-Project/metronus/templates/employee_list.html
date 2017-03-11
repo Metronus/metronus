@@ -31,6 +31,8 @@
                     <td>{{employee.phone}}</td>
 
                     <td>{{employee.registryDate}}</td>
+
+                    <td><a href="/employee/view/{{employee.user}}" type="button" class="btn bg-olive btn-flat">{% trans 'details' %}</a></td>
                 </tr>
                 {% endfor %}
               </tbody>
