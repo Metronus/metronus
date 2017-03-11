@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, render_to_response, get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from metronus_app.forms.projectDepartmentForm import ProjectDepartmentForm
 from metronus_app.model.projectDepartment import ProjectDepartment
@@ -28,14 +28,9 @@ def create(request):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-
-            project = form.cleaned_data['project_id']
-            department = form.cleaned_data['department_id']
-            legalForm = checkCompanyProjectSession(project, admin) and checkCompanyDepartmentSession(department, admin)
-            
-            if (legalForm):
-                createProjectDepartment(form)
-                return HttpResponseRedirect('/projectdepartment/list')
+            #print(form.cleaned_data["project_id"].deleted)
+            pd = createProjectDepartment(form, admin)
+            return render_to_response('projectdepartment_create.html', {'form': ProjectDepartmentForm(user=admin), 'success': True})
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -129,11 +124,15 @@ def edit(request):
 
 #Auxiliar methods, containing the operation logic
 
-def createProjectDepartment(form):
+def createProjectDepartment(form, admin):
     project=form.cleaned_data['project_id']
     department = form.cleaned_data['department_id']
 
-    ProjectDepartment.objects.create(project_id = project, department_id = department)
+    legalForm = checkCompanyProjectSession(project, admin) and checkCompanyDepartmentSession(department, admin)
+    if not legalForm:
+        raise PermissionDenied
+
+    return ProjectDepartment.objects.create(project_id = project, department_id = department)
 
 #Se permitirán los updates de projectDepartment?
 def updateProjectDepartment(projectDepartment,form):

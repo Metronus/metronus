@@ -63,6 +63,11 @@ class ProjectDepartmentTestCase(TestCase):
 			deleted=False,
 			company_id=company124)
 
+		proj3 = Project.objects.create(
+			name="TestProjectC2",
+			deleted=False,
+			company_id=company123)
+
 		dep1 = Department.objects.create(
 			name="Departamento1",
 			active=True,company_id=company124)
@@ -81,18 +86,53 @@ class ProjectDepartmentTestCase(TestCase):
 			department_id = dep1)
 	
 
-	def test_create_projectDepartment(self):
+	def test_create_projectDepartment_positive(self):
 		"""
 		#checks the number of projectDepartments increased
 		"""
-		count=ProjectDepartment.objects.count()
-		company=Company.objects.get(cif="124")
-		project = Project.objects.get(name="TestProject")
-		department = Department.objects.get(name="Departamento1")
-		ProjectDepartment.objects.create(project_id = project, department_id = department)
+		c = Client()
+		c.login(username="admin", password="1234")
 
-		cuenta2=Project.objects.count()
-		self.assertTrue(count+1,count)
+
+		project = Project.objects.get(name="TestProject2")
+		department = Department.objects.get(name="Departamento1")
+		count=ProjectDepartment.objects.all().count()
+
+		response = c.post("/projectdepartment/create", {
+            "projectDepartment_id": "0",
+            "project_id": project.id,
+            "department_id": department.id,
+        })
+
+		count2=ProjectDepartment.objects.all().count()
+
+		self.assertEquals(response.status_code, 200)
+		self.assertEquals(count + 1,count2)
+
+	def test_create_projectDepartment_negative_project(self):
+		"""
+		#checks the number of projectDepartments increased
+		Admin is trying to create a projectDepartment using a project that's not from his Company
+		"""
+		c = Client()
+		c.login(username="admin", password="1234")
+
+
+		project = Project.objects.get(name="TestProjectC2")
+		department = Department.objects.get(name="Departamento1")
+		count=ProjectDepartment.objects.all().count()
+
+		response = c.post("/projectdepartment/create", {
+            "projectDepartment_id": "0",
+            "project_id": project.id,
+            "department_id": department.id,
+        })
+
+
+		count2=ProjectDepartment.objects.all().count()
+
+		self.assertEquals(response.status_code, 200)
+		self.assertEquals(count,count2)
 
 	def test_list_admin1(self):
 		#Logged as admin1, his company has 2 projectDepartments
