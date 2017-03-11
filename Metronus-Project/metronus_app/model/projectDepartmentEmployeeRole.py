@@ -7,7 +7,7 @@ class ProjectDepartmentEmployeeRole(models.Model):
     projectDepartment_id=models.ForeignKey(ProjectDepartment, on_delete=models.CASCADE);
     employee_id=models.ForeignKey(Employee);
     role_id=models.ForeignKey(Role);
-    roleDate=models.DateTimeField();
+    roleDate=models.DateTimeField(auto_now=True);
 
     class Meta:
         unique_together = ('projectDepartment_id', 'employee_id','role_id')

@@ -27,7 +27,7 @@ from metronus_app.controllers       import employeeController
 from metronus_app.controllers       import roleController
 from metronus_app.controllers       import companyController
 from metronus_app.controllers       import administratorController
-
+from metronus_app.controllers       import taskController
 urlpatterns=[url(r'^i18n/', include('django.conf.urls.i18n')),]
 urlpatterns += [#i18n_patterns(
     url(r'^$', views.index),
@@ -37,6 +37,13 @@ urlpatterns += [#i18n_patterns(
     url(r'^department/list$', departmentController.list),
     url(r'^department/edit$', departmentController.edit),
     url(r'^department/delete$', departmentController.delete),
+
+    #a la espera de ponerle el name
+    url(r'^task/create$', taskController.create),
+    url(r'^task/list_project$', taskController.list_project),
+    url(r'^task/list_department$', taskController.list_department),
+    url(r'^task/edit$', taskController.edit),
+    url(r'^task/delete$', taskController.delete),
 
     url(r'^project/list$', projectController.list, name='project_list'),
     url(r'^project/edit/(?P<project_id>\w{0,50})/$', projectController.edit, name='project_edit'),

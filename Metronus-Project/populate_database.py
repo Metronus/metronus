@@ -5,13 +5,12 @@ from metronus_app.model.project import Project
 from metronus_app.model.department import Department
 from django.contrib.auth.models import User
 from metronus_app.model.administrator import Administrator
-
-
+from metronus_app.model.task import Task
+from metronus_app.model.projectDepartment import ProjectDepartment
+from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 def basicLoad():
-    Company.objects.create(cif="123", company_name="company1", short_name="company1", email="company1@gmail.com", phone="123456789")
-    Company.objects.create(cif="000000000", company_name="metronus", short_name="met", email="metronus@us.com", phone="123456789")
-    company = Company.objects.get(cif="123")
-    company2 = Company.objects.get(cif="000000000")
+    company=Company.objects.create(cif="123", company_name="company1", short_name="company1", email="company1@gmail.com", phone="123456789")
+    company2=Company.objects.create(cif="000000000", company_name="metronus", short_name="met", email="metronus@us.com", phone="123456789")
     #From first company:company1
     User.objects.create_user(
         username="employee",
@@ -56,28 +55,134 @@ def basicLoad():
         phone="123456789",
         company_id=company2)
 
-    create_user("anddonram",company2)
-    create_user("raisans_138",company2)
-    create_user("JoseGavilan",company2)
-    create_user("ddlsb",company2)
-    create_user("agubelu",company2)
-    create_user("JkLiebana",company2)
-    create_user("Guardsoul",company2)
-    create_user("Barrelito",company2)
-    create_user("andjimrio",company2)
-    create_user("Jarvie",company2)
+    emp1=create_user("anddonram",company2)
+    emp2=create_user("raisans_138",company2)
+    emp3=create_user("JoseGavilan",company2)
+    emp4=create_user("ddlsb",company2)
+    emp5=create_user("agubelu",company2)
+    emp6=create_user("JkLiebana",company2)
+    emp7=create_user("Guardsoul",company2)
+    emp8=create_user("Barrelito",company2)
+    emp9=create_user("andjimrio",company2)
+    emp10=create_user("Jarvie",company2)
     Department.objects.create(name="dep3",active=True,company_id=company)
     Project.objects.create(name="TestProject",deleted=False,company_id=company)
 
+    proj1 = Project.objects.create(
+        name="Metronus",
+        deleted=False,
+        company_id=company2)
+
+    proj2 = Project.objects.create(
+        name="Proust-Ligeti",
+        deleted=False,
+        company_id=company)
+
+    dep1 = Department.objects.create(
+        name="Backend",
+		active=True,company_id=company2)
+
+    dep2 = Department.objects.create(
+        name="Frontend",
+		active=True,
+		company_id=company2)
+
+    #Frontend
+    pd1 = ProjectDepartment.objects.create(
+		project_id = proj1,
+		department_id = dep2)
+
+    #Backend
+    pd2 = ProjectDepartment.objects.create(
+		project_id = proj1,
+		department_id = dep1)
+
+    populate_roles()
+
+    emp_role=Role.objects.get(name="Employee")
+    coor_role=Role.objects.get(name="Coordinator")
+    pm_role=Role.objects.get(name="Project manager")
+
+    ProjectDepartmentEmployeeRole.objects.create(
+        projectDepartment_id=pd2,
+        employee_id=emp1,
+        role_id= emp_role)
+    ProjectDepartmentEmployeeRole.objects.create(
+        projectDepartment_id=pd2,
+        employee_id=emp2,
+        role_id=emp_role )
+    ProjectDepartmentEmployeeRole.objects.create(
+        projectDepartment_id=pd1,
+        employee_id=emp3,
+        role_id=emp_role )
+
+    ProjectDepartmentEmployeeRole.objects.create(
+        projectDepartment_id=pd2,
+        employee_id=emp4,
+        role_id=pm_role )
+    ProjectDepartmentEmployeeRole.objects.create(
+        projectDepartment_id=pd1,
+        employee_id=emp4,
+        role_id=pm_role )
+
+    ProjectDepartmentEmployeeRole.objects.create(
+        projectDepartment_id=pd2,
+        employee_id=emp5,
+        role_id=coor_role )
+    ProjectDepartmentEmployeeRole.objects.create(
+        projectDepartment_id=pd1,
+        employee_id=emp6,
+        role_id= emp_role)
+    ProjectDepartmentEmployeeRole.objects.create(
+        projectDepartment_id=pd2,
+        employee_id=emp7,
+        role_id=emp_role )
+    ProjectDepartmentEmployeeRole.objects.create(
+        projectDepartment_id=pd1,
+        employee_id=emp8,
+        role_id=coor_role )
+    ProjectDepartmentEmployeeRole.objects.create(
+        projectDepartment_id=pd1,
+        employee_id=emp9,
+        role_id=emp_role )
+    ProjectDepartmentEmployeeRole.objects.create(
+        projectDepartment_id=pd2,
+        employee_id=emp10,
+        role_id=emp_role )
+
+    ProjectDepartmentEmployeeRole.objects.create(
+        projectDepartment_id=pd2,
+        employee_id=emp4,
+        role_id=Role.objects.get(name="Administrator") )
+
+    Task.objects.create(
+        name  ="Hacer cosas",
+        description  = "meda",
+        actor_id = emp4,
+        projectDepartment_id = pd1
+    )
+
+    Task.objects.create(
+        name  ="Hacer cosas de back",
+        description  = "hola",
+        actor_id = emp5,
+        projectDepartment_id = pd1
+    )
+    Task.objects.create(
+        name  ="Hacer cosas de front",
+        description  = "nada",
+        actor_id = emp8,
+        projectDepartment_id = pd2
+    )
 def create_user(nombre,company2):
     User.objects.create_user(
         username=nombre,
-        password=nombre,
+        password="123456",
         email=nombre+"@gmail.com",
         first_name=nombre,
         last_name=nombre)
     user2 = User.objects.get(username=nombre)
-    Employee.objects.create(
+    return Employee.objects.create(
         user=user2,
         user_type="E",
         identifier="12345",
@@ -100,4 +205,3 @@ def populate_roles():
 
 def populate_database():
     basicLoad()
-    populate_roles()
