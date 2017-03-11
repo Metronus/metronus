@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from metronus_app.forms.projectDepartmentForm import ProjectDepartmentForm
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.controllers.projectController import checkCompanyProjectSession
@@ -34,7 +35,7 @@ def create(request):
             
             if (legalForm):
                 createProjectDepartment(form)
-                return HttpResponseRedirect('/project/list')
+                return HttpResponseRedirect('/projectdepartment/list')
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -42,6 +43,24 @@ def create(request):
 
     return render(request, 'projectdepartment_form.html', {'form': form})
 
+def delete(request, projectDepartment_id):
+    """
+    parameters:
+    Recibe el id del projectDepartment a borrar: projectDepartment_id
+
+    template: projectDepartment_list.html
+    """
+
+    admin = get_current_admin_or_403(request)
+    projectDepartment = get_object_or_404(ProjectDepartment, id=projectDepartment_id)
+
+    # Check that the admin has permission to delete that projectDepartment
+    if not checkCompanyProjectDepartmentSession(projectDepartment, admin):
+        raise PermissionDenied
+
+    deleteProjectDepartment(projectDepartment)
+
+    return HttpResponseRedirect('/projectdepartment/list/')
 
 def list(request):
     """
@@ -96,7 +115,7 @@ def edit(request):
             if checkCompanyProjectDepartmentSession(projectDepartment, admin):
                 updateProjectDepartment(projectDepartment,form)
 
-            return HttpResponseRedirect('/project/list')
+            return HttpResponseRedirect('/projectdepartment/list')
 
     # if a GET (or any other method) we'll create a blank form
     else:
