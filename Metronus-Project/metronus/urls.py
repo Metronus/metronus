@@ -34,8 +34,10 @@ urlpatterns += [#i18n_patterns(
 
 	url(r'^index.html/$', views.index),
     url(r'^department/create$', departmentController.create),
+    url(r'^department/createAsync$', departmentController.createAsync),
     url(r'^department/list$', departmentController.list),
     url(r'^department/edit$', departmentController.edit),
+    url(r'^department/view$', departmentController.view),
     url(r'^department/delete$', departmentController.delete),
 
     #a la espera de ponerle el name
