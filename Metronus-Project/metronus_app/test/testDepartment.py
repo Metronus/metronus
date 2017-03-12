@@ -6,6 +6,7 @@ from django.test import TestCase, Client
 from metronus_app.model.employee         import Employee
 from django.core.exceptions                      import ObjectDoesNotExist, PermissionDenied
 from populate_database import populate_database
+import json
 class DepartmentTestCase(TestCase):
     def setUpTestData():
         company1 = Company.objects.create(
@@ -99,6 +100,38 @@ class DepartmentTestCase(TestCase):
         logs_after = Department.objects.all().count()
 
         self.assertEquals(logs_before + 1, logs_after)
+
+    def test_create_async_department_positive(self):
+        # Logged in as an administrator, try to create an department
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        logs_before = Department.objects.all().count()
+
+        response = c.post("/department/createAsync", {
+            "department_id": "0",
+            "name": "dep4",
+        })
+
+        self.assertEquals(response.status_code, 200)
+
+        # Check that the department has been successfully created
+
+        dep = Department.objects.all().last()
+        self.assertEquals(dep.name, "dep4")
+        self.assertEquals(dep.company_id,Administrator.objects.get(identifier="adm01").company_id)
+        self.assertEquals(dep.active,True)
+
+        #response in bytes must be decode to string
+        data=response.content.decode("utf-8")
+        #string to dict
+        data=json.loads(data)
+        self.assertEquals(data["repeated_name"],False)
+        self.assertEquals(data["success"],True)
+        logs_after = Department.objects.all().count()
+
+        self.assertEquals(logs_before + 1, logs_after)
+
 
     def test_create_department_duplicate(self):
         # Logged in as an administrator, try to create an department with the name of an existing company
