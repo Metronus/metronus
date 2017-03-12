@@ -77,5 +77,7 @@ urlpatterns += [#i18n_patterns(
 
     url(r'^register$', companyController.create),
     url(r'^ajax/validate_cif/$', companyController.validateCIF, name='validate_cif'),
+    url(r'^ajax/validate_admin/$', companyController.validateAdmin, name='validate_admin'),
+
 #)
 ]

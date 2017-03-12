@@ -135,8 +135,17 @@ def checkPasswords(form):
 def validateCIF(request):
     cif = request.GET.get('cif', None)
     data = {
-        'is_taken': 1 == 1
+        'is_taken': cif == "A11111111"
     }
     if data['is_taken']:
-        data['error_message'] = 'A user with this username already exists.'
+        data['error_message'] = 'ERROR'
+    return JsonResponse(data)
+
+def validateAdmin(request):
+    admin = request.GET.get('admin', None)
+    data = {
+        'is_taken': admin == "admin"
+    }
+    if data['is_taken']:
+        data['error_message'] = 'ERROR'
     return JsonResponse(data)

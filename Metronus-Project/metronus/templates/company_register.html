@@ -17,11 +17,10 @@
       }
 
     };
-
-</script>
+  </script>
 
 <script type="text/javascript">
-//ESTE SCRIPT COMPRUEBA LOS VALORES DEL FORM DE LA COMPAÑÍA PARA NO DEJAR PASAR AL DEL ADMIN SI NO ESTAN CORRECTOS
+  //ESTE SCRIPT COMPRUEBA LOS VALORES DEL FORM DE LA COMPAÑÍA PARA NO DEJAR PASAR AL DEL ADMIN SI NO ESTAN CORRECTOS
   $('#div_company_info').change(function() {
     formIsValid = true;
     $('.company_class',$(this)).each( function() {
@@ -34,11 +33,11 @@
 
         $('.next_button', $(this)).attr('disabled', true);
     }
-});
+  });
 </script>
 
 <script type="text/javascript">
-//ESTE SCRIPT COMPRUEBA LOS VALORES DEL FORM COMPLETO PARA NO DEJAR PULSAR SOBRE "REGISTRAR" SI NO ESTAN TODOS CORRECTOS
+  //ESTE SCRIPT COMPRUEBA LOS VALORES DEL FORM COMPLETO PARA NO DEJAR PULSAR SOBRE "REGISTRAR" SI NO ESTAN TODOS CORRECTOS
   $('#register_form').change(function() {
     formIsValid = true;
     $('.form-class',$(this)).each( function() {
@@ -50,37 +49,14 @@
 
         $('.submit-button', $(this)).attr('disabled', true);
     }
-});
-
-
+  });
 </script>
 
 <script>
-//Validación Ajax
-   $("#id_company_email").change(function () {
-     // $('.collapse').collapse('toggle');
-		 /*var cif = $(this).val();
-		 console.log(cif);
 
-      $.ajax({
-        url: '/ajax/validate_cif/',
-        data: {
-          'cif': cif
-        },
-        dataType: 'json',
-        success: function (data) {
-          if (data.is_taken) {
-            //alert("A user with this username already exists.");
-          }
-        }
-      });*/
+  //Esto es para validar en cliente de forma bonita con bootstrap :)
 
-    });
-</script>
-
-<script>
-//Esto es para validar en cliente de forma bonita con bootstrap :)
-$(document).ready(function() {
+  $(document).ready(function() {
     $('#register_form').bootstrapValidator({
         feedbackIcons: {
             valid: 'glyphicon glyphicon-ok',
@@ -91,23 +67,13 @@ $(document).ready(function() {
           cif: {
                 validators: {
                     notEmpty: {
-                        message: '{% trans 'cif_error'%}'
+                        message: '{% trans 'cif_error#1'%}'
+                    },
+                    regexp:{
+                      regexp: /^[a-zA-Z]\d{8}$/ig,
+                      message: '{% trans 'cif_error#2'%}'
                     },
                 },
-               /* custom: {
-                    "uniquecif": function(el) {
-                      $.ajax({
-                        url:'/ajax/validate_cif/',
-                        type:'POST',
-                        data: {username: $(el).val()},
-                            }).done(result => {
-                                console.log(Boolean(result))
-                                return Boolean(!result)
-                              }).fail(err => {
-                                console.log('Error:', err)
-                      })
-                    }
-                },*/
             },
             company_name: {
                 validators: {
@@ -136,8 +102,12 @@ $(document).ready(function() {
             company_phone: {
                 validators: {
                     notEmpty: {
-                        message: '{% trans 'company_phone_error' %}'
-                    }
+                        message: '{% trans 'company_phone_error#1' %}'
+                    },
+                     regexp:{
+                      regexp: /^\d{9}$/ig,
+                      message: '{% trans 'company_phone_error#2' %}'
+                    },
                 }
             },           
             username: {
@@ -195,29 +165,122 @@ $(document).ready(function() {
             admin_phone: {
                 validators: {
                     notEmpty: {
-                        message: '{% trans 'admin_phone_error' %}'
-                    }
+                        message: '{% trans 'admin_phone_error#1' %}'
+                    },
+                    regexp:{
+                      regexp: /^\d{9}$/ig,
+                      message: '{% trans 'admin_phone_error#2' %}'
+                    },
                 }
             },
 
         },
     });
-});
-
-
+  });
 </script>
 
-<script>
-/*
-  $("#id_cif").validator({
-    
-    errors: {
-        "uniquecif":"Username in use",
+
+<script type="text/javascript">
+  var password = document.getElementById("id_password")
+  , confirm_password = document.getElementById("id_repeatPassword")
+  , div_pass_1 = document.getElementById("div_pass_1")
+  , div_pass_2 = document.getElementById("div_pass_2");
+
+  function validatePassword(){
+  if((password.value != confirm_password.value) || password.value == "" || confirm_password.value == "") {
+    div_pass_1.className = "form-group required form-class has-feedback has-error";
+    div_pass_1.childNodes[2].childNodes[1].className = "form-control-feedback glyphicon glyphicon-remove"
+    div_pass_2.className = "form-group required form-class has-feedback has-error";
+    div_pass_2.childNodes[2].childNodes[1].className = "form-control-feedback glyphicon glyphicon-remove"
+
+
+  } else {
+
+    div_pass_1.className = "form-group required form-class has-feedback has-success";
+    div_pass_1.childNodes[2].childNodes[1].className = "form-control-feedback glyphicon glyphicon-ok"
+
+    div_pass_2.className = "form-group required form-class has-feedback has-success";
+    div_pass_2.childNodes[2].childNodes[1].className = "form-control-feedback glyphicon glyphicon-ok"
+
+  }
+  }
+
+  password.onchange = validatePassword;
+  confirm_password.onkeyup = validatePassword;
+</script>
+
+<script type="text/javascript">
+  var cif = document.getElementById("id_cif")
+  , div_cif = document.getElementById("div_cif")
+  , unique_message = document.getElementById("id_unique_message");
+
+
+  var isUnique;
+
+  function validateCIF(){
+    $.ajax({
+          url: '/ajax/validate_cif/',
+          data: {
+            'cif': cif.value
+          },
+          dataType: 'json',
+          success: function (data) {
+            isUnique = !data.is_taken;
+              if(!isUnique) {
+
+                div_cif.className = "form-group required form-class has-feedback has-error";
+                div_cif.childNodes[2].childNodes[1].className = "form-control-feedback glyphicon glyphicon-remove"
+                unique_message.style.display = 'block';        
+
+              } else {
+                unique_message.style.display = 'none'; 
+                div_cif.className = "form-group required form-class has-feedback has-success";
+                div_cif.childNodes[2].childNodes[1].className = "form-control-feedback glyphicon glyphicon-ok"
+
+              }
+                }
+        });
     }
-});
-*/
-
+  cif.onchange = validateCIF;
 </script>
+
+<script type="text/javascript">
+
+  var admin = document.getElementById("id_username")
+  , div_admin = document.getElementById("div_admin")
+  , admin_unique_message = document.getElementById("id_admin_unique_message");
+
+
+  var isUnique;
+
+  function validateAdmin(){
+    $.ajax({
+          url: '/ajax/validate_admin/',
+          data: {
+            'admin': admin.value
+          },
+          dataType: 'json',
+          success: function (data) {
+            isUnique = !data.is_taken;
+              if(!isUnique) {
+
+                div_admin.className = "form-group required form-class has-feedback has-error";
+                div_admin.childNodes[2].childNodes[1].className = "form-control-feedback glyphicon glyphicon-remove"
+                admin_unique_message.style.display = 'block';        
+
+              } else {
+                admin_unique_message.style.display = 'none'; 
+                div_admin.className = "form-group required form-class has-feedback has-success";
+                div_admin.childNodes[2].childNodes[1].className = "form-control-feedback glyphicon glyphicon-ok"
+
+              }
+                }
+        });
+    }
+  admin.onchange = validateAdmin;
+</script>
+
+
 
 {% endblock %}
 
@@ -247,43 +310,41 @@ $(document).ready(function() {
           
         </div>
 
-
-
-
-
       <!-- AQUI COMIENZA LA INFO DE LA COMPAÑIA -->
 
 	    <div id="div_company_info" class="col-md-6 col-md-offset-2 collapse in" >
 
-        <div class="form-group company_class form-class">
+        <div class="form-group required company_class form-class" id="div_cif">
           <label class="control-label col-sm-4" for="id_{{ form.cif.name }}">{% trans 'cif' %}</label>
             <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.cif.name }}" id="id_{{ form.cif.name }}">
+              <input type="text" class="form-control col-md-6" name="{{ form.cif.name }}"  id="id_{{ form.cif.name }}">
+              <div class="help-block with-errors" id="id_unique_message" style="display: none;">{% trans 'company_duplicate' %}</div>
             </div>
+            
         </div>
 
-        <div class="form-group company_class form-class">
+        <div class="form-group required company_class form-class">
           <label class="control-label col-sm-4" for="id_{{ form.company_name.name }}">{% trans 'companyName' %}</label>
             <div class="col-sm-6">
               <input type="text" class="form-control col-md-6" name="{{ form.company_name.name }}" id="id_{{ form.company_name.label }}">
             </div>
         </div>
 
-        <div class="form-group company_class form-class">
+        <div class="form-group required company_class form-class">
           <label class="control-label col-sm-4" for="id_{{ form.short_name.name }}">{% trans 'short_name'%}</label>
             <div class="col-sm-6">
               <input type="text" class="form-control col-md-6" name="{{ form.short_name.name }}" id="id_{{ form.short_name.label }}">
             </div>
         </div>
 
-        <div class="form-group company_class form-class">
+        <div class="form-group required company_class form-class">
           <label class="control-label col-sm-4" for="id_{{ form.company_email.name }}">{% trans 'company_email' %}</label>
             <div class="col-sm-6">
               <input type="email" class="form-control col-md-6" name="{{ form.company_email.name }}" id="id_{{ form.company_email.label }}">
             </div>
         </div>
 
-        <div class="form-group company_class form-class">
+        <div class="form-group required company_class form-class">
           <label class="control-label col-sm-4" for="id_{{ form.company_phone.name }}">{% trans 'company_phone' %}</label>
             <div class="col-sm-6">
             <input type="text" class="form-control col-md-6" name="{{ form.company_phone.name }}" id="id_{{ form.company_phone.label }}">
@@ -306,56 +367,57 @@ $(document).ready(function() {
         <div id="div_admin_info" class="col-md-6 col-md-offset-2 collapse" >
 
 
-        <div class="form-group form-class">
+        <div class="form-group required form-class" id="div_admin">
           <label class="control-label col-sm-4" for="id_{{ form.username.label }}">{% trans 'username' %}</label>
             <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.username.name }}" id="id_{{ form.username.label }}">
+              <input type="text" class="form-control col-md-6" name="{{ form.username.name }}" id="id_{{ form.username.name }}">
+              <div class="help-block with-errors" id="id_admin_unique_message" style="display: none;">{% trans 'admin_duplicate' %}</div>
             </div>
         </div>
 
-        <div class="form-group form-class">
+        <div class="form-group required form-class">
           <label class="control-label col-sm-4" for="id_{{ form.admin_email.label }}">{% trans 'admin_email' %}</label>
             <div class="col-sm-6">
               <input type="email" class="form-control col-md-6" name="{{ form.admin_email.name }}" id="id_{{ form.admin_email.label }}">
             </div>
         </div>
 
-        <div class="form-group form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.password.label }}">{% trans 'password' %}</label>
+        <div class="form-group required form-class" id="div_pass_1">
+          <label class="control-label col-sm-4" for="id_{{ form.password.name }}">{% trans 'password' %}</label>
             <div class="col-sm-6">
-              <input type="password" class="form-control col-md-6" name="{{ form.password.name }}" id="id_{{ form.password.label }}">
+              <input type="password" class="form-control col-md-6" onchange="validatePassword" name="{{ form.password.name }}" id="id_{{ form.password.name }}">
             </div>
         </div>
 
-        <div class="form-group form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.repeatPassword.label }}">{% trans 'repeatPassword' %}</label>
+        <div class="form-group required form-class" id="div_pass_2">
+          <label class="control-label col-sm-4" for="id_{{ form.repeatPassword.name }}">{% trans 'repeatPassword' %}</label>
             <div class="col-sm-6">
-              <input type="password" class="form-control col-md-6" name="{{ form.repeatPassword.name }}" id="id_{{ form.repeatPassword.label }}">
+              <input type="password" class="form-control col-md-6" onchange="validatePassword" name="{{ form.repeatPassword.name }}" id="id_{{ form.repeatPassword.name }}">
             </div>
         </div>
 
-        <div class="form-group form-class">
+        <div class="form-group required form-class">
           <label class="control-label col-sm-4" for="id_{{ form.first_name.label }}">{% trans 'first_name' %}</label>
             <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.first_name.name }}" id="id_{{ form.first_name.label }}">
+              <input type="text" class="form-control col-md-6" name="{{ form.first_name.name }}" id="id_{{ form.first_name.name }}">
             </div>
         </div>
 
-        <div class="form-group form-class">
+        <div class="form-group required form-class">
           <label class="control-label col-sm-4" for="id_{{ form.last_name.label }}">{% trans 'last_name'%}</label>
             <div class="col-sm-6">
               <input type="text" class="form-control col-md-6" name="{{ form.last_name.name }}" id="id_{{ form.last_name.label }}">
             </div>
         </div>
 
-        <div class="form-group form-class">
+        <div class="form-group required form-class">
           <label class="control-label col-sm-4" for="id_{{ form.admin_identifier.label }}">{% trans 'admin_identifier' %}</label>
             <div class="col-sm-6">
               <input type="text" class="form-control col-md-6" name="{{ form.admin_identifier.name }}" id="id_{{ form.admin_identifier.label }}">
             </div>
         </div>
 
-        <div class="form-group form-class">
+        <div class="form-group required form-class">
           <label class="control-label col-sm-4" for="id_{{ form.admin_phone.label }}">{% trans 'admin_phone'%}</label>
             <div class="col-sm-6">
               <input type="text" class="form-control col-md-6" name="{{ form.admin_phone.name }}" id="id_{{ form.admin_phone.label }}">
