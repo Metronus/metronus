@@ -5,8 +5,9 @@ from django.contrib.auth.models                  import User
 from django.test import TestCase, Client
 from metronus_app.model.employee         import Employee
 from django.core.exceptions                      import ObjectDoesNotExist, PermissionDenied
+from populate_database import populate_database
 class DepartmentTestCase(TestCase):
-    def setUp(self):
+    def setUpTestData():
         company1 = Company.objects.create(
             cif="123",
             company_name = "company1",

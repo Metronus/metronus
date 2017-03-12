@@ -10,7 +10,8 @@ from metronus_app.model.department import Department
 from django.core.exceptions                      import ObjectDoesNotExist, PermissionDenied
 from populate_database import populate_database
 class TaskTestCase(TestCase):
-    def setUp(self):
+
+    def setUpTestData():
         populate_database()
 
     def test_create_task_positive(self):
@@ -22,7 +23,7 @@ class TaskTestCase(TestCase):
         pro_id=Project.objects.get(name="Metronus").id,
 
         dep_id=Department.objects.get(name="Frontend").id
-        
+
         response = c.post("/task/create", {
             "task_id": "0",
             "name": "dep4",

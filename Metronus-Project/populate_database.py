@@ -8,6 +8,9 @@ from metronus_app.model.administrator import Administrator
 from metronus_app.model.task import Task
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
+from django.db import transaction
+
+@transaction.atomic
 def basicLoad():
     company=Company.objects.create(cif="123", company_name="company1", short_name="company1", email="company1@gmail.com", phone="123456789")
     company2=Company.objects.create(cif="000000000", company_name="metronus", short_name="met", email="metronus@us.com", phone="123456789")
