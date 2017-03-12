@@ -63,7 +63,6 @@ urlpatterns += [#i18n_patterns(
     url(r'^employee/delete/(?P<username>\w{0,50})/$', employeeController.delete, name='employee_delete'),
 
     url(r'^roles/manage$', roleController.manage, name='roles_manage'),
-    url(r'^roles/get_info$', roleController.ajax_get_employees_and_roles, name='roles_get_info'),
 
     # Administrator
     url(r'^administrator/edit/(?P<username>\w{0,50})/$', administratorController.edit, name='administrator_edit'),
