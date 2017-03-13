@@ -32,7 +32,6 @@ def manage(request):
     """
 
     admin = get_current_admin_or_403(request)
-    company = admin.company_id
 
     # Return all departments and roles for the logged admin
     if request.method == "GET":
@@ -95,16 +94,22 @@ def create_new_role(form):
 
 
 def return_get_form(request, admin):
+    company = admin.company_id
+
     departments = Department.objects.filter(company_id=company)
     projects = Project.objects.filter(company_id=company)
     roles = Role.objects.all()
 
     if "employee_id" in request.GET:
         # New form
-        form = RoleManagementForm(initial = {'employee_id': request.GET['employee_id'], 'employeeRole_id': 0})
+        employee = get_object_or_404(Employee, id=request.GET['employee_id'])
+        if employee.company_id != company:
+            raise PermissionDenied
+
+        form = RoleManagementForm(initial = {'employee_id': employee.id, 'employeeRole_id': 0})
     else:
         # Edit existing role
-        role = get_object_or_404(ProjectDepartmentEmployeeRole, id=request.GET['employeeRole_id'])
+        role = get_object_or_404(ProjectDepartmentEmployeeRole, id=request.GET['role_id'])
         
         # Check that the role belongs to the current admin's company
         if role.employee_id.company_id != admin.company_id:
