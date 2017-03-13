@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.conf.urls               import url, include
 from django.contrib                 import admin
+from metronus_app.admin                 import admin_site
 from django.conf.urls.i18n          import i18n_patterns
 from metronus_app                   import views
 from django.core.urlresolvers       import reverse_lazy
@@ -28,7 +29,7 @@ from metronus_app.controllers       import roleController
 from metronus_app.controllers       import companyController
 from metronus_app.controllers       import administratorController
 from metronus_app.controllers       import taskController
-urlpatterns=[url(r'^i18n/', include('django.conf.urls.i18n')),]
+urlpatterns=[url(r'^i18n/', include('django.conf.urls.i18n')),  url(r'^admin/', admin_site.urls),]
 urlpatterns += [#i18n_patterns(
     url(r'^$', views.index),
 
