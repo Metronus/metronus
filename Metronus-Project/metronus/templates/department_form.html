@@ -51,6 +51,7 @@ $(document).ready(function() {
 	
 function ajax(){
     $.post('/department/createAsync', $('#register_form').serialize(), function(data, status){
+    	document.getElementById('register_form').reset();
     	console.log(data)
     	if(JSON.stringify(data['success'])=="true"){
     		$('#errorDiv').attr('hidden', true);
