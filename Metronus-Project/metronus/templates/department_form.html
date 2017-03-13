@@ -18,17 +18,11 @@
     $('.form-class',$(this)).each( function() {
         formIsValid = formIsValid && $(this).hasClass('has-success');
     });
-    if(formIsValid) {
-        $('.submit-button', $(this)).attr('disabled', false);
-    } else {
-
-        $('.submit-button', $(this)).attr('disabled', true);
-    }
 });
 
 
 </script>
-
+{#}
 <script>
 //Esto es para validar en cliente de forma bonita con bootstrap :)
 $(document).ready(function() {
@@ -39,12 +33,11 @@ $(document).ready(function() {
             validating: 'glyphicon glyphicon-refresh'
         },
         fields: {
-          
             name: {
                 validators: {
                     notEmpty: {
-                        message: '{% trans 'departmentNameNotNull' %}'
-                    }
+                        message: "{% trans 'departmentNameNotNull' %}"
+                    },
                 }
             },
             
@@ -52,22 +45,50 @@ $(document).ready(function() {
         },
     });
 });
-
-
+</script>
+#}
+<script type="text/javascript">
+	
+function ajax(){
+    $.post('/department/createAsync', $('#register_form').serialize(), function(data, status){
+    	console.log(data)
+    	if(JSON.stringify(data['success'])=="true"){
+    		$('#errorDiv').attr('hidden', true);
+    		$('#error2Div').attr('hidden', true);
+    		$('#successDiv').attr('hidden', false).html("<strong>{% trans 'success' %} | </strong>{% trans 'departmentSaved' %}");
+    	}else if(JSON.stringify(data['repeated_name'])=="true"){
+    		$('#successDiv').attr('hidden', true);
+    		$('#error2Div').attr('hidden', true);
+    		$('#errorDiv').attr('hidden', false).html("<strong>{% trans 'fail' %} | </strong>{% trans 'departmentName' %}");
+    	}else{
+    		$('#successDiv').attr('hidden', true);
+    		$('#error2Div').attr('hidden', true);
+    		$('#errorDiv').attr('hidden', false).html("<strong>{% trans 'fail' %} | </strong>{% trans 'departmentError' %}"); 
+    	}
+       	
+    });
+};
 </script>
 
 {% endblock %}
 
 {% block content %}
-		{% if  form.department_id.value == 0 %}
+		{% if  form.department_id.value is 0%}
 			<h1 align="center"> {% trans 'createDepartment' %} </h1></br>
 		{% else %}
 			<h1 align="center"> {% trans 'editDepartment' %} </h1></br>
 		{% endif %}
-
+		<div id="successDiv" class="alert alert-success" hidden='true'>
+	    	</div>
+	    <div id="errorDiv" class="alert alert-danger"  hidden='true'>
+	    	</div>
+		{% if  repeated_name == True %}
+	    	<div id="error2Div" class="alert alert-danger">
+	    		<strong>{% trans 'fail' %} | </strong>{% trans 'departmentName' %}
+	    	</div>
+	    {% endif %}
     <form id="register_form" method="POST" action="" class="form-horizontal">{% csrf_token %}
 
-	    
 	    <div class="form-group company_class form-class">
           <label class="control-label col-sm-4" for="id_{{ form.name.name }}">{{ form.name.label }}</label>
             <div class="col-sm-6">
@@ -76,7 +97,12 @@ $(document).ready(function() {
             <input type="text" hidden="true" name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}" value="{{ form.department_id.value}}">
         </div>
 	    </br>
-	    <div align="center" ><p><input type="submit" class="btn btn-success submit-button" disabled="true" value="{% trans 'confirm' %}" /></p></div>
+	    <div align="center" >
+		    <input type="submit" class="btn btn-success submit-button" value="{% trans 'confirm' %}" />
+		    {% if  form.department_id.value is 0%}
+		    	<input type="button" class="btn btn-success submit-button" value="{% trans 'departmentAdd' %}" onclick="ajax();" />
+		    {% endif %}
+		</div>
     </form>
 
 {% endblock %}
