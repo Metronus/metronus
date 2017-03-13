@@ -175,7 +175,7 @@ def edit(request):
                 #dep does not exists or it's the same
                 if dep is None or dep.id==department.id:
                     editDepartment(department,form)
-                    return HttpResponseRedirect('/department/list')
+                    return HttpResponseRedirect('/department/view?department_id='+str(department.id))
                 else:
                     if dep.active:
                         repeated_name=True
