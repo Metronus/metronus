@@ -40,7 +40,7 @@ def create(request):
 
     return render(request, 'projectdepartment_form.html', {'form': form})
 
-def delete(request, projectDepartment_id):
+def delete(request):
     """
     parameters:
     Recibe el id del projectDepartment a borrar: projectDepartment_id
@@ -49,13 +49,10 @@ def delete(request, projectDepartment_id):
     """
 
     admin = get_current_admin_or_403(request)
+    projectDepartment_id = request.GET.get("projectDepartment_id")
     projectDepartment = get_object_or_404(ProjectDepartment, id=projectDepartment_id)
 
-    # Check that the admin has permission to delete that projectDepartment
-    if not checkCompanyProjectDepartmentSession(projectDepartment, admin):
-        raise PermissionDenied
-
-    deleteProjectDepartment(projectDepartment)
+    deleteProjectDepartment(projectDepartment, admin)
 
     return HttpResponseRedirect('/projectdepartment/list/')
 
@@ -76,12 +73,12 @@ def list(request):
     department_id = request.GET.get('department_id')
 
     if project_id is not None:
-        project = Project.objects.get(id=project_id)
+        project = get_object_or_404(Project, id=project_id)
         checkCompanyProjectSession(project, admin)
         lista = ProjectDepartment.objects.filter(project_id=project)
 
     elif department_id is not None:
-        department = Department.objects.get(id=department_id)
+        department = get_object_or_404(Department, id=department_id)
         checkCompanyDepartmentSession(department, admin)
         lista = ProjectDepartment.objects.filter(department_id=department)
 
@@ -112,15 +109,14 @@ def edit(request):
             # redirect to a new URL:
             projectDepartment=ProjectDepartment.objects.get(pk=form.cleaned_data['projectDepartment_id'])
 
-            if checkCompanyProjectDepartmentSession(projectDepartment, admin):
-                updateProjectDepartment(projectDepartment,form)
+            updateProjectDepartment(projectDepartment,form,admin)
 
             return HttpResponseRedirect('/projectdepartment/list')
 
     # if a GET (or any other method) we'll create a blank form
     else:
         projectDepartment=request.GET.get('projectDepartment_id')
-        projectDepartment=ProjectDepartment.objects.get(pk=projectDepartment)
+        projectDepartment=get_object_or_404(ProjectDepartment, id=projectDepartment)
         form = ProjectDepartmentForm(
             initial={"department_id":projectDepartment.department_id, "project_id":projectDepartment.project_id}, user=admin)
 
@@ -140,29 +136,36 @@ def createProjectDepartment(form, admin):
     return ProjectDepartment.objects.create(project_id = project, department_id = department)
 
 #Se permitirán los updates de projectDepartment?
-def updateProjectDepartment(projectDepartment,form):
+def updateProjectDepartment(projectDepartment, form, admin):
     projectDepartment.project_id = form.cleaned_data['project_id']
     projectDepartment.department_id = form.cleaned_data['department_id']
 
-    checkCompanyProjectDepartmentSession(projectDepartment)
+    if not checkCompanyProjectDepartmentSession(projectDepartment, admin):
+        raise PermissionDenied
 
     return projectDepartment.save()
 
-def deleteProjectDepartment(projectDepartment):
+def deleteProjectDepartment(projectDepartment, admin):
+    # Check that the admin has permission to delete that projectDepartment
+    if not checkCompanyProjectDepartmentSession(projectDepartment, admin):
+        raise PermissionDenied
+
     projectDepartment.delete()
 
+
+#---------------- UTILITY
 
 def checkCompanyProjectDepartmentSession(projectDepartment, admin):
     """
     checks if the project belongs to the logged company
     """
-    return checkCompanyProjectDepartment(projectDepartment,admin.company_id)
+    return checkCompanyProjectDepartment(projectDepartment,admin)
 
-def checkCompanyProjectDepartment(projectDepartment,company_id):
+def checkCompanyProjectDepartment(projectDepartment, admin):
     """
     checks if the projectDepartment belongs to the specified company, and neither project nor department are deleted
     """
-    res = checkCompanyProjectSession(projectDepartment.project_id)
-    res = res and checkCompanyDepartmentSession(projectDepartment.department_id)
+    res = checkCompanyProjectSession(projectDepartment.project_id, admin)
+    res = res and checkCompanyDepartmentSession(projectDepartment.department_id, admin)
 
     return res
