@@ -9,7 +9,7 @@ from metronus_app.forms.roleManagementForm            import RoleManagementForm
 
 from django.core.exceptions                           import PermissionDenied, ObjectDoesNotExist
 from django.shortcuts                                 import render_to_response, get_object_or_404
-from django.http                                      import HttpResponseBadRequest 
+from django.http                                      import HttpResponseBadRequest, HttpResponseRedirect
  
 from metronus_app.common_utils                        import get_current_admin_or_403
 
@@ -32,7 +32,6 @@ def manage(request):
     """
 
     admin = get_current_admin_or_403(request)
-    company = admin.company_id
 
     # Return all departments and roles for the logged admin
     if request.method == "GET":
@@ -50,7 +49,7 @@ def manage(request):
         if form.is_valid():
             check_form_permissions(form, admin)
 
-            if form.cleaned_data['role_id'] == 0:
+            if form.cleaned_data['employeeRole_id'] == 0:
                 # ID = 0, crear un nuevo rol
                 create_new_role(form)
             else:
@@ -65,7 +64,7 @@ def manage(request):
                     existing_role.save()
 
 
-            return HttpResponseRedirect('/employee/view/' + existing_role.employee_id.user.username + '/')
+            return HttpResponseRedirect('/employee/view/' + Employee.objects.get(id=form.cleaned_data["employee_id"]).user.username + '/')
     else:
         raise PermissionDenied
 
@@ -75,36 +74,50 @@ def manage(request):
 ########################################################################################################################################
 
 def create_new_role(form):
-    # Permissions are already checked
+    # Permissions and objects are already checked
     dpmt_id = form.cleaned_data['department_id']
     project_id = form.cleaned_data['project_id']
     employee_id = form.cleaned_data['employee_id']
     role_id = form.cleaned_data['role_id']
 
+    department = Department.objects.get(id=dpmt_id)
+    project = Project.objects.get(id=project_id)
+    employee = Employee.objects.get(id=employee_id)
+    role = Role.objects.get(id=role_id)
+
     # Check if there is an existing role for that combination and overwrites if so
     try:
-        existing = ProjectDepartmentEmployeeRole.objects.get(employee_id__id=employee_id, projectDepartment_id__project_id__id=project_id, projectDepartment_id__department_id__id=department_id)
-        existing.role_id = get_object_or_404(Role, id=role_id)
+        existing = ProjectDepartmentEmployeeRole.objects.get(employee_id=employee, projectDepartment_id__project_id=project, projectDepartment_id__department_id=department)
+        existing.role_id = role
         existing.save()
     except ObjectDoesNotExist:
+        # If the employee role doesn't exist, create a new one, 
+        # taking care of also creating a new projectdepartment for the desired combination if it doesn't yet exist
         try:
-            pd = ProjectDepartment.objects.find(department_id__id=department_id, project_id__id=project_id)
+            pd = ProjectDepartment.objects.get(department_id=department, project_id=project)
         except ObjectDoesNotExist:
-            pd = ProjectDepartment.objects.create(department_id=department_id, project_id=project_id)
-            ProjectDepartmentEmployeeRole.objects.create(projectDepartment_id=pd, employee_id=employee_id, role_id=role_id)
+            pd = ProjectDepartment.objects.create(department_id=department, project_id=project)
+
+        ProjectDepartmentEmployeeRole.objects.create(projectDepartment_id=pd, employee_id=employee, role_id=role)
 
 
 def return_get_form(request, admin):
+    company = admin.company_id
+
     departments = Department.objects.filter(company_id=company)
     projects = Project.objects.filter(company_id=company)
     roles = Role.objects.all()
 
     if "employee_id" in request.GET:
         # New form
-        form = RoleManagementForm(initial = {'employee_id': request.GET['employee_id'], 'employeeRole_id': 0})
+        employee = get_object_or_404(Employee, id=request.GET['employee_id'])
+        if employee.company_id != company:
+            raise PermissionDenied
+
+        form = RoleManagementForm(initial = {'employee_id': employee.id, 'employeeRole_id': 0})
     else:
         # Edit existing role
-        role = get_object_or_404(ProjectDepartmentEmployeeRole, id=request.GET['employeeRole_id'])
+        role = get_object_or_404(ProjectDepartmentEmployeeRole, id=request.GET['role_id'])
         
         # Check that the role belongs to the current admin's company
         if role.employee_id.company_id != admin.company_id:
