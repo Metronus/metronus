@@ -101,6 +101,7 @@ class ProjectDepartmentTestCase(TestCase):
             project_id = proj1,
             department_id = dep1)
 
+    #---------------------- CREATE
 
     def test_create_projectDepartment_positive(self):
         """
@@ -173,7 +174,7 @@ class ProjectDepartmentTestCase(TestCase):
         self.assertEquals(count, count2)
 
 
-    def test_create_projectDepartment_negative_project3(self):
+    def test_create_projectDepartment_negative_department1(self):
         """
 		#checks the number of projectDepartments didn't increase
 		Admin is trying to create a projectDepartment using a department that's not from his Company
@@ -197,7 +198,7 @@ class ProjectDepartmentTestCase(TestCase):
         self.assertEquals(count, count2)
 
 
-    def test_create_projectDepartment_negative_project4(self):
+    def test_create_projectDepartment_negative_department2(self):
         """
 		#checks the number of projectDepartments didn't increase
 		Admin is trying to create a projectDepartment using a department that's not active
@@ -220,6 +221,7 @@ class ProjectDepartmentTestCase(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertEquals(count, count2)
 
+    #---------------------- LIST
 
     def test_list_admin1_positive(self):
         #Logged as admin1, his company has 2 projectDepartments
@@ -266,3 +268,39 @@ class ProjectDepartmentTestCase(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertEquals(len(response.context["projectDepartments"]), 0)
 
+
+    #---------------------- DELETE
+
+    def test_delete_positive(self):
+        #Logged as admin, tries to delete a PD that belongs to his company
+        c = Client()
+        c.login(username="admin", password="1234")
+
+        project = Project.objects.get(name="TestProject")
+        department = Department.objects.get(name="Departamento1")
+        pd = ProjectDepartment.objects.get(project_id = project, department_id = department)
+        count=ProjectDepartment.objects.all().count()
+
+        response = c.get("/projectdepartment/delete", {"projectDepartment_id" : pd.id})
+
+        count2=ProjectDepartment.objects.all().count()
+
+        self.assertEquals(response.status_code, 302)
+        self.assertEquals(count - 1, count2)
+
+    def test_delete_negative(self):
+        #Logged as admin2, tries to delete a PD that's not from his company
+        c = Client()
+        c.login(username="admin2", password="4321")
+
+        project = Project.objects.get(name="TestProject")
+        department = Department.objects.get(name="Departamento1")
+        pd = ProjectDepartment.objects.get(project_id = project, department_id = department)
+        count=ProjectDepartment.objects.all().count()
+
+        response = c.get("/projectdepartment/delete", {"projectDepartment_id" : pd.id})
+
+        count2=ProjectDepartment.objects.all().count()
+
+        self.assertEquals(count, count2)
+        self.assertEquals(response.status_code, 403)
