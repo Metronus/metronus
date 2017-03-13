@@ -11,7 +11,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
-from metronus_app.common_utils import get_current_admin_or_403
+from metronus_app.common_utils import get_current_admin_or_403, get_or_none
 from django.core.exceptions import PermissionDenied
 
 
@@ -132,19 +132,37 @@ def checkPasswords(form):
     """
     return form.cleaned_data['password'] == form.cleaned_data['repeatPassword']
 
+
 def validateCIF(request):
+    """
+    checks if the company cif already exist
+    """
     cif = request.GET.get('cif', None)
+
+    check = get_or_none(Company, cif=cif)
+    if check is not None:
+        check = check.cif
+
     data = {
-        'is_taken': cif == "A11111111"
+        'is_taken': cif == check
     }
     if data['is_taken']:
         data['error_message'] = 'ERROR'
     return JsonResponse(data)
 
+
 def validateAdmin(request):
+    """
+    checks if the company administrator is registered
+    """
     admin = request.GET.get('admin', None)
+
+    check = get_or_none(Administrator, user__username=admin)
+    if check is not None:
+        check = check.user.username
+
     data = {
-        'is_taken': admin == "admin"
+        'is_taken': admin == check
     }
     if data['is_taken']:
         data['error_message'] = 'ERROR'
