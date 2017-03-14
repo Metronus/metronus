@@ -29,6 +29,7 @@ from metronus_app.controllers       import roleController
 from metronus_app.controllers       import companyController
 from metronus_app.controllers       import administratorController
 from metronus_app.controllers       import taskController
+from metronus_app.controllers       import timeLogController
 urlpatterns=[url(r'^i18n/', include('django.conf.urls.i18n')),  url(r'^admin/', admin_site.urls),]
 urlpatterns += [#i18n_patterns(
     url(r'^$', views.index),
@@ -64,6 +65,12 @@ urlpatterns += [#i18n_patterns(
     url(r'^employee/view/(?P<username>\w{0,50})/$', employeeController.view, name='employee_view'),
     url(r'^employee/edit/(?P<username>\w{0,50})/$', employeeController.edit, name='employee_edit'),
     url(r'^employee/delete/(?P<username>\w{0,50})/$', employeeController.delete, name='employee_delete'),
+
+    # TimeLogs
+    url(r'^timeLog/list/(?P<task_id>\w{0,50})/$', timeLogController.list, name='timeLog_list'),
+    url(r'^timeLog/create/(?P<task_id>\w{0,50})/$', timeLogController.create, name='timeLog_create'),
+    url(r'^timeLog/edit/(?P<timeLog_id>\w{0,50})/$', timeLogController.edit, name='timeLog_edit'),
+    url(r'^timeLog/delete/(?P<timeLog_id>\w{0,50})/$', timeLogController.delete, name='timeLog_delete'),
 
     url(r'^roles/manage$', roleController.manage, name='roles_manage'),
 
