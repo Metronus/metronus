@@ -34,7 +34,7 @@ urlpatterns=[url(r'^i18n/', include('django.conf.urls.i18n')),  url(r'^admin/', 
 urlpatterns += [#i18n_patterns(
     url(r'^$', views.index),
 
-	url(r'^index.html/$', views.index),
+	url(r'^index.html/$', views.index, name='home'),
     url(r'^department/create$', departmentController.create),
     url(r'^department/createAsync$', departmentController.createAsync),
     url(r'^department/list$', departmentController.list),
