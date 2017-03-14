@@ -3,16 +3,24 @@ from metronus_app.forms.companyForm import CompanyForm
 from metronus_app.model.company import Company
 from metronus_app.model.administrator import Administrator
 from django.contrib.auth.models import User
-from django.shortcuts import render_to_response
 from django.shortcuts import render
 from django.http import JsonResponse
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
-from django.template.context import RequestContext
-from metronus_app.common_utils import get_current_admin_or_403
+from metronus_app.common_utils import get_current_admin_or_403, get_or_none
 from django.core.exceptions import PermissionDenied
+
+from PIL import Image
+from django.core.mail import send_mail
+
+
+# Image limit parameters
+FILE_SIZE = 100000000
+HEIGHT = 256
+WIDTH = 256
+VALID_FORMATS = ['JPEG', 'JPG', 'PNG']
 
 
 def create(request):
@@ -28,19 +36,25 @@ def create(request):
         # create a form instance and populate it with data from the request:
         form = RegistrationForm(request.POST, request.FILES)
         # check whether it's valid:
-        if form.is_valid() and checkPasswords(form):
+        if form.is_valid() and checkPasswords(form) and checkImage(form):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
             company = createCompany(form)
-            registerAdministrator(form, company)
+            administrator = registerAdministrator(form, company)
+
+            # This sends an information email to the company and to the admin
+
+            #send_mail('Metronus Info.', 'Registrado :)', 'info@metronus.es',
+            #          [company.email, administrator.user.email], fail_silently=False,)
+
             return HttpResponseRedirect(reverse('login'))
 
     # if a GET (or any other method) we'll create a blank form
     else:
         # form = DepartmentForm(initial={"department_id":0})
         form = RegistrationForm()
-    return render(request,'company_register.html', {'form': form})
+    return render(request, 'company_register.html', {'form': form})
 
 
 def edit(request, cif):
@@ -86,6 +100,41 @@ def edit(request, cif):
 
     return render_to_response('company_edit.html', {'form': form})
 
+
+def view(request, cif):
+    """
+    url = company/view/<cif>
+
+    parameters/returns:
+    company: datos de la compañía
+
+    template: company_view.html
+    """
+
+    # Check that the user is logged in and it's an administrator
+    admin = get_current_admin_or_403(request)
+
+    company = get_object_or_404(Company, cif=cif)
+
+    # Check that the admin has permission to view that company
+    if company.pk != admin.company_id:
+        raise PermissionDenied
+
+    return render(request, 'company_view.html', {'company': company})
+
+
+
+def request_to_delete(request, cif):
+    """
+    url = company/delete/<cif>
+
+    parameters/returns:
+    Nada, redirecciona al inicio
+
+    template: ninguna
+    """
+    pass  # TODO
+
 def delete(request, cif):
     """
     url = company/delete/<cif>
@@ -123,8 +172,9 @@ def registerAdministrator(form, company):
     identifier = form.cleaned_data['admin_identifier']
     phone = form.cleaned_data['admin_phone']
 
-    Administrator.objects.create(user=admin, user_type="A", identifier=identifier, phone=phone, company_id=company)
+    administrator = Administrator.objects.create(user=admin, user_type="A", identifier=identifier, phone=phone, company_id=company)
 
+    return administrator
 
 def checkPasswords(form):
     """
@@ -132,19 +182,55 @@ def checkPasswords(form):
     """
     return form.cleaned_data['password'] == form.cleaned_data['repeatPassword']
 
+
+def checkImage(form):
+    """
+    checks if logo has the correct dimensions
+    """
+    ret = False
+
+    logo = form.cleaned_data['logo']
+    image = Image.open(logo, mode="r")
+    xsize, ysize = image.size
+
+    print(logo)
+    for i in VALID_FORMATS:
+        if i == image.format:
+            ret = True
+
+    return xsize <= WIDTH and ysize <= HEIGHT and ret
+
+
 def validateCIF(request):
+    """
+    checks if the company cif already exist
+    """
     cif = request.GET.get('cif', None)
+
+    check = get_or_none(Company, cif=cif)
+    if check is not None:
+        check = check.cif
+
     data = {
-        'is_taken': cif == "A11111111"
+        'is_taken': cif == check
     }
     if data['is_taken']:
         data['error_message'] = 'ERROR'
     return JsonResponse(data)
 
+
 def validateAdmin(request):
+    """
+    checks if the company administrator is registered
+    """
     admin = request.GET.get('admin', None)
+
+    check = get_or_none(Administrator, user__username=admin)
+    if check is not None:
+        check = check.user.username
+
     data = {
-        'is_taken': admin == "admin"
+        'is_taken': admin == check
     }
     if data['is_taken']:
         data['error_message'] = 'ERROR'

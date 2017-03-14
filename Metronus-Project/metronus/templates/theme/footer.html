@@ -1,4 +1,12 @@
 <!-- Main Footer -->
+{% block javascript %}
+<script type="text/javascript">
+	function changeLanguage(){
+		document.getElementById("languageForm").submit();
+	}
+</script>
+{% endblock %}
+
 <footer class="main-footer">
 	<div class="pull-right hidden-xs">
 		Time Matters
@@ -6,9 +14,9 @@
 	<strong>Copyright &copy; 2017 <a href="/">MetroBus</a>.</strong> All rights reserved.
 	{% load i18n %}
 
-	<form action="{% url 'set_language' %}" method="post">{% csrf_token %}
+	<form id="languageForm" action="{% url 'set_language' %}" method="post">{% csrf_token %}
 	    <input name="next" type="hidden" value="{{ redirect_to }}" />
-	    <select name="language">
+	    <select name="language" onchange="changeLanguage();">
 	        {% get_current_language as LANGUAGE_CODE %}
 	        {% get_available_languages as LANGUAGES %}
 	        {% get_language_info_list for LANGUAGES as languages %}
@@ -18,6 +26,5 @@
 	            </option>
 	        {% endfor %}
 	    </select>
-	    <input type="submit" value="Go" />
 	</form>
 </footer>

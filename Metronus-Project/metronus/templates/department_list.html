@@ -3,6 +3,19 @@
 {% load l10n %}
 {% block title %}{% trans 'departmentList' %}{% endblock %}
 
+{% block javascript %}
+<script>
+	function windowAlert(id){
+		var confirm=window.confirm("{% trans 'departmentConfirm' %}");
+		if(confirm==true){
+			window.location="/department/delete?department_id="+id;
+		}else{
+			return false;
+		}
+	}
+</script>
+{% endblock %}
+
 
 {% block content %}
 <h1>{% trans 'departmentList' %}</h1>
@@ -16,7 +29,7 @@
 	<div class="list-group col-xs-4">{{department.name}} </div>
 	<div align="right" >
 		<a align="right" class="btn btn-primary" href="/department/edit?department_id={{department.id}}">{% trans 'update' %}</a>
-		<a align="right" class="btn btn-danger" href="/department/delete?department_id={{department.id}}">{% trans 'delete' %}</a>
+		<input type="button" align="right" class="btn btn-danger" onclick="windowAlert({{department.id}})" value="{% trans 'delete' %}"/>
 	</div>
 	</li>
 

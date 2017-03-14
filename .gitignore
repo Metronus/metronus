@@ -93,3 +93,6 @@ Metronus-Project/metronus_app/migrations/
 
 # PyCharm
 .idea
+
+# Media
+Metronus-Project/media/

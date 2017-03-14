@@ -160,7 +160,6 @@ class DepartmentTestCase(TestCase):
         response = c.get("/department/create")
         self.assertEquals(response.status_code, 403)
 
-
     def test_list_departments_positive(self):
         c = Client()
         c.login(username="admin1", password="123456")
@@ -170,6 +169,18 @@ class DepartmentTestCase(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertEquals(len(response.context["departments"]), 2)
         self.assertEquals(response.context["departments"][0].name, "dep1")
+
+
+    def test_view_department_positive(self):
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        response = c.get("/department/list")
+        dep_id=response.context["departments"][0].id
+        response = c.get("/department/view?department_id="+str(dep_id))
+        self.assertEquals(response.status_code, 200)
+
+        #self.assertEquals(response.context["employees"][0].department.id, dep_id)
 
     def test_list_departments_not_logged(self):
         c = Client()

@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from metronus_app.forms.departmentForm import DepartmentForm
 from metronus_app.model.department import Department
+from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
+from metronus_app.model.employee import Employee
 from metronus_app.model.administrator import Administrator
 from populate_database import basicLoad
 from django.shortcuts                            import render_to_response, get_object_or_404
@@ -119,7 +121,7 @@ def list(request):
     lista=Department.objects.filter(company_id=admin.company_id,active=True)
     return render(request, "department_list.html", {"departments": lista})
 
-def view(request, username):
+def view(request):
     """
     url = department/view
 
@@ -142,7 +144,7 @@ def view(request, username):
     if department.company_id != admin.company_id:
         raise PermissionDenied
 
-    employees = ProjectDepartmentEmployeeRole.objects.filter(projectDepartment_id__department_id=department)
+    employees = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__department_id=department)
 
     return render(request, 'department_view.html', {'department': department, 'employees': employees})
 

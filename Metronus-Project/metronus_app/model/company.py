@@ -9,7 +9,7 @@ class Company(models.Model):
     phone = models.CharField(max_length=15)
     registryDate = models.DateTimeField(auto_now=True)
 
-    logo = models.FileField(upload_to="company", blank=True, null=True)
+    logo = models.ImageField(upload_to="company", blank=True, null=True)
 
     def __unicode__(self):
         return self.name
