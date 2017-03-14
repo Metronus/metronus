@@ -92,7 +92,7 @@ def edit(request,project_id):
                 #pro does not exists or it's the same
                 if pro is None or pro.id==project.id:
                     updateProject(project,form)
-                    return HttpResponseRedirect('/project/list')
+                    return redirect('project_list')
                 else:
                     if not pro.deleted:
                         repeated_name=True

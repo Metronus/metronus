@@ -138,6 +138,8 @@ msgid "projectConfirm"
 msgstr "¿Está seguro de eliminar el proyecto? Se eliminará también todo lo relacionado con el mismo"
 msgid "projectName"
 msgstr "El nombre del proyecto ya está en uso, por favor, elija otro"
+msgid "projectNameNotNull"
+msgstr "El nombre del proyecto no puede estar vacío"
 
 #: Roles
 msgid "rol"
