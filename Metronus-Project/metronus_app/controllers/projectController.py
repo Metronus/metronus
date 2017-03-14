@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from metronus_app.forms.projectForm import ProjectForm
 from metronus_app.model.project import Project,Company
 from django.shortcuts import render_to_response, get_object_or_404
@@ -38,12 +38,12 @@ def create(request):
                 if pro.deleted:
                     pro.deleted=False
                     pro.save()
-                    return HttpResponseRedirect('/project/list')
+                    return redirect('project_list')
                 else:
                     repeated_name=True
             else:
                 createProject(form,admin)
-                return HttpResponseRedirect('/project/list')
+                return redirect('project_list')
 
     # if a GET (or any other method) we'll create a blank form
     else:

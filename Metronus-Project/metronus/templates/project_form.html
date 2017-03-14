@@ -3,7 +3,7 @@
 {% load l10n %}
 
 {% block title %}
-    {% if  form.project_id.value == 0 %}
+    {% if form.project_id.value|slugify == '0' %}
         {% trans 'createProject' %}
     {% else %}
         {% trans 'editProject' %}
@@ -11,14 +11,22 @@
 {% endblock %}
 
 {% block content %}
-    {% if  form.project_id.value == 0 %}
+    {% if form.project_id.value|slugify == '0' %}
         <h1> {% trans 'createProject' %} </h1></br>
     {% else %}
         <h1> {% trans 'editProject' %} </h1></br>
     {% endif %}
-        <form id="form" method="POST" action="">{% csrf_token %}
-            {{form.as_p}}
-            </br>
-            <p><input type="submit" value="{% trans 'confirm' %}" /></p>
-        </form>
+
+    {% if repeated_name == True %}
+        <div class="alert alert-warning alert-dismissible" role="alert">
+            <a class="close" data-dismiss="alert">x</a>
+            <span>{% trans 'projectName' %}</span>
+        </div>
+    {% endif %}
+
+    <form id="form" method="POST" action="">{% csrf_token %}
+        {{form.as_p}}
+        </br>
+        <p><input type="submit" value="{% trans 'confirm' %}" /></p>
+    </form>
 {% endblock %}

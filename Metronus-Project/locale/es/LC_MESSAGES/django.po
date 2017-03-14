@@ -136,6 +136,8 @@ msgid "projectList"
 msgstr "Lista de proyectos"
 msgid "projectConfirm"
 msgstr "¿Está seguro de eliminar el proyecto? Se eliminará también todo lo relacionado con el mismo"
+msgid "projectName"
+msgstr "El nombre del proyecto ya está en uso, por favor, elija otro"
 
 #: Roles
 msgid "rol"
