@@ -17,7 +17,14 @@ def create(request, task_id):
     return "2" #TODO
 
 def list(request, task_id):
-    return "2"  # TODO
+    return "2" # TODO
+
+def list_all(request):
+    # TODO
+
+    tareas=[t for t in range(1,5)]
+    month = [x for x in range(1,31)]
+    return render(request, "timeLog_list_all.html", {"tasks": tareas, "month":month})
 
 def edit(request, timeLog_id):
     return "2"  # TODO

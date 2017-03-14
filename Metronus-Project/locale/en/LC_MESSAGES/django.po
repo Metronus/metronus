@@ -141,6 +141,11 @@ msgstr "This project name is in use, please choose a different one"
 msgid "projectNameNotNull"
 msgstr "Project's name can't be empty"
 
+#: TimeLog
+msgid "timeLogList"
+msgstr "Time Log"
+
+
 #: Roles
 msgid "rol"
 msgstr "Role"

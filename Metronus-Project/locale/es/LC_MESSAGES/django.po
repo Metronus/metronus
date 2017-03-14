@@ -141,6 +141,10 @@ msgstr "El nombre del proyecto ya está en uso, por favor, elija otro"
 msgid "projectNameNotNull"
 msgstr "El nombre del proyecto no puede estar vacío"
 
+#: TimeLog
+msgid "timeLogList"
+msgstr "Registro del tiempo"
+
 #: Roles
 msgid "rol"
 msgstr "Rol"
