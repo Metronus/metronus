@@ -3,14 +3,12 @@ from metronus_app.forms.companyForm import CompanyForm
 from metronus_app.model.company import Company
 from metronus_app.model.administrator import Administrator
 from django.contrib.auth.models import User
-from django.shortcuts import render_to_response
 from django.shortcuts import render
 from django.http import JsonResponse
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
-from django.template.context import RequestContext
 from metronus_app.common_utils import get_current_admin_or_403, get_or_none
 from django.core.exceptions import PermissionDenied
 

@@ -1,11 +1,10 @@
-from django.contrib.auth.models import User
 from django.shortcuts import render_to_response, get_object_or_404
-from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
-from django.template.context import RequestContext
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.core.exceptions import  PermissionDenied
 from metronus_app.forms.administratorForm import AdministratorForm
 from metronus_app.model.administrator import Administrator
+from metronus_app.common_utils import get_current_admin_or_403
+from django.shortcuts import render
 
 
 def edit(request, username):
@@ -60,6 +59,29 @@ def edit(request, username):
 
     return render_to_response('administrator_edit.html', {'form': form})
 
+
+def view(request, username):
+    """
+    url = administrator/view/<username>
+
+    parameters/returns:
+    administrator: datos del administrador
+
+    template: company_view.html
+    """
+
+    # Check that the user is logged in and it's an administrator
+    admin = get_current_admin_or_403(request)
+
+    admin2 = get_object_or_404(Administrator, username=username)
+
+    # Check that the admin has permission to view that company
+    if admin2.company_id != admin.company_id:
+        raise PermissionDenied
+
+    return render(request, 'administrator_view.html', {'admin': admin2})
+
+
 def delete(request, username):
     """
     url = administrator/delete/<username>
@@ -75,5 +97,17 @@ def delete(request, username):
 def checkPasswords(form):
     return form.cleaned_data['password1'] == form.cleaned_data['password2']
 
+
 def notify_password_change(email):
+    """
+
+    POR_DETERMINAR
+
+    url = ..
+
+    parameters/returns: ..
+
+    template: ..
+    """
+
     pass # TODO
