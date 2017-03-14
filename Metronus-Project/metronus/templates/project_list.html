@@ -1,4 +1,5 @@
 {% extends "layout_base.html" %}
+
 {% load i18n %}
 {% load l10n %}
 
@@ -7,7 +8,9 @@
 {% block content %}
     <h1>{% trans 'projectList' %}</h1>
 
-    <br><br>
+    <br>
+    <div id="alert_placeholder"></div>
+    <br>
 
     <ul class="list-group">
     {% for project in projects %}
@@ -19,7 +22,9 @@
                 <div class="col-xs-6">
                     <div class="pull-right">
                         <a class="btn btn-primary" href="{% url 'project_edit' project.id %}">{% trans 'update' %}</a>
-                        <a class="btn btn-danger" href="{% url 'project_delete' project.id %}">{% trans 'delete' %}</a>
+                        <a class="btn btn-danger" onclick="removealert('{% url 'project_delete' project.id %}');">
+                            {% trans 'delete' %}
+                        </a>
                     </div>
                 </div>
             </div>
@@ -29,4 +34,16 @@
     </ul>
 
     <a class="btn btn-primary" href="{% url 'project_create' %}">{% trans 'create' %}</a>
+{% endblock %}
+
+{% block javascript %}
+<script>
+
+    function removealert(link){
+        text = '{% trans 'projectConfirm' %} ';
+        button = '<a href="'+link+'" class="alert-link">{% trans 'click' %}</a>';
+
+        showalert(text+button,'alert-error');
+    }
+</script>
 {% endblock %}

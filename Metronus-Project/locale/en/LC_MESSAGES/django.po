@@ -69,6 +69,8 @@ msgid "fire"
 msgstr "Fire"
 msgid "actions"
 msgstr "Actions"
+msgid "click"
+msgstr "Click here"
 
 msgid "username_error"
 msgstr "The username cannot be empty"
@@ -132,6 +134,8 @@ msgid "editProject"
 msgstr "Edit project"
 msgid "projectList"
 msgstr "Project list"
+msgid "projectConfirm"
+msgstr "Are you sure about deleting this project? All information related to it will be erased too"
 
 #: Roles
 msgid "rol"
