@@ -13,8 +13,30 @@ from django.core.exceptions             import ObjectDoesNotExist, PermissionDen
 from django.http                        import HttpResponseForbidden
 from django.contrib.auth import authenticate,login
 
-def create(request, task_id):
-    return "2" #TODO
+def create(request):
+    #TODO: Revisar
+    employee = get_current_employee_or_403(request)
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = TimeLogForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            # ...
+            # redirect to a new URL:
+            taskSelected = form.cleaned_data['task_id']
+            task = findTask(taskSelected.id)
+            if task is not None:
+                createTimeLog(form,task,employee)
+                return HttpResponseRedirect('/task/list')
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = TimeLogForm(initial={"timeLog_id":0})
+
+
+    return render(request, 'timeLog_form.html', {'form': form})
+
 
 def list(request, task_id):
     return "2" # TODO
@@ -31,3 +53,13 @@ def edit(request, timeLog_id):
 
 def delete(request, timeLog_id):
     return "2"  # TODO
+
+def findTask(task_id):
+    task = get_object_or_404(Task,pk=task_id)
+    return task
+
+def createTimeLog(form, task, employee):
+    fdescription = form.cleaned_data['description']
+    fworkDate = form.cleaned_data['workDate']
+    fduration = form.cleaned_data['duration']
+    TimeLog.objects.create(description=fdescription,workDate=fworkDate,duration=fduration,task_id=task,employee_id=employee)
