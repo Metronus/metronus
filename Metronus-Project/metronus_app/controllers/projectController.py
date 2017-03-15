@@ -65,6 +65,12 @@ def list(request):
     lista=Project.objects.filter(company_id=admin.company_id,deleted=False)
     return render(request, "project_list.html", {"projects": lista})
 
+def show(request,project_id):
+    admin = get_current_admin_or_403(request)
+    repeated_name = False
+    project = get_object_or_404(Project, pk=project_id)
+    return render(request, "project_show.html", {"project": project})
+
 
 def edit(request,project_id):
     """
