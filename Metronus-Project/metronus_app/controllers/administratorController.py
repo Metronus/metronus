@@ -3,6 +3,7 @@ from django.http import HttpResponseRedirect
 from django.core.exceptions import  PermissionDenied
 from metronus_app.forms.administratorForm import AdministratorForm
 from metronus_app.model.administrator import Administrator
+from metronus_app.model.company import Company
 from metronus_app.common_utils import get_current_admin_or_403
 from django.shortcuts import render
 
@@ -24,7 +25,7 @@ def edit(request, username):
         form = AdministratorForm(initial={
             'first_name': administrator.user.first_name,
             'last_name': administrator.user.last_name,
-            'email': administrator.user.email,
+            'admin_email': administrator.user.email,
             'identifier': administrator.identifier,
             'phone': administrator.phone
         })
@@ -42,22 +43,22 @@ def edit(request, username):
             user = administrator.user
             user.first_name = form.cleaned_data["first_name"]
             user.last_name = form.cleaned_data["last_name"]
-            user.email = form.cleaned_data["email"]
+            user.email = form.cleaned_data["admin_email"]
 
             # If a new password has been specified, change the current one and notify the user
-            if form.cleaned_data["password1"]:
-                user.set_password(form.cleaned_data["password1"])
+            if form.cleaned_data["password"]:
+                user.set_password(form.cleaned_data["password"])
                 notify_password_change(user.email)
 
             user.save()
             administrator.save()
 
-            return HttpResponseRedirect('/administrator/view/' + username + '/')
+            return HttpResponseRedirect('/company/view/' + administrator.company_id.cif + '/')
 
     else:
         raise PermissionDenied
 
-    return render_to_response('administrator_edit.html', {'form': form})
+    return render(request, 'company/administrator_edit.html', {'form': form})
 
 
 def view(request, username):
@@ -95,7 +96,7 @@ def delete(request, username):
 
 
 def checkPasswords(form):
-    return form.cleaned_data['password1'] == form.cleaned_data['password2']
+    return form.cleaned_data['password'] == form.cleaned_data['repeatPassword']
 
 
 def notify_password_change(email):

@@ -57,7 +57,7 @@ def create(request):
     else:
         # form = DepartmentForm(initial={"department_id":0})
         form = RegistrationForm()
-    return render(request, 'company_register.html', {'form': form})
+    return render(request, 'company/company_register.html', {'form': form})
 
 
 @login_required
@@ -83,7 +83,7 @@ def edit(request, cif):
         # Return a form filled with the employee's data
         form = CompanyForm(initial={
             'visible_short_name': company.visible_short_name,
-            'company_email': company.company_email,
+            'company_email': company.email,
             'company_phone': company.phone,
             'logo': company.logo,
         })
@@ -99,12 +99,12 @@ def edit(request, cif):
             company.logo = form.cleaned_data["logo"]
             company.save()
 
-            return HttpResponseRedirect('/company/edit/' + cif + '/')
+            return HttpResponseRedirect('/company/view/' + cif + '/')
 
     else:
         raise PermissionDenied
 
-    return render_to_response('company_edit.html', {'form': form})
+    return render(request,'company/company_edit.html', {'form': form})
 
 
 @login_required
@@ -120,14 +120,12 @@ def view(request, cif):
 
     # Check that the user is logged in and it's an administrator
     admin = get_current_admin_or_403(request)
-
     company = get_object_or_404(Company, cif=cif)
-
     # Check that the admin has permission to view that company
-    if company.pk != admin.company_id:
+    if str(company.pk) != str(admin.company_id):
         raise PermissionDenied
 
-    return render(request, 'company_view.html', {'company': company})
+    return render(request, 'company/company_view.html', {'company': company, 'admin':admin})
 
 
 @login_required
