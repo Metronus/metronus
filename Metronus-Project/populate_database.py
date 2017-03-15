@@ -12,8 +12,8 @@ from django.db import transaction
 
 @transaction.atomic
 def basicLoad():
-    company=Company.objects.create(cif="123", company_name="company1", short_name="company1", email="company1@gmail.com", phone="123456789")
-    company2=Company.objects.create(cif="000000000", company_name="metronus", short_name="met", email="metronus@us.com", phone="123456789")
+    company=Company.objects.create(cif="A00000001", company_name="company1", short_name="company1", email="company1@gmail.com", phone="123456789")
+    company2=Company.objects.create(cif="A00000002", company_name="metronus", short_name="metronus", email="info@metronus.es", phone="123456789")
     #From first company:company1
     User.objects.create_user(
         username="employee",
@@ -45,12 +45,12 @@ def basicLoad():
 
     #From second company:metronus
     User.objects.create_user(
-        username="admin2",
-        password="admin2",
+        username="metronus",
+        password="metronus",
         email="admin2@gmail.com",
         first_name="admin2",
         last_name="admin2")
-    admin2 = User.objects.get(username="admin2")
+    admin2 = User.objects.get(username="metronus")
     Administrator.objects.create(
         user=admin2,
         user_type="A",

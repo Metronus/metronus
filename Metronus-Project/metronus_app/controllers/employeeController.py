@@ -39,11 +39,11 @@ def create(request):
             employeeUser = createEmployeeUser(form)
             employee = createEmployee(employeeUser, admin, form)
             EmployeeLog.objects.create(employee_id=employee, event="A")
-            return render_to_response('employee_register.html', {'form': EmployeeRegisterForm(), 'success': True})
+            render(request, 'employee_register.html', {'form': EmployeeRegisterForm(), 'success': True})
     else:
         raise PermissionDenied
 
-    return render_to_response('employee_register.html', {'form': form})
+    return render(request, 'employee_register.html', {'form': form})
 
 def list(request):
     """
@@ -56,7 +56,7 @@ def list(request):
     # Check that the user is logged in and it's an administrator
     admin = get_current_admin_or_403(request)
     employees = Employee.objects.filter(company_id=admin.company_id, user__is_active=True)
-    return render_to_response('employee_list.html', {'employees': employees})
+    return render(request, 'employee_list.html', {'employees': employees})
 
 def view(request, username):
     """
@@ -138,7 +138,7 @@ def edit(request, username):
     else:
         raise PermissionDenied
 
-    return render_to_response('employee_edit.html', {'form': form})
+    return render(request, 'employee_edit.html', {'form': form})
 
 def delete(request, username):
     """
