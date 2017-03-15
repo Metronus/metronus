@@ -4,7 +4,7 @@ from django.db import models
 class Company(models.Model):
     cif = models.CharField(max_length=9, unique=True)
     company_name = models.CharField(max_length=100)
-    short_name = models.CharField(max_length=50)
+    short_name = models.CharField(max_length=50, unique=True)
     visible_short_name = models.BooleanField(default=True)
     email = models.EmailField()
     phone = models.CharField(max_length=15)

@@ -82,6 +82,7 @@ def edit(request, cif):
     if request.method == "GET":
         # Return a form filled with the employee's data
         form = CompanyForm(initial={
+            'visible_short_name': company.visible_short_name,
             'company_email': company.company_email,
             'company_phone': company.phone,
             'logo': company.logo,
@@ -92,6 +93,7 @@ def edit(request, cif):
         form = CompanyForm(request.POST)
         if form.is_valid():
             # Company data
+            company.visible_short_name = form.cleaned_data["visible_short_name"]
             company.company_email = form.cleaned_data["company_email"]
             company.company_phone = form.cleaned_data["company_phone"]
             company.logo = form.cleaned_data["logo"]
@@ -197,15 +199,18 @@ def checkImage(form):
     ret = False
 
     logo = form.cleaned_data['logo']
-    image = Image.open(logo, mode="r")
-    xsize, ysize = image.size
+    if logo is not None:
+        image = Image.open(logo, mode="r")
+        xsize, ysize = image.size
 
-    print(logo)
-    for i in VALID_FORMATS:
-        if i == image.format:
-            ret = True
+        print(logo)
+        for i in VALID_FORMATS:
+            if i == image.format:
+                ret = True
 
-    return xsize <= WIDTH and ysize <= HEIGHT and ret
+        return xsize <= WIDTH and ysize <= HEIGHT and ret
+    else:
+        return True
 
 
 def validateCIF(request):
@@ -238,6 +243,23 @@ def validateAdmin(request):
 
     data = {
         'is_taken': admin == check
+    }
+    if data['is_taken']:
+        data['error_message'] = 'ERROR'
+    return JsonResponse(data)
+
+def validateShortName(request):
+    """
+    checks if the company short name already exist
+    """
+    short_name = request.GET.get('short_name', None)
+
+    check = get_or_none(Company, short_name=short_name)
+    if check is not None:
+        check = check.short_name
+
+    data = {
+        'is_taken': short_name == check
     }
     if data['is_taken']:
         data['error_message'] = 'ERROR'
