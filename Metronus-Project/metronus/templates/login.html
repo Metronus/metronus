@@ -1,36 +1,73 @@
 {% extends "layout_base.html" %}
 
-{% block title %}Login{% endblock %}
+{% load i18n %}
+{% load l10n %}
 
+{% block title %}{% trans 'registerCompany' %}{% endblock %}
+
+{% block javascript %}
+<script>
+
+  //Esto es para validar en cliente de forma bonita con bootstrap :)
+
+  $(document).ready(function() {
+    $('#login_form').bootstrapValidator({
+        feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+            username: {
+                validators: {
+                    notEmpty: {
+                        message: '{% trans 'username_error' %}'
+                    }
+                }
+            },
+            password: {
+                validators: {
+                    notEmpty: {
+                        message: '{% trans 'password_error' %}'
+                    }
+                }
+            },
+        },
+    });
+  });
+</script>
+{% endblock %}
 
 {% block content %}
 
+{% if form.errors %}
+        <p>{{ form.errors }}</p>
+{% endif %}
     <h3>{{ company.company_name }}</h3>
     <br>
-    <form method="POST" class="form-horizontal" action="" accept-charset="utf-8">
+    <form id="login_form" method="POST" class="form-horizontal" action="" accept-charset="utf-8">
         {% csrf_token %}
 
         <div class="col-md-6 col-md-offset-2" >
-            {% for field in form %}
-                <div class="form-group">
-                    <label class="control-label col-sm-4" for="id_{{ field.name }}">{{ field.label }}</label>
-                    <div class="col-sm-6">
-                        {% if field.label == 'Password' %}
-                            <input type="password" class="form-control col-md-6"
-                                   name="{{ field.name }}"
-                                   id="id_{{ field.name }}" >
-                        {% else%}
-                            <input type="text" class="form-control col-md-6"
-                                   name="{{ field.name }}"
-                                   id="id_{{ field.name }}" >
-                        {% endif %}
-                    </div>
-                </div>
-            {% endfor %}
 
-        {% csrf_token %}
+        <div class="form-group">
+            <label class="control-label col-sm-4" for="id_{{ form.username.name }}">{% trans 'username' %}</label>
+            <div class="col-sm-6">
+              <input type="text" class="form-control col-md-6" name="{{ form.username.name }}"  id="id_{{ form.username.name }}">
+            </div>
+            
+        </div>
 
-        <input type="hidden" name="next" value="{{ next }}"/><br/>
+
+        <div class="form-group">
+            <label class="control-label col-sm-4" for="id_{{ form.password.name }}">{% trans 'password' %}</label>
+            <div class="col-sm-6">
+                <input type="password" class="form-control col-md-6" name="{{ form.password.name }}" id="id_{{ form.password.name }}">
+            </div>
+        </div>
+
+
+          <input type="hidden" name="next" value="{{ next }}"/><br/>
             <div class="form-group">
                 <div class="col-sm-offset-4 col-sm-10">
                     <button type="submit" class="btn btn-default">Inicia sesión</button>
