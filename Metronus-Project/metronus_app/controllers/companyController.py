@@ -197,15 +197,18 @@ def checkImage(form):
     ret = False
 
     logo = form.cleaned_data['logo']
-    image = Image.open(logo, mode="r")
-    xsize, ysize = image.size
+    if logo is not None:
+        image = Image.open(logo, mode="r")
+        xsize, ysize = image.size
 
-    print(logo)
-    for i in VALID_FORMATS:
-        if i == image.format:
-            ret = True
+        print(logo)
+        for i in VALID_FORMATS:
+            if i == image.format:
+                ret = True
 
-    return xsize <= WIDTH and ysize <= HEIGHT and ret
+        return xsize <= WIDTH and ysize <= HEIGHT and ret
+    else:
+        return True
 
 
 def validateCIF(request):
