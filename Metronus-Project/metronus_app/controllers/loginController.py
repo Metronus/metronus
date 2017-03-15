@@ -66,8 +66,8 @@ def login(request, template_name='registration/login.html',
         form = authentication_form(request, data=request.POST)
         if form.is_valid():
 
-            if company is not None:
-                check_company_contains_actor(company, form.get_user())
+            #if company is not None:
+            #    check_company_contains_actor(company, form.get_user())
 
             auth_login(request, form.get_user())
             return HttpResponseRedirect(_get_login_redirect_url(request, redirect_to))
