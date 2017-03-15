@@ -1,0 +1,81 @@
+{% extends "layout_base.html" %}
+{% load i18n %}
+{% load l10n %}
+
+{% block title %}
+    {% trans 'registerEmployee' %}
+{% endblock %}
+{% block contentTitle %}
+    {% trans 'registerEmployee' %}
+{% endblock %}
+
+{% load static }
+
+{% block javascript %}
+
+<script>
+
+  //Esto es para validar en cliente de forma bonita con bootstrap :)
+
+  $(document).ready(function() {
+    $('#register_form').bootstrapValidator({
+        feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+          	name: {
+                validators: {
+                    notEmpty: {
+                        message: "{% trans 'taskName_not_empty'%}"
+                    },
+                },
+            },
+            description: {
+                validators: {
+                    notEmpty: {
+                        message: "{% trans 'description_not_empty' %}"
+                    }
+                }
+            }
+        }
+    })
+  });
+</script>
+{% endblock %}
+
+{% block content %}
+
+{% if form.errors %}
+        <p>{{ form.errors }}</p>
+{% endif %}
+ 
+
+
+<div class="row">
+   <form id="register_form" method="POST" class="form-horizontal" data-toggle="validator" role="form" action="" enctype="multipart/form-data">
+
+    {% csrf_token %}
+
+	    <div class="col-md-6 col-md-offset-2 collapse in" >
+
+        <div class="form-group required form-class">
+          <label class="control-label col-sm-4" for="id_{{ form.name.name }}">{% trans 'title'%}</label>
+            <div class="col-sm-6">
+              <input type="passwordtext" class="form-control col-md-6" name="{{ form.name.name }}" id="id_{{ form.name.label }}">
+            </div>
+        </div>
+
+        <div class="form-group required form-class">
+          <label class="control-label col-sm-4" for="id_{{ form.description.name }}">{% trans 'description' %}</label>
+            <div class="col-sm-6">
+              <input type="textarea" class="form-control col-md-6" name="{{ form.description.name }}" id="id_{{ form.description.label }}">
+            </div>
+        </div>
+
+        </div>
+
+    </form>
+ </div>
+{% endblock %}
