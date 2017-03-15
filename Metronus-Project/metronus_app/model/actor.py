@@ -2,6 +2,9 @@ from django.db import models
 from django.contrib.auth.models import User
 from metronus_app.model.company import Company
 
+import os
+from django.conf import settings
+
 
 class Actor(models.Model):
 
@@ -15,6 +18,9 @@ class Actor(models.Model):
 
     company_id = models.ForeignKey(Company)
     registryDate = models.DateTimeField(auto_now=True)
+
+    picture = models.ImageField(upload_to="actor", blank=True, null=True,
+                                default=os.path.join(settings.STATIC_ROOT, 'avatar.png'))
 
     def __unicode__(self):
         return self.identifier

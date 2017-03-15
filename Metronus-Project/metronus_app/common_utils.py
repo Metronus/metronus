@@ -37,6 +37,5 @@ def check_company_contains_actor(company, username):
         for actor in actor_set:
             if str(username) == str(actor.user.username):
                 ret = True
-        print(ret)
         if ret is False:
             raise PermissionDenied
