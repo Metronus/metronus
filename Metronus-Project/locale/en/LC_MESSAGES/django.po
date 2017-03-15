@@ -121,6 +121,26 @@ msgid "backToList"
 msgstr "Back to list"
 msgid "details"
 msgstr "Details"
+msgid "identifier_not_empty"
+msgstr "Employee's ID can't be empty"
+msgid "phone_valid"
+msgstr "Provide a valid phone"
+msgid "phone_not_empty"
+msgstr "Employee's phone can't be empty"
+msgid "email_valid"
+msgstr "Submit a valid email"
+msgid "email_not_empty"
+msgstr "Employee's email can't be empty"
+msgid "surname_not_empty"
+msgstr "Employee's surnames can't be empty"
+msgid "name_not_empty"
+msgstr "Employee's name can't be empty"
+msgid "passwords_must_match"
+msgstr "Passwords must match"
+msgid "password_not_empty"
+msgstr "Pasword can't be empty"
+msgid "username_not_empty"
+msgstr " Username can't be empty"
 
 
 #: Project
@@ -136,6 +156,15 @@ msgid "projectList"
 msgstr "Project list"
 msgid "projectConfirm"
 msgstr "Are you sure about deleting this project? All information related to it will be erased too"
+msgid "projectName"
+msgstr "This project name is in use, please choose a different one"
+msgid "projectNameNotNull"
+msgstr "Project's name can't be empty"
+
+#: TimeLog
+msgid "timeLogList"
+msgstr "Time Log"
+
 
 #: Roles
 msgid "rol"
