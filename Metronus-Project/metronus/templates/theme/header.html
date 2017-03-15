@@ -1,4 +1,7 @@
 <!-- Main Header -->
+{% load i18n %}
+{% load l10n %}
+
 <header class="main-header">
 
 	<!-- Logo -->
@@ -11,6 +14,10 @@
 
 	<!-- Header Navbar -->
 	<nav class="navbar navbar-static-top" role="navigation">
+
+	<a href="/login" class="btn btn-success">{% trans 'login' %}</a>
+	<a href="/register" class="btn btn-info">{% trans 'register' %}</a>
+
 		<!-- Sidebar toggle button-->
 		<a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
 			<span class="sr-only">Toggle navigation</span>

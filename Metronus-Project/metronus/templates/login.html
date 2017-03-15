@@ -5,6 +5,58 @@
 
 {% block title %}{% trans 'registerCompany' %}{% endblock %}
 
+
+
+{% block content %}
+
+{% if form.errors %}
+        <p>{{ form.errors }}</p>
+{% endif %}
+    <h3>{{ company.company_name }}</h3>
+    <br>
+    <form id="login_form" method="POST" class="form-horizontal" action="" accept-charset="utf-8">
+        {% csrf_token %}
+
+        <div class="col-md-6 col-md-offset-2" >
+
+        <div class="form-group">
+            <label class="control-label col-sm-4" for="id_{{ form.username.name }}">{% trans 'username' %}</label>
+            <div class="col-sm-6">
+              <input type="text" class="form-control col-md-6" name="{{ form.username.name }}"  id="id_{{ form.username.name }}">
+            </div>
+            
+        </div>
+
+
+        <div class="form-group">
+            <label class="control-label col-sm-4" for="id_{{ form.password.name }}">{% trans 'password' %}</label>
+            <div class="col-sm-6">
+                <input type="password" class="form-control col-md-6" name="{{ form.password.name }}" id="id_{{ form.password.name }}">
+            </div>
+        </div>
+
+    <div class="form-group control-buttons">
+          <input type="hidden" name="next" value="{{ next }}"/><br/>
+            <div class="form-group">
+                <div class="col-sm-offset-4 col-sm-10">
+                    <button type="submit" class="btn btn-default">{% trans 'login' %}</button>
+                    <button type="button" class="btn btn-info">{% trans 'recover_password' %}</button>
+                </div>
+
+            </div>
+        
+            
+          
+        </div>
+    </form>
+
+    
+           
+
+
+
+{% endblock %}
+
 {% block javascript %}
 <script>
 
@@ -36,44 +88,4 @@
     });
   });
 </script>
-{% endblock %}
-
-{% block content %}
-
-{% if form.errors %}
-        <p>{{ form.errors }}</p>
-{% endif %}
-    <h3>{{ company.company_name }}</h3>
-    <br>
-    <form id="login_form" method="POST" class="form-horizontal" action="" accept-charset="utf-8">
-        {% csrf_token %}
-
-        <div class="col-md-6 col-md-offset-2" >
-
-        <div class="form-group">
-            <label class="control-label col-sm-4" for="id_{{ form.username.name }}">{% trans 'username' %}</label>
-            <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.username.name }}"  id="id_{{ form.username.name }}">
-            </div>
-            
-        </div>
-
-
-        <div class="form-group">
-            <label class="control-label col-sm-4" for="id_{{ form.password.name }}">{% trans 'password' %}</label>
-            <div class="col-sm-6">
-                <input type="password" class="form-control col-md-6" name="{{ form.password.name }}" id="id_{{ form.password.name }}">
-            </div>
-        </div>
-
-
-          <input type="hidden" name="next" value="{{ next }}"/><br/>
-            <div class="form-group">
-                <div class="col-sm-offset-4 col-sm-10">
-                    <button type="submit" class="btn btn-default">Inicia sesión</button>
-                </div>
-            </div>
-        </div>
-    </form>
-
 {% endblock %}
