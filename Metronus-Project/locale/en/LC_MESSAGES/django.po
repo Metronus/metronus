@@ -181,6 +181,8 @@ msgid "noRoles"
 msgstr "This employee has no roles"
 msgid "addRole"
 msgstr "Add role"
+msgid "editRole"
+msgstr "Edit role"
 msgid "selectRole"
 msgstr "Choose a role"
 

@@ -180,6 +180,8 @@ msgid "noRoles"
 msgstr "Este empleado no tiene ningún rol"
 msgid "addRole"
 msgstr "Añadir un rol"
+msgid "editRole"
+msgstr "Editar un rol"
 msgid "selectRole"
 msgstr "Seleccione un rol"
 
