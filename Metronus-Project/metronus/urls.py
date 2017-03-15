@@ -86,6 +86,7 @@ urlpatterns += [#i18n_patterns(
     # Company
     url(r'^company/edit/(?P<cif>\w{9})/$', companyController.edit, name='company_edit'),
     url(r'^company/view/(?P<cif>\w{9})/$', companyController.view, name='company_view'),
+    url(r'^company/delete/$', companyController.view, name='company_view'),
 
     # Login
     url(r'^login/$', loginController.login, {'template_name': 'login.html', }, name="login"),
