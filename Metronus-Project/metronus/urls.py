@@ -19,7 +19,6 @@ from metronus_app.admin                 import admin_site
 from django.conf.urls.i18n          import i18n_patterns
 from metronus_app                   import views
 from django.core.urlresolvers       import reverse_lazy
-from django.contrib.auth.views      import login, logout
 
 from metronus_app.controllers       import departmentController
 from metronus_app.controllers       import projectController
@@ -30,11 +29,16 @@ from metronus_app.controllers       import companyController
 from metronus_app.controllers       import administratorController
 from metronus_app.controllers       import taskController
 from metronus_app.controllers       import timeLogController
-urlpatterns=[url(r'^i18n/', include('django.conf.urls.i18n')),  url(r'^admin/', admin_site.urls),]
-urlpatterns += [#i18n_patterns(
-    url(r'^$', views.index),
+from metronus_app.controllers       import loginController
 
-	url(r'^index.html/$', views.index, name='home'),
+
+urlpatterns = [url(r'^i18n/', include('django.conf.urls.i18n')),
+                url(r'^admin/', admin_site.urls),]
+urlpatterns += [#i18n_patterns(
+
+    url(r'^$', views.index),
+    url(r'^index.html/$', views.index, name='home'),
+
     url(r'^department/create$', departmentController.create),
     url(r'^department/createAsync$', departmentController.createAsync),
     url(r'^department/list$', departmentController.list),
@@ -82,9 +86,12 @@ urlpatterns += [#i18n_patterns(
     url(r'^company/edit/(?P<cif>\w{9})/$', companyController.edit, name='company_edit'),
     url(r'^company/view/(?P<cif>\w{9})/$', companyController.view, name='company_view'),
 
-    # Register & Login
-    url(r'^login/$', login, {'template_name': 'login.html', }, name="login"),
-    url(r'^logout/$', logout, {'next_page': reverse_lazy('home'), }, name="logout"),
+    # Login
+    url(r'^login/$', loginController.login, {'template_name': 'login.html', }, name="login"),
+    url(r'^(?P<company>\w{0,50})/', include([
+        url(r'^login/$', loginController.login, {'template_name': 'login.html', }, name="login"),
+    ])),
+    url(r'^logout/$', loginController.logout, {'next_page': reverse_lazy('home'), }, name="logout"),
 
     url(r'^register$', companyController.create),
     url(r'^ajax/validate_cif/$', companyController.validateCIF, name='validate_cif'),

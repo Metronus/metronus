@@ -48,7 +48,7 @@ def create(request):
             #send_mail('Metronus Info.', 'Registrado :)', 'info@metronus.es',
             #          [company.email, administrator.user.email], fail_silently=False,)
 
-            return HttpResponseRedirect(reverse('login'))
+            return HttpResponseRedirect('/' + company.short_name + '/login/')
 
     # if a GET (or any other method) we'll create a blank form
     else:
