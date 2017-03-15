@@ -9,6 +9,7 @@ from populate_database import basicLoad
 from django.core.exceptions             import ObjectDoesNotExist, PermissionDenied
 from django.http                        import HttpResponseForbidden
 from django.contrib.auth import authenticate,login
+from metronus_app.model.employee import Employee
 
 
 
@@ -69,7 +70,8 @@ def show(request,project_id):
     admin = get_current_admin_or_403(request)
     repeated_name = False
     project = get_object_or_404(Project, pk=project_id)
-    return render(request, "project_show.html", {"project": project})
+    employees = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__project_id=project)
+    return render(request, "project_show.html", {"project": project, 'employees': employees})
 
 
 def edit(request,project_id):
@@ -173,12 +175,6 @@ def checkCompanyProjectId(projectId, companyId):
     project = Project.objects.get(id = projectId, company_id=companyId, deleted=False)
 
     return project is not None
-
-def get_current_admin(request):
-    try:
-        return Administrator.objects.get(user=request.user)
-    except ObjectDoesNotExist:
-        return None
 
 def findName(pname,admin):
     return Project.objects.filter(name=pname,company_id=admin.company_id).first()
