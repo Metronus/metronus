@@ -64,10 +64,10 @@
 
 
 <div>
-<h2>{% trans 'roles' %}</h2>
+<h2 align="center">{% trans 'roles' %}</h2>
 {% if employee_roles %}
-<table>
-  <thead class="table">
+<table align="center" class="table table-striped">
+  <thead>
     <tr>
       <th class="col-xs-3">{% trans 'department' %}</th>
       <th class="col-xs-3">{% trans 'project' %}</th>
@@ -78,11 +78,11 @@
   <tbody>
   {% for rol in employee_roles %}
     <tr>
-      <td>{{rol.projectDepartment.department.name}}</td>
-      <td>{{rol.projectDepartment.project.name}}</td>
-      <td>{{rol.role_id}}</td>
-      <td><div align="right"><a align="right" class="btn btn-primary" href="/rol/update?rol_id={{rol.id}}">{% trans 'update' %}</a>
-		<a align="right" class="btn btn-danger" href="/rol/delete?rol_id={{rol.id}}">{% trans 'delete' %}</a></div></td>
+      <td>{{rol.projectDepartment_id.department_id.name}}</td>
+      <td>{{rol.projectDepartment_id.project_id.name}}</td>
+      <td>{{rol.role_id.name}}</td>
+      <td><div align="right"><a align="right" class="btn btn-primary" href="/roles/manage?role_id={{rol.id}}">{% trans 'update' %}</a>
+		<a align="right" class="btn btn-danger" href="/roles/delete?rol_id={{rol.id}}">{% trans 'delete' %}</a></div></td>
     </tr>
 	{% endfor %}
 	</tbody>
@@ -92,6 +92,6 @@
 {% endif %}
 </div>
 </br>
-<a class="btn btn-primary" href="/rol/create?employee_id={{employee.id}}">{% trans 'addRole' %}</a>
+<a align="center" class="btn btn-primary" href="/roles/manage?employee_id={{employee.id}}">{% trans 'addRole' %}</a>
 
 {% endblock %}

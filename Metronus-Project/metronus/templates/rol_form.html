@@ -2,23 +2,103 @@
 {% load i18n %}
 {% load l10n %}
 {% block title %}
-{% if  form.rol_id.value == 0 %}
-{% trans 'addRol' %}
+{% if  form.employeeRole_id.value == 0 %}
+{% trans 'addRole' %}
 {% else %}
-{% trans 'editRol' %}
+{% trans 'editRole' %}
 {% endif %}
 {% endblock %}
 
+{% block javascript %}
+
+
+<script>
+//Esto es para validar en cliente de forma bonita con bootstrap :)
+$(document).ready(function() {
+    $('#register_form').bootstrapValidator({
+        feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+            department_id: {
+                validators: {
+                    notEmpty: {
+                        message: "{% trans 'departmentNameNotNull' %}"
+                    },
+                }
+            },
+            project_id: {
+                validators: {
+                    notEmpty: {
+                        message: "{% trans 'departmentNameNotNull' %}"
+                    },
+                }
+            },
+            role_id: {
+                validators: {
+                    notEmpty: {
+                        message: "{% trans 'departmentNameNotNull' %}"
+                    },
+                }
+            },
+            
+        },
+    });
+});
+</script>
+
+{% endblock %}
+
 {% block content %}
-{% if  form.rol_id.value == 0 %}
-<h1> {% trans 'addRol' %} </h1></br>
+{% if  form.employeeRole_id.value == 0 %}
+<h1 align="center"> {% trans 'addRole' %} </h1></br>
 {% else %}
-<h1> {% trans 'editRol' %} </h1></br>
+<h1 align="center"> {% trans 'editRole' %} </h1></br>
 {% endif %}
-    <form id="form" method="POST" action="">{% csrf_token %}
-	    {{form.as_p}}
+    
+
+        <form id="register_form" method="POST" action="" class="form-horizontal" align="center">{% csrf_token %}
+
+	    <div class="form-group company_class form-class" >
+          <label class="control-label col-sm-4" for="id_{{ form.department_id.name }}">{% trans 'department' %}</label>
+            <div class="col-sm-6">
+              <select class="selectpicker col-md-6" name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}">
+              <option value="" selected>{% trans 'selectDepartment' %}</option>
+              	{% for dep in departments %}
+    				<option value="{{ dep.id }}"{% if form.department_id.value == dep.id %} selected{% endif %}>{{ dep.name }}</option>
+				{% endfor %}
+              </select>
+			</div>
+			<label class="control-label col-sm-4" for="id_{{ form.project_id.name }}">{% trans 'project' %}</label>
+            <div class="col-sm-6">
+              <select class="selectpicker col-md-6" name="{{ form.project_id.name }}" id="id_{{ form.project_id.name }}">
+              <option value="" selected>{% trans 'selectProject' %}</option>
+              	{% for dep in projects %}
+    				<option value="{{ dep.id }}"{% if form.project_id.value == dep.id %} selected{% endif %}>{{ dep.name }}</option>
+				{% endfor %}
+              </select>
+			</div>
+			<label class="control-label col-sm-4" for="id_{{ form.role_id.name }}">{% trans 'rol' %}</label>
+			<div class="col-sm-6">
+              <select class="selectpicker col-md-6" name="{{ form.role_id.name }}" id="id_{{ form.role_id.name }}">
+              <option value="" selected>{% trans 'selectRole' %}</option>
+              	{% for dep in roles %}
+    				<option value="{{ dep.id }}"{% if form.role_id.value == dep.id %} selected{% endif %}>{{ dep.name }}</option>
+				{% endfor %}
+              </select>
+			</div>
+	
+              
+              <input type="text" hidden="true" name="{{ form.employee_id.name }}" id="id_{{ form.employee_id.name }}" value="{{ form.employee_id.value}}">
+              <input type="text" hidden="true" name="{{ form.employeeRole_id.name }}" id="id_{{ form.employeeRole_id.name }}" value="{{ form.employeeRole_id.value}}">
+             </div>
 	    </br>
-	    <p><input type="submit" value="{% trans 'confirm' %}" /></p>
+	    <div align="center" >
+	    	<input type="submit" class="btn btn-success submit-button" value="{% trans 'confirm' %}" />
+	    </div>
     </form>
+
 
 {% endblock %}

@@ -77,7 +77,9 @@ msgstr "The username cannot be empty"
 msgid "password_error"
 msgstr "Password cannot be empty"
 msgid "passwordRepeat_error"
-msgstr "Yout must confirm the password"
+msgstr "You must confirm the password"
+msgid "fieldEmpty"
+msgstr "This field cannot be empty"
 
 
 #: Department
@@ -103,6 +105,8 @@ msgid "departmentAdd"
 msgstr "Create and add a new department"
 msgid "departmentConfirm"
 msgstr "Are you sure about deleting this department? All information related to it will be erased too"
+msgid "selectDepartment"
+msgstr "Choose a department"
 
 #: Employee
 msgid "registryDate"
@@ -160,6 +164,8 @@ msgid "projectName"
 msgstr "This project name is in use, please choose a different one"
 msgid "projectNameNotNull"
 msgstr "Project's name can't be empty"
+msgid "selectProject"
+msgstr "Choose a project"
 
 #: TimeLog
 msgid "timeLogList"
@@ -175,6 +181,8 @@ msgid "noRoles"
 msgstr "This employee has no roles"
 msgid "addRole"
 msgstr "Add role"
+msgid "selectRole"
+msgstr "Choose a role"
 
 #: Company
 msgid "registerCompany"

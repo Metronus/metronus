@@ -78,6 +78,8 @@ msgid "password_error"
 msgstr "La contraseña no puede estar vacia"
 msgid "passwotdRepeat_error"
 msgstr "Debe confirmar la contraseña"
+msgid "fieldEmpty"
+msgstr "Este campo no puede estar vacío"
 
 
 #: Department
@@ -103,6 +105,8 @@ msgid "departmentAdd"
 msgstr "Crear y añadir otro departamento"
 msgid "departmentConfirm"
 msgstr "¿Está seguro de eliminar el departamento? Se eliminará también todo lo relacionado con el mismo"
+msgid "selectDepartment"
+msgstr "Seleccione departamento"
 
 #: Employee
 msgid "registryDate"
@@ -160,6 +164,8 @@ msgid "projectName"
 msgstr "El nombre del proyecto ya está en uso, por favor, elija otro"
 msgid "projectNameNotNull"
 msgstr "El nombre del proyecto no puede estar vacío"
+msgid "selectProject"
+msgstr "Seleccione proyecto"
 
 #: TimeLog
 msgid "timeLogList"
@@ -174,6 +180,8 @@ msgid "noRoles"
 msgstr "Este empleado no tiene ningún rol"
 msgid "addRole"
 msgstr "Añadir un rol"
+msgid "selectRole"
+msgstr "Seleccione un rol"
 
 #: Company
 msgid "registerCompany"

@@ -8,6 +8,7 @@ from metronus_app.model.projectDepartment             import ProjectDepartment
 from metronus_app.forms.roleManagementForm            import RoleManagementForm
 
 from django.core.exceptions                           import PermissionDenied, ObjectDoesNotExist
+from django.shortcuts                                 import render
 from django.shortcuts                                 import render_to_response, get_object_or_404
 from django.http                                      import HttpResponseBadRequest, HttpResponseRedirect
  
@@ -131,7 +132,7 @@ def return_get_form(request, admin):
             'employeeRole_id': role.id,
         })
 
-    return render_to_response('rol_form.html', {'departments': departments, 'projects': projects, 'roles': roles, 'form': form})
+    return render(request, 'rol_form.html', {'departments': departments, 'projects': projects, 'roles': roles, 'form': form})
 
 def check_form_permissions(form, admin):
 
