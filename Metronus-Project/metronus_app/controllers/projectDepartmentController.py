@@ -10,35 +10,32 @@ from metronus_app.controllers.departmentController import checkCompanyDepartment
 from django.http                                 import HttpResponseRedirect
 from metronus_app.common_utils                   import get_current_admin_or_403
 
+
 def create(request):
     """
     parameters/returns:
-    form: el formulario con los datos de la clase ProjectDepartment: project_id y department_id
+    form: el formulario con los datos de la clase ProjectDepartment: project_id, department_id;
+    y projectDepartment_id, que será 0 en caso de que estemos creando uno.
 
     template:
-    proyectdepartment_form.html
+    projectdepartment_create.html
     """
 
     admin = get_current_admin_or_403(request)
 
-    # if this is a POST request we need to process the form data
     if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
         form = ProjectDepartmentForm(data=request.POST, user=admin)
-        # check whether it's valid:
+
         if form.is_valid():
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:
-            #print(form.cleaned_data["project_id"].deleted)
-            pd = createProjectDepartment(form, admin)
+            createProjectDepartment(form, admin)
             return render_to_response('projectdepartment_create.html', {'form': ProjectDepartmentForm(user=admin), 'success': True})
 
-    # if a GET (or any other method) we'll create a blank form
+    #GET -> Create an empty form
     else:
         form = ProjectDepartmentForm(initial={"project_id":0, "department_id":0, "projectDepartment_id":0}, user=admin)
 
     return render(request, 'projectdepartment_form.html', {'form': form})
+
 
 def delete(request):
     """
@@ -56,19 +53,22 @@ def delete(request):
 
     return HttpResponseRedirect('/projectdepartment/list/')
 
+
 def list(request):
     """
-    parameters: project_id o department_id
+    parameters: project_id or department_id, both optional.
+    If it receives project_id, it will return all projectDepartments from that project
+    If it receives department_id, it will return all projectDepartments form that department
+    If it receives none, it will return all projectDeparments from the logged company
 
     returns:
     projectDepartments: lista de relaciones proyecto-departamento de la compañía logeada, según el parámetro pasado. 
 
     template:
-    proyectdepartment_list.html
+    projectdepartment_list.html
     """
 
     admin = get_current_admin_or_403(request)
-
     project_id = request.GET.get('project_id')
     department_id = request.GET.get('department_id')
 
@@ -85,40 +85,32 @@ def list(request):
     else:
         lista = ProjectDepartment.objects.filter(project_id__company_id = admin.company_id)
 
-    
     return render(request, "projectdepartment_list.html", {"projectDepartments": lista})
 
 
 def edit(request):
     """
-    returns:
-    form: el formulario con los datos de la clase ProjectDepartment: project_id y department_id
-
-    template:
-    projectdepartment_form.html
+    Will not be used
     """
     admin = get_current_admin_or_403(request)
-    # if this is a POST request we need to process the form data
     if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
         form = ProjectDepartmentForm(data=request.POST, user=admin)
-        # check whether it's valid:
+
         if form.is_valid():
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:
             projectDepartment=ProjectDepartment.objects.get(pk=form.cleaned_data['projectDepartment_id'])
 
             updateProjectDepartment(projectDepartment,form,admin)
 
             return HttpResponseRedirect('/projectdepartment/list')
 
-    # if a GET (or any other method) we'll create a blank form
+    #GET -> Create an empty form
     else:
         projectDepartment=request.GET.get('projectDepartment_id')
         projectDepartment=get_object_or_404(ProjectDepartment, id=projectDepartment)
         form = ProjectDepartmentForm(
-            initial={"department_id":projectDepartment.department_id, "project_id":projectDepartment.project_id}, user=admin)
+            initial={"department_id":projectDepartment.department_id,
+                     "project_id":projectDepartment.project_id},
+                     user=admin)
 
     return render(request, 'projectdepartment_form.html', {'form': form})
 
@@ -135,7 +127,8 @@ def createProjectDepartment(form, admin):
 
     return ProjectDepartment.objects.create(project_id = project, department_id = department)
 
-#Se permitirán los updates de projectDepartment?
+
+#Se permitirán los updates de projectDepartment? -> Nope
 def updateProjectDepartment(projectDepartment, form, admin):
     projectDepartment.project_id = form.cleaned_data['project_id']
     projectDepartment.department_id = form.cleaned_data['department_id']
@@ -145,21 +138,22 @@ def updateProjectDepartment(projectDepartment, form, admin):
 
     return projectDepartment.save()
 
+
 def deleteProjectDepartment(projectDepartment, admin):
-    # Check that the admin has permission to delete that projectDepartment
     if not checkCompanyProjectDepartmentSession(projectDepartment, admin):
         raise PermissionDenied
 
     projectDepartment.delete()
 
 
-#---------------- UTILITY
+#Utility methods, mostly checkers
 
 def checkCompanyProjectDepartmentSession(projectDepartment, admin):
     """
-    checks if the project belongs to the logged company
+    checks if the projectDepartment belongs to the logged company, and neither project nor department are deleted
     """
     return checkCompanyProjectDepartment(projectDepartment,admin)
+
 
 def checkCompanyProjectDepartment(projectDepartment, admin):
     """

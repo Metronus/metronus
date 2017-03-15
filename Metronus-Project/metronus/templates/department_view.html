@@ -11,7 +11,7 @@
           <div class="box">
             <!-- /.box-header -->
             <div class="box-body table-responsive no-padding">
-              <table id="employeeTable" class="table table-hover">
+              <table class="table table-hover">
               <thead>
                 <tr>
                   <th>{% trans 'username' %}</th>
@@ -43,16 +43,4 @@
 {% endblock %}
 
 {% block javascript %}
-<script>
-  $(function () {
-    $('#employeeTable').DataTable({
-      "paging": true,
-      "lengthChange": true,
-      "searching": true,
-      "ordering": true,
-      "info": false,
-      "autoWidth": true
-    });
-  });
-</script>
 {% endblock %}

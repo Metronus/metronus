@@ -19,7 +19,6 @@ from metronus_app.admin                 import admin_site
 from django.conf.urls.i18n          import i18n_patterns
 from metronus_app                   import views
 from django.core.urlresolvers       import reverse_lazy
-from django.contrib.auth.views      import login, logout
 
 from metronus_app.controllers       import departmentController
 from metronus_app.controllers       import projectController
@@ -30,11 +29,16 @@ from metronus_app.controllers       import companyController
 from metronus_app.controllers       import administratorController
 from metronus_app.controllers       import taskController
 from metronus_app.controllers       import timeLogController
-urlpatterns=[url(r'^i18n/', include('django.conf.urls.i18n')),  url(r'^admin/', admin_site.urls),]
-urlpatterns += [#i18n_patterns(
-    url(r'^$', views.index),
+from metronus_app.controllers       import loginController
 
-	url(r'^index.html/$', views.index),
+
+urlpatterns = [url(r'^i18n/', include('django.conf.urls.i18n')),
+                url(r'^admin/', admin_site.urls),]
+urlpatterns += [#i18n_patterns(
+
+    url(r'^$', views.index),
+    url(r'^index.html/$', views.index, name='home'),
+
     url(r'^department/create$', departmentController.create),
     url(r'^department/createAsync$', departmentController.createAsync),
     url(r'^department/list$', departmentController.list),
@@ -57,7 +61,7 @@ urlpatterns += [#i18n_patterns(
 
     url(r'^projectdepartment/create$', projectDepartmentController.create, name='projectdepartment_create'),
     url(r'^projectdepartment/list$', projectDepartmentController.list, name='projectdepartment_list'),
-    url(r'^projectdepartment/edit$', projectDepartmentController.edit, name='projectdepartment_edit'),
+    #url(r'^projectdepartment/edit$', projectDepartmentController.edit, name='projectdepartment_edit'),No necesario, en un principio
     url(r'^projectdepartment/delete$', projectDepartmentController.delete, name='projectdepartment_delete'),
 
     url(r'^employee/create$', employeeController.create, name='employee_create'),
@@ -67,6 +71,7 @@ urlpatterns += [#i18n_patterns(
     url(r'^employee/delete/(?P<username>\w{0,50})/$', employeeController.delete, name='employee_delete'),
 
     # TimeLogs
+    url(r'^timeLog/list_all/$', timeLogController.list_all, name='timeLog_list_all'),
     url(r'^timeLog/list/(?P<task_id>\w{0,50})/$', timeLogController.list, name='timeLog_list'),
     url(r'^timeLog/create/(?P<task_id>\w{0,50})/$', timeLogController.create, name='timeLog_create'),
     url(r'^timeLog/edit/(?P<timeLog_id>\w{0,50})/$', timeLogController.edit, name='timeLog_edit'),
@@ -81,14 +86,19 @@ urlpatterns += [#i18n_patterns(
     # Company
     url(r'^company/edit/(?P<cif>\w{9})/$', companyController.edit, name='company_edit'),
     url(r'^company/view/(?P<cif>\w{9})/$', companyController.view, name='company_view'),
+    url(r'^company/delete/$', companyController.view, name='company_view'),
 
-    # Register & Login
-    url(r'^login/$', login, {'template_name': 'login.html', }, name="login"),
-    url(r'^logout/$', logout, {'next_page': reverse_lazy('home'), }, name="logout"),
+    # Login
+    url(r'^login/$', loginController.login, {'template_name': 'login.html', }, name="login"),
+    url(r'^(?P<company>\w{0,50})/', include([
+        url(r'^login/$', loginController.login, {'template_name': 'login.html', }, name="login"),
+    ])),
+    url(r'^logout/$', loginController.logout, {'next_page': reverse_lazy('home'), }, name="logout"),
 
     url(r'^register$', companyController.create),
     url(r'^ajax/validate_cif/$', companyController.validateCIF, name='validate_cif'),
     url(r'^ajax/validate_admin/$', companyController.validateAdmin, name='validate_admin'),
+    url(r'^ajax/validate_short_name/$', companyController.validateShortName, name='validate_short_name'),
 
 #)
 ]

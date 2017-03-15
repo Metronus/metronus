@@ -24,6 +24,10 @@
 	<!-- Bootstrap theme -->
 	<link rel="stylesheet" href="/static/css/AdminLTE.min.css">
 	<link rel="stylesheet" href="/static/css/skin-blue.css">
+	
+	<!-- Bootstrap validator -->
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/css/bootstrapvalidator.min.css"/>
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/4.3.8/css/fileinput.min.css"/>
 
 	<!-- Element -->
   	<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-default/index.css">
@@ -57,6 +61,9 @@
 
 	{% include './theme/sidebar.html' %}
 
+	<!-- Metronus -->
+	<script src="/static/js/functions.js"></script>
+
 	<!-- Vue -->
 	<script src="https://unpkg.com/vue/dist/vue.js"></script>
 
@@ -69,18 +76,13 @@
 
 	<!-- Bootstrap -->
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-	<script src="//cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+	<script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
 
 	<!-- Boostrap Theme -->
 	<script src="/static/js/app.min.js"></script>
 
 	<!-- Bootstrap validator -->
-	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/css/bootstrapvalidator.min.css"/>
-
 	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/js/bootstrapvalidator.min.js"></script>
-
-	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/4.3.8/css/fileinput.min.css"/>
-
 	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/4.3.8/js/fileinput.min.js"></script>
 	
 	{% block javascript %} {% endblock %}

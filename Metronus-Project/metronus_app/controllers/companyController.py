@@ -1,10 +1,13 @@
 from metronus_app.forms.registrationForm import RegistrationForm
 from metronus_app.forms.companyForm import CompanyForm
 from metronus_app.model.company import Company
+from metronus_app.model.companyLog import CompanyLog
 from metronus_app.model.administrator import Administrator
 from django.contrib.auth.models import User
 from django.shortcuts import render
 from django.http import JsonResponse
+
+from django.contrib.auth.decorators import login_required
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
@@ -48,7 +51,7 @@ def create(request):
             #send_mail('Metronus Info.', 'Registrado :)', 'info@metronus.es',
             #          [company.email, administrator.user.email], fail_silently=False,)
 
-            return HttpResponseRedirect(reverse('login'))
+            return HttpResponseRedirect('/' + company.short_name + '/login/')
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -57,6 +60,7 @@ def create(request):
     return render(request, 'company_register.html', {'form': form})
 
 
+@login_required
 def edit(request, cif):
     """
     url = company/edit/<cif>
@@ -78,6 +82,7 @@ def edit(request, cif):
     if request.method == "GET":
         # Return a form filled with the employee's data
         form = CompanyForm(initial={
+            'visible_short_name': company.visible_short_name,
             'company_email': company.company_email,
             'company_phone': company.phone,
             'logo': company.logo,
@@ -88,6 +93,7 @@ def edit(request, cif):
         form = CompanyForm(request.POST)
         if form.is_valid():
             # Company data
+            company.visible_short_name = form.cleaned_data["visible_short_name"]
             company.company_email = form.cleaned_data["company_email"]
             company.company_phone = form.cleaned_data["company_phone"]
             company.logo = form.cleaned_data["logo"]
@@ -101,6 +107,7 @@ def edit(request, cif):
     return render_to_response('company_edit.html', {'form': form})
 
 
+@login_required
 def view(request, cif):
     """
     url = company/view/<cif>
@@ -123,28 +130,30 @@ def view(request, cif):
     return render(request, 'company_view.html', {'company': company})
 
 
-
-def request_to_delete(request, cif):
+@login_required
+def delete(request):
     """
-    url = company/delete/<cif>
+    url = company/delete
 
     parameters/returns:
     Nada, redirecciona al inicio
 
     template: ninguna
     """
-    pass  # TODO
+    # Check that the user is logged in and it's an administrator
+    admin = get_current_admin_or_403(request)
+    company = get_object_or_404(Company, pk=admin.company_id)
 
-def delete(request, cif):
-    """
-    url = company/delete/<cif>
+    # Check that the admin has permission to view that company
+    if company.pk != admin.company_id:
+        raise PermissionDenied
 
-    parameters/returns:
-    Nada, redirecciona al inicio
+    CompanyLog.objects.create(cif=company.cif, company_name=company.company_name, registryDate=company.registryDate)
 
-    template: ninguna
-    """
-    pass  # TODO
+    company.delete()
+
+    return HttpResponseRedirect('')
+
 
 #Auxiliar methods, containing the operation logic
 
@@ -190,15 +199,18 @@ def checkImage(form):
     ret = False
 
     logo = form.cleaned_data['logo']
-    image = Image.open(logo, mode="r")
-    xsize, ysize = image.size
+    if logo is not None:
+        image = Image.open(logo, mode="r")
+        xsize, ysize = image.size
 
-    print(logo)
-    for i in VALID_FORMATS:
-        if i == image.format:
-            ret = True
+        print(logo)
+        for i in VALID_FORMATS:
+            if i == image.format:
+                ret = True
 
-    return xsize <= WIDTH and ysize <= HEIGHT and ret
+        return xsize <= WIDTH and ysize <= HEIGHT and ret
+    else:
+        return True
 
 
 def validateCIF(request):
@@ -231,6 +243,23 @@ def validateAdmin(request):
 
     data = {
         'is_taken': admin == check
+    }
+    if data['is_taken']:
+        data['error_message'] = 'ERROR'
+    return JsonResponse(data)
+
+def validateShortName(request):
+    """
+    checks if the company short name already exist
+    """
+    short_name = request.GET.get('short_name', None)
+
+    check = get_or_none(Company, short_name=short_name)
+    if check is not None:
+        check = check.short_name
+
+    data = {
+        'is_taken': short_name == check
     }
     if data['is_taken']:
         data['error_message'] = 'ERROR'

@@ -14,10 +14,21 @@
 		}
 	}
 </script>
+<script>
+	function display(id){
+		window.location="/department/view?department_id="+id;
+		
+	}
+</script>
 {% endblock %}
 
 
 {% block content %}
+<style type="text/css">
+	#departmentName{
+		background-color: red;
+	}
+</style>
 <h1>{% trans 'departmentList' %}</h1>
 </br>
 </br>
@@ -26,7 +37,7 @@
 {% for department in departments %}
 
 	<li class="list-group-item">
-	<div class="list-group col-xs-4">{{department.name}} </div>
+	<div style="cursor: pointer;" class="list-group col-xs-4" onclick="display({{department.id}})">{{department.name}} </div>
 	<div align="right" >
 		<a align="right" class="btn btn-primary" href="/department/edit?department_id={{department.id}}">{% trans 'update' %}</a>
 		<input type="button" align="right" class="btn btn-danger" onclick="windowAlert({{department.id}})" value="{% trans 'delete' %}"/>

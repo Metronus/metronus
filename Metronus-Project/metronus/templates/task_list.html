@@ -1,0 +1,54 @@
+{% extends "layout_base.html" %}
+{% load i18n %}
+{% load l10n %}
+
+{% block title %}{% trans 'taskList' %}{% endblock %}
+{% block contentTitle %}{% trans 'taskList' %}{% endblock %}
+
+{% block content %}
+
+<div class="row">
+        <div class="col-xs-12">
+          <div class="box">
+            <!-- /.box-header -->
+            <div class="box-body table-responsive no-padding">
+              <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>{% trans 'task' %}</th>
+                  <th>{% trans 'projectDeparment' %}</th>
+                  <th>{% trans 'creationDate' %}</th>
+                  <th>{% trans 'creator' %}</th>
+                  <th>{% trans 'actions' %}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for task in tasks %}
+                <tr>
+                    <td>{{task.name}}</td>
+
+                    <td>{{task.projectDepartment_id}}</td>
+
+                    <td>{{task.actor_id}}</td>
+
+                    <td>{{task.registryDate}}</td>
+
+                    <td>
+                      <a href="/task/edit" type="button" class="btn bg-orange btn-flat">{% trans 'edit' %}</a>
+                      <a href="/task/delete" type="button" class="btn bg-maroon btn-flat">{% trans 'delete' %}</a>
+                    </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+              </table>
+            </div>
+          </div>
+
+                      <a href="/employee/create" type="button" class="btn bg-purple btn-flat">{% trans 'new' %}</a>
+        </div>
+      </div>
+
+{% endblock %}
+
+{% block javascript %}
+{% endblock %}

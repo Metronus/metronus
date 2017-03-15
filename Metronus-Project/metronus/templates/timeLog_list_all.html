@@ -1,0 +1,44 @@
+{% extends "layout_base.html" %}
+
+{% load i18n %}
+{% load l10n %}
+
+{% block title %}{% trans 'timeLogList' %}{% endblock %}
+
+{% block content %}
+    <h1>{% trans 'timeLogList' %}</h1>
+
+    <br>
+    <div id="alert_placeholder"></div>
+    <br>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead class="thead-inverse">
+                <tr>
+                    <th>#</th>
+                    {% for day in month %}
+                        <th>{{ day }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in tasks %}
+                    <tr>
+                        <th scope="row">{{ task }}</th>
+                        {% for day in month %}
+                            <td>1h</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+                <tr class="success">
+                    <th scope="row">Total</th>
+                    {% for day in month %}
+                        <td>5h</td>
+                    {% endfor %}
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}
