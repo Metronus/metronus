@@ -3,10 +3,12 @@ from metronus_app.forms.departmentForm import DepartmentForm
 from metronus_app.model.department import Department
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 from metronus_app.model.employee import Employee
+from metronus_app.model.actor import Actor
+from metronus_app.model.task import Task
 from metronus_app.model.administrator import Administrator
 from populate_database import basicLoad
 from django.shortcuts                            import render_to_response, get_object_or_404
-from metronus_app.common_utils                   import get_current_admin_or_403
+from metronus_app.common_utils                   import get_current_admin_or_403,get_current_employee_or_403
 from django.http import HttpResponseRedirect
 from django.core.exceptions                      import ObjectDoesNotExist, PermissionDenied
 from django.contrib.auth import authenticate,login
@@ -41,12 +43,12 @@ def create(request):
                 if not dep.active:
                     dep.active=True
                     dep.save()
-                    return HttpResponseRedirect('/department/view?department_id='+str(dep.id))
+                    return HttpResponseRedirect('/department/view/'+str(dep.id)+"/")
                 else:
                     repeated_name=True
             else:
                 department=createDepartment(form,admin)
-                return HttpResponseRedirect('/department/view?department_id='+str(department.id))
+                return HttpResponseRedirect('/department/view/'+str(department.id)+"/")
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -120,10 +122,26 @@ def list(request):
 
     lista=Department.objects.filter(company_id=admin.company_id,active=True)
     return render(request, "department_list.html", {"departments": lista})
-
-def view(request):
+def list_for_employees(request):
     """
-    url = department/view
+    OJO: esta no debería ser necesaria
+    returns:
+    departments: lista de departamentos del empleado logeada
+
+    template:
+    department_list.html
+    """
+
+    # Check that the current user is an employee
+    employee = get_current_employee_or_403(request)
+
+    lista=Department.objects.filter(company_id=employee.company_id,active=True,
+        projectdepartment__projectdepartmentemployeerole__employee_id=employee).distinct()
+    return render(request, "department_list.html", {"departments": lista})
+
+def view(request,department_id):
+    """
+    url = department/view/(department_id)/
 
     parameters:
     department_id: id del department
@@ -131,25 +149,23 @@ def view(request):
     returns:
     department: datos del departamento
     employees: objetos Empleados
+    tasks: lista de tareas del departamento
 
     template: department_view.html
     """
+    department = get_object_or_404(Department, pk=department_id)
+    checkRoleForList(department,request)
 
-    # Check that the user is logged in and it's an administrator
-    admin = get_current_admin_or_403(request)
-
-    department = get_object_or_404(Department, pk=request.GET.get("department_id"))
-
-    # Check that the admin has permission to view that employee
-    if department.company_id != admin.company_id:
-        raise PermissionDenied
+    tasks=Task.objects.filter(active=True, projectDepartment_id__department_id__id=department_id)
 
     employees = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__department_id=department)
 
-    return render(request, 'department_view.html', {'department': department, 'employees': employees})
+    return render(request, 'department_view.html', {'department': department, 'employees': employees,'tasks':tasks})
 
-def edit(request):
+def edit(request,department_id):
     """
+    url = department/edit/(department_id)/
+
     parameters/returns:
     form: el formulario con los datos del departamento
     repeated_name:true si el nombre ya existe para otro departamento
@@ -177,22 +193,22 @@ def edit(request):
                 #dep does not exists or it's the same
                 if dep is None or dep.id==department.id:
                     editDepartment(department,form)
-                    return HttpResponseRedirect('/department/view?department_id='+str(department.id))
+                    return HttpResponseRedirect('/department/view/'+str(department.id)+"/")
                 else:
                     if dep.active:
                         repeated_name=True
     # if a GET (or any other method) we'll create a blank form
     else:
 
-        department_id=request.GET.get('department_id')
         department=get_object_or_404(Department,pk=department_id)
         form = DepartmentForm(initial={"name":department.name,"department_id":department.id})
 
 
     return render(request, 'department_form.html', {'form': form,'repeated_name':repeated_name})
 
-def delete(request):
+def delete(request,department_id):
     """
+    url = department/delete/(department_id)/
     parameters:
     department_id: the department id to delete
 
@@ -207,7 +223,6 @@ def delete(request):
     # Check that the current user is an administrator
     admin = get_current_admin_or_403(request)
 
-    department_id=request.GET.get('department_id')
     department=get_object_or_404(Department,pk=department_id)
     if checkCompanyDepartment(department,admin.company_id):
         deleteDepartment(department)
@@ -249,8 +264,29 @@ def checkCompanyDepartment(department,company_id):
     return res
 
 
-def get_current_admin(request):
+
+def checkRoleForList(dep,request):
+
+    actor=None
+    if not request.user.is_authenticated():
+        raise PermissionDenied
     try:
-        return Administrator.objects.get(user=request.user)
+        actor= Actor.objects.get(user=request.user)
     except ObjectDoesNotExist:
-        return None
+        raise PermissionDenied
+
+    # Check that the admin has permission to view that employee
+    if dep.company_id != actor.company_id:
+        raise PermissionDenied
+    
+    if actor.user_type!='A':
+        isAdminOrTeamManager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+                    role_id__name__in=["Administrator" , "Team manager"])
+        res=isAdminOrTeamManager.count()>0
+
+        if not res:
+            roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+                        projectDepartment_id__department_id=dep)
+            res=roles.count()>0
+        if not res:
+            raise PermissionDenied

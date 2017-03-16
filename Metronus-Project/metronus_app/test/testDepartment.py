@@ -177,10 +177,18 @@ class DepartmentTestCase(TestCase):
 
         response = c.get("/department/list")
         dep_id=response.context["departments"][0].id
-        response = c.get("/department/view?department_id="+str(dep_id))
+        response = c.get("/department/view/"+str(dep_id)+"/")
         self.assertEquals(response.status_code, 200)
-
+        self.assertEquals(len(response.context["employees"]), 0)
+        self.assertEquals(len(response.context["tasks"]), 0)
         #self.assertEquals(response.context["employees"][0].department.id, dep_id)
+    def test_view_department_not_allowed(self):
+        c = Client()
+        c.login(username="emp1", password="123456")
+
+        response = c.get("/department/view/2/")
+        self.assertEquals(response.status_code, 403)
+
 
     def test_list_departments_not_logged(self):
         c = Client()
@@ -199,7 +207,7 @@ class DepartmentTestCase(TestCase):
         c.login(username="admin1", password="123456")
         response = c.get("/department/list")
         dep_id=response.context["departments"][0].id
-        response = c.get("/department/edit?department_id="+str(dep_id))
+        response = c.get("/department/edit/"+str(dep_id)+"/")
         self.assertEquals(response.status_code, 200)
         form = response.context["form"]
 
@@ -221,7 +229,7 @@ class DepartmentTestCase(TestCase):
         response = c.get("/department/list")
         dep_id=response.context["departments"][0].id
 
-        response = c.get("/department/delete?department_id="+str(dep_id))
+        response = c.get("/department/delete/"+str(dep_id)+"/")
         self.assertRedirects(response, "/department/list", fetch_redirect_response=False)
 
         self.assertFalse(Department.objects.get(pk=dep_id).active)
@@ -234,7 +242,7 @@ class DepartmentTestCase(TestCase):
         dep_id=response.context["departments"][0].id
         c.logout()
         c.login(username="admin2", password="123456")
-        response = c.get("/department/delete?department_id="+str(dep_id))
+        response = c.get("/department/delete/"+str(dep_id)+"/")
         self.assertEquals(response.status_code, 403)
 
     def test_delete_department_not_active(self):
@@ -242,7 +250,7 @@ class DepartmentTestCase(TestCase):
         c.login(username="admin1", password="123456")
 
         dep_id=Department.objects.get(active=False).id
-        response = c.get("/department/delete?department_id="+str(dep_id))
+        response = c.get("/department/delete/"+str(dep_id)+"/")
         self.assertEquals(response.status_code, 403)
 
 

@@ -79,7 +79,7 @@ class TaskTestCase(TestCase):
         c.login(username="ddlsb", password="123456")
 
         department=Department.objects.filter(name="Backend").first()
-        response = c.get("/task/list_department?department_id="+str(department.id))
+        response = c.get("/task/list_department/"+str(department.id)+"/")
 
         self.assertEquals(response.status_code, 200)
         self.assertEquals(len(response.context["tasks"]), 2)
@@ -90,7 +90,7 @@ class TaskTestCase(TestCase):
         c.login(username="Barrelito", password="123456")
 
         department=Department.objects.filter(name="Frontend").first()
-        response = c.get("/task/list_department?department_id="+str(department.id))
+        response = c.get("/task/list_department/"+str(department.id)+"/")
 
         self.assertEquals(response.status_code, 200)
         self.assertEquals(len(response.context["tasks"]), 1)
@@ -100,14 +100,14 @@ class TaskTestCase(TestCase):
     def test_list_tasks_not_logged(self):
         c = Client()
         department=Department.objects.filter(name="Backend").first()
-        response = c.get("/task/list_department?department_id="+str(department.id))
+        response = c.get("/task/list_department/"+str(department.id)+"/")
         self.assertEquals(response.status_code, 403)
 
     def test_list_tasks_not_allowed(self):
         c = Client()
         c.login(username="anddonram", password="123456")
         department=Department.objects.filter(name="Frontend").first()
-        response = c.get("/task/list_department?department_id="+str(department.id))
+        response = c.get("/task/list_department/"+str(department.id)+"/")
         self.assertEquals(response.status_code, 403)
 
 
@@ -115,9 +115,9 @@ class TaskTestCase(TestCase):
         c = Client()
         c.login(username="agubelu", password="123456")
         department=Department.objects.filter(name="Backend").first()
-        response = c.get("/task/list_department?department_id="+str(department.id))
+        response = c.get("/task/list_department/"+str(department.id)+"/")
         dep_id=response.context["tasks"][0].id
-        response = c.get("/task/edit?task_id="+str(dep_id))
+        response = c.get("/task/edit/"+str(dep_id)+"/")
         self.assertEquals(response.status_code, 200)
         form = response.context["form"]
 
@@ -136,10 +136,10 @@ class TaskTestCase(TestCase):
         c = Client()
         c.login(username="agubelu", password="123456")
         department=Department.objects.filter(name="Backend").first()
-        response = c.get("/task/list_department?department_id="+str(department.id))
+        response = c.get("/task/list_department/"+str(department.id)+"/")
         dep_id=response.context["tasks"][0].id
 
-        response = c.get("/task/delete?task_id="+str(dep_id))
+        response = c.get("/task/delete/"+str(dep_id)+"/")
         self.assertRedirects(response, "/task/list", fetch_redirect_response=False)
 
         self.assertFalse(Task.objects.get(pk=dep_id).active)
@@ -148,7 +148,7 @@ class TaskTestCase(TestCase):
         c = Client()
         c.login(username="andjimrio", password="123456")
         task=Task.objects.filter(name="Hacer cosas de back").first()
-        response = c.get("/task/delete?task_id="+str(task.id))
+        response = c.get("/task/delete/"+str(task.id)+"/")
         self.assertEquals(response.status_code, 403)
 
     def test_delete_task_not_active(self):
@@ -156,5 +156,5 @@ class TaskTestCase(TestCase):
         c.login(username="ddlsb", password="123456")
 
         dep_id=Task.objects.filter(active=False).first().id
-        response = c.get("/task/delete?task_id="+str(dep_id))
+        response = c.get("/task/delete/"+str(dep_id)+"/")
         self.assertEquals(response.status_code, 404)

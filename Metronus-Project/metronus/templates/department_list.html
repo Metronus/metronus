@@ -8,7 +8,7 @@
 	function windowAlert(id){
 		var confirm=window.confirm("{% trans 'departmentConfirm' %}");
 		if(confirm==true){
-			window.location="/department/delete?department_id="+id;
+			window.location="/department/delete/"+id+"/";
 		}else{
 			return false;
 		}
@@ -16,8 +16,8 @@
 </script>
 <script>
 	function display(id){
-		window.location="/department/view?department_id="+id;
-		
+		window.location="/department/view/"+id+"/";
+
 	}
 </script>
 {% endblock %}
@@ -35,7 +35,8 @@
 	<li class="list-group-item">
 	<div style="cursor: pointer;" class="list-group col-xs-4" onclick="display({{department.id}})">{{department.name}} </div>
 	<div align="right" >
-		<a align="right" class="btn btn-primary" href="/department/edit?department_id={{department.id}}">{% trans 'update' %}</a>
+		<a class="btn btn-primary" href="{% url 'department_edit' department.id %}">{% trans 'update' %}</a>
+		
 		<input type="button" align="right" class="btn btn-danger" onclick="windowAlert({{department.id}})" value="{% trans 'delete' %}"/>
 	</div>
 	</li>
