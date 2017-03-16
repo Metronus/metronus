@@ -60,7 +60,7 @@ def edit(request, username):
 
     return render(request, 'company/administrator_edit.html', {'form': form})
 
-
+'''
 def view(request, username):
     """
     url = administrator/view/<username>
@@ -81,7 +81,7 @@ def view(request, username):
         raise PermissionDenied
 
     return render(request, 'administrator_view.html', {'admin': admin2})
-
+'''
 
 def delete(request, username):
     """

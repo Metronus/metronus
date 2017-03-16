@@ -81,11 +81,11 @@ urlpatterns += [#i18n_patterns(
 
     # Administrator
     url(r'^administrator/edit/(?P<username>\w{0,50})/$', administratorController.edit, name='administrator_edit'),
-    url(r'^administrator/view/(?P<username>\w{0,50})/$', administratorController.view, name='administrator_edit'),
+    # url(r'^administrator/view/(?P<username>\w{0,50})/$', administratorController.view, name='administrator_edit'),
 
     # Company
-    url(r'^company/edit/(?P<cif>\w{9})/$', companyController.edit, name='company_edit'),
-    url(r'^company/view/(?P<cif>\w{9})/$', companyController.view, name='company_view'),
+    url(r'^company/edit/$', companyController.edit, name='company_edit'),
+    url(r'^company/view/$', companyController.view, name='company_view'),
     url(r'^company/delete/$', companyController.view, name='company_view'),
 
     # Login

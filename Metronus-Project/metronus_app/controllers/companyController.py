@@ -61,9 +61,11 @@ def create(request):
 
 
 @login_required
-def edit(request, cif):
+def edit(request):
     """
-    url = company/edit/<cif>
+    Se escoge la comoañía correspondiente al administrador que la edita
+
+    url = company/edit
 
     parameters/returns:
     form: formulario de edicion de datos de la compañía
@@ -73,11 +75,7 @@ def edit(request, cif):
 
     # Check that the user is logged in and it's an administrator
     admin = get_current_admin_or_403(request)
-    company = get_object_or_404(Company, cif=cif)
-
-    # Check that the admin has permission to view that company
-    if company.pk != admin.company_id:
-        raise PermissionDenied
+    company = get_object_or_404(Company, cif=admin.company_id.cif)
 
     if request.method == "GET":
         # Return a form filled with the employee's data
@@ -93,24 +91,28 @@ def edit(request, cif):
         form = CompanyForm(request.POST)
         if form.is_valid():
             # Company data
+            print(form.cleaned_data["company_email"])
             company.visible_short_name = form.cleaned_data["visible_short_name"]
-            company.company_email = form.cleaned_data["company_email"]
-            company.company_phone = form.cleaned_data["company_phone"]
+            company.email = form.cleaned_data["company_email"]
+            company.phone = form.cleaned_data["company_phone"]
             company.logo = form.cleaned_data["logo"]
+
             company.save()
 
-            return HttpResponseRedirect('/company/view/' + cif + '/')
+            return HttpResponseRedirect('/company/view/')
 
     else:
         raise PermissionDenied
 
-    return render(request,'company/company_edit.html', {'form': form})
+    return render(request, 'company/company_edit.html', {'form': form})
 
 
 @login_required
-def view(request, cif):
+def view(request):
     """
-    url = company/view/<cif>
+    Se escoge la comoañía correspondiente al administrador que la ve
+
+    url = company/view
 
     parameters/returns:
     company: datos de la compañía
@@ -120,12 +122,9 @@ def view(request, cif):
 
     # Check that the user is logged in and it's an administrator
     admin = get_current_admin_or_403(request)
-    company = get_object_or_404(Company, cif=cif)
-    # Check that the admin has permission to view that company
-    if str(company.pk) != str(admin.company_id):
-        raise PermissionDenied
+    company = get_object_or_404(Company, cif=admin.company_id.cif)
 
-    return render(request, 'company/company_view.html', {'company': company, 'admin':admin})
+    return render(request, 'company/company_view.html', {'company': company, 'admin': admin})
 
 
 @login_required
