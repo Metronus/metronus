@@ -1,91 +1,51 @@
-{% extends "layout_base.html" %}
-
+{% extends "anon_master.html" %}
 {% load i18n %}
 {% load l10n %}
 
-{% block title %}{% trans 'registerCompany' %}{% endblock %}
-
+{% block title %}{% trans 'login' %}{% endblock %}
 
 
 {% block content %}
 
-{% if form.errors %}
-        <p>{{ form.errors }}</p>
-{% endif %}
-    <h3>{{ company.company_name }}</h3>
-    <br>
-    <form id="login_form" method="POST" class="form-horizontal" action="" accept-charset="utf-8">
-        {% csrf_token %}
+<body class="login">
+  <div>
+    <a class="hiddenanchor" id="signup"></a>
+    <a class="hiddenanchor" id="signin"></a>
 
-        <div class="col-md-6 col-md-offset-2" >
-
-        <div class="form-group">
-            <label class="control-label col-sm-4" for="id_{{ form.username.name }}">{% trans 'username' %}</label>
-            <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.username.name }}"  id="id_{{ form.username.name }}">
+    <div class="login_wrapper">
+      <div class="animate form login_form">
+        <section class="login_content">
+          <form id="login_form" method="POST" action="" accept-charset="utf-8">
+            {% csrf_token %}
+            <h1>Login Form</h1>
+            <div>
+              <input type="text" for="id_{{ form.username.name }}" class="form-control" placeholder="Username" required="" name="{{ form.username.name }}"  id="id_{{ form.username.name }}"/>
             </div>
-            
-        </div>
-
-
-        <div class="form-group">
-            <label class="control-label col-sm-4" for="id_{{ form.password.name }}">{% trans 'password' %}</label>
-            <div class="col-sm-6">
-                <input type="password" class="form-control col-md-6" name="{{ form.password.name }}" id="id_{{ form.password.name }}">
+            <div>
+              <input type="password" for="id_{{ form.password.name }}" class="form-control" placeholder="Password" required="" name="{{ form.password.name }}" id="id_{{ form.password.name }}"/>
             </div>
-        </div>
-
-    <div class="form-group control-buttons">
-          <input type="hidden" name="next" value="{{ next }}"/><br/>
-            <div class="form-group">
-                <div class="col-sm-offset-4 col-sm-10">
-                    <button type="submit" class="btn btn-default">{% trans 'login' %}</button>
-                    <button type="button" class="btn btn-info">{% trans 'recover_password' %}</button>
-                </div>
-
+            <div>
+              <button type="submit" class="btn btn-default submit">{% trans 'login' %}</button>
+              <button type="button" class="btn btn-warning submit">{% trans 'recover_password' %}</button>
             </div>
-        
-            
-          
-        </div>
-    </form>
 
-    
-           
+            <div class="separator">
+              <p class="change_link">New to site?
+                <a href="/register" class="to_register"> Create Account </a>
+              </p>
+            </div>
+          </form>
+        </section>
+        {% if form.errors %}
+          <div class="clearfix"></div>
 
-
-
-{% endblock %}
-
-{% block javascript %}
-<script>
-
-  //Esto es para validar en cliente de forma bonita con bootstrap :)
-
-  $(document).ready(function() {
-    $('#login_form').bootstrapValidator({
-        feedbackIcons: {
-            valid: 'glyphicon glyphicon-ok',
-            invalid: 'glyphicon glyphicon-remove',
-            validating: 'glyphicon glyphicon-refresh'
-        },
-        fields: {
-            username: {
-                validators: {
-                    notEmpty: {
-                        message: '{% trans 'username_error' %}'
-                    }
-                }
-            },
-            password: {
-                validators: {
-                    notEmpty: {
-                        message: '{% trans 'password_error' %}'
-                    }
-                }
-            },
-        },
-    });
-  });
-</script>
+          <div class="alert alert-danger alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <strong>Error!</strong> {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</body>
 {% endblock %}
