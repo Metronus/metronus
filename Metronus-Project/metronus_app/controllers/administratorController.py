@@ -6,8 +6,10 @@ from metronus_app.model.administrator import Administrator
 from metronus_app.model.company import Company
 from metronus_app.common_utils import get_current_admin_or_403
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 
 
+@login_required
 def edit(request, username):
     """
     url = administrator/edit/<username>
@@ -53,7 +55,7 @@ def edit(request, username):
             user.save()
             administrator.save()
 
-            return HttpResponseRedirect('/company/view/' + administrator.company_id.cif + '/')
+            return HttpResponseRedirect('/company/view/')
 
     else:
         raise PermissionDenied
