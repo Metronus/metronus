@@ -24,9 +24,52 @@
         </div>
     {% endif %}
 
-    <form id="form" method="POST" action="">{% csrf_token %}
-        {{form.as_p}}
-        </br>
-        <p><input type="submit" class="btn btn-success submit-button" value="{% trans 'confirm' %}" /></p>
+    <form id="form" method="POST" class="form-horizontal">{% csrf_token %}
+        <div class="row">
+            {% for field in form.visible_fields %}
+                <div class="form-group">
+                    <label class="control-label col-md-3 col-xs-12" for="id_{{ field.name }}">{{ field.label }}</label>
+                    <div class="col-md-7 col-xs-12">
+                        <input class="form-control" name="{{ field.name }}" id="id_{{ field.name }}"
+                               type="text" value="{{ field.value|default_if_none:"" }}">
+                    </div>
+                </div>
+            {% endfor %}
+
+            {% for field in form.hidden_fields %}{{ field }}{% endfor %}
+
+
+            <div class="row">
+                <div class="form-actions col-xs-12 col-xs-offset-5">
+                    <input type="submit" class="btn btn-success submit-button" value="{% trans 'confirm' %}" />
+                </div>
+            </div>
+        </div>
     </form>
+{% endblock %}
+
+{% block javascript %}
+<script>
+//Esto es para validar en cliente de forma bonita con bootstrap :)
+$(document).ready(function() {
+    $('#form').bootstrapValidator({
+        feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+            name: {
+                validators: {
+                    notEmpty: {
+                        message: "{% trans 'projectNameNotNull' %}"
+                    },
+                }
+            },
+
+
+        },
+    });
+});
+</script>
 {% endblock %}
