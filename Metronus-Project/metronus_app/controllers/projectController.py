@@ -50,7 +50,7 @@ def create(request):
     else:
         form = ProjectForm(initial={"project_id":0})
 
-    return render(request, 'project_form.html', {'form': form,'repeated_name':repeated_name})
+    return render(request, 'project/project_form.html', {'form': form, 'repeated_name':repeated_name})
 
 
 def list(request):
@@ -64,7 +64,7 @@ def list(request):
      # Check that the user is logged in
     admin = get_current_admin_or_403(request)
     lista=Project.objects.filter(company_id=admin.company_id,deleted=False)
-    return render(request, "project_list.html", {"projects": lista})
+    return render(request, "project/project_list.html", {"projects": lista})
 
 def show(request,project_id):
     admin = get_current_admin_or_403(request)
@@ -111,7 +111,7 @@ def edit(request,project_id):
         form = ProjectForm(initial={"name":project.name,"project_id":project.id})
 
 
-    return render(request, 'project_form.html', {'form': form,'repeated_name':repeated_name})
+    return render(request, 'project/project_form.html', {'form': form, 'repeated_name':repeated_name})
 
 def delete(request,project_id):
     """
