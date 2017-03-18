@@ -209,6 +209,13 @@ msgid "company_info"
 msgstr "Company Info"
 msgid "admin_info"
 msgstr "Admin Info"
+msgid "companyView"
+msgstr "Company view"
+msgid "editCompany"
+msgstr "Company edit"
+msgid "visible_short_name"
+msgstr "Short name visible"
+
 
 msgid "cif_error#1"
 msgstr "The CIF cannot be empty"
