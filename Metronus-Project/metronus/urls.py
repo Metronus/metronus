@@ -59,6 +59,7 @@ urlpatterns += [#i18n_patterns(
     url(r'^project/show/(?P<project_id>\w{0,50})/$', projectController.show, name='project_show'),
     url(r'^project/delete/(?P<project_id>\w{0,50})/$', projectController.delete, name='project_delete'),
     url(r'^project/create$', projectController.create, name='project_create'),
+    url(r'^project/createAsync$', departmentController.createAsync, name='project_create_async'),
 
     url(r'^projectdepartment/create$', projectDepartmentController.create, name='projectdepartment_create'),
     url(r'^projectdepartment/list$', projectDepartmentController.list, name='projectdepartment_list'),
