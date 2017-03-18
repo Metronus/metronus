@@ -1,0 +1,76 @@
+{% extends "layout_base.html" %}
+{% load i18n %}
+{% load l10n %}
+
+{% block title %}
+    {% if form.timeLog_id.value == None %}
+        {% trans 'createTimeLog' %}
+    {% else %}
+        {% trans 'editTimeLog' %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if form.timeLog_id.value == None %}
+        <h1> {% trans 'createTimeLog' %} </h1></br>
+    {% else %}
+        <h1> {% trans 'editTimeLog' %} </h1></br>
+    {% endif %}
+
+    {% if repeated_name == True %}
+        <div class="alert alert-warning alert-dismissible" role="alert">
+            <a class="close" data-dismiss="alert">x</a>
+            <span>{% trans 'projectName' %}</span>
+        </div>
+    {% endif %}
+
+    <form id="form" method="POST" class="form-horizontal">{% csrf_token %}
+        <div class="row">
+            {% for field in form.visible_fields %}
+                <div class="form-group">
+                    <label class="control-label col-md-3 col-xs-12" for="id_{{ field.name }}">{{ field.label }}</label>
+                    <div class="col-md-7 col-xs-12">
+                        <input class="form-control" name="{{ field.name }}" id="id_{{ field.name }}"
+                               type="text" value="{{ field.value|default_if_none:"" }}">
+                    </div>
+                </div>
+            {% endfor %}
+
+            {% for field in form.hidden_fields %}{{ field }}{% endfor %}
+
+
+            <div class="row">
+                <div class="form-actions col-xs-12 col-xs-offset-5">
+                    <input type="submit" class="btn btn-primary" value="{% trans 'confirm' %}" />
+                    <a class="btn btn-danger" href="{% url 'timeLog_list_all' %}">{% trans 'cancel' %}</a>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block javascript %}
+<script>
+//Esto es para validar en cliente de forma bonita con bootstrap :)
+$(document).ready(function() {
+    $('#form').bootstrapValidator({
+        feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+            name: {
+                validators: {
+                    notEmpty: {
+                        message: "{% trans 'projectNameNotNull' %}"
+                    },
+                }
+            },
+
+
+        },
+    });
+});
+</script>
+{% endblock %}

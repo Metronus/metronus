@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from metronus_app.forms.timeLogForm import TimeLogForm
 from metronus_app.model.task import Task
 from django.shortcuts import render_to_response, get_object_or_404
@@ -13,9 +13,10 @@ from django.core.exceptions             import ObjectDoesNotExist, PermissionDen
 from django.http                        import HttpResponseForbidden
 from django.contrib.auth import authenticate,login
 
-def create(request):
+def create(request,task_id):
     #TODO: Revisar
     employee = get_current_employee_or_403(request)
+    task = findTask(task_id)
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         form = TimeLogForm(request.POST)
@@ -24,18 +25,16 @@ def create(request):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-            taskSelected = form.cleaned_data['task_id']
-            task = findTask(taskSelected.id)
             if task is not None:
                 createTimeLog(form,task,employee)
-                return HttpResponseRedirect('/task/list')
+                return redirect('task_list')
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = TimeLogForm(initial={"timeLog_id":0})
+        form = TimeLogForm(projectDepartment=task.projectDepartment_id)
 
 
-    return render(request, 'timeLog_form.html', {'form': form})
+    return render(request, 'timeLog/timeLog_form.html', {'form': form})
 
 
 def list(request, task_id):
@@ -44,9 +43,9 @@ def list(request, task_id):
 def list_all(request):
     # TODO
 
-    tareas=[t for t in range(1,5)]
+    tareas=Task.objects.all()
     month = [x for x in range(1,31)]
-    return render(request, "timeLog_list_all.html", {"tasks": tareas, "month":month})
+    return render(request, "timeLog/timeLog_list_all.html", {"tasks": tareas, "month":month})
 
 def edit(request, timeLog_id):
     return "2"  # TODO

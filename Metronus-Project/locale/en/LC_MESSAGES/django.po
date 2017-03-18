@@ -174,8 +174,14 @@ msgid "selectProject"
 msgstr "Choose a project"
 
 #: TimeLog
-msgid "timeLogList"
+msgid "timeLog"
 msgstr "Time Log"
+msgid "createTimeLog"
+msgstr "Create Time Log"
+msgid "editTimeLog"
+msgstr "Edit Time Log"
+msgid "timeLogList"
+msgstr "List of Time Log"
 
 
 #: Roles
