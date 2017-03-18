@@ -10,6 +10,7 @@ from django.core.exceptions             import ObjectDoesNotExist, PermissionDen
 from django.http                        import HttpResponseForbidden
 from django.contrib.auth import authenticate,login
 from metronus_app.model.employee import Employee
+from django.http import JsonResponse
 
 
 
@@ -51,6 +52,55 @@ def create(request):
         form = ProjectForm(initial={"project_id":0})
 
     return render(request, 'project/project_form.html', {'form': form, 'repeated_name':repeated_name})
+
+def createAsync(request):
+    """
+    parameters:
+    form: el formulario con los datos del departamento
+
+    returns:
+    data: JSON con un mensaje de respuesta. Es un dict que contiene lo siguiente
+    repeated_name: true si se ha repetido el nombre
+    success:true si hubo exito, false si no
+
+    """
+
+    # Check that the current user is an administrator
+    admin = get_current_admin_or_403(request)
+
+    data = {
+        'repeated_name': False,
+        'success':True
+    }
+
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = ProjectForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            # ...
+            # redirect to a new URL:
+            pname=form.cleaned_data['name']
+            pro=findName(pname,admin)
+            if pro is not None:
+                if pro.deleted:
+                    pro.deleted = False
+                    pro.save()
+                    return JsonResponse(data)
+                else:
+                    data['repeated_name']=True
+            else:
+                project=createProject(form,admin)
+                return JsonResponse(data)
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        return redirect('project_list')
+
+    data['success']=False
+    return JsonResponse(data)
 
 
 def list(request):
