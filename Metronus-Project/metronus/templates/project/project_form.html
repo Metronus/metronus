@@ -41,7 +41,8 @@
 
             <div class="row">
                 <div class="form-actions col-xs-12 col-xs-offset-5">
-                    <input type="submit" class="btn btn-success submit-button" value="{% trans 'confirm' %}" />
+                    <input type="submit" class="btn btn-primary" value="{% trans 'confirm' %}" />
+                    <a class="btn btn-danger" href="{% url 'project_list' %}">{% trans 'cancel' %}</a>
                 </div>
             </div>
         </div>

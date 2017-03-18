@@ -71,7 +71,7 @@ def show(request,project_id):
     repeated_name = False
     project = get_object_or_404(Project, pk=project_id)
     employees = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__project_id=project)
-    return render(request, "project_show.html", {"project": project, 'employees': employees})
+    return render(request, "project/project_show.html", {"project": project, 'employees': employees})
 
 
 def edit(request,project_id):
