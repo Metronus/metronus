@@ -1,0 +1,42 @@
+{% extends "layout_base.html" %}
+
+{% load i18n %}
+{% load l10n %}
+
+{% block title %}{% trans 'project' %}: {{project.name}}{% endblock %}
+
+{% block content %}
+    <h1><strong>{% trans 'project' %}: </strong> {{project.name}}</h1>
+
+    <h3>{% trans 'employeeList' %}</h3>
+
+    <div class="box">
+        <div class="box-body table-responsive no-padding">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>{% trans 'username' %}</th>
+                        <th>{% trans 'identifier' %}</th>
+                        <th>{% trans 'phone' %}</th>
+                        <th>{% trans 'registryDate' %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for employee in employees %}
+                        <tr>
+                            <td>{{employee.user}}</td>
+                            <td>{{employee.identifier}}</td>
+                            <td>{{employee.phone}}</td>
+                            <td>{{employee.registryDate}}</td>
+                            <td>
+                                <a href="{% url 'employee_view' employee.user %}" type="button" class="btn bg-olive btn-flat">
+                                    {% trans 'details' %}
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

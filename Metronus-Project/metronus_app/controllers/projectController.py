@@ -43,8 +43,8 @@ def create(request):
                 else:
                     repeated_name=True
             else:
-                createProject(form,admin)
-                return redirect('project_list')
+                project = createProject(form,admin)
+                return redirect('project_show', project_id=project.id)
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -137,7 +137,7 @@ def delete(request,project_id):
 def createProject(form, admin):
     pname=form.cleaned_data['name']
     company=admin.company_id
-    Project.objects.create(name=pname,deleted=False,company_id=company)
+    return Project.objects.create(name=pname,deleted=False,company_id=company)
 
 def updateProject(project,form):
     project.name = form.cleaned_data['name']
