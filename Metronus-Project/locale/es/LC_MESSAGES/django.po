@@ -190,6 +190,8 @@ msgid "timeLogList"
 msgstr "Lista de Registros del tiempo"
 msgid "timeLogNot"
 msgstr "Todavía no has registrado el registro de tiempo"
+msgid "timeLogConfirm"
+msgstr "¿Está seguro de eliminar el registro de tiempo? Se eliminará también todo lo relacionado con el mismo"
 
 #: Roles
 msgid "rol"

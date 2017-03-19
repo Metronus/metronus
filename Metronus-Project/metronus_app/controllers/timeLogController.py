@@ -21,7 +21,6 @@ def create(request,task_id):
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         form = TimeLogForm(request.POST)
-        print(form.errors)
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
@@ -59,15 +58,17 @@ def list_all(request):
 def edit(request, timeLog_id):
     employee = get_current_employee_or_403(request)
     timeLog = findTimeLog(timeLog_id)
-    if(employee.id==timeLog.employee_id):
+    if(employee.id==timeLog.employee_id.id):
         if request.method == 'POST':
             form = TimeLogForm(request.POST)
             if form.is_valid():
                 log = get_object_or_404(TimeLog,pk=form.cleaned_data['timeLog_id'])
                 updateTimeLog(log,form)
+                return redirect('timeLog_list',timeLog.task_id.id)
         else:
             log = get_object_or_404(TimeLog, pk=timeLog.id)
-            form = TimeLogForm(initial={"description":log.description,"duration":log.duration,"workDate":log.workDate,"timeLog_id":log.id})
+            form = TimeLogForm(initial={"description":log.description,"duration":log.duration,
+                                        "workDate":log.workDate,"timeLog_id":log.id,"task_id":log.task_id.id})
     else:
         raise PermissionDenied
     return render (request, 'timeLog/timeLog_form.html', {'form': form})
@@ -76,12 +77,13 @@ def edit(request, timeLog_id):
 def delete(request, timeLog_id):
     employee = get_current_employee_or_403(request)
     timeLog = findTimeLog(timeLog_id)
-    task = findTask(timeLog.task_id)
-    if(employee.id==timeLog.employee_id):
+    task = timeLog.task_id
+    if(employee.id==timeLog.employee_id.id):
         if(timeLog.registryDate.date() is not date.today()):
             raise PermissionDenied
         else:
             timeLog.delete()
+            return redirect('timeLog_list',task.id)
     else:
         raise PermissionDenied
     if (checkRoleForTask(employee, task)):

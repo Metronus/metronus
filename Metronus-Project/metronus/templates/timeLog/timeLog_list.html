@@ -9,6 +9,8 @@
     <h1>{% trans 'timeLogList' %}</h1>
 
     <br>
+    <div id="alert_placeholder"></div>
+    <br>
 
     <div class="panel {% if task.active %}panel-primary{% else %}panel-danger{% endif %}">
         <div class="panel-heading">{{ task.name }}</div>
@@ -16,13 +18,13 @@
 
         <div class="list-group">
             {% for timeLog in timeLogs %}
-                <a href="#" class="list-group-item">
+                <a href="{% url 'timeLog_edit' timeLog.id %}" class="list-group-item">
                     <h4 class="list-group-item-heading">{{ timeLog.duration }} - {{ timeLog.workDate }}</h4>
                     <p class="list-group-item-text">{{ timeLog.description }}</p>
                 </a>
 
             {% empty %}
-                <a href="#" class="list-group-item">{% trans 'timeLogNot' %}</a>
+                <a href="{% url 'timeLog_create' task.id %}" class="list-group-item">{% trans 'timeLogNot' %}</a>
 
             {% endfor %}
         </div>
@@ -30,6 +32,6 @@
 
     <br>
 
-    <a class="btn btn-primary" href="{% url 'timeLog_create' task.id %}">{% trans 'create' %}</a>
+    <a class="btn btn-primary" href="{% url 'timeLog_create' task.id %}">{% trans 'createTimeLog' %}</a>
 
 {% endblock %}
