@@ -12,6 +12,7 @@ from populate_database import basicLoad
 from django.core.exceptions             import ObjectDoesNotExist, PermissionDenied
 from django.http                        import HttpResponseForbidden
 from django.contrib.auth import authenticate,login
+from datetime import date
 
 def create(request,task_id):
     employee = get_current_employee_or_403(request)
@@ -55,7 +56,20 @@ def list_all(request):
     return render(request, "timeLog/timeLog_list_all.html", {"tasks": tareas, "month":month})
 
 def edit(request, timeLog_id):
-    return "2"  # TODO
+    employee = get_current_employee_or_403(request)
+    timeLog = findTimeLog(timeLog_id)
+    if(employee.id==timeLog.employee_id):
+        if request.method == 'POST':
+            form = TimeLogForm(request.POST)
+            if form.is_valid():
+                log = get_object_or_404(TimeLog,pk=form.cleaned_data['timeLog_id'])
+                updateTimeLog(log,form)
+        else:
+            log = get_object_or_404(TimeLog, pk=form.cleaned_data['timeLog_id'])
+            form = TimeLogForm(initial={"description":log.description,"duration":log.duration,"workDate":log.workDate,"timeLog_id":log.id})
+    else:
+        raise PermissionDenied
+    return render (request, 'timeLog/timeLog_form.html', {'form': form})
 
 def delete(request, timeLog_id):
     return "2"  # TODO
@@ -95,3 +109,16 @@ def checkRoleForTask(employee, task):
                                                                                 "Coordinator"])
         res = roles.count() > 0
     return res
+
+def findTimeLog(timeLog_id):
+    timeLog = get_object_or_404(TimeLog,pk=timeLog_id)
+    return timeLog
+
+def updateTimeLog(timeLog,form):
+    if(timeLog.registryDate.date() is not date.today()):
+        raise PermissionDenied
+    else:
+        timeLog.description = form.cleaned_data['description']
+        timeLog.workDate = form.cleaned_data['workDate']
+        timeLog.duration = form.cleaned_data['duration']
+        timeLog.save()
