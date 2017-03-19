@@ -71,13 +71,32 @@ def edit(request, timeLog_id):
         raise PermissionDenied
     return render (request, 'timeLog/timeLog_form.html', {'form': form})
 
+#Método para eliminar un registro siempre que la fecha del registro sea la misma que cuando se llama al método
 def delete(request, timeLog_id):
-    return "2"  # TODO
+    employee = get_current_employee_or_403(request)
+    timeLog = findTimeLog(timeLog_id)
+    task = findTask(timeLog.task_id)
+    if(employee.id==timeLog.employee_id):
+        if(timeLog.registryDate.date() is not date.today()):
+            raise PermissionDenied
+        else:
+            timeLog.delete()
+    else:
+        raise PermissionDenied
+    if (checkRoleForTask(employee, task)):
+        lista = TimeLog.objects.filter(
+            task_id=task.id)  # Mando superior: Puede ver las imputaciones de cualquiera en esa tarea
+    else:
+        lista = TimeLog.objects.filter(task_id=task.id,
+                                       employee_id=employee.id)  # Empleado normal: Solo puede ver sus imputaciones en esa tarea
+    return render(request, "timeLog/timeLog_list.html", {"timeLogs": lista, "task": task})
 
+#Método auxiliar para encontrar una tarea
 def findTask(task_id):
     task = get_object_or_404(Task,pk=task_id)
     return task
 
+#Método auxiliar para la creación de registros
 def createTimeLog(form, task, employee):
     fdescription = form.cleaned_data['description']
     fworkDate = form.cleaned_data['workDate']
@@ -110,6 +129,7 @@ def checkRoleForTask(employee, task):
         res = roles.count() > 0
     return res
 
+#Método auxiliar para encontrar un registro
 def findTimeLog(timeLog_id):
     timeLog = get_object_or_404(TimeLog,pk=timeLog_id)
     return timeLog
