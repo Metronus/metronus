@@ -14,9 +14,9 @@ from django.http                        import HttpResponseForbidden
 from django.contrib.auth import authenticate,login
 
 def create(request,task_id):
-    #TODO: Revisar
     employee = get_current_employee_or_403(request)
     task = findTask(task_id)
+    checkPermissionForTask(employee,task)
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         form = TimeLogForm(request.POST)
@@ -38,7 +38,11 @@ def create(request,task_id):
 
 
 def list(request, task_id):
-    return "2" # TODO
+    employee = get_current_employee_or_403(request)
+    task = findTask(task_id)
+    checkPermissionForTask(employee, task)
+    lista = TimeLog.objects.filter(task_id=task_id,employee_id=employee.id) #Es posible que se cambie el filtro dependiendo de si se quieren mostrar unos registros o no
+    return render(request, "timeLog/timeLog_list.html", {"timeLogs": lista})
 
 def list_all(request):
     # TODO
@@ -62,3 +66,15 @@ def createTimeLog(form, task, employee):
     fworkDate = form.cleaned_data['workDate']
     fduration = form.cleaned_data['duration']
     TimeLog.objects.create(description=fdescription,workDate=fworkDate,duration=fduration,task_id=task,employee_id=employee)
+
+
+#Comprobación para saber si el empleado puede imputar horas
+def checkPermissionForTask(employee, task):
+    if employee is not None and task is not None:
+        res = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee, projectDepartment_id=task.projectDepartment_id)
+        if res.count()>0:
+            return res
+        else:
+            raise PermissionDenied
+    else:
+        raise PermissionDenied
