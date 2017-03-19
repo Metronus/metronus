@@ -79,7 +79,7 @@ def delete(request, timeLog_id):
     timeLog = findTimeLog(timeLog_id)
     task = timeLog.task_id
     if(employee.id==timeLog.employee_id.id):
-        if(timeLog.registryDate.date() is not date.today()):
+        if(timeLog.registryDate.date() < date.today()):
             raise PermissionDenied
         else:
             timeLog.delete()
@@ -138,7 +138,7 @@ def findTimeLog(timeLog_id):
     return timeLog
 
 def updateTimeLog(timeLog,form):
-    if(timeLog.registryDate.date() is not date.today()):
+    if(timeLog.registryDate.date() < date.today()):
         raise PermissionDenied
     else:
         timeLog.description = form.cleaned_data['description']
