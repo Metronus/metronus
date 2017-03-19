@@ -11,12 +11,3 @@ class TimeLogForm(forms.Form):
     duration = forms.IntegerField(label=_("duration"))
     timeLog_id = forms.IntegerField(widget=forms.HiddenInput())
     task_id = forms.IntegerField(widget=forms.HiddenInput())
-
-    def __init__(self, projectDepartment, task_id=None, *args, **kwargs):
-        super(TimeLogForm, self).__init__(*args, **kwargs)
-        if task_id == None:
-            tasks = Task.objects.filter(projectDepartment_id = projectDepartment.id)
-            self.fields['task_id'] = forms.ModelChoiceField(queryset=tasks)
-        else:
-            self.fields['task_id'].initial = int(task_id)
-

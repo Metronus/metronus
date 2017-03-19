@@ -32,7 +32,7 @@ def create(request,task_id):
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = TimeLogForm(projectDepartment=task.projectDepartment_id, task_id=task_id)
+        form = TimeLogForm(initial={"timeLog_id":0})
 
 
     return render(request, 'timeLog/timeLog_form.html', {'form': form})
@@ -65,7 +65,7 @@ def edit(request, timeLog_id):
                 log = get_object_or_404(TimeLog,pk=form.cleaned_data['timeLog_id'])
                 updateTimeLog(log,form)
         else:
-            log = get_object_or_404(TimeLog, pk=form.cleaned_data['timeLog_id'])
+            log = get_object_or_404(TimeLog, pk=timeLog.id)
             form = TimeLogForm(initial={"description":log.description,"duration":log.duration,"workDate":log.workDate,"timeLog_id":log.id})
     else:
         raise PermissionDenied
