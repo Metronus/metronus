@@ -31,7 +31,7 @@ def create(request,task_id):
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = TimeLogForm(projectDepartment=task.projectDepartment_id)
+        form = TimeLogForm(projectDepartment=task.projectDepartment_id, task_id=task_id)
 
 
     return render(request, 'timeLog/timeLog_form.html', {'form': form})
