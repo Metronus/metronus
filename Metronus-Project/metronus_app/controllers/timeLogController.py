@@ -45,7 +45,7 @@ def list(request, task_id):
         lista = TimeLog.objects.filter(task_id=task_id) #Mando superior: Puede ver las imputaciones de cualquiera en esa tarea
     else:
         lista = TimeLog.objects.filter(task_id=task_id, employee_id=employee.id) #Empleado normal: Solo puede ver sus imputaciones en esa tarea
-    return render(request, "timeLog/timeLog_list.html", {"timeLogs": lista})
+    return render(request, "timeLog/timeLog_list.html", {"timeLogs": lista,"task":task})
 
 def list_all(request):
     # TODO

@@ -188,6 +188,8 @@ msgid "editTimeLog"
 msgstr "Editar un Registro de Tiempo"
 msgid "timeLogList"
 msgstr "Lista de Registros del tiempo"
+msgid "timeLogNot"
+msgstr "Todavía no has registrado el registro de tiempo"
 
 #: Roles
 msgid "rol"
