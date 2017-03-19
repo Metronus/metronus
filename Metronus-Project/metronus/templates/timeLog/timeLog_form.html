@@ -3,7 +3,7 @@
 {% load l10n %}
 
 {% block title %}
-    {% if form.timeLog_id.value == None %}
+    {% if form.timeLog_id.value|slugify == '0' %}
         {% trans 'createTimeLog' %}
     {% else %}
         {% trans 'editTimeLog' %}
@@ -11,27 +11,35 @@
 {% endblock %}
 
 {% block content %}
-    {% if form.timeLog_id.value == None %}
+    {% if form.timeLog_id.value|slugify == '0' %}
         <h1> {% trans 'createTimeLog' %} </h1></br>
     {% else %}
         <h1> {% trans 'editTimeLog' %} </h1></br>
     {% endif %}
 
-    {% if repeated_name == True %}
-        <div class="alert alert-warning alert-dismissible" role="alert">
-            <a class="close" data-dismiss="alert">x</a>
-            <span>{% trans 'projectName' %}</span>
-        </div>
+    {% if form.errors %}
+        {% for field in form.visible_fields %}{% if field.errors %}
+            <div class="alert alert-danger alert-dismissible" role="alert">
+                <a class="close" data-dismiss="alert">x</a>
+                <span><strong>{{ field.name }}</strong>: {% for error in  field.errors %}{{ error }}{% endfor %}</span>
+            </div>
+        {% endif %}{% endfor %}
+        {% for error in  form.non_field_errors %}
+            <div class="alert alert-danger alert-dismissible" role="alert">
+                <a class="close" data-dismiss="alert">x</a>
+                <span>{{ error|escape }}</span>
+            </div>
+        {% endfor %}
     {% endif %}
 
     <form id="form" method="POST" class="form-horizontal">{% csrf_token %}
         <div class="row">
             {% for field in form.visible_fields %}
+                {{ field.widget }}
                 <div class="form-group">
-                    <label class="control-label col-md-3 col-xs-12" for="id_{{ field.name }}">{{ field.label }}</label>
+                    <label class="control-label col-md-3 col-xs-12" for="{{ field.id_for_label }}">{{ field.label }}</label>
                     <div class="col-md-7 col-xs-12">
-                        <input class="form-control" name="{{ field.name }}" id="id_{{ field.name }}"
-                               type="text" value="{{ field.value|default_if_none:"" }}">
+                        {{ field }}
                     </div>
                 </div>
             {% endfor %}

@@ -12,7 +12,7 @@ from populate_database import basicLoad
 from django.core.exceptions             import ObjectDoesNotExist, PermissionDenied
 from django.http                        import HttpResponseForbidden
 from django.contrib.auth import authenticate,login
-from datetime import date
+from datetime import date,datetime
 
 def create(request,task_id):
     employee = get_current_employee_or_403(request)
@@ -21,6 +21,7 @@ def create(request,task_id):
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         form = TimeLogForm(request.POST)
+        print(form.errors)
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
@@ -28,11 +29,11 @@ def create(request,task_id):
             # redirect to a new URL:
             if task is not None:
                 createTimeLog(form,task,employee)
-                return redirect('task_list')
+                return redirect('timeLog_list',task_id)
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = TimeLogForm(initial={"timeLog_id":0})
+        form = TimeLogForm(initial={"timeLog_id":0, "task_id":task_id, "workDate":datetime.now()})
 
 
     return render(request, 'timeLog/timeLog_form.html', {'form': form})
