@@ -17,8 +17,10 @@
         <h1> {% trans 'editProject' %} </h1></br>
     {% endif %}
 
-    {% if repeated_name == True %}
-        <div class="alert alert-warning alert-dismissible" role="alert">
+    <div id="alert_placeholder"></div>
+
+    {% if repeated_name %}
+        <div id="repeated_name" class="alert alert-warning alert-dismissible" role="alert">
             <a class="close" data-dismiss="alert">x</a>
             <span>{% trans 'projectName' %}</span>
         </div>
@@ -40,9 +42,12 @@
 
 
             <div class="row">
-                <div class="form-actions col-xs-12 col-xs-offset-5">
+                <div class="form-actions col-xs-12 row-centered">
                     <input type="submit" class="btn btn-primary" value="{% trans 'confirm' %}" />
                     <a class="btn btn-danger" href="{% url 'project_list' %}">{% trans 'cancel' %}</a>
+                    {% if form.project_id.value|slugify == '0' %}
+                        <a class="btn btn-info" onclick="createAndContinue()">{% trans 'createAndContinue' %}</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -51,7 +56,37 @@
 
 {% block javascript %}
 <script>
-//Esto es para validar en cliente de forma bonita con bootstrap :)
+function error_alert(){
+    showalert('{% trans 'projectError' %}','alert-error');
+}
+function success_alert(){
+    showalert('{% trans 'projectSaved' %}','alert-success');
+}
+function repeated_alert(){
+    showalert('{% trans 'projectName' %}','alert-warning');
+}
+/**
+ * Función ajax de crear y continuar
+ * */
+function createAndContinue() {
+    $.post('{% url 'project_create_async' %}',$('#form').serialize(), function(data,status) {
+        document.getElementById('form').reset();
+        $('#form').data('bootstrapValidator').resetForm();
+
+        if(JSON.stringify(data['success'])=="true"){
+            success_alert();
+        } else if(JSON.stringify(data['repeated_name'])=="true") {
+            repeated_alert();
+        } else {
+            error_alert();
+        }
+    } );
+};
+
+
+/**
+ * Validación en cliente del formulario
+ * */
 $(document).ready(function() {
     $('#form').bootstrapValidator({
         feedbackIcons: {

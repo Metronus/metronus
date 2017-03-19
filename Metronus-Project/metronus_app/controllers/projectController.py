@@ -51,7 +51,13 @@ def create(request):
     else:
         form = ProjectForm(initial={"project_id":0})
 
-    return render(request, 'project/project_form.html', {'form': form, 'repeated_name':repeated_name})
+    if repeated_name:
+        hidden_repeated_name = ''
+    else:
+        hidden_repeated_name = 'none'
+
+    return render(request, 'project/project_form.html',
+                  {'form': form, 'repeated_name':repeated_name, 'hidden_repeated_name': hidden_repeated_name})
 
 def createAsync(request):
     """
