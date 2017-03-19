@@ -49,7 +49,7 @@ def list(request, task_id):
     return render(request, "timeLog/timeLog_list.html", {"timeLogs": lista,"task":task})
 
 def list_all(request):
-    # TODO
+    # TODO por usuario
 
     tareas=Task.objects.all()
     month = [x for x in range(1,31)]
