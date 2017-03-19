@@ -41,7 +41,10 @@ def list(request, task_id):
     employee = get_current_employee_or_403(request)
     task = findTask(task_id)
     checkPermissionForTask(employee, task)
-    lista = TimeLog.objects.filter(task_id=task_id,employee_id=employee.id) #Es posible que se cambie el filtro dependiendo de si se quieren mostrar unos registros o no
+    if(checkRoleForTask(employee,task)):
+        lista = TimeLog.objects.filter(task_id=task_id) #Mando superior: Puede ver las imputaciones de cualquiera en esa tarea
+    else:
+        lista = TimeLog.objects.filter(task_id=task_id, employee_id=employee.id) #Empleado normal: Solo puede ver sus imputaciones en esa tarea
     return render(request, "timeLog/timeLog_list.html", {"timeLogs": lista})
 
 def list_all(request):
@@ -78,3 +81,17 @@ def checkPermissionForTask(employee, task):
             raise PermissionDenied
     else:
         raise PermissionDenied
+
+#Comprobacion para saber si el empleado es un mando superior y tiene acceso a todas las imputaciones de una tarea
+def checkRoleForTask(employee, task):
+    isAdminOrTeamManager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee,
+                                                                        role_id__name__in=["Administrator",
+                                                                                           "Team manager"])
+    res = isAdminOrTeamManager.count() > 0
+    if not res:
+        roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee,
+                                                             projectDepartment_id=task.projectDepartment_id,
+                                                             role_id__name__in=["Project manager", "Department manager",
+                                                                                "Coordinator"])
+        res = roles.count() > 0
+    return res
