@@ -14,3 +14,4 @@ class AdministratorForm(Form):
     # Administrator (Profile data)
     identifier = forms.CharField(label=_("admin_identifier"),max_length=15)
     phone = forms.CharField(label=_("admin_phone"),max_length=15)
+    photo = forms.ImageField(label=_("photo"), required=False)

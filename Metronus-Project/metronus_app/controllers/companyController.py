@@ -12,18 +12,10 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
-from metronus_app.common_utils import get_current_admin_or_403, get_or_none
+from metronus_app.common_utils import get_current_admin_or_403, get_or_none, checkImage
 from django.core.exceptions import PermissionDenied
 
-from PIL import Image
 from django.core.mail import send_mail
-
-
-# Image limit parameters
-FILE_SIZE = 100000000
-HEIGHT = 256
-WIDTH = 256
-VALID_FORMATS = ['JPEG', 'JPG', 'PNG']
 
 
 def create(request):
@@ -34,24 +26,30 @@ def create(request):
     template:
     company_form.html
     """
+    # If it's a GET request, return an empty form
+    if request.method == "GET":
+        form = RegistrationForm()
     # if this is a POST request we need to process the form data
-    if request.method == 'POST':
+    elif request.method == 'POST':
         # create a form instance and populate it with data from the request:
         form = RegistrationForm(request.POST, request.FILES)
         # check whether it's valid:
-        if form.is_valid() and checkPasswords(form) and checkImage(form):
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:
-            company = createCompany(form)
-            administrator = registerAdministrator(form, company)
+        if form.is_valid() and checkPasswords(form):
+            if checkImage(form, 'logo'):
+                # process the data in form.cleaned_data as required
+                # ...
+                # redirect to a new URL:
+                company = createCompany(form)
+                administrator = registerAdministrator(form, company)
 
-            # This sends an information email to the company and to the admin
+                # This sends an information email to the company and to the admin
 
-            #send_mail('Metronus Info.', 'Registrado :)', 'info@metronus.es',
-            #          [company.email, administrator.user.email], fail_silently=False,)
+                #send_mail('Metronus Info.', 'Registrado :)', 'info@metronus.es',
+                #          [company.email, administrator.user.email], fail_silently=False,)
 
-            return HttpResponseRedirect('/' + company.short_name + '/login/')
+                return HttpResponseRedirect('/' + company.short_name + '/login/')
+            else:
+                return render(request, 'company/company_register.html', {'form': form, 'errors': ['error.imageNotValid']})
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -90,16 +88,19 @@ def edit(request):
 
         form = CompanyForm(request.POST)
         if form.is_valid():
-            # Company data
-            print(form.cleaned_data["company_email"])
-            company.visible_short_name = form.cleaned_data["visible_short_name"]
-            company.email = form.cleaned_data["company_email"]
-            company.phone = form.cleaned_data["company_phone"]
-            company.logo = form.cleaned_data["logo"]
+            if checkImage(form, 'logo'):
+                # Company data
+                print(form.cleaned_data["company_email"])
+                company.visible_short_name = form.cleaned_data["visible_short_name"]
+                company.email = form.cleaned_data["company_email"]
+                company.phone = form.cleaned_data["company_phone"]
+                company.logo = form.cleaned_data["logo"]
 
-            company.save()
+                company.save()
 
-            return HttpResponseRedirect('/company/view/')
+                return HttpResponseRedirect('/company/view/')
+            else:
+                return render(request, 'company/company_edit.html', {'form': form, 'errors': ['error.imageNotValid']})
 
     else:
         raise PermissionDenied
@@ -187,27 +188,6 @@ def checkPasswords(form):
     checks if two passwords are the same
     """
     return form.cleaned_data['password'] == form.cleaned_data['repeatPassword']
-
-
-def checkImage(form):
-    """
-    checks if logo has the correct dimensions
-    """
-    ret = False
-
-    logo = form.cleaned_data['logo']
-    if logo is not None:
-        image = Image.open(logo, mode="r")
-        xsize, ysize = image.size
-
-        print(logo)
-        for i in VALID_FORMATS:
-            if i == image.format:
-                ret = True
-
-        return xsize <= WIDTH and ysize <= HEIGHT and ret
-    else:
-        return True
 
 
 def validateCIF(request):

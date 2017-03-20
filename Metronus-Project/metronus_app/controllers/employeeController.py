@@ -13,7 +13,7 @@ from metronus_app.model.employeeLog              import EmployeeLog
 from metronus_app.model.administrator            import Administrator
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 
-from metronus_app.common_utils                   import get_current_admin_or_403
+from metronus_app.common_utils                   import get_current_admin_or_403, checkImage
 
 def create(request):
     """
@@ -37,7 +37,7 @@ def create(request):
         form = EmployeeRegisterForm(request.POST, request.FILES)
 
         if form.is_valid() and checkPasswords(form):
-            if checkImage(form):
+            if checkImage(form, 'photo'):
                 employeeUser = createEmployeeUser(form)
                 employee = createEmployee(employeeUser, admin, form)
                 EmployeeLog.objects.create(employee_id=employee, event="A")
@@ -197,19 +197,3 @@ def checkPasswords(form):
 
 def notify_password_change(email):
     pass # TODO
-
-def checkImage(form):
-    """
-    checks if logo has the correct dimensions and extension
-    """
-    ext = False
-    logo = form.cleaned_data['photo']
-
-    if logo is not None:
-        image = Image.open(logo, mode="r")
-        xsize, ysize = image.size
-        ext = image.format in VALID_FORMATS
-
-        return xsize <= WIDTH and ysize <= HEIGHT and ret
-    else:
-        return True
