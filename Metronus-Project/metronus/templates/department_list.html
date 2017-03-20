@@ -4,21 +4,17 @@
 {% block title %}{% trans 'departmentList' %}{% endblock %}
 
 {% block javascript %}
-<script>
-	function windowAlert(id){
-		var confirm=window.confirm("{% trans 'departmentConfirm' %}");
-		if(confirm==true){
-			window.location="/department/delete/"+id+"/";
-		}else{
-			return false;
-		}
-	}
-</script>
+
 <script>
 	function display(id){
 		window.location="/department/view/"+id+"/";
 
 	}
+</script>
+<script>
+$('#confirm-delete').on('show.bs.modal', function(e) {
+    $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+});
 </script>
 {% endblock %}
 
@@ -36,9 +32,11 @@
 	<div style="cursor: pointer;" class="list-group col-xs-4" onclick="display({{department.id}})">{{department.name}} </div>
 	<div align="right" >
 		<a class="btn btn-primary" href="{% url 'department_edit' department.id %}">{% trans 'update' %}</a>
-		
-		<input type="button" align="right" class="btn btn-danger" onclick="windowAlert({{department.id}})" value="{% trans 'delete' %}"/>
-	</div>
+
+		<a href="#" align="right" class="btn btn-danger" data-href="/department/delete/{{department.id}}/" data-toggle="modal" data-target="#confirm-delete">{% trans 'delete' %}</a>
+
+		</div>
+
 	</li>
 
 {% endfor %}
@@ -46,4 +44,21 @@
 </br>
 
 <a class="btn btn-primary" href="/department/create">{% trans 'create' %}</a>
+
+<div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		    <div class="modal-dialog">
+		        <div class="modal-content">
+		            <div class="modal-header">
+		                {% trans 'delete' %}
+		            </div>
+		            <div class="modal-body">
+		                {% trans 'departmentConfirm' %}
+		            </div>
+		            <div class="modal-footer">
+		                <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'cancel' %}</button>
+		                <a class="btn btn-danger btn-ok">{% trans 'delete' %}</a>
+		            </div>
+		        </div>
+		    </div>
+		</div>
 {% endblock %}

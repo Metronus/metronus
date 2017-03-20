@@ -5,6 +5,15 @@
 {{employee.user}}
 {% endblock %}
 
+{% block javascript %}
+
+<script>
+$('#confirm-delete').on('show.bs.modal', function(e) {
+    $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+});
+</script>
+{% endblock %}
+
 {% block content %}
 <h1>{% trans 'profile' %}</h1>
 
@@ -82,7 +91,7 @@
       <td>{{rol.projectDepartment_id.project_id.name}}</td>
       <td>{{rol.role_id.name}}</td>
       <td><div align="right"><a align="right" class="btn btn-primary" href="/roles/manage?role_id={{rol.id}}">{% trans 'update' %}</a>
-		<a align="right" class="btn btn-danger" href="/roles/delete?rol_id={{rol.id}}">{% trans 'delete' %}</a></div></td>
+      <a href="#" align="right" class="btn btn-danger" data-href="/roles/delete/{{rol.id}}" data-toggle="modal" data-target="#confirm-delete">{% trans 'delete' %}</a>
     </tr>
 	{% endfor %}
 	</tbody>
@@ -93,5 +102,22 @@
 </div>
 </br>
 <a align="center" class="btn btn-primary" href="/roles/manage?employee_id={{employee.id}}">{% trans 'addRole' %}</a>
+
+<div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    {% trans 'delete' %}
+                </div>
+                <div class="modal-body">
+                    {% trans 'roleConfirm' %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'cancel' %}</button>
+                    <a class="btn btn-danger btn-ok">{% trans 'delete' %}</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}

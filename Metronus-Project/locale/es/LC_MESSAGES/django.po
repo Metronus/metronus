@@ -206,6 +206,8 @@ msgid "editRole"
 msgstr "Editar un rol"
 msgid "selectRole"
 msgstr "Seleccione un rol"
+msgid "roleConfirm"
+msgstr "¿Está seguro de eliminar el rol? Se eliminará también todo lo relacionado con el mismo"
 
 #: Company
 msgid "registerCompany"
