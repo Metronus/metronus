@@ -158,7 +158,7 @@ def view(request,department_id):
 
     tasks=Task.objects.filter(active=True, projectDepartment_id__department_id__id=department_id)
 
-    employees = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__department_id=department)
+    employees = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__department_id=department).distinct()
 
     return render(request, 'department_view.html', {'department': department, 'employees': employees,'tasks':tasks})
 
@@ -278,7 +278,7 @@ def checkRoleForList(dep,request):
     # Check that the admin has permission to view that employee
     if dep.company_id != actor.company_id:
         raise PermissionDenied
-    
+
     if actor.user_type!='A':
         isAdminOrTeamManager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
                     role_id__name__in=["Administrator" , "Team manager"])

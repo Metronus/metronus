@@ -11,7 +11,7 @@ from django.http                        import HttpResponseForbidden
 from django.contrib.auth import authenticate,login
 from metronus_app.model.employee import Employee
 from django.http import JsonResponse
-
+from metronus_app.model.task import Task
 
 
 def create(request):
@@ -126,8 +126,9 @@ def show(request,project_id):
     admin = get_current_admin_or_403(request)
     repeated_name = False
     project = get_object_or_404(Project, pk=project_id)
-    employees = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__project_id=project)
-    return render(request, "project/project_show.html", {"project": project, 'employees': employees})
+    employees = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__project_id=project).distinct()
+    tasks=Task.objects.filter(active=True, projectDepartment_id__project_id__id=project_id)
+    return render(request, "project/project_show.html", {"project": project, 'employees': employees,"tasks":tasks})
 
 
 def edit(request,project_id):
@@ -185,7 +186,7 @@ def delete(request,project_id):
     project=get_object_or_404(Project,pk=project_id)
     if checkCompanyProject(project,admin.company_id):
         deleteProject(project)
-        
+
     return HttpResponseRedirect('/project/list')
 
 #Auxiliar methods, containing the operation logic
