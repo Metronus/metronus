@@ -20,6 +20,7 @@ def create(request):
     parameters/returns:
     form: formulario con los datos necesarios para el registro del empleado
     success: opcional, si se ha tenido éxito al crear un empleado
+    errors: opcional, array de mensajes de error si ha habido algún error
     
     template:
     employee_register.html
@@ -33,13 +34,16 @@ def create(request):
         form = EmployeeRegisterForm()
     elif request.method == "POST":
     # We are serving a POST request
-        form = EmployeeRegisterForm(request.POST)
+        form = EmployeeRegisterForm(request.POST, request.FILES)
 
         if form.is_valid() and checkPasswords(form):
-            employeeUser = createEmployeeUser(form)
-            employee = createEmployee(employeeUser, admin, form)
-            EmployeeLog.objects.create(employee_id=employee, event="A")
-            render(request, 'employee_register.html', {'form': EmployeeRegisterForm(), 'success': True})
+            if checkImage(form):
+                employeeUser = createEmployeeUser(form)
+                employee = createEmployee(employeeUser, admin, form)
+                EmployeeLog.objects.create(employee_id=employee, event="A")
+                render(request, 'employee_register.html', {'form': EmployeeRegisterForm(), 'success': True})
+            else:
+                return render(request, 'employee_register.html', {'form': form, 'errors': ['error.imageNotValid']})
     else:
         raise PermissionDenied
 
@@ -184,11 +188,28 @@ def createEmployee(employeeUser, admin, form):
     identifier = form.cleaned_data['identifier']
     phone = form.cleaned_data['phone']
     company = admin.company_id
+    picture = form.cleaned_data['photo']
 
-    return Employee.objects.create(user=user, user_type=user_type, identifier=identifier, phone=phone, company_id=company)
+    return Employee.objects.create(user=user, user_type=user_type, identifier=identifier, phone=phone, company_id=company, picture=picture)
 
 def checkPasswords(form):
     return form.cleaned_data['password1'] == form.cleaned_data['password2']
 
 def notify_password_change(email):
     pass # TODO
+
+def checkImage(form):
+    """
+    checks if logo has the correct dimensions and extension
+    """
+    ext = False
+    logo = form.cleaned_data['photo']
+
+    if logo is not None:
+        image = Image.open(logo, mode="r")
+        xsize, ysize = image.size
+        ext = image.format in VALID_FORMATS
+
+        return xsize <= WIDTH and ysize <= HEIGHT and ret
+    else:
+        return True

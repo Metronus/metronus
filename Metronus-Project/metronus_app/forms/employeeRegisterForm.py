@@ -16,3 +16,4 @@ class EmployeeRegisterForm(Form):
     # Employee (Actor) data
     phone = forms.CharField(label=_("phone"), max_length=15)
     identifier = forms.CharField(label=_("identifier"), max_length=15)
+    photo = forms.ImageField(label=_("photo"), required = False)
