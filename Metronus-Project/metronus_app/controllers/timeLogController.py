@@ -76,8 +76,10 @@ def list_all(request):
     # TODO por usuario
 
     tareas=Task.objects.all()
+    my_tasks = [myTask(x) for x in tareas]
     month = [x for x in range(1,31)]
-    return render(request, "timeLog/timeLog_list_all.html", {"tasks": tareas, "month":month})
+    total = [sum([x.durations[i] for x in my_tasks]) for i in range(0,30) ]
+    return render(request, "timeLog/timeLog_list_all.html", {"my_tasks": my_tasks, "month":month,"total":total})
 
 def edit(request, timeLog_id):
     employee = get_current_employee_or_403(request)
@@ -169,7 +171,14 @@ def updateTimeLog(timeLog,form):
         timeLog.duration = form.cleaned_data['duration']
         timeLog.save()
 
-class myTask:
+class myTask():
+    name = ""
+    durations = []
+
     def __init__(self, task):
         self.name = task.name
-        self.durations = TimeLog.objects.filter(task_id=task.id).values('duration')
+        self.durations = [0 for x in range(0,30)]
+
+        for tl in task.timelog_set.all():
+            index = int(tl.workDate.day)
+            self.durations[index] += tl.duration
