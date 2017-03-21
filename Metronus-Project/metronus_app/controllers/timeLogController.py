@@ -20,13 +20,13 @@ def create_all(request):
 
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = TimeLog2Form(request.POST)
+        form = TimeLog2Form(request, request.POST)
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-            task = findTask(form.cleaned_data['task_id'])
+            task = form.cleaned_data['task_id']
             if task is not None:
                 createTimeLog(form,task,employee)
                 return redirect('timeLog_list_all')
