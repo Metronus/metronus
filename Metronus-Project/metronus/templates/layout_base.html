@@ -27,7 +27,7 @@
         <div class="col-md-3 left_col">
           <div class="left_col scroll-view">
             <div class="navbar nav_title" style="border: 0;">
-              <a href="index.html" class="site_title"><i class="fa fa-paw"></i> <span>Metronus</span></a>
+              <a href="index.html" class="site_title"><i class="fa fa-paw"></i> <span>{{user.actor.company_id.company_name}}</span></a>
             </div>
 
             <div class="clearfix"></div>
@@ -38,8 +38,8 @@
                 <img src="{{user.actor.picture}}" alt="{{user.get_username}}" class="img-circle profile_img">
               </div>
               <div class="profile_info">
-                <span>{% trans 'dashWelcome' %}</span>
-                <h2>{{user.get_username}}</h2>
+                <span>{% trans 'dashWelcome' %}, </span>
+                <h2>{{user.first_name}} {{user.last_name}}</h2>
               </div>
             </div>
             <!-- /menu profile quick info -->
@@ -61,26 +61,26 @@
                   </li>
                   <li><a><i class="fa fa-group"></i>{% trans 'dashDepartments' %}<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
-                      <li><a href="form.html">{% trans 'dashDepartmentsList' %}</a></li>
-                      <li><a href="form_advanced.html">{% trans 'dashDepartmentCreate' %}</a></li>
+                      <li><a href="/department/list">{% trans 'dashDepartmentsList' %}</a></li>
+                      <li><a href="/department/create">{% trans 'dashDepartmentCreate' %}</a></li>
                     </ul>
                   </li>
                   <li><a><i class="fa fa-user"></i>{% trans 'dashEmployees' %}<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
-                      <li><a href="general_elements.html">{% trans 'dashEmployeesList' %}</a></li>
-                      <li><a href="media_gallery.html">{% trans 'dashEmployeesCreate' %}</a></li>
+                      <li><a href="/employee/list">{% trans 'dashEmployeesList' %}</a></li>
+                      <li><a href="/employee/create">{% trans 'dashEmployeesCreate' %}</a></li>
                     </ul>
                   </li>
                   <li><a><i class="fa fa-tasks"></i>{% trans 'dashTasks' %}<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
-                      <li><a href="general_elements.html">{% trans 'dashTasksList' %}</a></li>
-                      <li><a href="media_gallery.html">{% trans 'dashTasksCreate' %}</a></li>
+                      <li><a href="/task/list">{% trans 'dashTasksList' %}</a></li>
+                      <li><a href="/task/create">{% trans 'dashTasksCreate' %}</a></li>
                     </ul>
                   </li>
                   <li><a><i class="fa fa-calendar"></i>{% trans 'dashTimeControl' %}<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
-                      <li><a href="general_elements.html">{% trans 'dashTimeControlList' %}</a></li>
-                      <li><a href="media_gallery.html">{% trans 'dashTimeControlCreate' %}</a></li>
+                      <li><a href="/timeLog/list_all">{% trans 'dashTimeControlList' %}</a></li>
+                      <li><a href="/timeLog/create">{% trans 'dashTimeControlCreate' %}</a></li>
                     </ul>
                   </li>
                 </ul>
@@ -101,7 +101,7 @@
               <ul class="nav navbar-nav navbar-right">
                 <li class="">
                   <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <img src="{{user.picture}}" alt="">{{user.user}}
+                    <img src="{{user.actor.picture}}" alt="">{{user.first_name}} {{user.last_name}}
                     <span class=" fa fa-angle-down"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-usermenu pull-right">
