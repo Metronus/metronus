@@ -144,3 +144,8 @@ def updateTimeLog(timeLog,form):
         timeLog.workDate = form.cleaned_data['workDate']
         timeLog.duration = form.cleaned_data['duration']
         timeLog.save()
+
+class myTask:
+    def __init__(self, task):
+        self.name = task.name
+        self.durations = TimeLog.objects.filter(task_id=task.id).values('duration')

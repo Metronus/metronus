@@ -38,6 +38,8 @@
                       <a class="btn btn-danger" onclick="removealert('{% url 'task_delete' task.id %}');">
                           {% trans 'delete' %}
                       </a>
+                      <a href="{% url 'timeLog_list' task.id %}" type="button" class="btn btn-info">{% trans 'timeLog' %}</a>
+
 
                     </td>
                 </tr>
