@@ -20,6 +20,7 @@ from django.conf.urls.i18n          import i18n_patterns
 from metronus_app                   import views
 from django.core.urlresolvers       import reverse_lazy
 
+from metronus_app.controllers               import appController
 from metronus_app.controllers       import departmentController
 from metronus_app.controllers       import projectController
 from metronus_app.controllers       import projectDepartmentController
@@ -38,7 +39,7 @@ urlpatterns += [#i18n_patterns(
 
     url(r'^$', views.index),
     url(r'^index.html/$', views.index, name='home'),
-
+    url(r'^app/$', appController.index, name='app_index'),
     url(r'^department/create$', departmentController.create, name='department_create'),
     url(r'^department/createAsync$', departmentController.createAsync),
     url(r'^department/list$', departmentController.list, name='department_list'),

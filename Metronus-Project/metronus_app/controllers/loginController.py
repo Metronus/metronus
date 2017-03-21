@@ -70,7 +70,8 @@ def login(request, template_name='registration/login.html',
             #    check_company_contains_actor(company, form.get_user())
 
             auth_login(request, form.get_user())
-            return HttpResponseRedirect(_get_login_redirect_url(request, redirect_to))
+            return HttpResponseRedirect("/app/")
+            #return HttpResponseRedirect(_get_login_redirect_url(request, redirect_to))
     else:
         form = authentication_form(request)
 
