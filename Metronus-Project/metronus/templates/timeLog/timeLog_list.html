@@ -24,7 +24,7 @@
                 </a>
 
             {% empty %}
-                <a href="{% url 'timeLog_create' task.id %}" class="list-group-item">{% trans 'timeLogNot' %}</a>
+                <a href="{% url 'timeLog_create_by_task' task.id %}" class="list-group-item">{% trans 'timeLogNot' %}</a>
 
             {% endfor %}
         </div>

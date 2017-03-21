@@ -14,6 +14,8 @@ from django.core.exceptions             import ObjectDoesNotExist, PermissionDen
 from django.http                        import HttpResponseForbidden
 from django.contrib.auth import authenticate,login
 from datetime import date,datetime
+from metronus_app.model.actor import Actor
+import calendar
 
 def create_all(request):
     employee = get_current_employee_or_403(request)
@@ -73,13 +75,21 @@ def list(request, task_id):
     return render(request, "timeLog/timeLog_list.html", {"timeLogs": lista,"task":task})
 
 def list_all(request):
-    # TODO por usuario
+    today = datetime.today()
 
-    tareas=Task.objects.all()
+
+    try:
+        actor = Actor.objects.get(user=request.user)
+    except ObjectDoesNotExist:
+        raise PermissionDenied
+    tareas=Task.objects.filter(actor_id__company_id=actor.company_id,
+                                   projectDepartment_id__projectdepartmentemployeerole__employee_id=actor,
+                                   active=True).distinct()
     my_tasks = [myTask(x) for x in tareas]
-    month = [x for x in range(1,31)]
-    total = [sum([x.durations[i] for x in my_tasks]) for i in range(0,30) ]
-    return render(request, "timeLog/timeLog_list_all.html", {"my_tasks": my_tasks, "month":month,"total":total})
+    month = [x for x in range(1,calendar.monthrange(today.year,today.month)[1]+1)]
+    total = [sum([x.durations[i] for x in my_tasks]) for i in range(0,calendar.monthrange(today.year,today.month)[1]) ]
+    monthTotal = sum(total)
+    return render(request, "timeLog/timeLog_list_all.html", {"my_tasks": my_tasks, "month":month,"total":total, "monthTotal":monthTotal})
 
 def edit(request, timeLog_id):
     employee = get_current_employee_or_403(request)
@@ -176,8 +186,9 @@ class myTask():
     durations = []
 
     def __init__(self, task):
+        today = datetime.today()
         self.name = task.name
-        self.durations = [0 for x in range(0,30)]
+        self.durations = [0 for x in range(0,calendar.monthrange(today.year,today.month)[1])]
 
         for tl in task.timelog_set.all():
             index = int(tl.workDate.day)
