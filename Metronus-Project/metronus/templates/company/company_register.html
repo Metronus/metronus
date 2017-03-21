@@ -1,435 +1,95 @@
-{% extends "layout_base.html" %}
+{% extends "anon_master.html" %}
 {% load i18n %}
 {% load l10n %}
+{% load custom_tags %}
 
 {% block title %}{% trans 'registerCompany' %}{% endblock %}
-
-
-{% block javascript %}
-
-<script type="text/javascript">
-    function toggle_form(){
-      var elem = document.getElementById('toggle_button_id');
-      if(elem.textContent == "{% trans 'company_info'%}"){
-        document.getElementById('toggle_button_id').textContent = "{% trans 'admin_info' %}";
-      }else{
-        document.getElementById('toggle_button_id').textContent = "{% trans 'company_info' %}";
-      }
-
-    };
-  </script>
-
-<script type="text/javascript">
-  //ESTE SCRIPT COMPRUEBA LOS VALORES DEL FORM DE LA COMPAÑÍA PARA NO DEJAR PASAR AL DEL ADMIN SI NO ESTAN CORRECTOS
-  $('#div_company_info').change(function() {
-    formIsValid = true;
-    $('.company_class',$(this)).each( function() {
-        formIsValid = formIsValid && $(this).hasClass('has-success');
-    });
-
-    if(formIsValid) {
-       $('.next_button', $(this)).attr('disabled', false);
-    } else {
-
-        $('.next_button', $(this)).attr('disabled', true);
-    }
-  });
-</script>
-
-<script type="text/javascript">
-  //ESTE SCRIPT COMPRUEBA LOS VALORES DEL FORM COMPLETO PARA NO DEJAR PULSAR SOBRE "REGISTRAR" SI NO ESTAN TODOS CORRECTOS
-  $('#register_form').change(function() {
-    formIsValid = true;
-    $('.form-class',$(this)).each( function() {
-        formIsValid = formIsValid && $(this).hasClass('has-success');
-    });
-    if(formIsValid) {
-        $('.submit-button', $(this)).attr('disabled', false);
-    } else {
-
-        $('.submit-button', $(this)).attr('disabled', true);
-    }
-  });
-</script>
-
-<script>
-
-  //Esto es para validar en cliente de forma bonita con bootstrap :)
-
-  $(document).ready(function() {
-    $('#register_form').bootstrapValidator({
-        feedbackIcons: {
-            valid: 'glyphicon glyphicon-ok',
-            invalid: 'glyphicon glyphicon-remove',
-            validating: 'glyphicon glyphicon-refresh'
-        },
-        fields: {
-          cif: {
-                validators: {
-                    notEmpty: {
-                        message: '{% trans 'cif_error#1'%}'
-                    },
-                    regexp:{
-                      regexp: /^[a-zA-Z]\d{8}$/ig,
-                      message: '{% trans 'cif_error#2'%}'
-                    },
-                },
-            },
-            company_name: {
-                validators: {
-                    notEmpty: {
-                        message: '{% trans 'company_name_error' %}'
-                    }
-                }
-            },
-            company_email: {
-                validators: {
-                    notEmpty: {
-                        message: '{% trans 'company_email_error#1' %}'
-                    },
-                    emailAddress: {
-                        message: '{% trans 'company_email_error#2' %}'
-                    }
-                }
-            },
-            short_name: {
-                validators: {
-                    notEmpty: {
-                        message: '{% trans 'company_short_name_error' %}'
-                    }
-                }
-            },
-            company_phone: {
-                validators: {
-                    notEmpty: {
-                        message: '{% trans 'company_phone_error#1' %}'
-                    },
-                     regexp:{
-                      regexp: /^\d{9}$/ig,
-                      message: '{% trans 'company_phone_error#2' %}'
-                    },
-                }
-            },           
-            username: {
-                validators: {
-                    notEmpty: {
-                        message: '{% trans 'username_error' %}'
-                    }
-                }
-            },
-            admin_email: {
-                validators: {
-                    notEmpty: {
-                        message: '{% trans 'admin_email_error#1' %}'
-                    },
-                    emailAddress: {
-                        message: '{% trans 'admin_email_error#2' %}'
-                    }
-                }
-            },
-            password: {
-                validators: {
-                    notEmpty: {
-                        message: '{% trans 'password_error' %}'
-                    }
-                }
-            },
-            repeatPassword: {
-                validators: {
-                    notEmpty: {
-                        message: '{% trans 'passwordRepeat_error' %}'
-                    }
-                }
-            },
-            first_name: {
-                validators: {
-                    notEmpty: {
-                        message: '{% trans 'first_name_error' %}'
-                    }
-                }
-            },
-            last_name: {
-                validators: {
-                    notEmpty: {
-                        message: '{% trans 'last_name_error' %}'
-                    }
-                }
-            },
-            admin_identifier: {
-                validators: {
-                    notEmpty: {
-                        message: '{% trans 'admin_identifier_error' %}'
-                    }
-                }
-            },
-            admin_phone: {
-                validators: {
-                    notEmpty: {
-                        message: '{% trans 'admin_phone_error#1' %}'
-                    },
-                    regexp:{
-                      regexp: /^\d{9}$/ig,
-                      message: '{% trans 'admin_phone_error#2' %}'
-                    },
-                }
-            },
-
-        },
-    });
-  });
-</script>
-
-
-<script type="text/javascript">
-  var password = document.getElementById("id_password")
-  , confirm_password = document.getElementById("id_repeatPassword")
-  , div_pass_1 = document.getElementById("div_pass_1")
-  , div_pass_2 = document.getElementById("div_pass_2");
-
-  function validatePassword(){
-  if((password.value != confirm_password.value) || password.value == "" || confirm_password.value == "") {
-    div_pass_1.className = "form-group required form-class has-feedback has-error";
-    div_pass_1.childNodes[2].childNodes[1].className = "form-control-feedback glyphicon glyphicon-remove"
-    div_pass_2.className = "form-group required form-class has-feedback has-error";
-    div_pass_2.childNodes[2].childNodes[1].className = "form-control-feedback glyphicon glyphicon-remove"
-
-
-  } else {
-
-    div_pass_1.className = "form-group required form-class has-feedback has-success";
-    div_pass_1.childNodes[2].childNodes[1].className = "form-control-feedback glyphicon glyphicon-ok"
-
-    div_pass_2.className = "form-group required form-class has-feedback has-success";
-    div_pass_2.childNodes[2].childNodes[1].className = "form-control-feedback glyphicon glyphicon-ok"
-
-  }
-  }
-
-  password.onchange = validatePassword;
-  confirm_password.onkeyup = validatePassword;
-</script>
-
-<script type="text/javascript">
-  var cif = document.getElementById("id_cif")
-  , div_cif = document.getElementById("div_cif")
-  , unique_message = document.getElementById("id_unique_message");
-
-
-  var isUnique;
-
-  function validateCIF(){
-    $.ajax({
-          url: '/ajax/validate_cif/',
-          data: {
-            'cif': cif.value
-          },
-          dataType: 'json',
-          success: function (data) {
-            isUnique = !data.is_taken;
-              if(!isUnique) {
-
-                div_cif.className = "form-group required form-class has-feedback has-error";
-                div_cif.childNodes[2].childNodes[1].className = "form-control-feedback glyphicon glyphicon-remove"
-                unique_message.style.display = 'block';        
-
-              } else {
-                unique_message.style.display = 'none'; 
-                div_cif.className = "form-group required form-class has-feedback has-success";
-                div_cif.childNodes[2].childNodes[1].className = "form-control-feedback glyphicon glyphicon-ok"
-
-              }
-                }
-        });
-    }
-  cif.onchange = validateCIF;
-</script>
-
-<script type="text/javascript">
-
-  var admin = document.getElementById("id_username")
-  , div_admin = document.getElementById("div_admin")
-  , admin_unique_message = document.getElementById("id_admin_unique_message");
-
-
-  var isUnique;
-
-  function validateAdmin(){
-    $.ajax({
-          url: '/ajax/validate_admin/',
-          data: {
-            'admin': admin.value
-          },
-          dataType: 'json',
-          success: function (data) {
-            isUnique = !data.is_taken;
-              if(!isUnique) {
-
-                div_admin.className = "form-group required form-class has-feedback has-error";
-                div_admin.childNodes[2].childNodes[1].className = "form-control-feedback glyphicon glyphicon-remove"
-                admin_unique_message.style.display = 'block';        
-
-              } else {
-                admin_unique_message.style.display = 'none'; 
-                div_admin.className = "form-group required form-class has-feedback has-success";
-                div_admin.childNodes[2].childNodes[1].className = "form-control-feedback glyphicon glyphicon-ok"
-
-              }
-                }
-        });
-    }
-  admin.onchange = validateAdmin;
-</script>
-
-
-
-{% endblock %}
-
 {% block content %}
-<div class="row">
-{% if form.errors %}
-        <p>{{ form.errors }}</p>
-{% endif %}
- 
-<h1> {% trans 'registerCompany' %}</h1></br>
+<body>
+  <!-- page content -->
+  <div class="container body">
+  <div class="right_col" role="main">
+    <div class="">
+      <div class="clearfix"></div>
 
+      <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel">
+            <div class="x_content">
+              <!-- Smart Wizard -->
+              <form id="register_form" method="POST" class="form-horizontal" data-toggle="validator" role="form" action="" enctype="multipart/form-data">
+                {% csrf_token %}
+              <div id="wizard" class="form_wizard wizard_horizontal">
+                <ul class="wizard_steps">
+                  <li>
+                    <a href="#step-1">
+                      <span class="step_no">1</span>
+                      <span class="step_descr">
+                          {% trans 'registerCompanyMenu' %}<br />
+                          <small>{% trans 'registerCompanyMenuInfo' %}</small>
+                      </span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#step-2">
+                      <span class="step_no">2</span>
+                      <span class="step_descr">
+                          {% trans 'registerCompanyAdmin' %}<br />
+                          <small>{% trans 'registerCompanyAdminInfo' %}</small>
+                      </span>
+                    </a>
+                  </li>
+                </ul>
+                <div id="step-1">
+                  <div id="form-step-0" role="form" data-toggle="validator">
+                    {% show_field form.cif  %}
+                    {% show_field form.company_name  %}
+                    {% show_field form.short_name  %}
+                    {% show_field form.company_email  %}
+                    {% show_field form.company_phone  %}
+                    {% show_field form.logo False %}
+                  <div class="help-block with-errors"></div>
+                  </div>
+                </div>
 
+                <div id="step-2">
+                  <div id="form-step-0" role="form" data-toggle="validator">
 
+                    {% show_field form.username %}
+                    {% show_field form.admin_email %}
+                    {% show_field form.password %}
+                    {% show_field form.repeatPassword %}
+                    {% show_field form.first_name %}
+                    {% show_field form.last_name  %}
+                    {% show_field form.admin_identifier  %}
+                    {% show_field form.admin_phone  %}
+                    <div class="help-block with-errors"></div>
+                  </div>
+                </div>
 
-   <form id="register_form" method="POST" class="form-horizontal" data-toggle="validator" role="form" action="" enctype="multipart/form-data">
-
-    {% csrf_token %}
-
-
-        <div class="form-group control-buttons">
-            <div class="col-sm-offset-4 col-sm-10">
-                <button id="toggle_button_id"type="button" onclick="toggle_form()"class="btn btn-info" data-toggle="collapse" data-target="#div_company_info, #div_admin_info">{% trans 'admin_info'%}</button>
-
-                <button type="submit" class="btn btn-success submit-button" disabled="true">{% trans 'register' %}</button>
-
+              </div>
+            </form>
+              <!-- End SmartWizard Content -->
             </div>
-          
+          </div>
         </div>
-
-      <!-- AQUI COMIENZA LA INFO DE LA COMPAÑIA -->
-
-	    <div id="div_company_info" class="col-md-6 col-md-offset-2 collapse in" >
-
-        <div class="form-group required company_class form-class" id="div_cif">
-          <label class="control-label col-sm-4" for="id_{{ form.cif.name }}">{% trans 'cif' %}</label>
-            <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.cif.name }}"  id="id_{{ form.cif.name }}">
-              <div class="help-block with-errors" id="id_unique_message" style="display: none;">{% trans 'company_duplicate' %}</div>
-            </div>
-            
-        </div>
-
-        <div class="form-group required company_class form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.company_name.name }}">{% trans 'companyName' %}</label>
-            <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.company_name.name }}" id="id_{{ form.company_name.label }}">
-            </div>
-        </div>
-
-        <div class="form-group required company_class form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.short_name.name }}">{% trans 'short_name'%}</label>
-            <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.short_name.name }}" id="id_{{ form.short_name.label }}">
-            </div>
-        </div>
-
-        <div class="form-group required company_class form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.company_email.name }}">{% trans 'company_email' %}</label>
-            <div class="col-sm-6">
-              <input type="email" class="form-control col-md-6" name="{{ form.company_email.name }}" id="id_{{ form.company_email.label }}">
-            </div>
-        </div>
-
-        <div class="form-group required company_class form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.company_phone.name }}">{% trans 'company_phone' %}</label>
-            <div class="col-sm-6">
-            <input type="text" class="form-control col-md-6" name="{{ form.company_phone.name }}" id="id_{{ form.company_phone.label }}">
-            </div>
-        </div>
-
-        <div class="form-group">
-          <label class="control-label col-sm-4" for="id_{{ form.logo.name }}">{% trans 'logo' %}</label>
-            <div class="col-sm-6">
-              <input id="id_{{ form.logo.label }}" name="{{ form.logo.name }}" multiple type="file" class="file file-loading" data-allowed-file-extensions='["jpeg", "jpg", "png"]'>
-            </div>
-        </div>
-                   
-        <br/>
-
-        </div>
-
-        <!-- AQUI COMIENZA LA INFO DEL ADMIN-->
-
-        <div id="div_admin_info" class="col-md-6 col-md-offset-2 collapse" >
-
-
-        <div class="form-group required form-class" id="div_admin">
-          <label class="control-label col-sm-4" for="id_{{ form.username.label }}">{% trans 'username' %}</label>
-            <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.username.name }}" id="id_{{ form.username.name }}">
-              <div class="help-block with-errors" id="id_admin_unique_message" style="display: none;">{% trans 'admin_duplicate' %}</div>
-            </div>
-        </div>
-
-        <div class="form-group required form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.admin_email.label }}">{% trans 'admin_email' %}</label>
-            <div class="col-sm-6">
-              <input type="email" class="form-control col-md-6" name="{{ form.admin_email.name }}" id="id_{{ form.admin_email.label }}">
-            </div>
-        </div>
-
-        <div class="form-group required form-class" id="div_pass_1">
-          <label class="control-label col-sm-4" for="id_{{ form.password.name }}">{% trans 'password' %}</label>
-            <div class="col-sm-6">
-              <input type="password" class="form-control col-md-6" onchange="validatePassword" name="{{ form.password.name }}" id="id_{{ form.password.name }}">
-            </div>
-        </div>
-
-        <div class="form-group required form-class" id="div_pass_2">
-          <label class="control-label col-sm-4" for="id_{{ form.repeatPassword.name }}">{% trans 'repeatPassword' %}</label>
-            <div class="col-sm-6">
-              <input type="password" class="form-control col-md-6" onchange="validatePassword" name="{{ form.repeatPassword.name }}" id="id_{{ form.repeatPassword.name }}">
-            </div>
-        </div>
-
-        <div class="form-group required form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.first_name.label }}">{% trans 'first_name' %}</label>
-            <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.first_name.name }}" id="id_{{ form.first_name.name }}">
-            </div>
-        </div>
-
-        <div class="form-group required form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.last_name.label }}">{% trans 'last_name'%}</label>
-            <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.last_name.name }}" id="id_{{ form.last_name.label }}">
-            </div>
-        </div>
-
-        <div class="form-group required form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.admin_identifier.label }}">{% trans 'admin_identifier' %}</label>
-            <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.admin_identifier.name }}" id="id_{{ form.admin_identifier.label }}">
-            </div>
-        </div>
-
-        <div class="form-group required form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.admin_phone.label }}">{% trans 'admin_phone'%}</label>
-            <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.admin_phone.name }}" id="id_{{ form.admin_phone.label }}">
-            </div>
-        </div>
-                   
-        <br/>
-
-
-
-        </div>
-
-    </form>
+      </div>
     </div>
+  </div>
+</div>
+<body>
+
+<!-- /page content -->
+<script src="/static/js/fastclick.js"></script>
+<script src="/static/js/nprogress.js"></script>
+<script src="/static/js/custom.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.5/validator.min.js"></script>
+<script src="/static/js/jquery.smartWizard.js"></script>
+
+<script type="text/javascript">
+  $(document).ready(function(){
+      $('#wizard').smartWizard();
+  });
+</script>
 {% endblock %}

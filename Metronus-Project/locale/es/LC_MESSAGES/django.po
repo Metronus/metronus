@@ -99,6 +99,15 @@ msgstr "Empresarial"
 msgid "landingPricingEmployeesBusiness"
 msgstr "+5 empleados"
 
+#: Register
+msgid "registerCompanyMenu"
+msgstr "Registro de compañía"
+msgid "registerCompanyMenuInfo"
+msgstr "¡Necesitamos detalles!"
+msgid "registerCompanyAdmin"
+msgstr "Información del Administrador"
+msgid "registerCompanyAdminInfo"
+msgstr "¡Alguien debe gestionar tu compañía!"
 
 #: metronus/settings.py:33
 msgid "English"

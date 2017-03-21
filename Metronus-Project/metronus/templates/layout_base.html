@@ -1,93 +1,183 @@
 {% load i18n %}
 {% load l10n %}
 <!DOCTYPE html>
-<html>
-<head>
-	<meta charset="UTF-8">
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<style>
-	.form-group.required .control-label:after {
-    content:" *";
-    color:red;
-}
-	
-</style>
+		<title> {% block title %}{% endblock %} </title>
 
-    <!--Let browser know website is optimized for mobile-->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/font-awesome.min.css" rel="stylesheet">
+		<link href="/static/css/nprogress.css" rel="stylesheet">
+		<link href="/static/css/green.css" rel="stylesheet">
+		<link href="/static/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
+		<link href="/static/css/jqvmap.min.css" rel="stylesheet">
+		<link href="/static/css/daterangepicker.css" rel="stylesheet">
+		<link href="/static/css/custom_log.css" rel="stylesheet">
+  </head>
 
-	<!-- Bootstrap -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-	<link rel="stylesheet" href="//cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css">
-	<!-- Font Awesome -->
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
-	<!-- Bootstrap theme -->
-	<link rel="stylesheet" href="/static/css/AdminLTE.min.css">
-	<link rel="stylesheet" href="/static/css/skin-blue.css">
-	
-	<!-- Bootstrap validator -->
-	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/css/bootstrapvalidator.min.css"/>
-	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/4.3.8/css/fileinput.min.css"/>
+  <body class="nav-md">
+    <div class="container body">
+      <div class="main_container">
+        <div class="col-md-3 left_col">
+          <div class="left_col scroll-view">
+            <div class="navbar nav_title" style="border: 0;">
+              <a href="index.html" class="site_title"><i class="fa fa-paw"></i> <span>Metronus</span></a>
+            </div>
 
-	<!-- Element -->
-  	<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-default/index.css">
+            <div class="clearfix"></div>
 
-	<title>
-		{% block title %}{% endblock %}
-	</title>
-</head>
+            <!-- menu profile quick info -->
+            <div class="profile clearfix">
+              <div class="profile_pic">
+                <img src="{{user.actor.picture}}" alt="{{user.get_username}}" class="img-circle profile_img">
+              </div>
+              <div class="profile_info">
+                <span>{% trans 'dashWelcome' %}</span>
+                <h2>{{user.get_username}}</h2>
+              </div>
+            </div>
+            <!-- /menu profile quick info -->
 
-<body class="hold-transition skin-blue sidebar-mini">
-<div class="wrapper">
+            <br />
 
-	{% include './theme/header.html' %}
+            <!-- sidebar menu -->
+            <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+              <div class="menu_section">
+                <h3>{% trans 'dashControlPanel' %}</h3>
+                <ul class="nav side-menu">
+                  <li><a><i class="fa fa-home"></i>{% trans 'dashIndex' %}</span></a>
+                  </li>
+                  <li><a><i class="fa fa-desktop"></i>{% trans 'dashProjects' %}<span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="/project/list">{% trans 'dashProjectsList' %}</a></li>
+                      <li><a href="/project/create">{% trans 'dashProjectCreate' %}</a></li>
+                    </ul>
+                  </li>
+                  <li><a><i class="fa fa-group"></i>{% trans 'dashDepartments' %}<span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="form.html">{% trans 'dashDepartmentsList' %}</a></li>
+                      <li><a href="form_advanced.html">{% trans 'dashDepartmentCreate' %}</a></li>
+                    </ul>
+                  </li>
+                  <li><a><i class="fa fa-user"></i>{% trans 'dashEmployees' %}<span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="general_elements.html">{% trans 'dashEmployeesList' %}</a></li>
+                      <li><a href="media_gallery.html">{% trans 'dashEmployeesCreate' %}</a></li>
+                    </ul>
+                  </li>
+                  <li><a><i class="fa fa-tasks"></i>{% trans 'dashTasks' %}<span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="general_elements.html">{% trans 'dashTasksList' %}</a></li>
+                      <li><a href="media_gallery.html">{% trans 'dashTasksCreate' %}</a></li>
+                    </ul>
+                  </li>
+                  <li><a><i class="fa fa-calendar"></i>{% trans 'dashTimeControl' %}<span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="general_elements.html">{% trans 'dashTimeControlList' %}</a></li>
+                      <li><a href="media_gallery.html">{% trans 'dashTimeControlCreate' %}</a></li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <!-- /sidebar menu -->
+          </div>
+        </div>
 
-	{% include './theme/navbar.html' %}
+        <!-- top navigation -->
+        <div class="top_nav">
+          <div class="nav_menu">
+            <nav>
+              <div class="nav toggle">
+                <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+              </div>
 
-	<!-- Contains page content -->
-	<div class="content-wrapper">
-		<section class="content-header">
-			<h1>{% block contentTitle %}{% endblock %}</h1>
-		</section>
+              <ul class="nav navbar-nav navbar-right">
+                <li class="">
+                  <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    <img src="{{user.picture}}" alt="">{{user.user}}
+                    <span class=" fa fa-angle-down"></span>
+                  </a>
+                  <ul class="dropdown-menu dropdown-usermenu pull-right">
+                    <li><a href="javascript:;">{% trans 'dashProfile' %}</a></li>
+                    <li>
+                      <a href="javascript:;">
+                        <span>{% trans 'dashSettings' %}</span>
+                      </a>
+                    </li>
+                    <li><a href="login.html"><i class="fa fa-sign-out pull-right"></i>{% trans 'dashLogout' %}</a></li>
+                  </ul>
+                </li>
 
-		<section class="content">
-			<div id="metronus-app">
-				{% block content %}{% endblock %}
-			</div>
-		</section>
-	</div>
+                <li role="presentation" class="dropdown">
+                  <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
+                    <i class="fa fa-envelope-o"></i>
+                    <span class="badge bg-green">6</span>
+                  </a>
+                  <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
+                  </ul>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+        <!-- /top navigation -->
 
-	{% include './theme/footer.html' %}
+				<div class="right_col" role="main">
+          <div class="">
+						{% block content %}{% endblock %}
+					</div>
+				</div>
+      </div>
+    </div>
 
-	{% include './theme/sidebar.html' %}
+		<script src="/static/js/jquery.min.js"></script>
+	  <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/fastclick.js"></script>
+    <script src="/static/js/nprogress.js"></script>
+		<script src="/static/js/Chart.min.js"></script>
+		<script src="/static/js/gauge.min.js"></script>
+		<script src="/static/js/bootstrap-progressbar.min.js"></script>
+		<script src="/static/js/icheck.min.js"></script>
+		<script src="/static/js/skycons.min.js"></script>
 
-	<!-- Metronus -->
-	<script src="/static/js/functions.js"></script>
+    <!-- Flot -->
+		<script src="/static/js/jquery.flot.js"></script>
+		<script src="/static/jsjquery.flot.pie.js"></script>
+		<script src="/static/js/jquery.flot.time.js"></script>
+		<script src="/static/js/jquery.flot.stack.js"></script>
+		<script src="/static/js/jquery.flot.resize.js"></script>
 
-	<!-- Vue -->
-	<script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <!-- Flot plugins -->
+		<script src="/static/js/jquery.flot.orderBars.js"></script>
+		<script src="/static/js/jquery.flot.spline.min.js"></script>
+		<script src="/static/js/curvedLines.js"></script>
 
-	<!-- Element -->
-	<script src="https://unpkg.com/element-ui/lib/index.js"></script>
-	<script src="/static/app.js"></script>
+    <!-- DateJS -->
+		{% get_current_language as LANGUAGE_CODE %}
 
-	<!-- jQuery -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+		{% if LANGUAGE_CODE == "en" %}
+			<script src="/static/js/date.js"></script>
+		{% else %}
+			<script src="/static/js/date-es-ES.js"></script>
+		{% endif %}
 
-	<!-- Bootstrap -->
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-	<script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+    <!-- JQVMap -->
+		<script src="/static/js/jquery.vmap.js"></script>
+		<script src="/static/js/jquery.vmap.world.js"></script>
+		<script src="/static/js/jquery.vmap.sampledata.js"></script>
 
-	<!-- Boostrap Theme -->
-	<script src="/static/js/app.min.js"></script>
+    <!-- bootstrap-daterangepicker -->
+		<script src="/static/js/moment.min.js"></script>
+		<script src="/static/js/daterangepicker.js"></script>
 
-	<!-- Bootstrap validator -->
-	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/js/bootstrapvalidator.min.js"></script>
-	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/4.3.8/js/fileinput.min.js"></script>
-	
-	{% block javascript %} {% endblock %}
-
-</div>
-</body>
-
+    <!-- Custom Theme Scripts -->
+		<script src="/static/js/custom_log.min.js"></script>
+  </body>
 </html>
