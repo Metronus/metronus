@@ -42,7 +42,7 @@
 
 
             <div class="row">
-                <div class="form-actions col-xs-12 row-centered">
+                <div class="form-actions col-xs-12 text-center">
                     <input type="submit" class="btn btn-primary" value="{% trans 'confirm' %}" />
                     <a class="btn btn-danger" href="{% url 'project_list' %}">{% trans 'cancel' %}</a>
                     {% if form.project_id.value|slugify == '0' %}
