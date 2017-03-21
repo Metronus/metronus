@@ -76,7 +76,8 @@ urlpatterns += [#i18n_patterns(
     # TimeLogs
     url(r'^timeLog/list_all/$', timeLogController.list_all, name='timeLog_list_all'),
     url(r'^timeLog/list/(?P<task_id>\w{0,50})/$', timeLogController.list, name='timeLog_list'),
-    url(r'^timeLog/create/(?P<task_id>\w{0,50})/$', timeLogController.create, name='timeLog_create'),
+    url(r'^timeLog/create/(?P<task_id>\w{0,50})/$', timeLogController.create_by_task, name='timeLog_create_by_task'),
+    url(r'^timeLog/create_all/$', timeLogController.create_all, name='timeLog_create_all'),
     url(r'^timeLog/edit/(?P<timeLog_id>\w{0,50})/$', timeLogController.edit, name='timeLog_edit'),
     url(r'^timeLog/delete/(?P<timeLog_id>\w{0,50})/$', timeLogController.delete, name='timeLog_delete'),
 

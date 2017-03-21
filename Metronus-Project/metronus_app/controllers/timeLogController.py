@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect
 from metronus_app.forms.timeLogForm import TimeLogForm
+from metronus_app.forms.timeLog2Form import TimeLog2Form
 from metronus_app.model.task import Task
 from django.shortcuts import render_to_response, get_object_or_404
 from metronus_app.common_utils import get_current_admin_or_403,get_current_employee_or_403
@@ -14,7 +15,30 @@ from django.http                        import HttpResponseForbidden
 from django.contrib.auth import authenticate,login
 from datetime import date,datetime
 
-def create(request,task_id):
+def create_all(request):
+    employee = get_current_employee_or_403(request)
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = TimeLog2Form(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            # ...
+            # redirect to a new URL:
+            task = findTask(form.cleaned_data['task_id'])
+            if task is not None:
+                createTimeLog(form,task,employee)
+                return redirect('timeLog_list_all')
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = TimeLog2Form(request,initial={"timeLog_id":0, "workDate":datetime.now()})
+
+
+    return render(request, 'timeLog/timeLog_form.html', {'form': form})
+
+def create_by_task(request,task_id):
     employee = get_current_employee_or_403(request)
     task = findTask(task_id)
     checkPermissionForTask(employee,task)
