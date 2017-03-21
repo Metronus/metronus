@@ -58,46 +58,61 @@ $(document).ready(function() {
 <h1 align="center"> {% trans 'editRole' %} </h1></br>
 {% endif %}
 
+{% if form.errors %}
+<div id="errorDiv" class="alert alert-danger">
+        <p>{{ form.errors }}</p>
+</div></script>
+{% endif %}
+
+
 
         <form id="register_form" method="POST" action="" class="form-horizontal" align="center">{% csrf_token %}
 
 	    <div class="form-group company_class form-class" >
-          <label class="control-label col-sm-4" for="id_{{ form.department_id.name }}">{% trans 'department' %}</label>
-            <div class="col-sm-6">
-              <select class="selectpicker col-md-6" name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}">
-              <option value="" selected>{% trans 'selectDepartment' %}</option>
-              	{% for dep in departments %}
-    				<option value="{{ dep.id }}"{% if form.department_id.value == dep.id %} selected{% endif %}>{{ dep.name }}</option>
-				{% endfor %}
-              </select>
-			</div>
-			<label class="control-label col-sm-4" for="id_{{ form.project_id.name }}">{% trans 'project' %}</label>
-            <div class="col-sm-6">
-              <select class="selectpicker col-md-6" name="{{ form.project_id.name }}" id="id_{{ form.project_id.name }}">
-              <option value="" selected>{% trans 'selectProject' %}</option>
-              	{% for dep in projects %}
-    				<option value="{{ dep.id }}"{% if form.project_id.value == dep.id %} selected{% endif %}>{{ dep.name }}</option>
-				{% endfor %}
-              </select>
-			</div>
-			<label class="control-label col-sm-4" for="id_{{ form.role_id.name }}">{% trans 'rol' %}</label>
-			<div class="col-sm-6">
-              <select class="selectpicker col-md-6" name="{{ form.role_id.name }}" id="id_{{ form.role_id.name }}">
-              <option value="" selected>{% trans 'selectRole' %}</option>
-              	{% for dep in roles %}
-    				<option value="{{ dep.id }}"{% if form.role_id.value == dep.id %} selected{% endif %}>{{ dep.name }}</option>
-				{% endfor %}
-              </select>
-			</div>
-
-
+	    	<p align="center">
+          		<label class="control-label col-sm-4" for="id_{{ form.department_id.name }}">{% trans 'department' %}</label>
+            	<div class="col-sm-6">
+              		<select class="selectpicker col-md-6" name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}">
+	              		<option value="" selected>{% trans 'selectDepartment' %}</option>
+	              		{% for dep in departments %}
+	    					<option value="{{ dep.id }}"{% if form.department_id.value == dep.id %} selected{% endif %}>{{ dep.name }}</option>
+						{% endfor %}
+              		</select>
+				</div>
+				<br>
+			</p>
+			<p align="center">
+				<label class="control-label col-sm-4" for="id_{{ form.project_id.name }}">{% trans 'project' %}</label>
+            	<div class="col-sm-6">
+              		<select class="selectpicker col-md-6" name="{{ form.project_id.name }}" id="id_{{ form.project_id.name }}">
+	              		<option value="" selected>{% trans 'selectProject' %}</option>
+	              		{% for dep in projects %}
+	    				<option value="{{ dep.id }}"{% if form.project_id.value == dep.id %} selected{% endif %}>{{ dep.name }}</option>
+						{% endfor %}
+              		</select>
+				</div>
+				<br>
+			</p>
+			<p align="center">
+				<label class="control-label col-sm-4" for="id_{{ form.role_id.name }}">{% trans 'rol' %}</label>
+				<div class="col-sm-6">
+	              <select class="selectpicker col-md-6" name="{{ form.role_id.name }}" id="id_{{ form.role_id.name }}">
+		              <option value="" selected>{% trans 'selectRole' %}</option>
+		             	{% for dep in roles %}
+		    			<option value="{{ dep.id }}"{% if form.role_id.value == dep.id %} selected{% endif %}>{{ dep.name }}</option>
+						{% endfor %}
+	              </select>
+				</div>
+			</p>
               <input type="text" hidden="true" name="{{ form.employee_id.name }}" id="id_{{ form.employee_id.name }}" value="{{ form.employee_id.value}}">
               <input type="text" hidden="true" name="{{ form.employeeRole_id.name }}" id="id_{{ form.employeeRole_id.name }}" value="{{ form.employeeRole_id.value}}">
              </div>
 	    </br>
+	    <p align="center">
 	    <div align="center" >
 	    	<input type="submit" class="btn btn-success submit-button" value="{% trans 'confirm' %}" />
 	    </div>
+	    </p>
     </form>
 
 

@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load l10n %}
 {% block title %}
-{% if  form.department_id.value == 0 %}
+{% if  request.path == '/department/create'%}
 {% trans 'createDepartment' %}
 {% else %}
 {% trans 'editDepartment' %}
@@ -64,8 +64,9 @@ function ajax(){
 
 {% endblock %}
 
+
 {% block content %}
-		{% if  form.department_id.value is 0%}
+		{% if  request.path == '/department/create'%}
 			<h1 align="center"> {% trans 'createDepartment' %} </h1></br>
 		{% else %}
 			<h1 align="center"> {% trans 'editDepartment' %} </h1></br>
@@ -91,7 +92,7 @@ function ajax(){
 	    </br>
 	    <div align="center" >
 		    <input type="submit" class="btn btn-success submit-button" value="{% trans 'confirm' %}" />
-		    {% if  form.department_id.value is 0%}
+		    {% if  request.path == '/department/create'%}
 		    	<input type="button" class="btn btn-success submit-button" value="{% trans 'departmentAdd' %}" onclick="ajax();" />
 		    {% endif %}
 		</div>
