@@ -125,7 +125,7 @@ class RoleTestCase(TestCase):
             department_id=department1
         )
 
-        role1 = Role.objects.create(name="Administrator")
+    
         role2 = Role.objects.create(name="Project manager")
         role3 = Role.objects.create(name="Department manager")
         role4 = Role.objects.create(name="Coordinator")
@@ -342,7 +342,7 @@ class RoleTestCase(TestCase):
         projdepts_before = ProjectDepartment.objects.all().count()
         employeeroles_before = ProjectDepartmentEmployeeRole.objects.all().count()
         role_before = ProjectDepartmentEmployeeRole.objects.get(employee_id=employee, projectDepartment_id__project_id=old_project, projectDepartment_id__department_id=old_department)
-        
+
         response = c.post("/roles/manage", {
             'employee_id': employee.id,
             'department_id': department.id,
@@ -355,7 +355,7 @@ class RoleTestCase(TestCase):
 
         projdepts_after = ProjectDepartment.objects.all().count()
         employeeroles_after = ProjectDepartmentEmployeeRole.objects.all().count()
-        
+
         self.assertEquals(projdepts_before + 1, projdepts_after)
         self.assertEquals(employeeroles_before + 1, employeeroles_after)
 

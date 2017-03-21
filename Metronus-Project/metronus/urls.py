@@ -50,8 +50,8 @@ urlpatterns += [#i18n_patterns(
 
     #a la espera de ponerle el name
     url(r'^task/create$', taskController.create, name='task_create'),
-    url(r'^task/list_project/(?P<project_id>\w{0,50})/$', taskController.list_project, name='task_list_project'),
-    url(r'^task/list_department/(?P<department_id>\w{0,50})/$', taskController.list_department, name='task_list_department'),
+    url(r'^task/list$', taskController.list, name='task_list'),
+    url(r'^task/view/(?P<task_id>\w{0,50})/$', taskController.view, name='task_view'),
     url(r'^task/edit/(?P<task_id>\w{0,50})/$', taskController.edit, name='task_edit'),
     url(r'^task/delete/(?P<task_id>\w{0,50})/$', taskController.delete, name='task_delete'),
 

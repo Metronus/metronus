@@ -120,14 +120,13 @@ def checkPermissionForTask(employee, task):
 
 #Comprobacion para saber si el empleado es un mando superior y tiene acceso a todas las imputaciones de una tarea
 def checkRoleForTask(employee, task):
-    isAdminOrTeamManager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee,
-                                                                        role_id__name__in=["Administrator",
-                                                                                           "Team manager"])
-    res = isAdminOrTeamManager.count() > 0
+    isTeamManager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee,
+                                                                        role_id__name="Team manager")
+    res = isTeamManager.count() > 0
     if not res:
         roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee,
                                                              projectDepartment_id=task.projectDepartment_id,
-                                                             role_id__name__in=["Project manager", "Department manager",
+                                                             role_id__name__in=["Project manager",
                                                                                 "Coordinator"])
         res = roles.count() > 0
     return res

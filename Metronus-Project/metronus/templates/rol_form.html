@@ -43,7 +43,7 @@ $(document).ready(function() {
                     },
                 }
             },
-            
+
         },
     });
 });
@@ -57,7 +57,7 @@ $(document).ready(function() {
 {% else %}
 <h1 align="center"> {% trans 'editRole' %} </h1></br>
 {% endif %}
-    
+
 
         <form id="register_form" method="POST" action="" class="form-horizontal" align="center">{% csrf_token %}
 
@@ -89,8 +89,8 @@ $(document).ready(function() {
 				{% endfor %}
               </select>
 			</div>
-	
-              
+
+
               <input type="text" hidden="true" name="{{ form.employee_id.name }}" id="id_{{ form.employee_id.name }}" value="{{ form.employee_id.value}}">
               <input type="text" hidden="true" name="{{ form.employeeRole_id.name }}" id="id_{{ form.employeeRole_id.name }}" value="{{ form.employeeRole_id.value}}">
              </div>

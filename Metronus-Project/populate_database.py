@@ -153,10 +153,6 @@ def basicLoad():
         employee_id=emp10,
         role_id=emp_role )
 
-    ProjectDepartmentEmployeeRole.objects.create(
-        projectDepartment_id=pd1,
-        employee_id=emp4,
-        role_id=Role.objects.get(name="Administrator") )
 
     Task.objects.create(
         name  ="Hacer cosas",
@@ -200,9 +196,7 @@ def create_user(nombre,company2):
         company_id=company2)
 
 def populate_roles():
-    Role.objects.create(name="Administrator")
     Role.objects.create(name="Project manager")
-    Role.objects.create(name="Department manager")
     Role.objects.create(name="Coordinator")
     Role.objects.create(name="Team manager")
     Role.objects.create(name="Employee")

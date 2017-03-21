@@ -280,9 +280,9 @@ def checkRoleForList(dep,request):
         raise PermissionDenied
 
     if actor.user_type!='A':
-        isAdminOrTeamManager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                    role_id__name__in=["Administrator" , "Team manager"])
-        res=isAdminOrTeamManager.count()>0
+        isTeamManager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+                    role_id__name= "Team manager")
+        res=isTeamManager.count()>0
 
         if not res:
             roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
