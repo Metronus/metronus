@@ -68,7 +68,7 @@ def manage(request):
             return HttpResponseRedirect('/employee/view/' + Employee.objects.get(id=form.cleaned_data["employee_id"]).user.username + '/')
     else:
         raise PermissionDenied
-
+    return render(request, 'rol_form.html', {'form': form})
 
 def delete(request, role_id):
     """
