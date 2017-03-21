@@ -63,8 +63,9 @@ def create(request):
     return render(request, 'task_form.html', {'form': form,'repeated_name':repeated_name})
 
 
-def list_project(request):
+def list_project(request,project_id):
     """
+    OJO: esta no debería servir, para eso esta la view de project
     returns:
     tasks: lista de tareas de la compañía logeada
 
@@ -73,12 +74,12 @@ def list_project(request):
     """
      # Check that the user is logged in
     employee = get_current_employee_or_403(request)
-    project_id=request.GET.get("project_id")
     checkRoleForList(employee,project_id,True)
     lista=Task.objects.filter(active=True, projectDepartment_id__project_id__id=project_id)
     return render(request, "task_list.html", {"tasks": lista})
-def list_department(request):
+def list_department(request,department_id):
     """
+    OJO: esta no debería servir, para eso esta la view de department
     returns:
     tasks: lista de tareas de la compañía logeada
 
@@ -87,14 +88,13 @@ def list_department(request):
     """
      # Check that the user is logged in
     employee = get_current_employee_or_403(request)
-    department_id=request.GET.get("department_id")
     checkRoleForList(employee,department_id,False)
     lista=Task.objects.filter(active=True, projectDepartment_id__department_id__id=department_id)
 
     return render(request, "task_list.html", {"tasks": lista})
 
 
-def edit(request):
+def edit(request,task_id):
     """
     parameters/returns:
     form: el formulario con los datos de la tarea
@@ -127,13 +127,13 @@ def edit(request):
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        task=get_object_or_404(Task,pk=request.GET.get("task_id"))
+        task=get_object_or_404(Task,pk=task_id)
         form = TaskForm(employee,initial={"name":task.name,"description":task.description,
                 "task_id":task.id})
 
     return render(request, 'task_form.html', {'form': form,'repeated_name':repeated_name})
 
-def delete(request):
+def delete(request,task_id):
     """
     parameters:
     task_id: the task id to delete
@@ -146,7 +146,7 @@ def delete(request):
     """
      # Check that the user is logged in
     employee = get_current_employee_or_403(request)
-    task=get_object_or_404(Task,pk=request.GET.get("task_id"),active=True)
+    task=get_object_or_404(Task,pk=task_id,active=True)
     checkTask(task,employee)
     deleteTask(task)
 

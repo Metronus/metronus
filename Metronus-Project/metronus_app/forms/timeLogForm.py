@@ -6,13 +6,11 @@ from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEm
 from metronus_app.model.task import Task
 
 class TimeLogForm(forms.Form):
-    description = forms.CharField(label=_("description"),max_length=200)
-    workDate = forms.DateTimeField()
-    duration = forms.IntegerField(label=_("duration"))
+    description = forms.CharField(label=_("description"),max_length=200,
+                                  widget=forms.TextInput(attrs={'class':'form-control'}))
+    workDate = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'class':'form-control timepicker'}))
+    duration = forms.IntegerField(label=_("duration"),
+                                  widget=forms.NumberInput(attrs={'class':'form-control'}))
+
     timeLog_id = forms.IntegerField(widget=forms.HiddenInput())
-
-    def __init__(self, projectDepartment, *args, **kwargs):
-        super(TimeLogForm, self).__init__(*args, **kwargs)
-        tasks = Task.objects.filter(projectDepartment_id = projectDepartment.id)
-        self.fields['task_id'] = forms.ModelChoiceField(queryset = tasks)
-
+    task_id = forms.IntegerField(widget=forms.HiddenInput())

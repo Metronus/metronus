@@ -1,0 +1,111 @@
+{% extends "layout_base.html" %}
+{% load i18n %}
+{% load l10n %}
+
+{% block title %}
+    {% if form.project_id.value|slugify == '0' %}
+        {% trans 'createProject' %}
+    {% else %}
+        {% trans 'editProject' %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if form.project_id.value|slugify == '0' %}
+        <h1> {% trans 'createProject' %} </h1></br>
+    {% else %}
+        <h1> {% trans 'editProject' %} </h1></br>
+    {% endif %}
+
+    <div id="alert_placeholder"></div>
+
+    {% if repeated_name %}
+        <div id="repeated_name" class="alert alert-warning alert-dismissible" role="alert">
+            <a class="close" data-dismiss="alert">x</a>
+            <span>{% trans 'projectName' %}</span>
+        </div>
+    {% endif %}
+
+    <form id="form" method="POST" class="form-horizontal">{% csrf_token %}
+        <div class="row">
+            {% for field in form.visible_fields %}
+                <div class="form-group">
+                    <label class="control-label col-md-3 col-xs-12" for="id_{{ field.name }}">{{ field.label }}</label>
+                    <div class="col-md-7 col-xs-12">
+                        <input class="form-control" name="{{ field.name }}" id="id_{{ field.name }}"
+                               type="text" value="{{ field.value|default_if_none:"" }}">
+                    </div>
+                </div>
+            {% endfor %}
+
+            {% for field in form.hidden_fields %}{{ field }}{% endfor %}
+
+
+            <div class="row">
+                <div class="form-actions col-xs-12 row-centered">
+                    <input type="submit" class="btn btn-primary" value="{% trans 'confirm' %}" />
+                    <a class="btn btn-danger" href="{% url 'project_list' %}">{% trans 'cancel' %}</a>
+                    {% if form.project_id.value|slugify == '0' %}
+                        <a class="btn btn-info" onclick="createAndContinue()">{% trans 'createAndContinue' %}</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block javascript %}
+<script>
+function error_alert(){
+    showalert('{% trans 'projectError' %}','alert-error');
+}
+function success_alert(){
+    showalert('{% trans 'projectSaved' %}','alert-success');
+}
+function repeated_alert(){
+    showalert('{% trans 'projectName' %}','alert-warning');
+}
+/**
+ * Función ajax de crear y continuar
+ * */
+function createAndContinue() {
+    $.post('{% url 'project_create_async' %}',$('#form').serialize(), function(data,status) {
+        document.getElementById('form').reset();
+        $('#form').data('bootstrapValidator').resetForm();
+
+        if(JSON.stringify(data['success'])=="true"){
+            success_alert();
+        } else if(JSON.stringify(data['repeated_name'])=="true") {
+            repeated_alert();
+        } else {
+            error_alert();
+        }
+    } );
+};
+
+
+/**
+ * Validación en cliente del formulario
+ * */
+$(document).ready(function() {
+    $('#form').bootstrapValidator({
+        feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+            name: {
+                validators: {
+                    notEmpty: {
+                        message: "{% trans 'projectNameNotNull' %}"
+                    },
+                }
+            },
+
+
+        },
+    });
+});
+</script>
+{% endblock %}

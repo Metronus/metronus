@@ -1,7 +1,7 @@
 {% extends "layout_base.html" %}
 {% load i18n %}
 {% load l10n %}
-{% block title %}{% trans 'companyList' %}{% endblock %}
+{% block title %}{% trans 'companyView' %}{% endblock %}
 
 {% block content %}
 <h1><strong>{{company.company_name}} </strong>{{company.name}}</h1>
@@ -35,7 +35,7 @@
                     <td>{{company.email}}</td>
 
 
-                    <td><a href="/company/edit/{{company.cif}}" type="button" class="btn bg-orange">{% trans 'edit' %}</a></td>
+                    <td><a href="/company/edit/" type="button" class="btn bg-orange">{% trans 'edit' %}</a></td>
                 </tr>
             
               </tbody>
@@ -75,7 +75,7 @@
 
                     <td>{{admin.registryDate}}</td>
 
-                    <td><a href="/employee/view/{{employee.user}}" type="button" class="btn bg-orange btn-flat">{% trans 'edit' %}</a></td>
+                    <td><a href="/administrator/edit/{{admin.user}}" type="button" class="btn bg-orange btn-flat">{% trans 'edit' %}</a></td>
 
                 </tr>
             

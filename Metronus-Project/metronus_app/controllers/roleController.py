@@ -70,6 +70,28 @@ def manage(request):
         raise PermissionDenied
 
 
+def delete(request, role_id):
+    """
+    url: /roles/delete/<role_id>
+
+    parameters/returns:
+    role_id: id del rol a borrar
+
+    returns: redirecciona a la vista del empleado en cuestión o devuelve 404 (si no existe) / 403 (si no está autorizado)
+    """
+
+    admin = get_current_admin_or_403(request)
+    role = get_object_or_404(ProjectDepartmentEmployeeRole, id=role_id)
+
+    if(role.employee_id.company_id != admin.company_id):
+        raise PermissionDenied
+
+    employee_username = role.employee_id.user.username
+    role.delete()
+
+    return HttpResponseRedirect('/employee/view/' + employee_username)
+
+
 ########################################################################################################################################
 ########################################################################################################################################
 ########################################################################################################################################

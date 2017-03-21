@@ -39,25 +39,27 @@ urlpatterns += [#i18n_patterns(
     url(r'^$', views.index),
     url(r'^index.html/$', views.index, name='home'),
 
-    url(r'^department/create$', departmentController.create),
+    url(r'^department/create$', departmentController.create, name='department_create'),
     url(r'^department/createAsync$', departmentController.createAsync),
-    url(r'^department/list$', departmentController.list),
-    url(r'^department/edit$', departmentController.edit),
-    url(r'^department/view$', departmentController.view),
-    url(r'^department/delete$', departmentController.delete),
+    url(r'^department/list$', departmentController.list, name='department_list'),
+    url(r'^department/list_for_employees$', departmentController.list_for_employees),
+    url(r'^department/edit/(?P<department_id>\w{0,50})/$', departmentController.edit, name='department_edit'),
+    url(r'^department/view/(?P<department_id>\w{0,50})/$', departmentController.view, name='department_view'),
+    url(r'^department/delete/(?P<department_id>\w{0,50})/$', departmentController.delete, name='department_delete'),
 
     #a la espera de ponerle el name
-    url(r'^task/create$', taskController.create),
-    url(r'^task/list_project$', taskController.list_project),
-    url(r'^task/list_department$', taskController.list_department),
-    url(r'^task/edit$', taskController.edit),
-    url(r'^task/delete$', taskController.delete),
+    url(r'^task/create$', taskController.create, name='task_create'),
+    url(r'^task/list_project/(?P<project_id>\w{0,50})/$', taskController.list_project, name='task_list_project'),
+    url(r'^task/list_department/(?P<department_id>\w{0,50})/$', taskController.list_department, name='task_list_department'),
+    url(r'^task/edit/(?P<task_id>\w{0,50})/$', taskController.edit, name='task_edit'),
+    url(r'^task/delete/(?P<task_id>\w{0,50})/$', taskController.delete, name='task_delete'),
 
     url(r'^project/list$', projectController.list, name='project_list'),
     url(r'^project/edit/(?P<project_id>\w{0,50})/$', projectController.edit, name='project_edit'),
     url(r'^project/show/(?P<project_id>\w{0,50})/$', projectController.show, name='project_show'),
     url(r'^project/delete/(?P<project_id>\w{0,50})/$', projectController.delete, name='project_delete'),
     url(r'^project/create$', projectController.create, name='project_create'),
+    url(r'^project/createAsync$', projectController.createAsync, name='project_create_async'),
 
     url(r'^projectdepartment/create$', projectDepartmentController.create, name='projectdepartment_create'),
     url(r'^projectdepartment/list$', projectDepartmentController.list, name='projectdepartment_list'),
@@ -77,15 +79,17 @@ urlpatterns += [#i18n_patterns(
     url(r'^timeLog/edit/(?P<timeLog_id>\w{0,50})/$', timeLogController.edit, name='timeLog_edit'),
     url(r'^timeLog/delete/(?P<timeLog_id>\w{0,50})/$', timeLogController.delete, name='timeLog_delete'),
 
+    # Roles
     url(r'^roles/manage$', roleController.manage, name='roles_manage'),
+    url(r'^roles/delete/(?P<role_id>\d{0,50})/$', roleController.delete, name='roles_delete'),
 
     # Administrator
     url(r'^administrator/edit/(?P<username>\w{0,50})/$', administratorController.edit, name='administrator_edit'),
-    url(r'^administrator/view/(?P<username>\w{0,50})/$', administratorController.view, name='administrator_edit'),
+    # url(r'^administrator/view/(?P<username>\w{0,50})/$', administratorController.view, name='administrator_edit'),
 
     # Company
-    url(r'^company/edit/(?P<cif>\w{9})/$', companyController.edit, name='company_edit'),
-    url(r'^company/view/(?P<cif>\w{9})/$', companyController.view, name='company_view'),
+    url(r'^company/edit/$', companyController.edit, name='company_edit'),
+    url(r'^company/view/$', companyController.view, name='company_view'),
     url(r'^company/delete/$', companyController.view, name='company_view'),
 
     # Login

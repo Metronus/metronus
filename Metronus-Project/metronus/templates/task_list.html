@@ -34,8 +34,11 @@
                     <td>{{task.registryDate}}</td>
 
                     <td>
-                      <a href="/task/edit" type="button" class="btn bg-orange btn-flat">{% trans 'edit' %}</a>
-                      <a href="/task/delete" type="button" class="btn bg-maroon btn-flat">{% trans 'delete' %}</a>
+                      <a href="{% url 'task_edit' task.id %}" type="button" class="btn btn-primary">{% trans 'edit' %}</a>
+                      <a class="btn btn-danger" onclick="removealert('{% url 'task_delete' task.id %}');">
+                          {% trans 'delete' %}
+                      </a>
+
                     </td>
                 </tr>
                 {% endfor %}
@@ -44,7 +47,7 @@
             </div>
           </div>
 
-                      <a href="/employee/create" type="button" class="btn bg-purple btn-flat">{% trans 'new' %}</a>
+                      <a href="/task/create" type="button" class="btn bg-purple btn-flat">{% trans 'new' %}</a>
         </div>
       </div>
 

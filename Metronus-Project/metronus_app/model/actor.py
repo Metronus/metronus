@@ -20,7 +20,7 @@ class Actor(models.Model):
     registryDate = models.DateTimeField(auto_now=True)
 
     picture = models.ImageField(upload_to="actor", blank=True, null=True,
-                                default=os.path.join(settings.STATIC_ROOT, 'avatar.png'))
+                                default=os.path.join(settings.STATIC_URL, 'avatar.png'))
 
     def __unicode__(self):
         return self.identifier
