@@ -343,6 +343,10 @@ msgid "selectRole"
 msgstr "Choose a role"
 msgid "roleConfirm"
 msgstr "Are you sure about deleting this role? All information related to it will be erased too"
+msgid "roleSaved"
+msgstr "Role was saved succesfully"
+msgid "roleError"
+msgstr "Role was not saved succesfully"
 
 #: Company
 msgid "registerCompany"

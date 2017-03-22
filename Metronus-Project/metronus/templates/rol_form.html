@@ -59,10 +59,10 @@ function ajax(){
     	if(JSON.stringify(data['success'])=="true"){
     		$('#errorDiv').attr('hidden', true);
     		$('#error2Div').attr('hidden', true);
-    		$('#successDiv').attr('hidden', false).html("<strong>{% trans 'success' %} | </strong>{% trans 'departmentSaved' %}");
+    		$('#successDiv').attr('hidden', false).html("<strong>{% trans 'success' %} | </strong>{% trans 'roleSaved' %}");
     	}else{
     		$('#successDiv').attr('hidden', true);
-    		$('#errorDiv').attr('hidden', false).html("<strong>{% trans 'fail' %} | </strong>{% trans 'departmentError' %}"); 
+    		$('#errorDiv').attr('hidden', false).html("<strong>{% trans 'fail' %} | </strong>{% trans 'roleError' %}"); 
     	}
        	
     });

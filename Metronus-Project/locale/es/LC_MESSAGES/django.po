@@ -344,6 +344,10 @@ msgid "selectRole"
 msgstr "Seleccione un rol"
 msgid "roleConfirm"
 msgstr "¿Está seguro de eliminar el rol? Se eliminará también todo lo relacionado con el mismo"
+msgid "roleSaved"
+msgstr "El rol se guardó correctamente"
+msgid "roleError"
+msgstr "El rol no se pudo guardar correctamente"
 
 #: Company
 msgid "registerCompany"
