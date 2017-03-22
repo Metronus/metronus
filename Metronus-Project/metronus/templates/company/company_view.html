@@ -1,0 +1,91 @@
+{% extends "layout_base.html" %}
+{% load i18n %}
+{% load l10n %}
+{% block title %}{% trans 'companyView' %}{% endblock %}
+
+{% block content %}
+<h1><strong>{{company.company_name}} </strong>{{company.name}}</h1>
+<h2>{% trans 'company_info' %}</h2>
+<div class="row">
+        <div class="col-xs-12">
+          <div class="box">
+            <!-- /.box-header -->
+            <div class="box-body table-responsive no-padding">
+              <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>{% trans 'companyName' %}</th>
+                  <th>{% trans 'cif' %}</th>
+                  <th>{% trans 'short_name' %}</th>
+                  <th>{% trans 'company_phone' %}</th>
+                  <th>{% trans 'company_email' %}</th>
+
+                </tr>
+              </thead>
+              <tbody>
+               
+                <tr>
+                    <td>{{company.company_name}}</td>
+
+                    <td>{{company.cif}}</td>
+
+                    <td>{{company.short_name}}</td>
+
+                    <td>{{company.phone}}</td>
+                    <td>{{company.email}}</td>
+
+
+                    <td><a href="/company/edit/" type="button" class="btn bg-orange">{% trans 'edit' %}</a></td>
+                </tr>
+            
+              </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+<h2>{% trans 'admin_info' %}</h2>
+<div class="row">
+        <div class="col-xs-12">
+          <div class="box">
+            <!-- /.box-header -->
+            <div class="box-body table-responsive no-padding">
+              <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>{% trans 'username' %}</th>
+                  <th>{% trans 'email' %}</th>
+                  <th>{% trans 'identifier' %}</th>
+                  <th>{% trans 'phone' %}</th>
+                  <th>{% trans 'registryDate' %}</th>
+
+                </tr>
+              </thead>
+              <tbody>
+               
+                <tr>
+                    <td>{{admin.user.username}}</td>
+
+                    <td>{{admin.user.email}}</td>
+
+                    <td>{{admin.identifier}}</td>
+
+                    <td>{{admin.phone}}</td>
+
+                    <td>{{admin.registryDate}}</td>
+
+                    <td><a href="/administrator/edit/{{admin.user}}" type="button" class="btn bg-orange btn-flat">{% trans 'edit' %}</a></td>
+
+                </tr>
+            
+              </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+{% endblock %}
+
+{% block javascript %}
+{% endblock %}

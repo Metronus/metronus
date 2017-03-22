@@ -1,0 +1,38 @@
+{% extends "layout_base.html" %}
+
+{% load i18n %}
+{% load l10n %}
+
+{% block title %}{% trans 'timeLogList' %}{% endblock %}
+
+{% block content %}
+    <h1>{% trans 'timeLogList' %}</h1>
+
+    <br>
+    <div id="alert_placeholder"></div>
+    <br>
+
+    <div class="panel {% if task.active %}panel-primary{% else %}panel-danger{% endif %}">
+        <div class="panel-heading">{{ task.name }}</div>
+        <div class="panel-body"><p>{{ task.description }}</p></div>
+
+        <div class="list-group">
+            {% for timeLog in timeLogs %}
+                <a href="{% url 'timeLog_edit' timeLog.id %}" class="list-group-item">
+                    <span class="badge">{{ timeLog.duration }}</span>
+                    <h4 class="list-group-item-heading">{{ timeLog.workDate }}</h4>
+                    <p class="list-group-item-text">{{ timeLog.description }}</p>
+                </a>
+
+            {% empty %}
+                <a href="{% url 'timeLog_create_by_task' task.id %}" class="list-group-item">{% trans 'timeLogNot' %}</a>
+
+            {% endfor %}
+        </div>
+    </div>
+
+    <br>
+
+    <a class="btn btn-primary" href="{% url 'timeLog_create_by_task' task.id %}">{% trans 'createTimeLog' %}</a>
+
+{% endblock %}

@@ -1,0 +1,33 @@
+language: python
+python: 3.5.2
+
+services:
+  - postgresql
+
+env:
+  global:
+    - DJANGO=1.10.4
+    - DJANGO_SETTINGS_MODULE=metronus.settings
+    - PYTHONPATH=$HOME/builds/Metronus/metronus
+    - PIP_USE_MIRRORS=true
+    - METRONUS_DB_NAME=metronus_db_travis
+    - METRONUS_DB_USER=metronus_user_travis
+    - METRONUS_DB_PASS=metronus_pass_travis
+    - DJANGO_SECRET_KEY=travistravistravistravistravistravistravis
+
+cache: pip3
+
+install:
+  - pip install -r requirements.txt
+
+before_script:
+  - psql -c "CREATE USER $METRONUS_DB_USER WITH PASSWORD '$METRONUS_DB_PASS';" -U postgres
+  - psql -c "ALTER USER $METRONUS_DB_USER CREATEDB;" -U postgres
+  - psql -c "CREATE DATABASE $METRONUS_DB_NAME;" -U postgres
+  - psql -c "GRANT ALL PRIVILEGES ON DATABASE $METRONUS_DB_NAME TO $METRONUS_DB_USER;" -U postgres
+  - cd $TRAVIS_BUILD_DIR/Metronus-Project/
+
+script:
+  - python3 manage.py makemigrations --noinput && python3 manage.py migrate --noinput
+  - python3 manage.py populate
+  - python3 manage.py test

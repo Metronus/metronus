@@ -1,0 +1,95 @@
+{% extends "anon_master.html" %}
+{% load i18n %}
+{% load l10n %}
+{% load custom_tags %}
+
+{% block title %}{% trans 'registerCompany' %}{% endblock %}
+{% block content %}
+<body>
+  <!-- versión anterior: http://pastebin.com/cupm22xH -->
+  <!-- page content -->
+  <div class="container body">
+  <div class="right_col" role="main">
+    <div class="">
+      <div class="clearfix"></div>
+
+      <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel">
+            <div class="x_content">
+              <!-- Smart Wizard -->
+              <form id="register_form" method="POST" class="form-horizontal" data-toggle="validator" role="form" action="" enctype="multipart/form-data">
+                {% csrf_token %}
+              <div id="wizard" class="form_wizard wizard_horizontal">
+                <ul class="wizard_steps">
+                  <li>
+                    <a href="#step-1">
+                      <span class="step_no">1</span>
+                      <span class="step_descr">
+                          {% trans 'registerCompanyMenu' %}<br />
+                          <small>{% trans 'registerCompanyMenuInfo' %}</small>
+                      </span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#step-2">
+                      <span class="step_no">2</span>
+                      <span class="step_descr">
+                          {% trans 'registerCompanyAdmin' %}<br />
+                          <small>{% trans 'registerCompanyAdminInfo' %}</small>
+                      </span>
+                    </a>
+                  </li>
+                </ul>
+                <div id="step-1">
+                  <div id="form-step-0" role="form" data-toggle="validator">
+                    {% show_field form.cif  %}
+                    {% show_field form.company_name  %}
+                    {% show_field form.short_name  %}
+                    {% show_field form.company_email  %}
+                    {% show_field form.company_phone  %}
+                    {% show_field form.logo False %}
+                  <div class="help-block with-errors"></div>
+                  </div>
+                </div>
+
+                <div id="step-2">
+                  <div id="form-step-0" role="form" data-toggle="validator">
+
+                    {% show_field form.username %}
+                    {% show_field form.admin_email %}
+                    {% show_field form.password %}
+                    {% show_field form.repeatPassword %}
+                    {% show_field form.first_name %}
+                    {% show_field form.last_name  %}
+                    {% show_field form.admin_identifier  %}
+                    {% show_field form.admin_phone  %}
+                    <div class="help-block with-errors"></div>
+                  </div>
+                </div>
+
+              </div>
+            </form>
+              <!-- End SmartWizard Content -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<body>
+
+<script src="/static/js/jquery.min.js"></script>
+<script src="/static/js/bootstrap.min.js"></script>
+<script src="/static/js/fastclick.js"></script>
+<script src="/static/js/nprogress.js"></script>
+<script src="/static/js/jquery.smartWizard.js"></script>
+<script src="/static/js/custom.min.js"></script>
+
+<script type="text/javascript">
+  $(document).ready(function(){
+      $('#wizard').smartWizard();
+  });
+</script>
+{% endblock %}

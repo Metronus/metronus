@@ -1,0 +1,123 @@
+{% extends "layout_base.html" %}
+{% load i18n %}
+{% load l10n %}
+{% block title %}
+{{employee.user}}
+{% endblock %}
+
+{% block javascript %}
+
+<script>
+$('#confirm-delete').on('show.bs.modal', function(e) {
+    $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<h1>{% trans 'profile' %}</h1>
+
+<!-- Employee's profile card -->
+<div class="row row-centered">
+  <div class="col-md-5 col-centered">
+    <div class="box box-widget widget-user">
+      <!-- Background can be changed to a custom one -->
+      <div class="widget-user-header " style="background: #1a2226 center center; color: white">
+        <h3 class="widget-user-username">{{employee.user}}</h3>
+        <h5 class="widget-user-desc">{{employee.identifier}}</h5>
+      </div>
+      <div class="widget-user-image">
+        <img class="img-circle" src="/static/img/profile-picture.jpg" alt="User Avatar">
+      </div>
+
+      <!-- Roles/Departments/Projects Summary -->
+      <div class="box-footer">
+        <div class="row">
+          <div class="col-sm-4 border-right">
+            <div class="description-block">
+              <h5 class="description-header">0</h5>
+              <span class="description-text">{% trans 'roles' %}</span>
+            </div>
+          </div>
+          <div class="col-sm-4 border-right">
+            <div class="description-block">
+              <h5 class="description-header">0</h5>
+              <span class="description-text">{% trans 'departments' %}</span>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="description-block">
+              <h5 class="description-header">0</h5>
+              <span class="description-text">{% trans 'projects' %}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- More self info -->
+      <div class="box-body box-profile">
+        <ul class="list-group list-group-unbordered">
+          <li class="list-group-item">
+            <b>{% trans 'phone' %}</b> <span class="pull-right">{{employee.phone}}</span>
+          </li>
+          <li class="list-group-item">
+            <b>{% trans 'registryDate' %}</b> <span class="pull-right">{{employee.registryDate}}</span>
+          </li>
+        </ul>
+        <a href="/employee/list" class="btn bg-olive btn-flat margin"><b>{% trans 'backToList' %}</b></a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<div>
+<h2 align="center">{% trans 'roles' %}</h2>
+{% if employee_roles %}
+<table align="center" class="table table-striped">
+  <thead>
+    <tr>
+      <th class="col-xs-3">{% trans 'department' %}</th>
+      <th class="col-xs-3">{% trans 'project' %}</th>
+      <th class="col-xs-3">{% trans 'rol' %}</th>
+      <th class="col-xs-3"></th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for rol in employee_roles %}
+    <tr>
+      <td>{{rol.projectDepartment_id.department_id.name}}</td>
+      <td>{{rol.projectDepartment_id.project_id.name}}</td>
+      <td>{{rol.role_id.name}}</td>
+      <td><div align="right"><a align="right" class="btn btn-primary" href="/roles/manage?role_id={{rol.id}}">{% trans 'update' %}</a>
+      <a href="#" align="right" class="btn btn-danger" data-href="/roles/delete/{{rol.id}}" data-toggle="modal" data-target="#confirm-delete">{% trans 'delete' %}</a>
+    </tr>
+	{% endfor %}
+	</tbody>
+</table>
+{% else %}
+{% trans 'noRoles' %}
+{% endif %}
+</div>
+</br>
+<a align="center" class="btn btn-primary" href="/roles/manage?employee_id={{employee.id}}">{% trans 'addRole' %}</a>
+
+<div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    {% trans 'delete' %}
+                </div>
+                <div class="modal-body">
+                    {% trans 'roleConfirm' %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'cancel' %}</button>
+                    <a class="btn btn-danger btn-ok">{% trans 'delete' %}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

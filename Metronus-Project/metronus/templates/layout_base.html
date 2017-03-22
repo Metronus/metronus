@@ -1,0 +1,156 @@
+{% load i18n %}
+{% load l10n %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<title> {% block title %}{% endblock %} </title>
+
+		<link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/font-awesome.min.css" rel="stylesheet">
+		<link href="/static/css/nprogress.css" rel="stylesheet">
+		<link href="/static/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
+		<link href="/static/css/jqvmap.min.css" rel="stylesheet">
+		<link href="/static/css/daterangepicker.css" rel="stylesheet">
+		<link href="/static/css/custom.min.css" rel="stylesheet">
+  </head>
+
+  <body class="nav-md">
+    <div class="container body">
+      <div class="main_container">
+        <div class="col-md-3 left_col">
+          <div class="left_col scroll-view">
+            <div class="navbar nav_title" style="border: 0;">
+              <a href="index.html" class="site_title"><i class="fa fa-paw"></i> <span>{{user.actor.company_id.company_name}}</span></a>
+            </div>
+
+            <div class="clearfix"></div>
+
+            <!-- menu profile quick info -->
+            <div class="profile clearfix">
+              <div class="profile_pic">
+                <img src="{{user.actor.picture}}" alt="{{user.get_username}}" class="img-circle profile_img">
+              </div>
+              <div class="profile_info">
+                <span>{% trans 'dashWelcome' %}, </span>
+                <h2>{{user.first_name}} {{user.last_name}}</h2>
+              </div>
+            </div>
+            <!-- /menu profile quick info -->
+
+            <br />
+
+            <!-- sidebar menu -->
+            <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+              <div class="menu_section">
+                <h3>{% trans 'dashControlPanel' %}</h3>
+                <ul class="nav side-menu">
+                  <li><a><i class="fa fa-home"></i>{% trans 'dashIndex' %}</span></a>
+                  </li>
+                  <li><a><i class="fa fa-desktop"></i>{% trans 'dashProjects' %}<span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="/project/list">{% trans 'dashProjectsList' %}</a></li>
+                      <li><a href="/project/create">{% trans 'dashProjectCreate' %}</a></li>
+                    </ul>
+                  </li>
+                  <li><a><i class="fa fa-group"></i>{% trans 'dashDepartments' %}<span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="/department/list">{% trans 'dashDepartmentsList' %}</a></li>
+                      <li><a href="/department/create">{% trans 'dashDepartmentCreate' %}</a></li>
+                    </ul>
+                  </li>
+                  <li><a><i class="fa fa-user"></i>{% trans 'dashEmployees' %}<span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="/employee/list">{% trans 'dashEmployeesList' %}</a></li>
+                      <li><a href="/employee/create">{% trans 'dashEmployeesCreate' %}</a></li>
+                    </ul>
+                  </li>
+                  <li><a><i class="fa fa-tasks"></i>{% trans 'dashTasks' %}<span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="/task/list">{% trans 'dashTasksList' %}</a></li>
+                      <li><a href="/task/create">{% trans 'dashTasksCreate' %}</a></li>
+                    </ul>
+                  </li>
+                  <li><a><i class="fa fa-calendar"></i>{% trans 'dashTimeControl' %}<span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="/timeLog/list_all">{% trans 'dashTimeControlList' %}</a></li>
+                      <li><a href="/timeLog/create_all">{% trans 'dashTimeControlCreate' %}</a></li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <!-- /sidebar menu -->
+          </div>
+        </div>
+
+        <!-- top navigation -->
+        <div class="top_nav">
+          <div class="nav_menu">
+            <nav>
+              <div class="nav toggle">
+                <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+              </div>
+
+              <ul class="nav navbar-nav navbar-right">
+                <li class="">
+                  <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    <img src="{{user.actor.picture}}" alt="">{{user.first_name}} {{user.last_name}}
+                    <span class=" fa fa-angle-down"></span>
+                  </a>
+                  <ul class="dropdown-menu dropdown-usermenu pull-right">
+                    <li><a href="javascript:;">{% trans 'dashProfile' %}</a></li>
+                    <li>
+                      <a href="javascript:;">
+                        <span>{% trans 'dashSettings' %}</span>
+                      </a>
+                    </li>
+                    <li><a href="/logout/"><i class="fa fa-sign-out pull-right"></i>{% trans 'dashLogout' %}</a></li>
+                  </ul>
+                </li>
+
+                <li role="presentation" class="dropdown">
+                  <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
+                    <i class="fa fa-envelope-o"></i>
+                    <span class="badge bg-green">6</span>
+                  </a>
+                  <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
+                  </ul>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+        <!-- /top navigation -->
+
+				<div class="right_col" role="main">
+          <div class="">
+						{% block content %}{% endblock %}
+					</div>
+				</div>
+      </div>
+    </div>
+
+		<script src="/static/js/jquery.min.js"></script>
+	  <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/fastclick.js"></script>
+    <script src="/static/js/nprogress.js"></script>
+		<script src="/static/js/Chart.min.js"></script>
+		<script src="/static/js/gauge.min.js"></script>
+		<script src="/static/js/bootstrap-progressbar.min.js"></script>
+		<script src="/static/js/icheck.min.js"></script>
+		<script src="/static/js/skycons.js"></script>
+		<script src="/static/js/custom.min.js"></script>
+		<script src="/static/js/validator.js"></script>
+		<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/css/bootstrapvalidator.min.css"/>
+		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/js/bootstrapvalidator.min.js"></script>
+		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/4.3.8/js/fileinput.min.js"></script>
+
+    {% block javascript %}{% endblock %}
+  </body>
+</html>

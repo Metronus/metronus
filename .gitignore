@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+# Generated StaticFiles
+staticfiles/
+
 # Distribution / packaging
 .Python
 env/
@@ -87,3 +90,12 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# Django migrations
+Metronus-Project/metronus_app/migrations/
+
+# PyCharm
+.idea
+
+# Media
+Metronus-Project/media/

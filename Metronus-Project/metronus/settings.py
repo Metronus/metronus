@@ -11,12 +11,13 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
+from django.utils.translation import ugettext_lazy as _
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_PATH = os.path.dirname(os.path.realpath(__file__))
 
-    
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
@@ -26,8 +27,16 @@ SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = "METRONUS_PRODUCTION" not in os.environ
 
-ALLOWED_HOSTS = [".metronus.es", "metronus.herokuapp.com", "localhost", "127.0.0.1"] 
+ALLOWED_HOSTS = [".metronus.es", "metronus.herokuapp.com", "localhost", "127.0.0.1"]
 
+LANGUAGES = (
+    ('en', _('English')),
+    ('es', _('Spanish')),
+)
+
+LOCALE_PATHS = (
+    os.path.join(BASE_DIR, 'locale'),
+)
 
 # Application definition
 
@@ -42,8 +51,11 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+
     'django.middleware.security.SecurityMiddleware',
+    #estas tres siguientes tienen que ir en este orden, para que la localización furule
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -60,6 +72,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.i18n',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
@@ -75,17 +88,18 @@ WSGI_APPLICATION = 'metronus.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
+heroku = os.environ["METRONUS_DB_NAME"] == 'dnuusjkalf041'
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ["METRONUS_DB_NAME"],
-        'USER': os.environ["METRONUS_DB_USER"],
-        'PASSWORD': os.environ["METRONUS_DB_PASS"],
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+	    'default': {
+		'ENGINE': 'django.db.backends.postgresql',
+		'NAME': os.environ["METRONUS_DB_NAME"],
+		'USER': os.environ["METRONUS_DB_USER"],
+		'PASSWORD': os.environ["METRONUS_DB_PASS"],
+		'HOST': os.environ["METRONUS_DB_HOST"] if heroku else '127.0.0.1',
+		'PORT': os.environ["METRONUS_DB_PORT"] if heroku else '5432',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
@@ -126,12 +140,21 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(PROJECT_PATH, 'staticfiles')
 STATICFILES_DIRS = (
-    os.path.join(PROJECT_PATH,'static'),
+    os.path.join(PROJECT_PATH, 'static'),
 )
 
+# Login static configuration
+LOGIN_REDIRECT_URL = "/"
+LOGIN_URL = '/login'
+LOGOUT_URL = '/'
+
+# File storage
+
+MEDIA_ROOT = (
+    os.path.join(BASE_DIR, 'media')
+)
 
 # Simplified static file serving.
 # https://warehouse.python.org/project/whitenoise/
 
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
-
