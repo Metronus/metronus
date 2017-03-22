@@ -168,7 +168,7 @@ msgstr "es"
 
 #: Generic
 msgid "identifier"
-msgstr "ID"
+msgstr "Identificador"
 msgid "username"
 msgstr "Usuario"
 msgid "name"
@@ -389,6 +389,8 @@ msgid "company_phone_error#2"
 msgstr "Formato inválido"
 msgid "company_duplicate"
 msgstr "La compañía ya esta registrada"
+msgid "errorUsernameNotUnique"
+msgstr "Ese nombre de usuario ya está registrado"
 
 #: Admin
 msgid "admin_email"

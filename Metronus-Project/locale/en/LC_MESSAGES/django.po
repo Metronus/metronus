@@ -166,7 +166,7 @@ msgstr "en"
 
 #: Generic
 msgid "identifier"
-msgstr "ID"
+msgstr "Identifier"
 msgid "username"
 msgstr "Username"
 msgid "name"

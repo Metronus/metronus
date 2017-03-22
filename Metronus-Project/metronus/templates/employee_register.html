@@ -106,7 +106,11 @@
         <p>{{ form.errors }}</p>
 {% endif %}
  
-
+{% if errors %}
+    {% for err in errors%}
+        <p>{% trans err %}</p>
+    {% endfor %}
+{% endif %}
 
 <div class="row">
    <form id="register_form" method="POST" class="form-horizontal" data-toggle="validator" role="form" action="" enctype="multipart/form-data">
