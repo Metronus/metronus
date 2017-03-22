@@ -53,28 +53,66 @@
 
 
 
+
 <div class="row">
+
+<div class="col-md-12 col-sm-12 col-xs-12">
+  <div class="x_panel">
+    <div class="x_title">
+      <h2>{% trans 'createTask' %}</h2>
+      <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
+
     <form id="register_form" method="POST" action="" class="form-horizontal" align="center">{% csrf_token %}
-    <div class="form-group company_class form-class" >
+    <div class="form-group" >
         <label class="control-label col-sm-4" for="id_{{ form.name.name }}">{% trans 'name' %}</label>
         <div class="col-sm-6">
-            <input type="text" class="form-control col-md-6" name="{{ form.name.name }}" id="id_{{ form.name.name }}" value="{{ form.name.value }}">
+            <input type="text" class="form-control col-md-6" name="{{ form.name.name }}" id="id_{{ form.name.name }}" value="{{ form.name.value }}" required>
         </div>
+    </div>
 
+    <div class="form-group" >
         <label class="control-label col-sm-4" for="id_{{ form.description.name }}">{% trans 'description' %}</label>
-          <div class="col-sm-6">
-            <input type="text" class="form-control col-md-6" name="{{ form.description.name }}" id="id_{{ form.description.name }}" value="{{ form.description.value }}">
+        <div class="col-sm-6">
+            <input type="text" class="form-control col-md-6" name="{{ form.description.name }}" id="id_{{ form.description.name }}" value="{{ form.description.value }}" required>
         </div>
+    </div>
+
+    <div class="form-group" >
+        <label class="control-label col-sm-4" for="id_{{ form.project_id.name }}">{% trans 'project' %}</label>
+        <div class="col-sm-6">
+        <select class="form-control" name="{{ form.project_id.name }}" id="id_{{ form.project_id.name }}" required>
+                <option value="" selected>{% trans 'selectProject' %}</option>
+                {% for project in projects %}
+                <option value="{{ project.id }}"{% if form.project_id.value == project.id %} selected{% endif %}>{{ project.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group" >
+        <label class="control-label col-sm-4" for="id_{{ form.department_id.name }}">{% trans 'department' %}</label>
+        <div class="col-sm-6">
+            <select class="form-control" name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}" required>
+                <option value="" selected>{% trans 'selectDepartment' %}</option>
+                {% for department in departments %}
+                <option value="{{ department.id }}"{% if form.department_id.value == department.id %} selected{% endif %}>{{ department.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
 
 
-{{form.project_id}}
-{{form.department_id}}
-{{form.task_id}}
+
     </br>
     <div align="center" >
-        <input type="submit" class="btn btn-success submit-button" value="{% trans 'confirm' %}" />
+        <input type="submit" class="btn btn-success submit-button" value="{% trans 'register' %}" />
     </div>
 </form>
 
+ </div>
+ </div>
+ </div>
  </div>
 {% endblock %}

@@ -109,6 +109,16 @@
 
 
 <div class="row">
+
+<div class="col-md-12 col-sm-12 col-xs-12">
+  <div class="x_panel">
+    <div class="x_title">
+      <h2>{% trans 'registerEmployee' %}</h2>
+      <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
+
+    
    <form id="register_form" method="POST" class="form-horizontal" data-toggle="validator" role="form" action="" enctype="multipart/form-data">
 
     {% csrf_token %}
@@ -118,7 +128,7 @@
         <div class="form-group required form-class">
           <label class="control-label col-sm-4" for="id_{{ form.username.name }}">{% trans 'username' %}</label>
             <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.username.name }}" id="id_{{ form.username.label }}">
+              <input type="text" class="form-control col-md-6" name="{{ form.username.name }}" id="id_{{ form.username.label }}" required>
               <div class="help-block with-errors" id="id_unique_message" style="display: none;">{% trans 'employee_username_duplicate' %}</div>
             </div>
         </div>
@@ -126,49 +136,49 @@
         <div class="form-group required form-class">
           <label class="control-label col-sm-4" for="id_{{ form.password1.name }}">{% trans 'password'%}</label>
             <div class="col-sm-6">
-              <input type="password" class="form-control col-md-6" name="{{ form.password1.name }}" id="id_{{ form.password1.label }}">
+              <input type="password" class="form-control col-md-6" name="{{ form.password1.name }}" id="id_{{ form.password1.label }}" required>
             </div>
         </div>
 
         <div class="form-group required form-class">
           <label class="control-label col-sm-4" for="id_{{ form.password2.name }}">{% trans 'repeatPassword' %}</label>
             <div class="col-sm-6">
-              <input type="password" class="form-control col-md-6" name="{{ form.password2.name }}" id="id_{{ form.password2.label }}">
+              <input type="password" class="form-control col-md-6" name="{{ form.password2.name }}" id="id_{{ form.password2.label }}" required>
             </div>
         </div>
 
         <div class="form-group required form-class">
           <label class="control-label col-sm-4" for="id_{{ form.first_name.name }}">{% trans 'name' %}</label>
             <div class="col-sm-6">
-            <input type="text" class="form-control col-md-6" name="{{ form.first_name.name }}" id="id_{{ form.first_name.label }}">
+            <input type="text" class="form-control col-md-6" name="{{ form.first_name.name }}" id="id_{{ form.first_name.label }}" required>
             </div>
         </div>
 
         <div class="form-group required form-class">
           <label class="control-label col-sm-4" for="id_{{ form.last_name.name }}">{% trans 'surname' %}</label>
             <div class="col-sm-6">
-            <input type="text" class="form-control col-md-6" name="{{ form.last_name.name }}" id="id_{{ form.last_name.label }}">
+            <input type="text" class="form-control col-md-6" name="{{ form.last_name.name }}" id="id_{{ form.last_name.label }}" required>
             </div>
         </div>
 
         <div class="form-group required form-class">
           <label class="control-label col-sm-4" for="id_{{ form.email.name }}">{% trans 'email' %}</label>
             <div class="col-sm-6">
-              <input type="email" class="form-control col-md-6" name="{{ form.email.name }}" id="id_{{ form.email.label }}">
+              <input type="email" class="form-control col-md-6" name="{{ form.email.name }}" id="id_{{ form.email.label }}" required>
             </div>
         </div>
 
         <div class="form-group required form-class">
           <label class="control-label col-sm-4" for="id_{{ form.phone.name }}">{% trans 'phone' %}</label>
             <div class="col-sm-6">
-            <input type="text" class="form-control col-md-6" name="{{ form.phone.name }}" id="id_{{ form.phone.label }}">
+            <input type="text" class="form-control col-md-6" name="{{ form.phone.name }}" id="id_{{ form.phone.label }}" required>
             </div>
         </div>
 
         <div class="form-group required form-class">
           <label class="control-label col-sm-4" for="id_{{ form.identifier.name }}">{% trans 'identifier' %}</label>
             <div class="col-sm-6">
-            <input type="text" class="form-control col-md-6" name="{{ form.identifier.name }}" id="id_{{ form.identifier.label }}">
+            <input type="text" class="form-control col-md-6" name="{{ form.identifier.name }}" id="id_{{ form.identifier.label }}" required>
             </div>
         </div>
 
@@ -184,5 +194,8 @@
         </div>
 
     </form>
+ </div>
+ </div>
+ </div>
  </div>
 {% endblock %}
