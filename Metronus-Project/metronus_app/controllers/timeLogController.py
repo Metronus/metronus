@@ -139,8 +139,15 @@ def findTask(task_id):
 def createTimeLog(form, task, employee):
     fdescription = form.cleaned_data['description']
     fworkDate = form.cleaned_data['workDate']
+    if (fworkDate.date() > date.today()):
+        raise PermissionDenied
     fduration = form.cleaned_data['duration']
-    TimeLog.objects.create(description=fdescription,workDate=fworkDate,duration=fduration,task_id=task,employee_id=employee)
+    timeLog = findTimeLogByDescriptionAndDate(fdescription,fworkDate)
+    if(timeLog is not None):
+        timeLog.duration += fduration
+        timeLog.save()
+    else:
+        TimeLog.objects.create(description=fdescription,workDate=fworkDate,duration=fduration,task_id=task,employee_id=employee)
 
 
 #Comprobación para saber si el empleado puede imputar horas
@@ -191,5 +198,9 @@ class myTask():
         self.durations = [0 for x in range(0,calendar.monthrange(today.year,today.month)[1])]
 
         for tl in task.timelog_set.all():
-            index = int(tl.workDate.day)
+            index = int(tl.workDate.day)-1
             self.durations[index] += tl.duration
+
+def findTimeLogByDescriptionAndDate(tDescription,tDate):
+    timeLog = TimeLog.objects.filter(description=tDescription,workDate=tDate).first()
+    return timeLog
