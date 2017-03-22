@@ -68,8 +68,8 @@ def manage(request):
 
         else:
             # Form is not valid
-            return render(request, 'rol_form.html', {'departments': Department.objects.filter(company_id=company), 
-                                                     'projects': Project.objects.filter(company_id=company), 
+            return render(request, 'rol_form.html', {'departments': Department.objects.filter(company_id=company, active=True), 
+                                                     'projects': Project.objects.filter(company_id=company, deleted=False), 
                                                      'roles': Role.objects.all(), 
                                                      'form': form})
     else:
@@ -133,8 +133,8 @@ def create_new_role(form):
 def return_get_form(request, admin):
     company = admin.company_id
 
-    departments = Department.objects.filter(company_id=company)
-    projects = Project.objects.filter(company_id=company)
+    departments = Department.objects.filter(company_id=company, active=True)
+    projects = Project.objects.filter(company_id=company, deleted=False)
     roles = Role.objects.all()
 
     if "employee_id" in request.GET:
@@ -164,15 +164,15 @@ def return_get_form(request, admin):
 
 def check_form_permissions(form, admin):
 
-    employee = get_object_or_404(Employee, id=form.cleaned_data['employee_id'])
+    employee = get_object_or_404(Employee, id=form.cleaned_data['employee_id'], user__is_active=True)
     if employee.company_id != admin.company_id:
         raise PermissionDenied
 
-    project = get_object_or_404(Project, id=form.cleaned_data['project_id'])
+    project = get_object_or_404(Project, id=form.cleaned_data['project_id'], deleted=False)
     if project.company_id != admin.company_id:
         raise PermissionDenied
 
-    dpmt = get_object_or_404(Department, id=form.cleaned_data['department_id'])
+    dpmt = get_object_or_404(Department, id=form.cleaned_data['department_id'], active=True)
     if dpmt.company_id != admin.company_id:
         raise PermissionDenied
 
