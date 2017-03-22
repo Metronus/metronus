@@ -6,12 +6,6 @@
 {% block javascript %}
 
 <script>
-	function display(id){
-		window.location="/department/view/"+id+"/";
-
-	}
-</script>
-<script>
 $('#confirm-delete').on('show.bs.modal', function(e) {
     $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
 });
@@ -21,29 +15,46 @@ $('#confirm-delete').on('show.bs.modal', function(e) {
 
 {% block content %}
 
-<h1>{% trans 'departmentList' %}</h1>
-</br>
-</br>
+<div class="col-md-12 col-sm-12 col-xs-12">
+  <div class="x_panel">
+    <div class="x_title">
+      <h2>{% trans 'departmentList' %}</h2>
+      <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
 
-<ul class="list-group col-xs-12">
-{% for department in departments %}
+      <table class="table table-striped table-hover">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>{% trans 'name' %}</th>
+            <th>{% trans 'actions' %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for department in departments %}
+          <tr>
+            <th scope="row">{{forloop.counter}}</th>
+            <td>{{department.name}}</td>
 
-	<li class="list-group-item">
-	<div style="cursor: pointer;" class="list-group col-xs-4" onclick="display({{department.id}})">{{department.name}} </div>
-	<div align="right" >
-		<a class="btn btn-primary" href="{% url 'department_edit' department.id %}">{% trans 'update' %}</a>
+            <td>
+              <a href="/department/view/{{department.id}}" type="button" class="btn btn-success">{% trans 'details' %}</a>
+              <a href="{% url 'department_edit' department.id %}" type="button" class="btn btn-dark">{% trans 'update' %}</a>
+              <a href="#" class="btn btn-default" data-href="/department/delete/{{department.id}}/" data-toggle="modal" data-target="#confirm-delete">{% trans 'delete' %}</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
 
-		<a href="#" align="right" class="btn btn-danger" data-href="/department/delete/{{department.id}}/" data-toggle="modal" data-target="#confirm-delete">{% trans 'delete' %}</a>
+    </div>
 
-		</div>
 
-	</li>
+	<a class="btn btn-dark" href="/department/create">{% trans 'create' %}</a>
+  </div>
 
-{% endfor %}
-</ul>
-</br>
+</div>
 
-<a class="btn btn-primary" href="/department/create">{% trans 'create' %}</a>
 
 <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 		    <div class="modal-dialog">

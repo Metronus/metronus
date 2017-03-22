@@ -3,51 +3,58 @@
 {% load l10n %}
 
 {% block title %}{% trans 'employeeList' %}{% endblock %}
-{% block contentTitle %}{% trans 'employeeList' %}{% endblock %}
 
 {% block content %}
 
-<div class="row">
-        <div class="col-xs-12">
-          <div class="box">
-            <!-- /.box-header -->
-            <div class="box-body table-responsive no-padding">
-              <table id="employeeTable2" class="table table-hover">
-              <thead>
-                <tr>
-                  <th>{% trans 'username' %}</th>
-                  <th>{% trans 'identifier' %}</th>
-                  <th>{% trans 'phone' %}</th>
-                  <th>{% trans 'registryDate' %}</th>
-                  <th>{% trans 'actions' %}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for employee in employees %}
-                <tr>
-                    <td>{{employee.user}}</td>
+<div class="col-md-12 col-sm-12 col-xs-12">
+  <div class="x_panel">
+    <div class="x_title">
+      <h2>{% trans 'employeeList' %}</h2>
+      <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
 
-                    <td>{{employee.identifier}}</td>
+      <table class="table table-striped table-hover">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>{% trans 'username' %}</th>
+            <th>{% trans 'identifier' %}</th>
+            <th>{% trans 'phone' %}</th>
+            <th>{% trans 'registryDate' %}</th>
+            <th>{% trans 'actions' %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for employee in employees %}
+          <tr>
+            <th scope="row">{{forloop.counter}}</th>
+            <td>{{employee.user}}</td>
 
-                    <td>{{employee.phone}}</td>
+            <td>{{employee.identifier}}</td>
 
-                    <td>{{employee.registryDate}}</td>
+            <td>{{employee.phone}}</td>
 
-                    <td>
-                      <a href="/employee/view/{{employee.user}}" type="button" class="btn bg-olive btn-flat">{% trans 'details' %}</a>
-                      <a href="/employee/edit/{{employee.user}}" type="button" class="btn bg-orange btn-flat">{% trans 'edit' %}</a>
-                      <a href="/employee/delete/{{employee.user}}" type="button" class="btn bg-maroon btn-flat">{% trans 'fire' %}</a>
-                    </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-              </table>
-            </div>
-          </div>
+            <td>{{employee.registryDate}}</td>
 
-                      <a href="/employee/create" type="button" class="btn bg-purple btn-flat">{% trans 'new' %}</a>
-        </div>
-      </div>
+            <td>
+              <a href="/employee/view/{{employee.user}}" type="button" class="btn btn-success">{% trans 'details' %}</a>
+              <a href="/employee/edit/{{employee.user}}" type="button" class="btn btn-dark">{% trans 'edit' %}</a>
+              <a onclick="removealert('/employee/delete/{{employee.user}}');" type="button" class="btn btn-default">{% trans 'fire' %}</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+    </div>
+
+
+  <a href="/employee/create" type="button" class="btn btn-dark">{% trans 'new' %}</a>
+  </div>
+
+</div>
+
 
 {% endblock %}
 
