@@ -33,6 +33,7 @@ def manage(request):
     """
 
     admin = get_current_admin_or_403(request)
+    company = admin.company_id
 
     # Return all departments and roles for the logged admin
     if request.method == "GET":
@@ -45,7 +46,6 @@ def manage(request):
     elif request.method == "POST":
 
         # Process the received form
-        
         form = RoleManagementForm(request.POST)
         if form.is_valid():
             check_form_permissions(form, admin)
@@ -64,11 +64,17 @@ def manage(request):
                     existing_role.role_id = get_object_or_404(Role, id=form.cleaned_data['role_id'])
                     existing_role.save()
 
-
             return HttpResponseRedirect('/employee/view/' + Employee.objects.get(id=form.cleaned_data["employee_id"]).user.username + '/')
+
+        else:
+            # Form is not valid
+            return render(request, 'rol_form.html', {'departments': Department.objects.filter(company_id=company), 
+                                                     'projects': Project.objects.filter(company_id=company), 
+                                                     'roles': Role.objects.all(), 
+                                                     'form': form})
     else:
         raise PermissionDenied
-    return render(request, 'rol_form.html', {'form': form})
+    
 
 def delete(request, role_id):
     """
