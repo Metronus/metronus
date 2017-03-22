@@ -19,12 +19,13 @@
         <div class="list-group">
             {% for timeLog in timeLogs %}
                 <a href="{% url 'timeLog_edit' timeLog.id %}" class="list-group-item">
-                    <h4 class="list-group-item-heading">{{ timeLog.duration }} - {{ timeLog.workDate }}</h4>
+                    <span class="badge">{{ timeLog.duration }}</span>
+                    <h4 class="list-group-item-heading">{{ timeLog.workDate }}</h4>
                     <p class="list-group-item-text">{{ timeLog.description }}</p>
                 </a>
 
             {% empty %}
-                <a href="{% url 'timeLog_create' task.id %}" class="list-group-item">{% trans 'timeLogNot' %}</a>
+                <a href="{% url 'timeLog_create_by_task' task.id %}" class="list-group-item">{% trans 'timeLogNot' %}</a>
 
             {% endfor %}
         </div>
@@ -32,6 +33,6 @@
 
     <br>
 
-    <a class="btn btn-primary" href="{% url 'timeLog_create' task.id %}">{% trans 'createTimeLog' %}</a>
+    <a class="btn btn-primary" href="{% url 'timeLog_create_by_task' task.id %}">{% trans 'createTimeLog' %}</a>
 
 {% endblock %}

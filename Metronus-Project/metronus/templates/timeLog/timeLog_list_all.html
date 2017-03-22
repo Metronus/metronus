@@ -23,18 +23,18 @@
                 </tr>
             </thead>
             <tbody>
-                {% for task in tasks %}
+                {% for my_task in my_tasks %}
                     <tr>
-                        <th scope="row">{{ task.name }}</th>
-                        {% for day in month %}
-                            <td>1h</td>
+                        <th scope="row">{{ my_task.name }}</th>
+                        {% for day in my_task.durations %}
+                            <td>{{ day }}</td>
                         {% endfor %}
                     </tr>
                 {% endfor %}
                 <tr class="success">
                     <th scope="row">Total</th>
-                    {% for day in month %}
-                        <td>5h</td>
+                    {% for day in total %}
+                        <td>{{ day }}</td>
                     {% endfor %}
                 </tr>
             </tbody>

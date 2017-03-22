@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect
 from metronus_app.forms.timeLogForm import TimeLogForm
+from metronus_app.forms.timeLog2Form import TimeLog2Form
 from metronus_app.model.task import Task
 from django.shortcuts import render_to_response, get_object_or_404
 from metronus_app.common_utils import get_current_admin_or_403,get_current_employee_or_403
@@ -13,8 +14,33 @@ from django.core.exceptions             import ObjectDoesNotExist, PermissionDen
 from django.http                        import HttpResponseForbidden
 from django.contrib.auth import authenticate,login
 from datetime import date,datetime
+from metronus_app.model.actor import Actor
+import calendar
 
-def create(request,task_id):
+def create_all(request):
+    employee = get_current_employee_or_403(request)
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = TimeLog2Form(request, request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            # ...
+            # redirect to a new URL:
+            task = form.cleaned_data['task_id']
+            if task is not None:
+                createTimeLog(form,task,employee)
+                return redirect('timeLog_list_all')
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = TimeLog2Form(request,initial={"timeLog_id":0, "workDate":datetime.now()})
+
+
+    return render(request, 'timeLog/timeLog_form.html', {'form': form})
+
+def create_by_task(request,task_id):
     employee = get_current_employee_or_403(request)
     task = findTask(task_id)
     checkPermissionForTask(employee,task)
@@ -49,11 +75,21 @@ def list(request, task_id):
     return render(request, "timeLog/timeLog_list.html", {"timeLogs": lista,"task":task})
 
 def list_all(request):
-    # TODO por usuario
+    today = datetime.today()
 
-    tareas=Task.objects.all()
-    month = [x for x in range(1,31)]
-    return render(request, "timeLog/timeLog_list_all.html", {"tasks": tareas, "month":month})
+
+    try:
+        actor = Actor.objects.get(user=request.user)
+    except ObjectDoesNotExist:
+        raise PermissionDenied
+    tareas=Task.objects.filter(actor_id__company_id=actor.company_id,
+                                   projectDepartment_id__projectdepartmentemployeerole__employee_id=actor,
+                                   active=True).distinct()
+    my_tasks = [myTask(x) for x in tareas]
+    month = [x for x in range(1,calendar.monthrange(today.year,today.month)[1]+1)]
+    total = [sum([x.durations[i] for x in my_tasks]) for i in range(0,calendar.monthrange(today.year,today.month)[1]) ]
+    monthTotal = sum(total)
+    return render(request, "timeLog/timeLog_list_all.html", {"my_tasks": my_tasks, "month":month,"total":total, "monthTotal":monthTotal})
 
 def edit(request, timeLog_id):
     employee = get_current_employee_or_403(request)
@@ -145,7 +181,15 @@ def updateTimeLog(timeLog,form):
         timeLog.duration = form.cleaned_data['duration']
         timeLog.save()
 
-class myTask:
+class myTask():
+    name = ""
+    durations = []
+
     def __init__(self, task):
+        today = datetime.today()
         self.name = task.name
-        self.durations = TimeLog.objects.filter(task_id=task.id).values('duration')
+        self.durations = [0 for x in range(0,calendar.monthrange(today.year,today.month)[1])]
+
+        for tl in task.timelog_set.all():
+            index = int(tl.workDate.day)
+            self.durations[index] += tl.duration

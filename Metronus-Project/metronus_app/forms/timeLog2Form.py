@@ -5,7 +5,7 @@ from metronus_app.model.actor import Actor
 from django.forms import ModelChoiceField
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 from metronus_app.model.task import Task
-from django.core.exceptions                      import PermissionDenied
+from django.core.exceptions                      import PermissionDenied, ObjectDoesNotExist
 
 class MyModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
@@ -19,7 +19,7 @@ class TimeLog2Form(forms.Form):
                                   widget=forms.NumberInput(attrs={'class':'form-control'}))
 
     timeLog_id = forms.IntegerField(widget=forms.HiddenInput())
-    task_id = MyModelChoiceField(queryset=None)
+    task_id = MyModelChoiceField(queryset=None, widget=forms.Select(attrs={'class':'form-control'}))
 
     def __init__(self, request,*args, **kwargs):
         super(TimeLog2Form, self).__init__(*args, **kwargs)
