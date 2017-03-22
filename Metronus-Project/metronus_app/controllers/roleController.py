@@ -33,6 +33,7 @@ def manage(request):
     """
 
     admin = get_current_admin_or_403(request)
+    company = admin.company_id
 
     # Return all departments and roles for the logged admin
     if request.method == "GET":
@@ -45,7 +46,6 @@ def manage(request):
     elif request.method == "POST":
 
         # Process the received form
-        
         form = RoleManagementForm(request.POST)
         if form.is_valid():
             check_form_permissions(form, admin)
@@ -64,11 +64,77 @@ def manage(request):
                     existing_role.role_id = get_object_or_404(Role, id=form.cleaned_data['role_id'])
                     existing_role.save()
 
-
             return HttpResponseRedirect('/employee/view/' + Employee.objects.get(id=form.cleaned_data["employee_id"]).user.username + '/')
+
+        else:
+            # Form is not valid
+            return render(request, 'rol_form.html', {'departments': Department.objects.filter(company_id=company, active=True), 
+                                                     'projects': Project.objects.filter(company_id=company, deleted=False), 
+                                                     'roles': Role.objects.all(), 
+                                                     'form': form})
     else:
         raise PermissionDenied
-    return render(request, 'rol_form.html', {'form': form})
+    
+
+
+def manageAsync(request):
+    """
+    parameters:
+    form: el formulario con los datos del departamento
+
+    returns:
+    data: JSON con un mensaje de respuesta. Es un dict que contiene lo siguiente
+    success:true si hubo exito, false si no
+    """
+
+    def false():
+        return JsonResponse({'success': False})
+
+    def true():
+        return JsonResponse({'success': True})
+
+    ################## 
+
+    admin = get_current_admin_or_403(request)
+    company = admin.company_id
+
+    # Process an AJAX request
+    if request.method == 'POST':
+
+        form = RoleManagementForm(request.POST)
+        if form.is_valid():
+            check_form_permissions(form, admin)
+
+            # Try to create a new role if the employee_role id is 0
+            if form.cleaned_data['employeeRole_id'] == 0:
+                try:
+                    create_new_role(form)
+                    return true()
+                except:
+                    return false()
+
+            else:
+                try:
+                    existing_role = get_object_or_404(ProjectDepartmentEmployeeRole, id=form.cleaned_data['employeeRole_id'])
+                    if existing_role.employee_id.id != form.cleaned_data['employee_id'] or existing_role.projectDepartment_id.project_id.id != form.cleaned_data['project_id'] or existing_role.projectDepartment_id.department_id.id != form.cleaned_data['department_id']:
+                        create_new_role(form) # Treat it like a new role if the employee, the project or the department have changed from the original
+                    else:
+                        # Update the current role
+                        existing_role.role_id = get_object_or_404(Role, id=form.cleaned_data['role_id'])
+                        existing_role.save()
+                    return true()
+
+                except:
+                    return false()
+
+        else:
+            return false()
+            
+
+    else:
+        # What are you doing
+        raise PermissionDenied
+
 
 def delete(request, role_id):
     """
@@ -127,8 +193,8 @@ def create_new_role(form):
 def return_get_form(request, admin):
     company = admin.company_id
 
-    departments = Department.objects.filter(company_id=company)
-    projects = Project.objects.filter(company_id=company)
+    departments = Department.objects.filter(company_id=company, active=True)
+    projects = Project.objects.filter(company_id=company, deleted=False)
     roles = Role.objects.all()
 
     if "employee_id" in request.GET:
@@ -158,15 +224,15 @@ def return_get_form(request, admin):
 
 def check_form_permissions(form, admin):
 
-    employee = get_object_or_404(Employee, id=form.cleaned_data['employee_id'])
+    employee = get_object_or_404(Employee, id=form.cleaned_data['employee_id'], user__is_active=True)
     if employee.company_id != admin.company_id:
         raise PermissionDenied
 
-    project = get_object_or_404(Project, id=form.cleaned_data['project_id'])
+    project = get_object_or_404(Project, id=form.cleaned_data['project_id'], deleted=False)
     if project.company_id != admin.company_id:
         raise PermissionDenied
 
-    dpmt = get_object_or_404(Department, id=form.cleaned_data['department_id'])
+    dpmt = get_object_or_404(Department, id=form.cleaned_data['department_id'], active=True)
     if dpmt.company_id != admin.company_id:
         raise PermissionDenied
 
