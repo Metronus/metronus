@@ -170,7 +170,7 @@ msgstr "es"
 
 #: Generic
 msgid "identifier"
-msgstr "ID"
+msgstr "Identificador"
 msgid "username"
 msgstr "Usuario"
 msgid "name"
@@ -346,6 +346,12 @@ msgid "selectRole"
 msgstr "Seleccione un rol"
 msgid "roleConfirm"
 msgstr "¿Está seguro de eliminar el rol? Se eliminará también todo lo relacionado con el mismo"
+msgid "roleSaved"
+msgstr "El rol se guardó correctamente"
+msgid "roleError"
+msgstr "El rol no se pudo guardar correctamente"
+msgid "roleAdd"
+msgstr "Crear y añadir otro rol"
 
 #: Company
 msgid "registerCompany"
@@ -391,6 +397,8 @@ msgid "company_phone_error#2"
 msgstr "Formato inválido"
 msgid "company_duplicate"
 msgstr "La compañía ya esta registrada"
+msgid "errorUsernameNotUnique"
+msgstr "Ese nombre de usuario ya está registrado"
 
 #: Admin
 msgid "admin_email"

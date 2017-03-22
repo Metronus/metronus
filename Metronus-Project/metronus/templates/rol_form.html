@@ -49,6 +49,26 @@ $(document).ready(function() {
 });
 </script>
 
+<script type="text/javascript">
+	
+function ajax(){
+    $.post('/roles/manageAsync', $('#register_form').serialize(), function(data, status){
+    	document.getElementById('register_form').reset();
+        $("#register_form").data('bootstrapValidator').resetForm();
+    	console.log(data)
+    	if(JSON.stringify(data['success'])=="true"){
+    		$('#errorDiv').attr('hidden', true);
+    		$('#error2Div').attr('hidden', true);
+    		$('#successDiv').attr('hidden', false).html("<strong>{% trans 'success' %} | </strong>{% trans 'roleSaved' %}");
+    	}else{
+    		$('#successDiv').attr('hidden', true);
+    		$('#errorDiv').attr('hidden', false).html("<strong>{% trans 'fail' %} | </strong>{% trans 'roleError' %}"); 
+    	}
+       	
+    });
+};
+</script>
+
 {% endblock %}
 
 {% block content %}
@@ -58,11 +78,11 @@ $(document).ready(function() {
 <h1 align="center"> {% trans 'editRole' %} </h1></br>
 {% endif %}
 
-{% if form.errors %}
-<div id="errorDiv" class="alert alert-danger">
-        <p>{{ form.errors }}</p>
-</div></script>
-{% endif %}
+<div id="successDiv" class="alert alert-success" hidden='true'>
+	</div>
+<div id="errorDiv" class="alert alert-danger"  hidden='true'>
+	</div>
+
 
 
 
@@ -72,7 +92,7 @@ $(document).ready(function() {
 	    	<p align="center">
           		<label class="control-label col-sm-4" for="id_{{ form.department_id.name }}">{% trans 'department' %}</label>
             	<div class="col-sm-6">
-              		<select class="selectpicker col-md-6" name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}">
+              		<select class="selectpicker col-md-6" name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}" required>
 	              		<option value="" selected>{% trans 'selectDepartment' %}</option>
 	              		{% for dep in departments %}
 	    					<option value="{{ dep.id }}"{% if form.department_id.value == dep.id %} selected{% endif %}>{{ dep.name }}</option>
@@ -84,7 +104,7 @@ $(document).ready(function() {
 			<p align="center">
 				<label class="control-label col-sm-4" for="id_{{ form.project_id.name }}">{% trans 'project' %}</label>
             	<div class="col-sm-6">
-              		<select class="selectpicker col-md-6" name="{{ form.project_id.name }}" id="id_{{ form.project_id.name }}">
+              		<select class="selectpicker col-md-6" name="{{ form.project_id.name }}" id="id_{{ form.project_id.name }}" required>
 	              		<option value="" selected>{% trans 'selectProject' %}</option>
 	              		{% for dep in projects %}
 	    				<option value="{{ dep.id }}"{% if form.project_id.value == dep.id %} selected{% endif %}>{{ dep.name }}</option>
@@ -96,7 +116,7 @@ $(document).ready(function() {
 			<p align="center">
 				<label class="control-label col-sm-4" for="id_{{ form.role_id.name }}">{% trans 'rol' %}</label>
 				<div class="col-sm-6">
-	              <select class="selectpicker col-md-6" name="{{ form.role_id.name }}" id="id_{{ form.role_id.name }}">
+	              <select class="selectpicker col-md-6" name="{{ form.role_id.name }}" id="id_{{ form.role_id.name }}" required>
 		              <option value="" selected>{% trans 'selectRole' %}</option>
 		             	{% for dep in roles %}
 		    			<option value="{{ dep.id }}"{% if form.role_id.value == dep.id %} selected{% endif %}>{{ dep.name }}</option>
@@ -104,13 +124,16 @@ $(document).ready(function() {
 	              </select>
 				</div>
 			</p>
-              <input type="text" hidden="true" name="{{ form.employee_id.name }}" id="id_{{ form.employee_id.name }}" value="{{ form.employee_id.value}}">
-              <input type="text" hidden="true" name="{{ form.employeeRole_id.name }}" id="id_{{ form.employeeRole_id.name }}" value="{{ form.employeeRole_id.value}}">
+              <input type="text" hidden="true" name="{{ form.employee_id.name }}" id="id_{{ form.employee_id.name }}" value="{{ form.employee_id.value}}" />
+              <input type="text" hidden="true" name="{{ form.employeeRole_id.name }}" id="id_{{ form.employeeRole_id.name }}" value="{{ form.employeeRole_id.value}}" />
              </div>
 	    </br>
 	    <p align="center">
 	    <div align="center" >
 	    	<input type="submit" class="btn btn-success submit-button" value="{% trans 'confirm' %}" />
+	    	{% if  form.employeeRole_id.value == 0 %}
+		    	<input type="button" class="btn btn-success submit-button" value="{% trans 'roleAdd' %}" onclick="ajax();" />
+		    {% endif %}
 	    </div>
 	    </p>
     </form>

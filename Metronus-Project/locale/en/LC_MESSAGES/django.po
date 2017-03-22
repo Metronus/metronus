@@ -166,7 +166,7 @@ msgstr "en"
 
 #: Generic
 msgid "identifier"
-msgstr "ID"
+msgstr "Identifier"
 msgid "username"
 msgstr "Username"
 msgid "name"
@@ -343,6 +343,12 @@ msgid "selectRole"
 msgstr "Choose a role"
 msgid "roleConfirm"
 msgstr "Are you sure about deleting this role? All information related to it will be erased too"
+msgid "roleSaved"
+msgstr "Role was saved succesfully"
+msgid "roleError"
+msgstr "Role was not saved succesfully"
+msgid "roleAdd"
+msgstr "Create and add a new role"
 
 #: Company
 msgid "registerCompany"

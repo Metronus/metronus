@@ -37,6 +37,11 @@ def create(request):
         form = EmployeeRegisterForm(request.POST, request.FILES)
 
         if form.is_valid() and checkPasswords(form):
+
+            # Check that the username is unique
+            if not is_username_unique(form.cleaned_data["username"]):
+                return render(request, 'employee_register.html', {'form': form, 'errors': ['errorUsernameNotUnique']})
+
             if checkImage(form, 'photo'):
                 employeeUser = createEmployeeUser(form)
                 employee = createEmployee(employeeUser, admin, form)
@@ -44,6 +49,8 @@ def create(request):
                 render(request, 'employee_register.html', {'form': EmployeeRegisterForm(), 'success': True})
             else:
                 return render(request, 'employee_register.html', {'form': form, 'errors': ['error.imageNotValid']})
+        else:
+            return render(request, 'employee_register.html', {'form': form})
     else:
         raise PermissionDenied
 
@@ -197,3 +204,6 @@ def checkPasswords(form):
 
 def notify_password_change(email):
     pass # TODO
+
+def is_username_unique(username):
+    return User.objects.filter(username=username).count() == 0
