@@ -348,6 +348,8 @@ msgid "roleSaved"
 msgstr "El rol se guardó correctamente"
 msgid "roleError"
 msgstr "El rol no se pudo guardar correctamente"
+msgid "roleAdd"
+msgstr "Crear y añadir otro rol"
 
 #: Company
 msgid "registerCompany"
