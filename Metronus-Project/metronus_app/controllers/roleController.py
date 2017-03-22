@@ -10,7 +10,7 @@ from metronus_app.forms.roleManagementForm            import RoleManagementForm
 from django.core.exceptions                           import PermissionDenied, ObjectDoesNotExist
 from django.shortcuts                                 import render
 from django.shortcuts                                 import render_to_response, get_object_or_404
-from django.http                                      import HttpResponseBadRequest, HttpResponseRedirect
+from django.http                                      import HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
  
 from metronus_app.common_utils                        import get_current_admin_or_403
 

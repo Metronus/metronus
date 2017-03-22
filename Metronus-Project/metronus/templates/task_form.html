@@ -52,6 +52,16 @@
 {% endif %}
 
 
+{% if  repeated_name == True %}
+    <div id="error2Div" class="alert alert-danger">
+        <strong>{% trans 'fail' %} | </strong>{% trans 'taskName' %}
+    </div>
+{% endif %}
+{% if  project_department_related == False %}
+    <div id="error2Div" class="alert alert-danger">
+        <strong>{% trans 'fail' %} | </strong>{% trans 'taskRelation' %}
+    </div>
+{% endif %}
 
 
 <div class="row">
