@@ -12,7 +12,7 @@
 {% block javascript %}
 
 
-{#}
+
 <script>
 //Esto es para validar en cliente de forma bonita con bootstrap :)
 $(document).ready(function() {
@@ -36,7 +36,7 @@ $(document).ready(function() {
     });
 });
 </script>
-#}
+
 <script type="text/javascript">
 	
 function ajax(){
@@ -85,13 +85,13 @@ function ajax(){
 	    <div class="form-group company_class form-class">
           <label class="control-label col-sm-4" for="id_{{ form.name.name }}">{{ form.name.label }}</label>
             <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.name.name }}" id="id_{{ form.name.name }}" value="{{ form.name.value }}">
+              <input type="text" class="form-control col-md-6" name="{{ form.name.name }}" id="id_{{ form.name.name }}" value="{{ form.name.value }}" required />
             </div>
-            <input type="text" hidden="true" name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}" value="{{ form.department_id.value}}">
+            <input type="text" hidden="true" name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}" value="{{ form.department_id.value}}" />
         </div>
 	    </br>
 	    <div align="center" >
-		    <input type="submit" class="btn btn-success submit-button" value="{% trans 'confirm' %}" />
+		    <button type="submit" class="btn btn-success submit-button" >{% trans 'confirm' %}</button>
 		    {% if  request.path == '/department/create'%}
 		    	<input type="button" class="btn btn-success submit-button" value="{% trans 'departmentAdd' %}" onclick="ajax();" />
 		    {% endif %}
