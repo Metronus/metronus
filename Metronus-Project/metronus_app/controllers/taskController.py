@@ -21,9 +21,11 @@ def create(request):
     """
     parameters/returns:
     form: el formulario con los datos de la tarea
-
+    departments:eso
+    projects:eso
     repeated_name: si el nombre es repetido
     project_department_related: si nos están relacionados projectdepartment
+
     template:
     task_form.html
     """
@@ -35,7 +37,7 @@ def create(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = TaskForm(request,request.POST)
+        form = TaskForm(request.POST)
         # check whether it's valid:
 
         if form.is_valid():
@@ -64,9 +66,10 @@ def create(request):
                 project_department_related=False
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = TaskForm(request,initial={"task_id":0})
-
-    return render(request, 'task_form.html', {'form': form,'repeated_name':repeated_name,'project_department_related':project_department_related})
+        form = TaskForm(initial={"task_id":0})
+    coll=find_collections(request)
+    return render(request, 'task_form.html', {'form': form,'repeated_name':repeated_name,'project_department_related':project_department_related
+        ,"departments":coll["departments"],"projects":coll["projects"]})
 
 
 def list(request):
@@ -102,7 +105,8 @@ def edit(request,task_id):
     """
     parameters/returns:
     form: el formulario con los datos de la tarea
-
+    departments:eso
+    projects:eso
     repeated_name: si el nombre es repetido
     project_department_related: si nos están relacionados projectdepartment
 
@@ -116,7 +120,7 @@ def edit(request,task_id):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = TaskForm(request,request.POST)
+        form = TaskForm(request.POST)
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
@@ -137,10 +141,11 @@ def edit(request,task_id):
     # if a GET (or any other method) we'll create a blank form
     else:
         task=get_object_or_404(Task,pk=task_id)
-        form = TaskForm(request,initial={"name":task.name,"description":task.description,
+        form = TaskForm(initial={"name":task.name,"description":task.description,
                 "task_id":task.id})
-
-    return render(request, 'task_form.html', {'form': form,'repeated_name':repeated_name,'project_department_related':project_department_related})
+    coll=find_collections(request)
+    return render(request, 'task_form.html', {'form': form,'repeated_name':repeated_name,'project_department_related':project_department_related
+        ,"departments":coll["departments"],"projects":coll["projects"]})
 
 def delete(request,task_id):
     """
@@ -250,3 +255,49 @@ def find_tuple(project_id,department_id,actor):
     if project.company_id!=department.company_id or  project.company_id!=actor.company_id :
         raise PermissionDenied
     return ProjectDepartment.objects.filter(project_id=project,department_id=department).first()
+
+
+def find_collections(request):
+    actor=None
+    if not request.user.is_authenticated():
+        raise PermissionDenied
+    try:
+        actor= Actor.objects.get(user=request.user)
+    except ObjectDoesNotExist:
+        raise PermissionDenied
+
+    if actor.user_type!='A':
+        #not an admin
+        isTeamManager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+                    role_id__name= "Team manager")
+        res=isTeamManager.count()>0
+
+        if res:
+            #is manager
+            proyectos=Project.objects.filter(company_id=actor.company_id,deleted=False)
+            departamentos=Department.objects.filter(company_id=actor.company_id,active=True)
+        else:
+            #not a manager
+            rolesPro = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+                     role_id__name="Project manager")
+            rolesDep=ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+                     role_id__name="Coordinator")
+
+            if  rolesPro.count()>0:
+                #you're a project manager. Loading your projects
+                proyectos=Project.objects.filter(company_id=actor.company_id,deleted=False,
+                    projectdepartment__projectdepartmentemployeerole__employee_id=actor).distinct()
+                departamentos=Department.objects.filter(company_id=actor.company_id,active=True)
+            elif rolesDep.count()>0:
+                #you're a department coordinator. loading your departments
+                proyectos=Project.objects.filter(company_id=actor.company_id,deleted=False)
+                departamentos=Department.objects.filter(company_id=actor.company_id,active=True,
+                    projectdepartment__projectdepartmentemployeerole__employee_id=actor).distinct()
+            else:
+                #not any of this? get outta here!!
+                raise PermissionDenied
+    else:
+        #is admin
+        proyectos=Project.objects.filter(company_id=actor.company_id,deleted=False)
+        departamentos=Department.objects.filter(company_id=actor.company_id,active=True)
+    return {"departments":departamentos,"projects":proyectos}
