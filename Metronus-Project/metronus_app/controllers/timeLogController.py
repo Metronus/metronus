@@ -202,5 +202,8 @@ class myTask():
             self.durations[index] += tl.duration
 
 def findTimeLogByDescriptionAndDate(tDescription,tDate):
-    timeLog = TimeLog.objects.filter(description=tDescription,workDate=tDate).first()
+    #Vaya churro para comprobar que el dia, el mes y el año sean iguales
+    timeLog = TimeLog.objects.filter(description=tDescription,workDate__year__gte=tDate.date().year,workDate__month__gte=tDate.date().month,workDate__day__gte=tDate.date().day,
+                                     workDate__year__lte=tDate.date().year, workDate__month__lte=tDate.date().month,
+                                     workDate__day__lte=tDate.date().day).first()
     return timeLog
