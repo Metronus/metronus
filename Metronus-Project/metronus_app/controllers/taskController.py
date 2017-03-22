@@ -22,12 +22,15 @@ def create(request):
     parameters/returns:
     form: el formulario con los datos de la tarea
 
+    repeated_name: si el nombre es repetido
+    project_department_related: si nos están relacionados projectdepartment
     template:
     task_form.html
     """
      # Check that the user is logged in
     actor=checkTask(None,request)
 
+    project_department_related=True
     repeated_name=False
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -43,25 +46,27 @@ def create(request):
             ppro=form.cleaned_data['project_id']
             pdep=form.cleaned_data['department_id']
             pdtuple=find_tuple(ppro.id,pdep.id,actor)
-            pro=find_name(pname,pdtuple)
-            if pro is not None:
-                if not pro.active:
-                    checkTask(pro,request)
-                    pro.active=True
-                    pro.save()
-                    return HttpResponseRedirect('/task/list')
+            if pdtuple is not None:
+                pro=find_name(pname,pdtuple)
+                if pro is not None:
+                    if not pro.active:
+                        checkTask(pro,request)
+                        pro.active=True
+                        pro.save()
+                        return HttpResponseRedirect('/task/list')
+                    else:
+                        repeated_name=True
                 else:
-                    repeated_name=True
+                    actor=checkTask(pro,request)
+                    createTask(form,pdtuple,actor)
+                    return HttpResponseRedirect('/task/list')
             else:
-                actor=checkTask(pro,request)
-                createTask(form,pdtuple,actor)
-                return HttpResponseRedirect('/task/list')
-
+                project_department_related=False
     # if a GET (or any other method) we'll create a blank form
     else:
         form = TaskForm(request,initial={"task_id":0})
 
-    return render(request, 'task_form.html', {'form': form,'repeated_name':repeated_name})
+    return render(request, 'task_form.html', {'form': form,'repeated_name':repeated_name,'project_department_related':project_department_related})
 
 
 def list(request):
@@ -98,12 +103,16 @@ def edit(request,task_id):
     parameters/returns:
     form: el formulario con los datos de la tarea
 
+    repeated_name: si el nombre es repetido
+    project_department_related: si nos están relacionados projectdepartment
+
     template:
     task_form.html
     """
      # Check that the user is logged in
     actor=checkTask(None,request)
     repeated_name=False
+    project_department_related=True
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -115,10 +124,8 @@ def edit(request,task_id):
             # redirect to a new URL:
             task=get_object_or_404(Task,pk=form.cleaned_data['task_id'])
             checkTask(task,request)
-            ppro=form.cleaned_data['project_id']
-            pdep=form.cleaned_data['department_id']
-            pdtuple=find_tuple(ppro.id,pdep.id,actor)
-            pro=find_name(form.cleaned_data['name'],pdtuple)
+            #find tasks with the same name
+            pro=Task.objects.filter(name=form.cleaned_data['name'],projectDepartment_id=task.projectDepartment_id).first()
             #pro does not exists or it's the same
             if pro is None or pro.id==task.id:
                 updateTask(task,form)
@@ -133,7 +140,7 @@ def edit(request,task_id):
         form = TaskForm(request,initial={"name":task.name,"description":task.description,
                 "task_id":task.id})
 
-    return render(request, 'task_form.html', {'form': form,'repeated_name':repeated_name})
+    return render(request, 'task_form.html', {'form': form,'repeated_name':repeated_name,'project_department_related':project_department_related})
 
 def delete(request,task_id):
     """
@@ -242,4 +249,4 @@ def find_tuple(project_id,department_id,actor):
 
     if project.company_id!=department.company_id or  project.company_id!=actor.company_id :
         raise PermissionDenied
-    return ProjectDepartment.objects.get(project_id=project,department_id=department)
+    return ProjectDepartment.objects.filter(project_id=project,department_id=department).first()

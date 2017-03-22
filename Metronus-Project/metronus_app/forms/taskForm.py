@@ -39,8 +39,8 @@ class TaskForm(forms.Form):
 
             if res:
                 #is manager
-                proyectos=Project.objects.filter(company_id=employee.company_id,deleted=False)
-                departamentos=Department.objects.filter(company_id=employee.company_id,active=True)
+                proyectos=Project.objects.filter(company_id=actor.company_id,deleted=False)
+                departamentos=Department.objects.filter(company_id=actor.company_id,active=True)
             else:
                 #not a manager
                 rolesPro = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,

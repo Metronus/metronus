@@ -105,6 +105,7 @@ def basicLoad():
     emp_role=Role.objects.get(name="Employee")
     coor_role=Role.objects.get(name="Coordinator")
     pm_role=Role.objects.get(name="Project manager")
+    team_role=Role.objects.get(name="Team manager")
 
     ProjectDepartmentEmployeeRole.objects.create(
         projectDepartment_id=pd1,
@@ -127,6 +128,10 @@ def basicLoad():
         projectDepartment_id=pd2,
         employee_id=emp4,
         role_id=pm_role )
+    ProjectDepartmentEmployeeRole.objects.create(
+        projectDepartment_id=pd2,
+        employee_id=emp4,
+        role_id=team_role )
 
     ProjectDepartmentEmployeeRole.objects.create(
         projectDepartment_id=pd1,
