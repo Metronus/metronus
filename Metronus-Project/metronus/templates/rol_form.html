@@ -49,6 +49,26 @@ $(document).ready(function() {
 });
 </script>
 
+<script type="text/javascript">
+	
+function ajax(){
+    $.post('/roles/manageAsync', $('#register_form').serialize(), function(data, status){
+    	document.getElementById('register_form').reset();
+        $("#register_form").data('bootstrapValidator').resetForm();
+    	console.log(data)
+    	if(JSON.stringify(data['success'])=="true"){
+    		$('#errorDiv').attr('hidden', true);
+    		$('#error2Div').attr('hidden', true);
+    		$('#successDiv').attr('hidden', false).html("<strong>{% trans 'success' %} | </strong>{% trans 'departmentSaved' %}");
+    	}else{
+    		$('#successDiv').attr('hidden', true);
+    		$('#errorDiv').attr('hidden', false).html("<strong>{% trans 'fail' %} | </strong>{% trans 'departmentError' %}"); 
+    	}
+       	
+    });
+};
+</script>
+
 {% endblock %}
 
 {% block content %}
@@ -58,11 +78,11 @@ $(document).ready(function() {
 <h1 align="center"> {% trans 'editRole' %} </h1></br>
 {% endif %}
 
-{% if form.errors %}
-<div id="errorDiv" class="alert alert-danger">
-        <p>{{ form.errors }}</p>
-</div></script>
-{% endif %}
+<div id="successDiv" class="alert alert-success" hidden='true'>
+	</div>
+<div id="errorDiv" class="alert alert-danger"  hidden='true'>
+	</div>
+
 
 
 
@@ -111,6 +131,9 @@ $(document).ready(function() {
 	    <p align="center">
 	    <div align="center" >
 	    	<input type="submit" class="btn btn-success submit-button" value="{% trans 'confirm' %}" />
+	    	{% if  form.employeeRole_id.value == 0 %}
+		    	<input type="button" class="btn btn-success submit-button" value="{% trans 'departmentAdd' %}" onclick="ajax();" />
+		    {% endif %}
 	    </div>
 	    </p>
     </form>
