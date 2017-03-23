@@ -25,7 +25,7 @@ def create(request):
     """
 
     # Check that the current user is an administrator
-    admin = get_current_admin_or_403(request)
+    admin = checkDepartment(None,request)
     repeated_name=False
 
     # if this is a POST request we need to process the form data
@@ -70,7 +70,7 @@ def createAsync(request):
     """
 
     # Check that the current user is an administrator
-    admin = get_current_admin_or_403(request)
+    admin = checkDepartment(None,request)
 
     data = {
         'repeated_name': False,
@@ -117,26 +117,8 @@ def list(request):
     department_list.html
     """
 
-    # Check that the current user is an administrator
-    admin = get_current_admin_or_403(request)
-
-    lista=Department.objects.filter(company_id=admin.company_id,active=True)
-    return render(request, "department_list.html", {"departments": lista})
-def list_for_employees(request):
-    """
-    OJO: esta no debería ser necesaria
-    returns:
-    departments: lista de departamentos del empleado logeada
-
-    template:
-    department_list.html
-    """
-
-    # Check that the current user is an employee
-    employee = get_current_employee_or_403(request)
-
-    lista=Department.objects.filter(company_id=employee.company_id,active=True,
-        projectdepartment__projectdepartmentemployeerole__employee_id=employee).distinct()
+    # Check that the current user has permissions
+    lista=getListForRole(request)
     return render(request, "department_list.html", {"departments": lista})
 
 def view(request,department_id):
@@ -154,7 +136,7 @@ def view(request,department_id):
     template: department_view.html
     """
     department = get_object_or_404(Department, pk=department_id)
-    checkRoleForList(department,request)
+    admin = checkDepartment(department,request)
 
     tasks=Task.objects.filter(active=True, projectDepartment_id__department_id__id=department_id)
 
@@ -175,7 +157,7 @@ def edit(request,department_id):
     """
 
     # Check that the current user is an administrator
-    admin = get_current_admin_or_403(request)
+    admin = checkDepartment(None,request)
     repeated_name=False
 
     # if this is a POST request we need to process the form data
@@ -188,15 +170,15 @@ def edit(request,department_id):
             # ...
             # redirect to a new URL:
             department=get_object_or_404(Department,pk=form.cleaned_data['department_id'])
-            if checkCompanyDepartment(department,admin.company_id):
-                dep=findName(form.cleaned_data['name'],admin)
-                #dep does not exists or it's the same
-                if dep is None or dep.id==department.id:
-                    editDepartment(department,form)
-                    return HttpResponseRedirect('/department/view/'+str(department.id)+"/")
-                else:
-                    if dep.active:
-                        repeated_name=True
+           
+            dep=findName(form.cleaned_data['name'],admin)
+            #dep does not exists or it's the same
+            if dep is None or dep.id==department.id:
+                editDepartment(department,form)
+                return HttpResponseRedirect('/department/view/'+str(department.id)+"/")
+            else:
+                if dep.active:
+                    repeated_name=True
     # if a GET (or any other method) we'll create a blank form
     else:
 
@@ -218,14 +200,11 @@ def delete(request,department_id):
     template:
     deparment_list.html
     """
-
-
-    # Check that the current user is an administrator
-    admin = get_current_admin_or_403(request)
-
     department=get_object_or_404(Department,pk=department_id)
-    if checkCompanyDepartment(department,admin.company_id):
-        deleteDepartment(department)
+    
+    # Check that the current user is an administrator
+    admin = checkDepartment(department,request)    
+    deleteDepartment(department)
 
     return HttpResponseRedirect('/department/list')
 
@@ -240,13 +219,44 @@ def createDepartment(form,admin):
     return Department.objects.create(name=dname,active=True,company_id=company)
 
 def editDepartment(department,form):
-
     department.name = form.cleaned_data['name']
     department.save()
 
 def deleteDepartment(department):
     department.active=False
     department.save()
+
+
+def checkDepartment(dep,request):
+    """
+    checks if the department belongs to the logged actor with appropiate roles
+    Admin, manager or project manager
+    """
+    actor=None
+    if not request.user.is_authenticated():
+        raise PermissionDenied
+    try:
+        actor= Actor.objects.get(user=request.user)
+    except ObjectDoesNotExist:
+        raise PermissionDenied
+
+    # Check that the actor has permission to view the dep
+    if dep is not None and (dep.company_id != actor.company_id or not dep.active):
+        raise PermissionDenied
+
+    if actor.user_type!='A':
+        isTeamManager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+                    role_id__name= "Team manager")
+        res=isTeamManager.count()>0
+
+        if not res:
+            roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+                    role_id__name="Project manager")
+            res=roles.count()>0
+        if not res:
+            raise PermissionDenied
+
+    return actor
 
 def checkCompanyDepartmentSession(department,admin):
     """
@@ -258,25 +268,18 @@ def checkCompanyDepartment(department,company_id):
     """
     checks if the department belongs to the specified company
     """
-    res= department is not None and company_id==department.company_id and department.active
+    res= department is not None and company_id==department.company_id 
     if not res:
         raise PermissionDenied
     return res
 
-
-
-def checkRoleForList(dep,request):
-
+def getListForRole(request):
     actor=None
     if not request.user.is_authenticated():
         raise PermissionDenied
     try:
         actor= Actor.objects.get(user=request.user)
     except ObjectDoesNotExist:
-        raise PermissionDenied
-
-    # Check that the admin has permission to view that employee
-    if dep.company_id != actor.company_id:
         raise PermissionDenied
 
     if actor.user_type!='A':
@@ -286,7 +289,16 @@ def checkRoleForList(dep,request):
 
         if not res:
             roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                        projectDepartment_id__department_id=dep)
+                    role_id__name="Project manager")
             res=roles.count()>0
-        if not res:
-            raise PermissionDenied
+            if not res:
+                raise PermissionDenied
+            else:
+                departments=Department.objects.filter(projectdepartment__projectdepartmentemployeerole__employee_id=actor,
+                    company_id=actor.company_id,active=True)
+        else:
+            departments=Department.objects.filter(company_id=actor.company_id,active=True)
+    else:
+        departments=Department.objects.filter(company_id=actor.company_id,active=True)
+
+    return departments 
