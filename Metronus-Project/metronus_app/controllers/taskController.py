@@ -15,7 +15,8 @@ from django.core.exceptions             import ObjectDoesNotExist, PermissionDen
 from django.http                        import HttpResponseForbidden
 from django.contrib.auth import authenticate,login
 
-
+from django.core import serializers
+from django.http import HttpResponse
 
 def create(request):
     """
@@ -72,10 +73,85 @@ def create(request):
         ,"departments":coll["departments"],"projects":coll["projects"]})
 
 
+def create(request):
+    """
+    parameters/returns:
+    form: el formulario con los datos de la tarea
+    departments:eso
+    projects:eso
+    repeated_name: si el nombre es repetido
+    project_department_related: si nos están relacionados projectdepartment
+
+    template:
+    task_form.html
+    """
+     # Check that the user is logged in
+    actor=checkTask(None,request)
+    data = {
+        'repeated_name': False,
+        'success':True,
+        'project_department_related':True
+    }
+
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = TaskForm(request.POST)
+        # check whether it's valid:
+
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            # ...
+            # redirect to a new URL:
+            pname=form.cleaned_data['name']
+            ppro=form.cleaned_data['project_id']
+            pdep=form.cleaned_data['department_id']
+            pdtuple=find_tuple(ppro.id,pdep.id,actor)
+            if pdtuple is not None:
+                pro=find_name(pname,pdtuple)
+                if pro is not None:
+                    if not pro.active:
+                        checkTask(pro,request)
+                        pro.active=True
+                        pro.save()
+                        return JsonResponse(data)
+                    else:
+                        data['repeated_name']=True
+                else:
+                    actor=checkTask(pro,request)
+                    createTask(form,pdtuple,actor)
+                    return JsonResponse(data)
+            else:
+                data['project_department_related']=False
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        return HttpResponseRedirect('/department/create')
+    data['success']=False
+    return JsonResponse(data)
+def form_projects(request):
+    """
+    parameters:
+    department_id: el departamento asociado
+    returns:
+    projects: lista de proyectos del actor logeada
+    """
+    response = serializers.serialize("json", find_projects(request))
+    return HttpResponse(response, content_type='application/json')
+
+def form_departments(request):
+    """
+    parameters:
+    project_id: el proyecto asociado
+    returns:
+    departments :la lista de departamentos
+    """
+    response = serializers.serialize("json", find_departments(request))
+    return HttpResponse(response, content_type='application/json')
+
 def list(request):
     """
     returns:
-    tasks: lista de tareas de la compañía logeada
+    tasks: lista de tareas del actor logeado
 
     template:
     task_list.html
@@ -287,10 +363,12 @@ def find_collections(request):
                 #you're a project manager. Loading your projects
                 proyectos=Project.objects.filter(company_id=actor.company_id,deleted=False,
                     projectdepartment__projectdepartmentemployeerole__employee_id=actor).distinct()
-                departamentos=Department.objects.filter(company_id=actor.company_id,active=True)
+                departamentos=Department.objects.filter(company_id=actor.company_id,active=True,
+                    projectdepartment__projectdepartmentemployeerole__employee_id=actor).distinct()
             elif rolesDep.count()>0:
                 #you're a department coordinator. loading your departments
-                proyectos=Project.objects.filter(company_id=actor.company_id,deleted=False)
+                proyectos=Project.objects.filter(company_id=actor.company_id,deleted=False,
+                    projectdepartment__projectdepartmentemployeerole__employee_id=actor).distinct()
                 departamentos=Department.objects.filter(company_id=actor.company_id,active=True,
                     projectdepartment__projectdepartmentemployeerole__employee_id=actor).distinct()
             else:
@@ -301,3 +379,95 @@ def find_collections(request):
         proyectos=Project.objects.filter(company_id=actor.company_id,deleted=False)
         departamentos=Department.objects.filter(company_id=actor.company_id,active=True)
     return {"departments":departamentos,"projects":proyectos}
+
+
+def find_departments(request):
+    project_id=request.GET.get("project_id")
+    actor=None
+    if not request.user.is_authenticated():
+        raise PermissionDenied
+    try:
+        actor= Actor.objects.get(user=request.user)
+    except ObjectDoesNotExist:
+        raise PermissionDenied
+
+    if actor.user_type!='A':
+        #not an admin
+        isTeamManager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+                    role_id__name= "Team manager")
+        res=isTeamManager.count()>0
+
+        if res:
+            #is manager
+            departamentos=Department.objects.filter(company_id=actor.company_id,active=True)
+        else:
+            #not a manager
+            rolesPro = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+                     role_id__name="Project manager")
+            rolesDep=ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+                     role_id__name="Coordinator")
+
+            if  rolesPro.count()>0:
+                #you're a project manager. Loading your projects
+                departamentos=Department.objects.filter(company_id=actor.company_id,active=True,
+                    projectdepartment__projectdepartmentemployeerole__employee_id=actor,projectdepartment__project_id_id=project_id).distinct()
+            elif rolesDep.count()>0:
+                #you're a department coordinator. loading your departments
+                departamentos=Department.objects.filter(company_id=actor.company_id,active=True,
+                    projectdepartment__projectdepartmentemployeerole__employee_id=actor,projectdepartment__project_id_id=project_id).distinct()
+            else:
+                #not any of this? get outta here!!
+                raise PermissionDenied
+    else:
+        #is admin
+
+        departamentos=Department.objects.filter(company_id=actor.company_id,active=True)
+    return departamentos
+
+def find_projects(request):
+    department_id=request.GET.get("department_id")
+    actor=None
+    if not request.user.is_authenticated():
+        raise PermissionDenied
+    try:
+        actor= Actor.objects.get(user=request.user)
+    except ObjectDoesNotExist:
+        raise PermissionDenied
+
+    if actor.user_type!='A':
+        #not an admin
+        isTeamManager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+                    role_id__name= "Team manager")
+        res=isTeamManager.count()>0
+
+        if res:
+            #is manager
+            proyectos=Project.objects.filter(company_id=actor.company_id,deleted=False)
+
+        else:
+            #not a manager
+            rolesPro = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+                     role_id__name="Project manager")
+            rolesDep=ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+                     role_id__name="Coordinator")
+
+            if  rolesPro.count()>0:
+                #you're a project manager. Loading your projects
+                proyectos=Project.objects.filter(company_id=actor.company_id,deleted=False,
+                    projectdepartment__projectdepartmentemployeerole__employee_id=actor
+                    ,projectdepartment__department_id_id=department_id).distinct()
+
+            elif rolesDep.count()>0:
+                #you're a department coordinator. loading your departments
+                proyectos=Project.objects.filter(company_id=actor.company_id,deleted=False,
+                    projectdepartment__projectdepartmentemployeerole__employee_id=actor
+                    ,projectdepartment__department_id_id=department_id).distinct()
+
+            else:
+                #not any of this? get outta here!!
+                raise PermissionDenied
+    else:
+        #is admin
+        proyectos=Project.objects.filter(company_id=actor.company_id,deleted=False)
+
+    return proyectos
