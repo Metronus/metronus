@@ -14,7 +14,7 @@ from populate_database import basicLoad
 from django.core.exceptions             import ObjectDoesNotExist, PermissionDenied
 from django.http                        import HttpResponseForbidden
 from django.contrib.auth import authenticate,login
-
+from django.http import JsonResponse
 from django.core import serializers
 from django.http import HttpResponse
 
@@ -73,7 +73,7 @@ def create(request):
         ,"departments":coll["departments"],"projects":coll["projects"]})
 
 
-def create(request):
+def createAsync(request):
     """
     parameters/returns:
     form: el formulario con los datos de la tarea
