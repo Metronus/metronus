@@ -14,6 +14,10 @@ env:
     - METRONUS_DB_USER=metronus_user_travis
     - METRONUS_DB_PASS=metronus_pass_travis
     - DJANGO_SECRET_KEY=travistravistravistravistravistravistravis
+    - METRONUS_MAIL_HOST='smtp.gmail.com'
+    - METRONUS_MAIL_PORT=587
+    - METRONUS_MAIL_USER='metronus.info@gmail.com'
+    - METRONUS_MAIL_DEFAULTFROM='Metronus-DEV <metronus.info@gmail.com>'
 
 cache: pip3
 

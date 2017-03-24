@@ -17,6 +17,8 @@ from django.utils.translation import ugettext_lazy as _
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_PATH = os.path.dirname(os.path.realpath(__file__))
 
+production = "METRONUS_PRODUCTION" in os.environ
+heroku = os.environ["METRONUS_DB_NAME"] == 'dnuusjkalf041'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
@@ -25,7 +27,7 @@ PROJECT_PATH = os.path.dirname(os.path.realpath(__file__))
 SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = "METRONUS_PRODUCTION" not in os.environ
+DEBUG = not production
 
 ALLOWED_HOSTS = [".metronus.es", "metronus.herokuapp.com", "localhost", "127.0.0.1"]
 
@@ -88,8 +90,6 @@ WSGI_APPLICATION = 'metronus.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
-heroku = os.environ["METRONUS_DB_NAME"] == 'dnuusjkalf041'
-
 DATABASES = {
 	    'default': {
 		'ENGINE': 'django.db.backends.postgresql',
@@ -124,13 +124,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
 
@@ -158,3 +154,11 @@ MEDIA_ROOT = (
 # https://warehouse.python.org/project/whitenoise/
 
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
+# Mail configuration
+EMAIL_HOST = os.environ["METRONUS_MAIL_HOST"]
+EMAIL_PORT = os.environ["METRONUS_MAIL_PORT"]
+EMAIL_HOST_USER = os.environ["METRONUS_MAIL_USER"]
+EMAIL_HOST_PASSWORD = os.environ["METRONUS_MAIL_PASSWORD"]
+EMAIL_USE_TLS = not production
+DEFAULT_FROM_EMAIL = os.environ["METRONUS_MAIL_DEFAULTFROM"]

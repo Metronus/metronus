@@ -1,7 +1,9 @@
 from django.core.exceptions                      import PermissionDenied
 from metronus_app.model.administrator            import Administrator
-from metronus_app.model.employee            import Employee
+from metronus_app.model.employee                 import Employee
 from django.core.exceptions                      import ObjectDoesNotExist
+from metronus.settings                           import DEFAULT_FROM_EMAIL
+from django.core                                 import mail
 
 from PIL import Image
 
@@ -64,3 +66,6 @@ def checkImage(form, param):
         return xsize <= WIDTH and ysize <= HEIGHT and ext
     else:
         return True
+
+def send_mail(subject, message, recipients, **kwargs):
+    mail.send_mail(subject, message, DEFAULT_FROM_EMAIL, recipients, **kwargs)
