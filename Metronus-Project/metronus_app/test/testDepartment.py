@@ -208,6 +208,7 @@ class DepartmentTestCase(TestCase):
         self.assertEquals(len(response.context["employees"]), 1)
         self.assertEquals(len(response.context["tasks"]), 0)
         #self.assertEquals(response.context["employees"][0].department.id, dep_id)
+        
     def test_view_department_not_allowed(self):
         c = Client()
         c.login(username="emp2", password="123456")

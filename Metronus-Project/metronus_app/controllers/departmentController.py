@@ -136,7 +136,7 @@ def view(request,department_id):
     template: department_view.html
     """
     department = get_object_or_404(Department, pk=department_id)
-    admin = checkDepartment(department,request)
+    admin = checkDepartmentForView(department,request,True)
 
     tasks=Task.objects.filter(active=True, projectDepartment_id__department_id__id=department_id)
 
@@ -226,11 +226,16 @@ def deleteDepartment(department):
     department.active=False
     department.save()
 
-
 def checkDepartment(dep,request):
+    """
+    this check department is only for creating, modifying or deleting
+    """
+    return checkDepartmentForView(dep,request,False)
+def checkDepartmentForView(dep,request,forView):
     """
     checks if the department belongs to the logged actor with appropiate roles
     Admin, manager or project manager
+    if forView is true, the coordinator has access too
     """
     actor=None
     if not request.user.is_authenticated():
@@ -250,8 +255,12 @@ def checkDepartment(dep,request):
         res=isTeamManager.count()>0
 
         if not res:
-            roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                    role_id__name="Project manager")
+            if forView:
+                roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+                         role_id__name__in=["Project manager","Coordinator"])
+            else:
+                roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+                        role_id__name="Project manager")
             res=roles.count()>0
         if not res:
             raise PermissionDenied
@@ -289,7 +298,7 @@ def getListForRole(request):
 
         if not res:
             roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                    role_id__name="Project manager")
+                    role_id__name__in=["Project manager","Coordinator"])
             res=roles.count()>0
             if not res:
                 raise PermissionDenied
