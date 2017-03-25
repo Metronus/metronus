@@ -67,7 +67,7 @@ def create(request):
                 project_department_related=False
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = TaskForm(initial={"task_id":0})
+        form = TaskForm(initial={"task_id":0,"name":"","description":""})
     coll=find_collections(request)
     return render(request, 'task_form.html', {'form': form,'repeated_name':repeated_name,'project_department_related':project_department_related
         ,"departments":coll["departments"],"projects":coll["projects"]})

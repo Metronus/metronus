@@ -49,6 +49,7 @@ urlpatterns += [#i18n_patterns(
 
     #a la espera de ponerle el name
     url(r'^task/create$', taskController.create, name='task_create'),
+    url(r'^task/createAsync$', taskController.createAsync),
     url(r'^task/list$', taskController.list, name='task_list'),
     url(r'^task/view/(?P<task_id>\w{0,50})/$', taskController.view, name='task_view'),
     url(r'^task/edit/(?P<task_id>\w{0,50})/$', taskController.edit, name='task_edit'),

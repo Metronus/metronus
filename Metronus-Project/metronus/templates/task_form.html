@@ -42,6 +42,27 @@
         }
     })
   });
+  function ajax(){
+    $.post('/task/createAsync', $('#register_form').serialize(), function(data, status){
+        document.getElementById('register_form').reset();
+        $("#register_form").data('bootstrapValidator').resetForm();
+        console.log(data)
+        if(JSON.stringify(data['success'])=="true"){
+            $('#errorDiv').attr('hidden', true);
+            $('#error2Div').attr('hidden', true);
+            $('#successDiv').attr('hidden', false).html("<strong>{% trans 'success' %} | </strong>{% trans 'taskSaved' %}");
+        }else if(JSON.stringify(data['repeated_name'])=="true"){
+            $('#successDiv').attr('hidden', true);
+            $('#error2Div').attr('hidden', true);
+            $('#errorDiv').attr('hidden', false).html("<strong>{% trans 'fail' %} | </strong>{% trans 'taskName' %}");
+        }else{
+            $('#successDiv').attr('hidden', true);
+            $('#error2Div').attr('hidden', true);
+            $('#errorDiv').attr('hidden', false).html("<strong>{% trans 'fail' %} | </strong>{% trans 'taskError' %}"); 
+        }
+        
+    });
+};
 </script>
 {% endblock %}
 
@@ -51,7 +72,11 @@
         <p>{{ form.errors }}</p>
 {% endif %}
 
-
+        <div id="successDiv" class="alert alert-success" hidden='true'>
+            </div>
+        <div id="errorDiv" class="alert alert-danger"  hidden='true'>
+            </div>
+    
 {% if  repeated_name == True %}
     <div id="error2Div" class="alert alert-danger">
         <strong>{% trans 'fail' %} | </strong>{% trans 'taskName' %}
@@ -118,9 +143,12 @@
 
 
     </br>
-    <div align="center" >
-        <input type="submit" class="btn btn-success submit-button" value="{% trans 'create' %}" />
-    </div>
+        <div align="center" >
+            <button type="submit" class="btn btn-success submit-button" >{% trans 'confirm' %}</button>
+            {% if  request.path == '/task/create'%}
+                <input type="button" class="btn btn-success submit-button" value="{% trans 'taskAdd' %}" onclick="ajax();" />
+            {% endif %}
+        </div>
 </form>
 
  </div>
