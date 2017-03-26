@@ -11,13 +11,22 @@
 {% endblock %}
 
 {% block content %}
+    <div class="clearfix"></div>
 
-    <div id="alert_placeholder"></div>
+    <div id="successDiv" class="alert alert-success" hidden='true'></div>
+    <div id="errorDiv" class="alert alert-danger"  hidden='true'></div>
+
+    {% if error %}
+        <div id="error" class="alert alert-error alert-dismissible" role="alert">
+            <a class="close" data-dismiss="alert">x</a>
+            <span><strong>{% trans 'fail' %} |</strong> {% trans 'projectError' %}</span>
+        </div>
+    {% endif %}
 
     {% if repeated_name %}
-        <div id="repeated_name" class="alert alert-warning alert-dismissible" role="alert">
+        <div id="repeated_name" class="alert alert-error alert-dismissible" role="alert">
             <a class="close" data-dismiss="alert">x</a>
-            <span>{% trans 'projectName' %}</span>
+            <span><strong>{% trans 'fail' %} |</strong> {% trans 'projectName' %}</span>
         </div>
     {% endif %}
 
@@ -52,7 +61,7 @@
                                 <a class="btn btn-danger" href="{% url 'project_list' %}">{% trans 'cancel' %}</a>
                                 <button type="submit" class="btn btn-success">{% trans 'confirm' %}</button>
                                 {% if form.project_id.value|slugify == '0' %}
-                                    <button class="btn btn-info" onclick="createAndContinue()">{% trans 'createAndContinue' %}</button>
+                                    <a class="btn btn-info" onclick="createAndContinue()">{% trans 'createAndContinue' %}</a>
                                 {% endif %}
                             </div>
                         </div>
@@ -65,15 +74,6 @@
 
 {% block javascript %}
 <script>
-function error_alert(){
-    showalert('{% trans 'projectError' %}','alert-error');
-}
-function success_alert(){
-    showalert('{% trans 'projectSaved' %}','alert-success');
-}
-function repeated_alert(){
-    showalert('{% trans 'projectName' %}','alert-warning');
-}
 /**
  * Función ajax de crear y continuar
  * */
@@ -83,12 +83,15 @@ function createAndContinue() {
         $('#form').data('bootstrapValidator').resetForm();
 
         if(JSON.stringify(data['success'])=="true"){
-            success_alert();
+            $('#errorDiv').attr('hidden', true);
+    		$('#successDiv').attr('hidden', false).html("<strong>{% trans 'success' %} | </strong>{% trans 'projectSaved' %}");
         } else if(JSON.stringify(data['repeated_name'])=="true") {
-            repeated_alert();
-        } else {
-            error_alert();
-        }
+    		$('#successDiv').attr('hidden', true);
+    		$('#errorDiv').attr('hidden', false).html("<strong>{% trans 'fail' %} | </strong>{% trans 'projectName' %}");
+    	} else {
+    		$('#successDiv').attr('hidden', true);
+    		$('#errorDiv').attr('hidden', false).html("<strong>{% trans 'fail' %} | </strong>{% trans 'projectError' %}");
+    	}
     } );
 };
 
