@@ -1,6 +1,7 @@
 {% extends "layout_base.html" %}
 {% load i18n %}
 {% load l10n %}
+{% load static }
 {% block title %}
 {% if  form.employeeRole_id.value == 0 %}
 {% trans 'addRole' %}
@@ -32,14 +33,14 @@ $(document).ready(function() {
             project_id: {
                 validators: {
                     notEmpty: {
-                        message: "{% trans 'departmentNameNotNull' %}"
+                        message: "{% trans 'projectNotNull' %}"
                     },
                 }
             },
             role_id: {
                 validators: {
                     notEmpty: {
-                        message: "{% trans 'departmentNameNotNull' %}"
+                        message: "{% trans 'roleNotNull' %}"
                     },
                 }
             },
@@ -72,71 +73,88 @@ function ajax(){
 {% endblock %}
 
 {% block content %}
-{% if  form.employeeRole_id.value == 0 %}
-<h1 align="center"> {% trans 'addRole' %} </h1></br>
-{% else %}
-<h1 align="center"> {% trans 'editRole' %} </h1></br>
-{% endif %}
 
-<div id="successDiv" class="alert alert-success" hidden='true'>
-	</div>
-<div id="errorDiv" class="alert alert-danger"  hidden='true'>
-	</div>
+<div class="row">
 
+<div class="col-md-12 col-sm-12 col-xs-12">
+  <div class="x_panel">
+    <div class="x_title">
+      {% if  form.employeeRole_id.value == 0 %}
+		  <h2 > {% trans 'addRole' %} </h2>
+	  {% else %}
+		  <h2 > {% trans 'editRole' %} </h2>
+	  {% endif %}
+      <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
 
+    
+   <form id="register_form" method="POST" action="" class="form-horizontal">
 
+    {% csrf_token %}
 
-        <form id="register_form" method="POST" action="" class="form-horizontal" align="center">{% csrf_token %}
+	    <div class="col-md-6 col-md-offset-2 collapse in" >
 
-	    <div class="form-group company_class form-class" >
-	    	<p align="center">
-          		<label class="control-label col-sm-4" for="id_{{ form.department_id.name }}">{% trans 'department' %}</label>
-            	<div class="col-sm-6">
-              		<select class="selectpicker col-md-6" name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}" required>
-	              		<option value="" selected>{% trans 'selectDepartment' %}</option>
-	              		{% for dep in departments %}
-	    					<option value="{{ dep.id }}"{% if form.department_id.value == dep.id %} selected{% endif %}>{{ dep.name }}</option>
-						{% endfor %}
-              		</select>
-				</div>
-				<br>
-			</p>
-			<p align="center">
-				<label class="control-label col-sm-4" for="id_{{ form.project_id.name }}">{% trans 'project' %}</label>
-            	<div class="col-sm-6">
-              		<select class="selectpicker col-md-6" name="{{ form.project_id.name }}" id="id_{{ form.project_id.name }}" required>
+	    <div class="form-group required form-class">
+          
+          <label class="control-label col-md-4 col-sm-4 col-xs-12" for="id_{{ form.project_id.name }}">{% trans 'project' %}</label>
+            <div class="col-sm-6">
+              <select class="form-control" name="{{ form.project_id.name }}" id="id_{{ form.project_id.name }}" required>
 	              		<option value="" selected>{% trans 'selectProject' %}</option>
 	              		{% for dep in projects %}
 	    				<option value="{{ dep.id }}"{% if form.project_id.value == dep.id %} selected{% endif %}>{{ dep.name }}</option>
 						{% endfor %}
               		</select>
-				</div>
-				<br>
-			</p>
-			<p align="center">
-				<label class="control-label col-sm-4" for="id_{{ form.role_id.name }}">{% trans 'rol' %}</label>
-				<div class="col-sm-6">
-	              <select class="selectpicker col-md-6" name="{{ form.role_id.name }}" id="id_{{ form.role_id.name }}" required>
+            </div>
+        </div>
+
+        <div class="form-group required form-class">
+          
+          <label class="control-label col-md-4 col-sm-4 col-xs-12" for="id_{{ form.department_id.name }}">{% trans 'department' %}</label>
+            <div class="col-sm-6">
+              <select class="form-control" name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}" required>
+	              		<option value="" selected>{% trans 'selectDepartment' %}</option>
+	              		{% for dep in departments %}
+	    					<option value="{{ dep.id }}"{% if form.department_id.value == dep.id %} selected{% endif %}>{{ dep.name }}</option>
+						{% endfor %}
+              		</select>
+            </div>
+        </div>
+
+        <div class="form-group required form-class">
+          <label class="control-label col-sm-4" for="id_{{ form.role_id.name }}">{% trans 'rol' %}</label>
+            <div class="col-sm-6">
+              <select class="form-control" name="{{ form.role_id.name }}" id="id_{{ form.role_id.name }}" required>
 		              <option value="" selected>{% trans 'selectRole' %}</option>
 		             	{% for dep in roles %}
 		    			<option value="{{ dep.id }}"{% if form.role_id.value == dep.id %} selected{% endif %}>{{ dep.name }}</option>
 						{% endfor %}
 	              </select>
-				</div>
-			</p>
-              <input type="text" hidden="true" name="{{ form.employee_id.name }}" id="id_{{ form.employee_id.name }}" value="{{ form.employee_id.value}}" />
-              <input type="text" hidden="true" name="{{ form.employeeRole_id.name }}" id="id_{{ form.employeeRole_id.name }}" value="{{ form.employeeRole_id.value}}" />
-             </div>
-	    </br>
-	    <p align="center">
-	    <div align="center" >
-	    	<input type="submit" class="btn btn-success submit-button" value="{% trans 'confirm' %}" />
+            </div>
+        </div>
+
+        <input type="text" hidden="true" name="{{ form.employee_id.name }}" id="id_{{ form.employee_id.name }}" value="{{ form.employee_id.value}}" />
+        <input type="text" hidden="true" name="{{ form.employeeRole_id.name }}" id="id_{{ form.employeeRole_id.name }}" value="{{ form.employeeRole_id.value}}" />
+
+
+        <div class="form-group control-buttons">
+            <div class="col-sm-offset-4 col-sm-10">
+
+            <input type="submit" class="btn btn-success submit-button" value="{% trans 'confirm' %}" />
 	    	{% if  form.employeeRole_id.value == 0 %}
 		    	<input type="button" class="btn btn-success submit-button" value="{% trans 'roleAdd' %}" onclick="ajax();" />
 		    {% endif %}
-	    </div>
-	    </p>
+
+            </div>
+          
+        </div>
+        </div>
+
     </form>
+ </div>
+ </div>
+ </div>
+ </div>
 
 
 {% endblock %}

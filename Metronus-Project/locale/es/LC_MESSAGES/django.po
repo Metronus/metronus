@@ -253,6 +253,8 @@ msgid "departmentConfirm"
 msgstr "¿Está seguro de eliminar el departamento? Se eliminará también todo lo relacionado con el mismo"
 msgid "selectDepartment"
 msgstr "Seleccione departamento"
+msgid "departmentNotNull"
+msgstr "El departamento no puede ser nulo"
 
 #: Employee
 msgid "registryDate"
@@ -316,6 +318,8 @@ msgid "projectSaved"
 msgstr "El proyecto se guardó correctamente"
 msgid "projectError"
 msgstr "El proyecto no se pudo guardar correctamente"
+msgid "projectNotNull"
+msgstr "El proyecto no puede ser nulo"
 
 #: TimeLog
 msgid "timeLog"
@@ -352,6 +356,8 @@ msgid "roleError"
 msgstr "El rol no se pudo guardar correctamente"
 msgid "roleAdd"
 msgstr "Crear y añadir otro rol"
+msgid "roleNotNull"
+msgstr "El rol no puede ser nulo"
 
 #: Company
 msgid "registerCompany"
