@@ -5,7 +5,7 @@
 {% block title %}{% trans 'employeeList' %}{% endblock %}
 
 {% block content %}
-
+<div class="row">
 <div class="col-md-12 col-sm-12 col-xs-12">
   <div class="x_panel">
     <div class="x_title">
@@ -27,9 +27,10 @@
         </thead>
         <tbody>
           {% for employee in employees %}
-          <tr>
+          <tr data-href="/employee/view/{{employee.user}}" style="cursor: pointer;">
             <th scope="row">{{forloop.counter}}</th>
-            <td>{{employee.user}}</td>
+
+            <td><img src="/static/avatar.png" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
 
             <td>{{employee.identifier}}</td>
 
@@ -38,9 +39,8 @@
             <td>{{employee.registryDate}}</td>
 
             <td>
-              <a href="/employee/view/{{employee.user}}" type="button" class="btn btn-success">{% trans 'details' %}</a>
-              <a href="/employee/edit/{{employee.user}}" type="button" class="btn btn-dark">{% trans 'edit' %}</a>
-              <a onclick="removealert('/employee/delete/{{employee.user}}');" type="button" class="btn btn-default">{% trans 'fire' %}</a>
+              <a href="/employee/edit/{{employee.user}}" type="button" class="btn btn-success">{% trans 'edit' %}</a>
+              <a onclick="removealert('/employee/delete/{{employee.user}}');" type="button" class="btn btn-dark">{% trans 'fire' %}</a>
             </td>
           </tr>
           {% endfor %}
@@ -54,9 +54,12 @@
   </div>
 
 </div>
-
+</div>
 
 {% endblock %}
 
 {% block javascript %}
+<script>
+$("[data-href]").click( function () { window.location.href = this.dataset.href })
+</script>
 {% endblock %}
