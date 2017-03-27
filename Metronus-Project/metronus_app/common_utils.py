@@ -4,6 +4,7 @@ from metronus_app.model.employee                 import Employee
 from django.core.exceptions                      import ObjectDoesNotExist
 from metronus.settings                           import DEFAULT_FROM_EMAIL
 from django.core                                 import mail
+from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 
 from PIL import Image
 
@@ -32,6 +33,22 @@ def get_current_employee_or_403(request):
         return Employee.objects.get(user=request.user)
     except ObjectDoesNotExist:
         raise PermissionDenied
+
+def get_authorized_or_403(request):
+    # Returns the current administrator, or the logged user if they have at least a role higher than Employee on any department/project
+
+    if not request.user.is_authenticated():
+        raise PermissionDenied
+
+    try:
+        return get_current_admin_or_403(request)
+    except PermissionDenied:
+        # The user is authenticated and it's not an admin
+        cur_user = Employee.objects.get(user=request.user)
+        if ProjectDepartmentEmployeeRole.objects.filter(employee_id=cur_user, role_id__tier__gt=10).count() > 0:
+            return cur_user
+        else:
+            raise PermissionDenied
 
 
 def get_or_none(model, *args, **kwargs):
