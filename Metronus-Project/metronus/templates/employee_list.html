@@ -21,8 +21,8 @@
             <th>{% trans 'username' %}</th>
             <th>{% trans 'identifier' %}</th>
             <th>{% trans 'phone' %}</th>
-            <th>{% trans 'registryDate' %}</th>
-            <th>{% trans 'actions' %}</th>
+            <th class="hidden-xs">{% trans 'registryDate' %}</th>
+            <th class="hidden-xs">{% trans 'actions' %}</th>
           </tr>
         </thead>
         <tbody>
@@ -30,15 +30,15 @@
           <tr data-href="/employee/view/{{employee.user}}" style="cursor: pointer;">
             <th scope="row">{{forloop.counter}}</th>
 
-            <td><img src="/static/avatar.png" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
+            <td><img src="{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
 
             <td>{{employee.identifier}}</td>
 
             <td>{{employee.phone}}</td>
 
-            <td>{{employee.registryDate}}</td>
+            <td class="hidden-xs">{{employee.registryDate}}</td>
 
-            <td>
+            <td class="hidden-xs">
               <a href="/employee/edit/{{employee.user}}" type="button" class="btn btn-success">{% trans 'edit' %}</a>
               <a onclick="removealert('/employee/delete/{{employee.user}}');" type="button" class="btn btn-dark">{% trans 'fire' %}</a>
             </td>

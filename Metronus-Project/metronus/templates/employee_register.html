@@ -96,7 +96,18 @@
             }
         }
     })
+
+
+   $('button[type="submit"]').click(function (e) {
+        var b = $('[data-bv-validator="callback"]')[0]
+        if (b.style.display!='none') {
+            e.preventDefault();
+        }
+   })
+
   });
+
+
 </script>
 {% endblock %}
 
