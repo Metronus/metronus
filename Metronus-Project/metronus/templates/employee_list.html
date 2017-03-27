@@ -40,7 +40,7 @@
 
             <td class="hidden-xs">
               <a href="/employee/edit/{{employee.user}}" type="button" class="btn btn-success">{% trans 'edit' %}</a>
-              <a onclick="removealert('/employee/delete/{{employee.user}}');" type="button" class="btn btn-dark">{% trans 'fire' %}</a>
+              <a href="/employee/delete/{{employee.user}}" type="button" class="btn btn-dark">{% trans 'fire' %}</a>
             </td>
           </tr>
           {% endfor %}
