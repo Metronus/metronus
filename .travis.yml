@@ -30,6 +30,7 @@ before_script:
   - psql -c "CREATE DATABASE $METRONUS_DB_NAME;" -U postgres
   - psql -c "GRANT ALL PRIVILEGES ON DATABASE $METRONUS_DB_NAME TO $METRONUS_DB_USER;" -U postgres
   - cd $TRAVIS_BUILD_DIR/Metronus-Project/
+  - rm -r metronus_app/migrations/
 
 script:
   - python3 manage.py makemigrations --noinput && python3 manage.py migrate --noinput
