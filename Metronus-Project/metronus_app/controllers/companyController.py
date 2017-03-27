@@ -12,10 +12,8 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
-from metronus_app.common_utils import get_current_admin_or_403, get_or_none, checkImage
+from metronus_app.common_utils import get_current_admin_or_403, get_or_none, checkImage, send_mail
 from django.core.exceptions import PermissionDenied
-
-from django.core.mail import send_mail
 
 
 def create(request):
@@ -44,8 +42,11 @@ def create(request):
 
                 # This sends an information email to the company and to the admin
 
-                #send_mail('Metronus Info.', 'Registrado :)', 'info@metronus.es',
-                #          [company.email, administrator.user.email], fail_silently=False,)
+                send_mail('Metronus Info.',
+                          'Su compañía sido registrada exitosamente en la aplicación.\n'
+                          'Como administrador podrá comenzar a usar Metronus a través del siguiente enlace.\n\n'
+                          + request.get_host() + '/' + company.short_name + '/login/'
+                          , [company.email, administrator.user.email], fail_silently=False)
 
                 return HttpResponseRedirect('/' + company.short_name + '/login/')
             else:

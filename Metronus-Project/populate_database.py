@@ -102,10 +102,10 @@ def basicLoad():
 
     populate_roles()
 
-    emp_role=Role.objects.get(name="Employee")
-    coor_role=Role.objects.get(name="Coordinator")
-    pm_role=Role.objects.get(name="Project manager")
-    team_role=Role.objects.get(name="Team manager")
+    emp_role=Role.objects.get(name="EMPLOYEE")
+    coor_role=Role.objects.get(name="COORDINATOR")
+    pm_role=Role.objects.get(name="PROJECT_MANAGER")
+    team_role=Role.objects.get(name="TEAM_MANAGER")
 
     ProjectDepartmentEmployeeRole.objects.create(
         projectDepartment_id=pd1,
@@ -201,10 +201,10 @@ def create_user(nombre,company2):
         company_id=company2)
 
 def populate_roles():
-    Role.objects.create(name="Project manager")
-    Role.objects.create(name="Coordinator")
-    Role.objects.create(name="Team manager")
-    Role.objects.create(name="Employee")
+    Role.objects.create(name="PROJECT_MANAGER", tier=40)
+    Role.objects.create(name="TEAM_MANAGER", tier=30)
+    Role.objects.create(name="COORDINATOR", tier=20)
+    Role.objects.create(name="EMPLOYEE", tier=10)
 
 #############################################################################
 #############################################################################

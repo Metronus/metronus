@@ -25,6 +25,7 @@ def create(request):
      # Check that the user is logged in
     admin = get_current_admin_or_403(request)
     repeated_name=False
+    error=False
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -46,18 +47,14 @@ def create(request):
             else:
                 project = createProject(form,admin)
                 return redirect('project_show', project_id=project.id)
-
+        else:
+            error = True
     # if a GET (or any other method) we'll create a blank form
     else:
         form = ProjectForm(initial={"project_id":0})
 
-    if repeated_name:
-        hidden_repeated_name = ''
-    else:
-        hidden_repeated_name = 'none'
-
     return render(request, 'project/project_form.html',
-                  {'form': form, 'repeated_name':repeated_name, 'hidden_repeated_name': hidden_repeated_name})
+                  {'form': form, 'repeated_name':repeated_name, 'error':error})
 
 def createAsync(request):
     """

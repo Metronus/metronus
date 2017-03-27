@@ -138,11 +138,12 @@ def view(request,department_id):
     department = get_object_or_404(Department, pk=department_id)
     admin = checkDepartmentForView(department,request,True)
 
+    coordinator=get_coordinator(department)
     tasks=Task.objects.filter(active=True, projectDepartment_id__department_id__id=department_id)
-
     employees = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__department_id=department).distinct()
 
-    return render(request, 'department_view.html', {'department': department, 'employees': employees,'tasks':tasks})
+    return render(request, 'department_view.html', {'department': department, 'employees': employees,
+        'tasks':tasks,'coordinator':coordinator})
 
 def edit(request,department_id):
     """
@@ -311,3 +312,7 @@ def getListForRole(request):
         departments=Department.objects.filter(company_id=actor.company_id,active=True)
 
     return departments 
+
+def get_coordinator(department):
+    return Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__department_id=department,
+        projectdepartmentemployeerole__role_id__name="Coordinator").first()
