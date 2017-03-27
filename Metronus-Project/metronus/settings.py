@@ -142,7 +142,7 @@ STATICFILES_DIRS = (
 # Login static configuration
 LOGIN_REDIRECT_URL = "/"
 LOGIN_URL = '/login'
-LOGOUT_URL = '/'
+LOGOUT_URL = ''
 
 # File storage
 

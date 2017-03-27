@@ -15,12 +15,13 @@ Including another URLconf
 """
 from django.conf.urls               import url, include
 from django.contrib                 import admin
-from metronus_app.admin                 import admin_site
+from django.contrib.auth.views      import password_reset, password_reset_complete, password_reset_confirm, password_reset_done
+from metronus_app.admin             import admin_site
 from django.conf.urls.i18n          import i18n_patterns
 from metronus_app                   import views
 from django.core.urlresolvers       import reverse_lazy
 
-from metronus_app.controllers               import appController
+from metronus_app.controllers       import appController
 from metronus_app.controllers       import departmentController
 from metronus_app.controllers       import projectController
 from metronus_app.controllers       import projectDepartmentController
@@ -31,6 +32,7 @@ from metronus_app.controllers       import administratorController
 from metronus_app.controllers       import taskController
 from metronus_app.controllers       import timeLogController
 from metronus_app.controllers       import loginController
+from metronus.settings              import DEFAULT_FROM_EMAIL
 
 
 urlpatterns = [url(r'^i18n/', include('django.conf.urls.i18n')),
@@ -93,14 +95,25 @@ urlpatterns += [#i18n_patterns(
     # Company
     url(r'^company/edit/$', companyController.edit, name='company_edit'),
     url(r'^company/view/$', companyController.view, name='company_view'),
-    url(r'^company/delete/$', companyController.view, name='company_view'),
+    url(r'^company/delete/$', companyController.view, name='company_delete'),
 
     # Login
     url(r'^login/$', loginController.login, {'template_name': 'login.html', }, name="login"),
+    url(r'^logout/$', loginController.logout, {'next_page': reverse_lazy('home'), }, name="logout"),
     url(r'^(?P<company>\w{0,50})/', include([
         url(r'^login/$', loginController.login, {'template_name': 'login.html', }, name="login"),
     ])),
-    url(r'^logout/$', loginController.logout, {'next_page': reverse_lazy('home'), }, name="logout"),
+
+    # Pass recovery
+    url(r'^lost-password/$', password_reset, {'template_name': 'auth/password_reset.html',
+        'post_reset_redirect': '/reset-password/', 'from_email': 'DEFAULT_FROM_EMAIL'}
+        , name='lost_password_1'),
+    url(r'^reset-password/$', password_reset_done, {'template_name': 'auth/info_reset_password.html'}
+        , name='lost_password_2'),
+    url(r'^user/password/reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', password_reset_confirm, {'template_name': 'auth/password_reset_confirm.html'}
+        , name='lost_password_3'),
+    url(r'^user/password/done/$', password_reset_complete, {'template_name': 'auth/password_reset_complete.html'}
+        , name='lost_password_4'),
 
     url(r'^register$', companyController.create),
     url(r'^ajax/validate_cif/$', companyController.validateCIF, name='validate_cif'),
