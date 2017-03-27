@@ -12,6 +12,9 @@ from django.contrib.auth import authenticate,login
 from metronus_app.model.employee import Employee
 from django.http import JsonResponse
 from metronus_app.model.task import Task
+from metronus_app.model.department import Department
+from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
+from metronus_app.model.actor import Actor
 
 
 def create(request):
@@ -115,17 +118,16 @@ def list(request):
     project_list.html
     """
      # Check that the user is logged in
-    admin = get_current_admin_or_403(request)
-    lista=Project.objects.filter(company_id=admin.company_id,deleted=False)
+    lista=getListForRole(request)
     return render(request, "project/project_list.html", {"projects": lista})
 
 def show(request,project_id):
-    admin = get_current_admin_or_403(request)
-    repeated_name = False
     project = get_object_or_404(Project, pk=project_id)
+    project_manager = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__project_id=project, projectdepartmentemployeerole__role_id__name="Project manager").first()
     employees = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__project_id=project).distinct()
     tasks=Task.objects.filter(active=True, projectDepartment_id__project_id__id=project_id)
-    return render(request, "project/project_show.html", {"project": project, 'employees': employees,"tasks":tasks})
+    departments = Department.objects.filter(active=True, projectdepartment__project_id__id=project_id)
+    return render(request, "project/project_show.html", {"project": project, "employees": employees,"tasks":tasks, "departments": departments, "project_manager": project_manager})
 
 
 def edit(request,project_id):
@@ -232,3 +234,33 @@ def checkCompanyProjectId(projectId, companyId):
 
 def findName(pname,admin):
     return Project.objects.filter(name=pname,company_id=admin.company_id).first()
+
+def getListForRole(request):
+    actor=None
+    if not request.user.is_authenticated():
+        raise PermissionDenied
+    try:
+        actor= Actor.objects.get(user=request.user)
+    except ObjectDoesNotExist:
+        raise PermissionDenied
+
+    if actor.user_type!='A':
+        isTeamManager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+                    role_id__name= "Team manager")
+        res=isTeamManager.count()>0
+
+        if not res:
+            roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+                    role_id__name__in=["Project manager","Coordinator"])
+            res=roles.count()>0
+            if not res:
+                raise PermissionDenied
+            else:
+                projects=Project.objects.filter(projectdepartment__projectdepartmentemployeerole__employee_id=actor,
+                    company_id=actor.company_id,deleted=False)
+        else:
+            projects=Project.objects.filter(company_id=actor.company_id,deleted=False)
+    else:
+        projects=Project.objects.filter(company_id=actor.company_id,deleted=False)
+
+    return projects
