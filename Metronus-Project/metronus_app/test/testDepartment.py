@@ -92,7 +92,7 @@ class DepartmentTestCase(TestCase):
         ProjectDepartmentEmployeeRole.objects.create(
             projectDepartment_id=pd1,
             employee_id=employee1,
-            role_id= Role.objects.create(name="Project manager"))
+            role_id= Role.objects.create(name="Project manager", tier=40))
     def test_create_department_positive(self):
         # Logged in as an administrator, try to create an department
         c = Client()

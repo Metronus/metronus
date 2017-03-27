@@ -126,11 +126,10 @@ class RoleTestCase(TestCase):
         )
 
     
-        role2 = Role.objects.create(name="Project manager")
-        role3 = Role.objects.create(name="Department manager")
-        role4 = Role.objects.create(name="Coordinator")
-        role5 = Role.objects.create(name="Team manager")
-        role6 = Role.objects.create(name="Employee")
+        role2 = Role.objects.create(name="PROJECT_MANAGER", tier=40)
+        role3 = Role.objects.create(name="TEAM_MANAGER", tier=30)
+        role4 = Role.objects.create(name="COORDINATOR", tier=20)
+        role6 = Role.objects.create(name="EMPLOYEE", tier=10)
 
         emprole1 = ProjectDepartmentEmployeeRole.objects.create(
             projectDepartment_id=projdept1,
@@ -233,7 +232,7 @@ class RoleTestCase(TestCase):
         employee = Employee.objects.get(identifier="emp01")
         department = Department.objects.get(name="departamento 2")
         project = Project.objects.get(name="proyecto 1")
-        role = Role.objects.get(name="Department manager")
+        role = Role.objects.get(name="TEAM_MANAGER")
 
         projdepts_before = ProjectDepartment.objects.all().count()
         employeeroles_before = ProjectDepartmentEmployeeRole.objects.all().count()
@@ -267,7 +266,7 @@ class RoleTestCase(TestCase):
         employee = Employee.objects.get(identifier="emp01")
         department = Department.objects.get(name="departamento 1")
         project = Project.objects.get(name="proyecto 1")
-        role = Role.objects.get(name="Team manager")
+        role = Role.objects.get(name="TEAM_MANAGER")
 
         projdepts_before = ProjectDepartment.objects.all().count()
         employeeroles_before = ProjectDepartmentEmployeeRole.objects.all().count()
@@ -300,7 +299,7 @@ class RoleTestCase(TestCase):
         employee = Employee.objects.get(identifier="emp01")
         department = Department.objects.get(name="departamento 1")
         project = Project.objects.get(name="proyecto 1")
-        role = Role.objects.get(name="Coordinator")
+        role = Role.objects.get(name="COORDINATOR")
 
         projdepts_before = ProjectDepartment.objects.all().count()
         employeeroles_before = ProjectDepartmentEmployeeRole.objects.all().count()
@@ -334,7 +333,7 @@ class RoleTestCase(TestCase):
         employee = Employee.objects.get(identifier="emp01")
         department = Department.objects.get(name="departamento 2")
         project = Project.objects.get(name="proyecto 2")
-        role = Role.objects.get(name="Coordinator")
+        role = Role.objects.get(name="COORDINATOR")
 
         old_department = Department.objects.get(name="departamento 1")
         old_project = Project.objects.get(name="proyecto 1")
@@ -372,7 +371,7 @@ class RoleTestCase(TestCase):
         employee = Employee.objects.get(identifier="emp01")
         department = Department.objects.get(name="departamento 1")
         project = Project.objects.get(name="proyecto 1")
-        role = Role.objects.get(name="Coordinator")
+        role = Role.objects.get(name="COORDINATOR")
 
         response = c.post("/roles/manage", {
             'employee_id': employee.id + 1000,
@@ -391,7 +390,7 @@ class RoleTestCase(TestCase):
         employee = Employee.objects.get(identifier="emp01")
         department = Department.objects.get(name="departamento 1")
         project = Project.objects.get(name="proyecto 1")
-        role = Role.objects.get(name="Coordinator")
+        role = Role.objects.get(name="COORDINATOR")
 
         response = c.post("/roles/manage", {
             'employee_id': employee.id,
@@ -410,7 +409,7 @@ class RoleTestCase(TestCase):
         employee = Employee.objects.get(identifier="emp01")
         department = Department.objects.get(name="departamento 1")
         project = Project.objects.get(name="proyecto 1")
-        role = Role.objects.get(name="Coordinator")
+        role = Role.objects.get(name="COORDINATOR")
 
         response = c.post("/roles/manage", {
             'employee_id': employee.id,
@@ -429,7 +428,7 @@ class RoleTestCase(TestCase):
         employee = Employee.objects.get(identifier="emp01")
         department = Department.objects.get(name="departamento 1")
         project = Project.objects.get(name="proyecto 1")
-        role = Role.objects.get(name="Coordinator")
+        role = Role.objects.get(name="COORDINATOR")
 
         response = c.post("/roles/manage", {
             'employee_id': employee.id,
@@ -448,7 +447,7 @@ class RoleTestCase(TestCase):
         employee = Employee.objects.get(identifier="emp02")
         department = Department.objects.get(name="departamento 1")
         project = Project.objects.get(name="proyecto 1")
-        role = Role.objects.get(name="Coordinator")
+        role = Role.objects.get(name="COORDINATOR")
 
         response = c.post("/roles/manage", {
             'employee_id': employee.id,
@@ -467,7 +466,7 @@ class RoleTestCase(TestCase):
         employee = Employee.objects.get(identifier="emp01")
         department = Department.objects.get(name="departamento 3")
         project = Project.objects.get(name="proyecto 1")
-        role = Role.objects.get(name="Coordinator")
+        role = Role.objects.get(name="COORDINATOR")
 
         response = c.post("/roles/manage", {
             'employee_id': employee.id,
@@ -486,7 +485,7 @@ class RoleTestCase(TestCase):
         employee = Employee.objects.get(identifier="emp01")
         department = Department.objects.get(name="departamento 1")
         project = Project.objects.get(name="proyecto 3")
-        role = Role.objects.get(name="Coordinator")
+        role = Role.objects.get(name="COORDINATOR")
 
         response = c.post("/roles/manage", {
             'employee_id': employee.id,
