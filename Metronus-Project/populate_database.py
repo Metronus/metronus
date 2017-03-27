@@ -201,10 +201,10 @@ def create_user(nombre,company2):
         company_id=company2)
 
 def populate_roles():
-    Role.objects.create(name="Project manager")
-    Role.objects.create(name="Coordinator")
-    Role.objects.create(name="Team manager")
-    Role.objects.create(name="Employee")
+    Role.objects.create(name="Project manager", tier=40)
+    Role.objects.create(name="Team manager", tier=30)
+    Role.objects.create(name="Coordinator", tier=20)
+    Role.objects.create(name="Employee", tier=10)
 
 #############################################################################
 #############################################################################
