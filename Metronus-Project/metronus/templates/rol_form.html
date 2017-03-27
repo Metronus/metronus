@@ -73,8 +73,8 @@ function ajax(){
 <script type="text/javascript">
 
 function ajaxDepartment(){
-	console.log("id_{{ form.project_id.name }}"); 
-	$.post('/roles/availableDepartments', { project_id: "id_{{ form.project_id.name }}"}, 
+	console.log($("#id_{{ form.project_id.name }}").val()); 
+	$.post('/roles/availableDepartments', { project_id : 3}, 
     function(returnedData){
 	     $.each(returnedData, function(i, obj){
                     $('#id_{{ form.department_id.name }}').append($('<option>').text(obj.name).attr('value', obj.id));
