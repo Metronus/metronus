@@ -101,7 +101,7 @@ urlpatterns += [#i18n_patterns(
 
     # Login
     url(r'^login/$', loginController.login, {'template_name': 'login.html', }, name="login"),
-    url(r'^logout/$', loginController.logout, {'next_page': reverse_lazy('home'), }, name="logout"),
+    url(r'^logout/$', loginController.logout, {'next_page': '/', }, name="logout"),
     url(r'^(?P<company>\w{0,50})/', include([
         url(r'^login/$', loginController.login, {'template_name': 'login.html', }, name="login"),
     ])),
