@@ -320,6 +320,8 @@ msgid "projectError"
 msgstr "El proyecto no se pudo guardar correctamente"
 msgid "projectNotNull"
 msgstr "El proyecto no puede ser nulo"
+msgid "projectManager"
+msgstr "Jefe de proyecto"
 
 #: TimeLog
 msgid "timeLog"

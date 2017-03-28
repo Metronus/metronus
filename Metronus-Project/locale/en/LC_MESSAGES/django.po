@@ -318,6 +318,8 @@ msgid "projectError"
 msgstr "Project was not saved succesfully"
 msgid "projectNotNull"
 msgstr "Project can't be null"
+msgid "projectManager"
+msgstr "Project manager"
 
 #: TimeLog
 msgid "timeLog"
