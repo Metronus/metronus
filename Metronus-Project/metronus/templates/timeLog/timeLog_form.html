@@ -39,7 +39,6 @@
     <form id="form" method="POST" class="form-horizontal">{% csrf_token %}
         <div class="row">
             {% for field in form.visible_fields %}
-                {{ field.widget }}
                 <div class="form-group">
                     <label class="control-label col-md-3 col-xs-12" for="{{ field.id_for_label }}">{{ field.label }}</label>
                     <div class="col-md-7 col-xs-12">

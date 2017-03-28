@@ -1,5 +1,6 @@
 from django import template
-from datetime import date,datetime
+from datetime import datetime
+import calendar
 
 register = template.Library()
 
@@ -25,12 +26,14 @@ def show_field(field, required = True):
 def converto_to_hours(amount):
     hours = amount//60
     minutes = amount%60
-    return {'hours':hours,'minutes':minutes}
+    return str(hours)+":"+str(minutes) if amount !=0 else ""
 
 @register.simple_tag
 def is_weekend(day,month,year):
-    fecha = datetime.date(year,month,day)
-    result = fecha.weekday() in (5,6)
-    return {'result': result}
+    result = True
+    if day != "Total" and int(day) != calendar.monthrange(year,month)[1]+1:
+        fecha = datetime(year,month,day).date()
+        result = fecha.weekday() in (5,6)
+    return "success" if result else ""
 
 
