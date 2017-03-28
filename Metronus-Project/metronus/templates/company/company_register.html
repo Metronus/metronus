@@ -67,17 +67,21 @@
                     <div class="help-block with-errors"></div>
                   </div>
                 </div>
-
               </div>
+               <div class="separator">
+               <button type="button" class="btn btn-info submit" onclick="window.location.href='/'">{% trans 'return_to_landingpage' %}</button>
+                </div>
             </form>
               <!-- End SmartWizard Content -->
             </div>
           </div>
         </div>
       </div>
+
     </div>
   </div>
 </div>
+
 <body>
 
 <script src="/static/js/jquery.min.js"></script>
@@ -90,6 +94,11 @@
 <script type="text/javascript">
   $(document).ready(function(){
       $('#wizard').smartWizard();
+      $(".buttonNext").text("{% trans 'next' %}");
+      $(".buttonPrevious").text("{% trans 'previous' %}");
+      $(".buttonFinish").text("{% trans 'finish' %}");
+
+
   });
 </script>
 {% endblock %}
