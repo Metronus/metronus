@@ -110,12 +110,14 @@ def view(request, username):
     """
 
     # Check that the user is logged in and it's an administrator
-
-    currentEmployee = get_current_employee_or_403(request)
+    try:
+        logged = get_current_admin_or_403(request)
+    except PermissionDenied:
+        logged = get_current_employee_or_403(request)
     employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
 
     # Check that the admin has permission to view that employee
-    if employee.company_id != currentEmployee.company_id:
+    if employee.company_id != logged.company_id:
         raise PermissionDenied
 
     employee_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee)
