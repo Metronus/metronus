@@ -74,7 +74,7 @@ function ajax(){
 
 function ajaxDepartment(){
 	console.log($("#id_{{ form.project_id.name }}").val()); 
-	$.post('/roles/availableDepartments', { project_id : "3"}, 
+	$.get('/roles/availableDepartments', { project_id : $("#id_{{ form.project_id.name }}").val()}, 
     function(returnedData){
 	     $.each(returnedData, function(i, obj){
 	     			if("{{form.department_id.value}}"==obj.id){
@@ -87,6 +87,22 @@ function ajaxDepartment(){
             });
 	 	 $('#id_{{ form.department_id.name }}').attr('disabled', false);    
 	});
+};
+function ajaxRole(){
+    console.log($("#id_{{ form.project_id.name }}").val()); 
+    $.get('/roles/availableRoles', { project_id : $("#id_{{ form.project_id.name }}").val(), department_id : $("#id_{{ form.department_id.name }}").val()}, 
+    function(returnedData){
+         $.each(returnedData, function(i, obj){
+                    if("{{form.role_id.value}}"==obj.id){
+                        $('#id_{{ form.role_id.name }}').append($('<option>').text(obj.name).attr('value', obj.id)).attr('selected', true);
+                    }
+                    else{
+                        $('#id_{{ form.role_id.name }}').append($('<option>').text(obj.name).attr('value', obj.id));
+                    }
+                    
+            });
+         $('#id_{{ form.role_id.name }}').attr('disabled', false);    
+    });
 };
 
     
@@ -114,6 +130,13 @@ function ajaxDepartment(){
    <form id="register_form" method="POST" action="" class="form-horizontal">
 
     {% csrf_token %}
+    {% if  errors %}
+        <div id="errorDiv" class="alert alert-danger"  hidden='true'>
+        {% for error in errors %}
+          <p>{% trans '{{error}}' %}</p>
+        {% endfor %}
+        </div>
+    {% endif %}
 
 	    <div class="col-md-6 col-md-offset-2 collapse in" >
 
@@ -121,7 +144,7 @@ function ajaxDepartment(){
           
           <label class="control-label col-md-4 col-sm-4 col-xs-12" for="id_{{ form.project_id.name }}">{% trans 'project' %}</label>
             <div class="col-sm-6">
-              <select class="form-control" name="{{ form.project_id.name }}" id="id_{{ form.project_id.name }}"{% if  form.employeeRole_id.value != 0 %} disabled="true" {% endif %}required onchange="ajaxDepartment();">
+              <select class="form-control" name="{{ form.project_id.name }}" id="id_{{ form.project_id.name }}"{% if  form.employeeRole_id.value != 0 %} disabled="true" {% endif %} required onchange="ajaxDepartment();">
 	              		<option value="" selected>{% trans 'selectProject' %}</option>
 	              		{% for dep in projects %}
 	    				<option value="{{ dep.id }}"{% if form.project_id.value == dep.id %} selected{% endif %}>{{ dep.name }}</option>
@@ -134,8 +157,15 @@ function ajaxDepartment(){
           
           <label class="control-label col-md-4 col-sm-4 col-xs-12" for="id_{{ form.department_id.name }}">{% trans 'department' %}</label>
             <div class="col-sm-6">
-              <select class="form-control" name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}" disabled="true" required>
+              <select class="form-control" name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}" disabled="true" required onchange="ajaxRole();">
 	              		<option value="" selected>{% trans 'selectDepartment' %}</option>
+                        {% if  form.employeeRole_id.value == 0 %}
+                            {% for dep in departments %}
+                            {% if form.department_id.value == dep.id %} 
+                            <option value="{{ dep.id }}"selected>{{ dep.name }}</option>
+                            {% endif %}
+                            {% endfor %}
+                        {% endif %}
 	              		
               		</select>
             </div>
@@ -146,9 +176,7 @@ function ajaxDepartment(){
             <div class="col-sm-6">
               <select class="form-control" name="{{ form.role_id.name }}" id="id_{{ form.role_id.name }}" required disabled="true">
 		              <option value="" selected>{% trans 'selectRole' %}</option>
-		             	{% for dep in roles %}
-		    			<option value="{{ dep.id }}"{% if form.role_id.value == dep.id %} selected{% endif %}>{{ dep.name }}</option>
-						{% endfor %}
+		             	
 	              </select>
             </div>
         </div>
