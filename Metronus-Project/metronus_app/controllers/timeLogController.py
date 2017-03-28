@@ -33,8 +33,9 @@ def create_all(request):
             valid_production_units=checkProducedUnits(form,task)
             if valid_production_units:
                 if task is not None:
-                    createTimeLog(form,task,employee)
-                    return redirect('timeLog_list_all')
+                    if task.active:
+                        createTimeLog(form,task,employee)
+                        return redirect('timeLog_list_all')
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -63,8 +64,10 @@ def create_by_task(request,task_id):
             valid_production_units=checkProducedUnits(form,task)
             if valid_production_units:
                 if task is not None:
-                    createTimeLog(form,task,employee)
-                    return redirect('timeLog_list',task_id)
+                    if task.active:
+                        createTimeLog(form, task, employee)
+                        return redirect('timeLog_list', task_id)
+
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -99,7 +102,8 @@ def list_all(request):
     month = [x for x in range(1,calendar.monthrange(today.year,today.month)[1]+1)]
     total = [sum([x.durations[i] for x in my_tasks]) for i in range(0,calendar.monthrange(today.year,today.month)[1]) ]
     monthTotal = sum(total)
-    return render(request, "timeLog/timeLog_list_all.html", {"my_tasks": my_tasks, "month":month,"total":total, "monthTotal":monthTotal})
+    total.append(monthTotal)
+    return render(request, "timeLog/timeLog_list_all.html", {"my_tasks": my_tasks, "month":month,"total":total})
 
 def edit(request, timeLog_id):
     """
@@ -225,9 +229,12 @@ class myTask():
         self.name = task.name
         self.durations = [0 for x in range(0,calendar.monthrange(today.year,today.month)[1])]
 
+
         for tl in task.timelog_set.all():
             index = int(tl.workDate.day)-1
             self.durations[index] += tl.duration
+        totalDuration = sum(self.durations)
+        self.durations.append(totalDuration)
 
 def findTimeLogByDescriptionAndDate(tDescription,tDate):
     #Vaya churro para comprobar que el dia, el mes y el año sean iguales

@@ -14,7 +14,7 @@ from metronus_app.model.employeeLog              import EmployeeLog
 from metronus_app.model.administrator            import Administrator
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 
-from metronus_app.common_utils                   import get_current_admin_or_403, checkImage
+from metronus_app.common_utils                   import get_current_admin_or_403, checkImage, get_current_employee_or_403
 
 def create(request):
     """
@@ -110,12 +110,12 @@ def view(request, username):
     """
 
     # Check that the user is logged in and it's an administrator
-    admin = get_current_admin_or_403(request)
 
+    currentEmployee = get_current_employee_or_403(request)
     employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
 
     # Check that the admin has permission to view that employee
-    if employee.company_id != admin.company_id:
+    if employee.company_id != currentEmployee.company_id:
         raise PermissionDenied
 
     employee_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee)
