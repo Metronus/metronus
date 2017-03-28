@@ -69,7 +69,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'metronus.urls'
 
 # Solo carga en producción la caché, que si no...
-if production:
+if production and not heroku:
     TEMPLATES = [
         {
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
