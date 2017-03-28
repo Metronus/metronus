@@ -8,11 +8,13 @@ from metronus_app.model.administrator import Administrator
 from metronus_app.model.actor import Actor
 from metronus_app.model.project import Project
 from metronus_app.model.department import Department
+from metronus_app.model.goalEvolution import GoalEvolution
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 from populate_database import basicLoad
 from django.core.exceptions             import ObjectDoesNotExist, PermissionDenied
 from django.http                        import HttpResponseForbidden
+
 from django.contrib.auth import authenticate,login
 from django.http import JsonResponse
 from django.core import serializers
@@ -25,6 +27,7 @@ def create(request):
     departments:eso
     projects:eso
     repeated_name: si el nombre es repetido
+    valid_goal:si el objetivo es correcto(no está uno en blanco y otro no)
     project_department_related: si nos están relacionados projectdepartment
 
     template:
@@ -35,6 +38,7 @@ def create(request):
 
     project_department_related=True
     repeated_name=False
+    valid_goal=True
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -43,33 +47,34 @@ def create(request):
 
         if form.is_valid():
             # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:
-            pname=form.cleaned_data['name']
-            ppro=form.cleaned_data['project_id']
-            pdep=form.cleaned_data['department_id']
-            pdtuple=find_tuple(ppro.id,pdep.id,actor)
-            if pdtuple is not None:
-                pro=find_name(pname,pdtuple)
-                if pro is not None:
-                    if not pro.active:
-                        checkTask(pro,request)
-                        pro.active=True
-                        pro.save()
-                        return HttpResponseRedirect('/task/list')
+            valid_goal = checkGoal(form)
+            if valid_goal:
+                pname=form.cleaned_data['name']
+                ppro=form.cleaned_data['project_id']
+                pdep=form.cleaned_data['department_id']
+                pdtuple=find_tuple(ppro.id,pdep.id,actor)
+                if pdtuple is not None:
+                    pro=find_name(pname,pdtuple)
+                    if pro is not None:
+                        if not pro.active:
+                            checkTask(pro,request)
+                            pro.active=True
+                            pro.save()
+                            return HttpResponseRedirect('/task/list')
+                        else:
+                            repeated_name=True
                     else:
-                        repeated_name=True
+                        actor=checkTask(pro,request)
+                        createTask(form,pdtuple,actor)
+                        return HttpResponseRedirect('/task/list')
                 else:
-                    actor=checkTask(pro,request)
-                    createTask(form,pdtuple,actor)
-                    return HttpResponseRedirect('/task/list')
-            else:
-                project_department_related=False
+                    project_department_related=False
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = TaskForm(initial={"task_id":0,"name":"","description":""})
+        form = TaskForm()
     coll=find_collections(request)
-    return render(request, 'task_form.html', {'form': form,'repeated_name':repeated_name,'project_department_related':project_department_related
+    return render(request, 'task_form.html', {'form': form,'repeated_name':repeated_name,"valid_goal":valid_goal,
+        'project_department_related':project_department_related
         ,"departments":coll["departments"],"projects":coll["projects"]})
 
 
@@ -90,7 +95,8 @@ def createAsync(request):
     data = {
         'repeated_name': False,
         'success':True,
-        'project_department_related':True
+        'project_department_related':True,
+        "valid_goal":True
     }
 
     # if this is a POST request we need to process the form data
@@ -101,32 +107,33 @@ def createAsync(request):
 
         if form.is_valid():
             # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:
-            pname=form.cleaned_data['name']
-            ppro=form.cleaned_data['project_id']
-            pdep=form.cleaned_data['department_id']
-            pdtuple=find_tuple(ppro.id,pdep.id,actor)
-            if pdtuple is not None:
-                pro=find_name(pname,pdtuple)
-                if pro is not None:
-                    if not pro.active:
-                        checkTask(pro,request)
-                        pro.active=True
-                        pro.save()
-                        return JsonResponse(data)
+            data['valid_goal'] = checkGoal(form)
+            if data['valid_goal']:
+                pname=form.cleaned_data['name']
+                ppro=form.cleaned_data['project_id']
+                pdep=form.cleaned_data['department_id']
+                pdtuple=find_tuple(ppro.id,pdep.id,actor)
+                if pdtuple is not None:
+                    pro=find_name(pname,pdtuple)
+                    if pro is not None:
+                        if not pro.active:
+                            checkTask(pro,request)
+                            pro.active=True
+                            pro.save()
+                            return JsonResponse(data)
+                        else:
+                            data['repeated_name']=True
                     else:
-                        data['repeated_name']=True
+                        actor=checkTask(pro,request)
+                        createTask(form,pdtuple,actor)
+                        return JsonResponse(data)
                 else:
-                    actor=checkTask(pro,request)
-                    createTask(form,pdtuple,actor)
-                    return JsonResponse(data)
-            else:
-                data['project_department_related']=False
+                    data['project_department_related']=False
     # if a GET (or any other method) we'll create a blank form
     else:
         return HttpResponseRedirect('/department/create')
     data['success']=False
+
     return JsonResponse(data)
 def form_projects(request):
     """
@@ -184,14 +191,17 @@ def edit(request,task_id):
     departments:eso
     projects:eso
     repeated_name: si el nombre es repetido
+    valid_goal:si los objetivos son válidos
     project_department_related: si nos están relacionados projectdepartment
-
+    
     template:
     task_form.html
     """
      # Check that the user is logged in
     actor=checkTask(None,request)
     repeated_name=False
+    valid_goal=True
+    
     project_department_related=True
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -200,27 +210,32 @@ def edit(request,task_id):
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:
-            task=get_object_or_404(Task,pk=form.cleaned_data['task_id'])
-            checkTask(task,request)
-            #find tasks with the same name
-            pro=Task.objects.filter(name=form.cleaned_data['name'],projectDepartment_id=task.projectDepartment_id).first()
-            #pro does not exists or it's the same
-            if pro is None or pro.id==task.id:
-                updateTask(task,form)
-                return HttpResponseRedirect('/task/list')
-            else:
-                if pro.active:
-                    repeated_name=True
+            valid_goal = checkGoal(form)
+            if valid_goal:
+                task=get_object_or_404(Task,pk=form.cleaned_data['task_id'])
+                checkTask(task,request)
+                #find tasks with the same name
+                pro=Task.objects.filter(name=form.cleaned_data['name'],projectDepartment_id=task.projectDepartment_id).first()
+                #pro does not exists or it's the same
+                if pro is None or pro.id==task.id:
+                    updateTask(task,form,actor)
+                    return HttpResponseRedirect('/task/list')
+                else:
+                    if pro.active:
+                        repeated_name=True
 
     # if a GET (or any other method) we'll create a blank form
     else:
         task=get_object_or_404(Task,pk=task_id)
         form = TaskForm(initial={"name":task.name,"description":task.description,
-                "task_id":task.id})
+                "task_id":task.id,
+                "production_goal":task.production_goal,"goal_description":task.goal_description,
+                "project_id":task.projectDepartment_id.project_id,
+                "department_id":task.projectDepartment_id.department_id})
+    #The project
     coll=find_collections(request)
-    return render(request, 'task_form.html', {'form': form,'repeated_name':repeated_name,'project_department_related':project_department_related
+    return render(request, 'task_form.html', {'form': form,'repeated_name':repeated_name,
+        "valid_goal":valid_goal,'project_department_related':project_department_related
         ,"departments":coll["departments"],"projects":coll["projects"]})
 
 def delete(request,task_id):
@@ -246,12 +261,40 @@ def delete(request,task_id):
 def createTask(form, project_department,actor):
     fname=form.cleaned_data['name']
     fdescription=form.cleaned_data['description']
-    Task.objects.create(name=fname,description=fdescription,projectDepartment_id=project_department,actor_id=actor)
+    fgoal=form.cleaned_data['production_goal']
+    fgoaldescription=form.cleaned_data['goal_description']
 
-def updateTask(task,form):
+    task=Task.objects.create(name=fname,description=fdescription,
+        projectDepartment_id=project_department,actor_id=actor,
+        production_goal=fgoal,goal_description=fgoaldescription)
+
+def updateTask(task,form,actor):
+    newGoalEntry(task,form,actor)
     task.name = form.cleaned_data['name']
     task.description = form.cleaned_data['description']
+    task.production_goal = form.cleaned_data['production_goal']
+    task.goal_description = form.cleaned_data['goal_description']
     task.save()
+
+def newGoalEntry(task,form,actor):
+    """
+    Creates a new entry in the goal production if the parameters were checked
+    """
+    fgoal=form.cleaned_data['production_goal']
+    fgoaldescription=form.cleaned_data['goal_description']
+    if fgoal!=task.production_goal or fgoaldescription!=task.goal_description:
+        GoalEvolution.objects.create(task_id  = task,
+            actor_id = actor,
+            production_goal=task.production_goal,
+            goal_description=task.goal_description)
+
+def checkGoal(form):
+    """
+    This returns true if both goal and description are empty or both are not empty
+    """
+    fgoal=form.cleaned_data['production_goal']
+    fgoaldescription=form.cleaned_data['goal_description']
+    return (fgoal!="" and fgoaldescription!="") or (not fgoal and not fgoaldescription)
 
 def deleteTask(task):
     task.active=False
