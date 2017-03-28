@@ -123,7 +123,7 @@ def list(request):
 
 def show(request,project_id):
     project = get_object_or_404(Project, pk=project_id)
-    project_manager = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__project_id=project, projectdepartmentemployeerole__role_id__name="Project manager").first()
+    project_manager = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__project_id=project, projectdepartmentemployeerole__role_id__tier=40).first()
     employees = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__project_id=project).distinct()
     tasks=Task.objects.filter(active=True, projectDepartment_id__project_id__id=project_id)
     departments = Department.objects.filter(active=True, projectdepartment__project_id__id=project_id)
@@ -246,12 +246,12 @@ def getListForRole(request):
 
     if actor.user_type!='A':
         isTeamManager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                    role_id__name= "Team manager")
+                    role_id__tier= 30)
         res=isTeamManager.count()>0
 
         if not res:
             roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                    role_id__name__in=["Project manager","Coordinator"])
+                    role_id__tier__in=[40,20])
             res=roles.count()>0
             if not res:
                 raise PermissionDenied

@@ -141,7 +141,7 @@ def view(request,department_id):
     coordinator=get_coordinator(department)
     tasks=Task.objects.filter(active=True, projectDepartment_id__department_id__id=department_id)
     employees = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__department_id=department).distinct()
-    print(coordinator)
+    
     return render(request, 'department_view.html', {'department': department, 'employees': employees,
         'tasks':tasks,'coordinator':coordinator})
 
@@ -252,16 +252,16 @@ def checkDepartmentForView(dep,request,forView):
 
     if actor.user_type!='A':
         isTeamManager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                    role_id__name= "Team manager")
+                    role_id__tier= 30)
         res=isTeamManager.count()>0
 
         if not res:
             if forView:
                 roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                         role_id__name__in=["Project manager","Coordinator"])
+                         role_id__tier__in=[40,20])
             else:
                 roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                        role_id__name="Project manager")
+                        role_id__tier=40)
             res=roles.count()>0
         if not res:
             raise PermissionDenied
@@ -294,12 +294,12 @@ def getListForRole(request):
 
     if actor.user_type!='A':
         isTeamManager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                    role_id__name= "Team manager")
+                    role_id__tier= 30)
         res=isTeamManager.count()>0
 
         if not res:
             roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                    role_id__name__in=["Project manager","Coordinator"])
+                    role_id__tier__in=[40,20])
             res=roles.count()>0
             if not res:
                 raise PermissionDenied
@@ -315,4 +315,4 @@ def getListForRole(request):
 
 def get_coordinator(department):
     return Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__department_id=department,
-        projectdepartmentemployeerole__role_id__name="Coordinator").first()
+        projectdepartmentemployeerole__role_id__tier=20).first()

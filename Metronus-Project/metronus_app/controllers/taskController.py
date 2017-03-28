@@ -315,7 +315,7 @@ def checkRoleForList(request):
     if actor.user_type!='A':
         #not an admin
         isTeamManager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                    role_id__name= "Team manager")
+                    role_id__tier= 30)
         res=isTeamManager.count()>0
 
         if res:
@@ -347,12 +347,12 @@ def checkTask(task,request):
 
     if actor.user_type!='A':
         isTeamManager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                    role_id__name= "TEAM_MANAGER")
+                    role_id__tier= 30)
         res=isTeamManager.count()>0
 
         if not res:
             roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                    role_id__name__in=["PROJECT_MANAGER","COORDINATOR"])
+                    role_id__tier__in=[40,20])
             res=roles.count()>0
         if not res:
             raise PermissionDenied
@@ -388,7 +388,7 @@ def find_collections(request):
     if actor.user_type!='A':
         #not an admin
         isTeamManager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                    role_id__name= "TEAM_MANAGER")
+                    role_id__tier= 30)
         res=isTeamManager.count()>0
 
         if res:
@@ -398,9 +398,9 @@ def find_collections(request):
         else:
             #not a manager
             rolesPro = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                     role_id__name="PROJECT_MANAGER")
+                     role_id__tier=40)
             rolesDep=ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                     role_id__name="COORDINATOR")
+                     role_id__tier=20)
 
             if  rolesPro.count()>0:
                 #you're a project manager. Loading your projects
@@ -437,7 +437,7 @@ def find_departments(request):
     if actor.user_type!='A':
         #not an admin
         isTeamManager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                    role_id__name= "TEAM_MANAGER")
+                    role_id__tier= 30)
         res=isTeamManager.count()>0
 
         if res:
@@ -446,9 +446,9 @@ def find_departments(request):
         else:
             #not a manager
             rolesPro = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                     role_id__name="PROJECT_MANAGER")
+                     role_id__tier=40)
             rolesDep=ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                     role_id__name="COORDINATOR")
+                     role_id__tier=20)
 
             if  rolesPro.count()>0:
                 #you're a project manager. Loading your projects
@@ -480,7 +480,7 @@ def find_projects(request):
     if actor.user_type!='A':
         #not an admin
         isTeamManager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                    role_id__name= "TEAM_MANAGER")
+                    role_id__tier= 30)
         res=isTeamManager.count()>0
 
         if res:
@@ -490,9 +490,9 @@ def find_projects(request):
         else:
             #not a manager
             rolesPro = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                     role_id__name="PROJECT_MANAGER")
+                     role_id__tier=40)
             rolesDep=ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                     role_id__name="COORDINATOR")
+                     role_id__tier=20)
 
             if  rolesPro.count()>0:
                 #you're a project manager. Loading your projects
