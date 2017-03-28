@@ -68,10 +68,8 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'metronus.urls'
 
-
 # Solo carga en producción la caché, que si no...
 if production:
-    MIDDLEWARE.append('django.middleware.http.ConditionalGetMiddleware') # Añadimos la carga condicional...
     TEMPLATES = [
         {
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -103,7 +101,6 @@ if production:
         'compressor.finders.CompressorFinder',
     )
 else:
-
     TEMPLATES = [
         {
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
