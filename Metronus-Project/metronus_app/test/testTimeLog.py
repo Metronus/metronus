@@ -14,5 +14,7 @@ class TaskTestCase(TestCase):
     def createTimeLogPositive(self):
         c = Client()
         c.login(username="andjimrio", password="123456")
-
+        task=Task.objects.filter(name="Hacer cosas de front").first()
         before = TimeLog.objects.all().count()
+
+ 
