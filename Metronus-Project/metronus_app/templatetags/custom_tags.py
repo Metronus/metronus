@@ -1,4 +1,5 @@
 from django import template
+from datetime import date,datetime
 
 register = template.Library()
 
@@ -25,5 +26,11 @@ def converto_to_hours(amount):
     hours = amount//60
     minutes = amount%60
     return {'hours':hours,'minutes':minutes}
+
+@register.simple_tag
+def is_weekend(day,month,year):
+    fecha = datetime.date(year,month,day)
+    result = fecha.weekday() in (5,6)
+    return {'result': result}
 
 
