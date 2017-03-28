@@ -5,7 +5,7 @@
 
 {% block content %}
 <h1><strong>{% trans 'department' %}: </strong>{{department.name}}</h1>
-<h2><strong>{% trans 'coordinator' %}: </strong>{{coordinator.user.username}}</h1>
+<h2><strong>{% trans 'coordinator' %}: </strong>{{coordinator.user.first_name}} {{coordinator.user.last_name}}</h2>
 
 <div class="col-md-12 col-sm-12 col-xs-12">
   <div class="x_panel">
@@ -22,29 +22,27 @@
             <th>{% trans 'username' %}</th>
             <th>{% trans 'identifier' %}</th>
             <th>{% trans 'phone' %}</th>
-            <th>{% trans 'registryDate' %}</th>
-            <th>{% trans 'actions' %}</th>
+            <th class="hidden-xs">{% trans 'registryDate' %}</th>
           </tr>
         </thead>
         <tbody>
           {% for employee in employees %}
-          <tr>
+          <tr data-href="/employee/view/{{employee.user}}" style="cursor: pointer;">
             <th scope="row">{{forloop.counter}}</th>
-            <td>{{employee.user}}</td>
+
+            <td><img src="{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
 
             <td>{{employee.identifier}}</td>
 
             <td>{{employee.phone}}</td>
 
-            <td>{{employee.registryDate}}</td>
+            <td class="hidden-xs">{{employee.registryDate}}</td>
 
-            <td>
-              <a href="/employee/view/{{employee.user}}" type="button" class="btn btn-success">{% trans 'details' %}</a>
-            </td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
+
 
     </div>
   </div>

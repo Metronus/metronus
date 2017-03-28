@@ -74,10 +74,16 @@ function ajax(){
 
 function ajaxDepartment(){
 	console.log($("#id_{{ form.project_id.name }}").val()); 
-	$.post('/roles/availableDepartments', { project_id : 3}, 
+	$.post('/roles/availableDepartments', { project_id : "3"}, 
     function(returnedData){
 	     $.each(returnedData, function(i, obj){
-                    $('#id_{{ form.department_id.name }}').append($('<option>').text(obj.name).attr('value', obj.id));
+	     			if("{{form.department_id.value}}"==obj.id){
+	     				$('#id_{{ form.department_id.name }}').append($('<option>').text(obj.name).attr('value', obj.id)).attr('selected', true);
+	     			}
+	     			else{
+	     				$('#id_{{ form.department_id.name }}').append($('<option>').text(obj.name).attr('value', obj.id));
+	     			}
+                    
             });
 	 	 $('#id_{{ form.department_id.name }}').attr('disabled', false);    
 	});
@@ -138,7 +144,7 @@ function ajaxDepartment(){
         <div class="form-group required form-class">
           <label class="control-label col-sm-4" for="id_{{ form.role_id.name }}">{% trans 'rol' %}</label>
             <div class="col-sm-6">
-              <select class="form-control" name="{{ form.role_id.name }}" id="id_{{ form.role_id.name }}" required>
+              <select class="form-control" name="{{ form.role_id.name }}" id="id_{{ form.role_id.name }}" required disabled="true">
 		              <option value="" selected>{% trans 'selectRole' %}</option>
 		             	{% for dep in roles %}
 		    			<option value="{{ dep.id }}"{% if form.role_id.value == dep.id %} selected{% endif %}>{{ dep.name }}</option>

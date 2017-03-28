@@ -41,10 +41,9 @@ $(document).ready(function() {
 	
 function ajax(){
     $.post('/department/createAsync', $('#register_form').serialize(), function(data, status){
-    	$('#id_{{ form.name.name }}').val('');
         $("#register_form").data('bootstrapValidator').resetForm();
-    	console.log(data)
     	if(JSON.stringify(data['success'])=="true"){
+            $('#id_{{ form.name.name }}').val('');
     		$('#errorDiv').attr('hidden', true);
     		$('#error2Div').attr('hidden', true);
     		$('#successDiv').attr('hidden', false).html("<strong>{% trans 'success' %} | </strong>{% trans 'departmentSaved' %}");
