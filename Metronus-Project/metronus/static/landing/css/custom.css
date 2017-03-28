@@ -2,6 +2,11 @@
                             Global
 =======================================================================================================*/
 
+#flag_es, #flag_en{
+  height: 20px;
+  cursor: pointer;
+}
+
 * {
     outline: none !important;
     box-shadow: none;
@@ -100,18 +105,18 @@ li a
 {
     text-decoration: none;
 }
-#heading-text
+#heading-text-services h3, #heading-text-team h3, #heading-text-pricing h3
 {
     padding-top: 10px;
 }
-#heading-text h3 {
+#heading-text-services h3, #heading-text-team h3, #heading-text-pricing h3 {
     font-size: 49px;
     font-family: 'Roboto', sans-serif;
     padding-top: 58px;
     text-transform: uppercase;
 }
 
-#heading-text p {
+#heading-text-services p, #heading-text-team p, #heading-text-pricing p {
     font-size: 18px;
     font-family: 'Roboto', sans-serif;
     padding: 5px 0px
@@ -197,13 +202,13 @@ iframe
 .rene {
     font-size: 120px;
     color: white;
-    font-family: "Helvetica", sans-serif;
+    font-family: 'Coda', "Helvetica", sans-serif;
     font-weight: 300;
     margin-top: 75px;
 }
 
 .starting-text h2 {
-    font-family: "Helvetica", sans-serif;
+    font-family: 'Coda', "Helvetica", sans-serif;
     color: #fff;
 }
 
@@ -808,7 +813,7 @@ form
     }
 }
 @media (max-width: 405px){
-    #heading-text h3
+    #heading-text-services, #heading-text-team, #heading-text-pricing h3
     {
         font-size: 45px;
     }
