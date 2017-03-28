@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load l10n %}
+{% load compress %}
 
 <!DOCTYPE html>
 <html>
@@ -14,6 +15,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
 	    <!-- css -->
+		{% compress css %}
 		<link rel="stylesheet" href="/static/landing/css/bootstrap.min.css">
 		<link rel="stylesheet" href="/static/landing/css/ionicons.min.css">
 		<link rel="stylesheet" href="/static/landing/css/font-awesome.min.css">
@@ -22,6 +24,7 @@
 		<link rel="stylesheet" href="/static/landing/css/owl.transitions.css">
 		<link rel="stylesheet" href="/static/landing/css/animate.css">
 		<link rel="stylesheet" href="/static/landing/css/custom.css">
+		{% endcompress %}
 	</head>
 
 	<body>
@@ -353,6 +356,7 @@
 
 
 		<!-- js -->
+		{% compress js %}
 		<script src="/static/landing/js/jquery.min.js" async></script>
 		<script src="/static/landing/js/bootstrap.min.js" async></script>
 		<script src="/static/landing/js/owl.carousel.min.js" async></script>
@@ -360,21 +364,22 @@
 		<script src="/static/landing/js/cookies.min.js" async></script>
 		<script src="/static/landing/js/wow.min.js" async></script>
 		<script src="/static/landing/js/jquery.actual.min.js" async></script>
+		{% endcompress %}
 
 		<script>
- 			new WOW().init();
-		</script>
+			$( document ).ready(function() {
+				new WOW().init();
 
-		<script>
-		$("#flag_es").click(function() {
-			Cookies.set('lang', 'es-es');
-			location.reload(true);
-		});
+				$("#flag_es").click(function() {
+					Cookies.set('lang', 'es-es');
+					location.reload(true);
+				});
 
-		$("#flag_en").click(function() {
-			Cookies.set('lang', 'en-us');
-			location.reload(true);
-		});
+				$("#flag_en").click(function() {
+					Cookies.set('lang', 'en-us');
+					location.reload(true);
+				});
+			});
 		</script>
 	</body>
 </html>

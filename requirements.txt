@@ -1,5 +1,6 @@
 appdirs==1.4.3
 Django==1.10.4
+django-compressor==2.1.1
 packaging==16.8
 psycopg2==2.6.2
 pyparsing==2.1.10
