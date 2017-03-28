@@ -106,7 +106,8 @@ def list_all(request):
     total.append(monthTotal)
     currentMonth = date.today().month
     currentYear = date.today().year
-    return render(request, "timeLog/timeLog_list_all.html", {"my_tasks": my_tasks, "month":month,"total":total, "currentMonth":currentMonth, "currentYear":currentYear})
+    form = TimeLog2Form(request, initial={"timeLog_id": 0, "workDate": datetime.now()})
+    return render(request, "timeLog/timeLog_list_all.html", {"my_tasks": my_tasks, "month":month,"total":total, "currentMonth":currentMonth, "currentYear":currentYear, "form":form})
 
 def edit(request, timeLog_id):
     """
