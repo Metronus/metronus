@@ -6,11 +6,29 @@
 <html lang="es">
 	<head>
 		<title>Metronus</title>
-
+		<meta name="description" content="Metronus, a productivity and profit driven project, where time is the most important variable and the variable which leads you towards success">
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<meta charset="UTF-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+		<link rel="apple-touch-icon" sizes="57x57" href="/static/landing/img/favicon/apple-icon-57x57.png">
+		<link rel="apple-touch-icon" sizes="60x60" href="/static/landing/img/favicon/apple-icon-60x60.png">
+		<link rel="apple-touch-icon" sizes="72x72" href="/static/landing/img/favicon/apple-icon-72x72.png">
+		<link rel="apple-touch-icon" sizes="76x76" href="/static/landing/img/favicon/apple-icon-76x76.png">
+		<link rel="apple-touch-icon" sizes="114x114" href="/static/landing/img/favicon/apple-icon-114x114.png">
+		<link rel="apple-touch-icon" sizes="120x120" href="/static/landing/img/favicon/apple-icon-120x120.png">
+		<link rel="apple-touch-icon" sizes="144x144" href="/static/landing/img/favicon/apple-icon-144x144.png">
+		<link rel="apple-touch-icon" sizes="152x152" href="/static/landing/img/favicon/apple-icon-152x152.png">
+		<link rel="apple-touch-icon" sizes="180x180" href="/static/landing/img/favicon/apple-icon-180x180.png">
+		<link rel="icon" type="image/png" sizes="192x192"  href="/static/landing/img/favicon/android-icon-192x192.png">
+		<link rel="icon" type="image/png" sizes="32x32" href="/static/landing/img/favicon/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="96x96" href="/static/landing/img/favicon/favicon-96x96.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="/static/landing/img/favicon/favicon-16x16.png">
+		<link rel="manifest" href="/static/landing/img/favicon/manifest.json">
+		<meta name="msapplication-TileColor" content="#ffffff">
+		<meta name="msapplication-TileImage" content="/static/landing/img/favicon/ms-icon-144x144.png">
+		<meta name="theme-color" content="#ffffff">
 	</head>
 
 	<body>
@@ -32,8 +50,8 @@
 		        					<li><a href="#price_table">{% trans 'landingPricing' %}</a></li>
 		        					<li><a href="/register">{% trans 'landingRegister' %}</a></li>
 		        					<li><a href="/login">{% trans 'landingLogin' %}</a></li>
-		        					<li><a href="#"><img id="flag_es" alt ="Spanish" class="img-responsive" style="height: 20px; cursor: pointer;" src="/static/landing/img/flag_es.png"></a></li>
-		      						<li><a href="#"><img id="flag_en" alt="English" class="img-responsive" style="height: 20px; cursor: pointer;" src="/static/landing/img/flag_en.png"></a></li>
+		        					<li><a href="#"><img id="flag_es" alt ="Spanish" class="img-responsive" src="/static/landing/img/flag_es.png"></a></li>
+		      						<li><a href="#"><img id="flag_en" alt="English" class="img-responsive" src="/static/landing/img/flag_en.png"></a></li>
 							    </ul>
 	    					</div>	<!-- collapse navbar-collapse -->
 	  					</div>	<!-- container-fluid -->
@@ -55,14 +73,14 @@
 		<!-- Our service -->
 		<section id="service">
 			<div class="container">
-				<div class="row text-center" id= "heading">
-	        		<div class="col-md-6 col-md-offset-3 wow animated zoomInDown" id= "heading-text">
-	        			<h3>{% trans 'landingService' %}</h3>
-	                	<p>{% trans 'landingServiceSub' %}</p>
-	                	<hr class= "full">
-	                	<br/>
-	        		</div>
-		        </div>
+				<div class="row text-center">
+        		<div class="col-md-6 col-md-offset-3 wow animated zoomInDown" id= "heading-text-services">
+        			<h3>{% trans 'landingService' %}</h3>
+                	<p>{% trans 'landingServiceSub' %}</p>
+                	<hr class= "full">
+                	<br/>
+        		</div>
+	        </div>
 			    <div class="main_content">
 				    <div class="services">
 			        	<div class="row">
@@ -109,8 +127,8 @@
 	    <section id="team">
 	    	<div class="container">
 		    	<div class="team-members">
-		    		<div class="row text-center" id="heading">
-		    			<div class="col-md-6 col-md-offset-3 wow animated zoomInDown" id="heading-text">
+		    		<div class="row text-center">
+		    			<div class="col-md-6 col-md-offset-3 wow animated zoomInDown" id="heading-text-team">
 		        			<h3>{% trans 'landingTeam' %}</h3>
 		                	<p>{% trans 'landingTeamDesc' %}</p>
 		                	<hr class="full">
@@ -225,8 +243,8 @@
 		<!-- Price-Table -->
 	    <section id="price_table">
 	    	<div class="container">
-	    		<div class="row text-center" id="heading">
-	    			<div class="col-md-6 col-md-offset-3 wow animated zoomInDown" id="heading-text">
+	    		<div class="row text-center">
+	    			<div class="col-md-6 col-md-offset-3 wow animated zoomInDown" id="heading-text-pricing">
 	        			<h3>{% trans 'landingPriceTable' %}</h3>
 	                	<p>{% trans 'landingPriceTableDesc' %}</p>
 	                	<hr class="full">
