@@ -14,3 +14,5 @@ class TimeLogForm(forms.Form):
 
     timeLog_id = forms.IntegerField(widget=forms.HiddenInput())
     task_id = forms.IntegerField(widget=forms.HiddenInput())
+
+    produced_units = forms.FloatField(label=_("produced_units"),required=False,initial="")

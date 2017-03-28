@@ -176,7 +176,9 @@ def basicLoad():
         name  ="Hacer cosas de front",
         description  = "nada",
         actor_id = emp8,
-        projectDepartment_id = pd2
+        projectDepartment_id = pd2,
+        production_goal="2.0",
+        goal_description="kgs"
     )
     Task.objects.create(
         name  ="Hacer cosas de cua",

@@ -8,6 +8,8 @@ class TimeLog(models.Model):
     workDate = models.DateTimeField()
     duration = models.PositiveSmallIntegerField(default=1, blank=False, null=False)
 
+    produced_units = models.FloatField(null=True, blank=True)
+
     task_id = models.ForeignKey(Task)
     employee_id = models.ForeignKey(Employee)
 
