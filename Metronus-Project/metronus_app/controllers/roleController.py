@@ -91,8 +91,9 @@ def manageAsync(request):
     logged = get_authorized_or_403(request)
 
     if request.method == 'POST':
+        
+        form = RoleManagementForm(request.POST)
         if form.is_valid():
-            form = RoleManagementForm(request.POST)
             result = process_post_form(logged, form)
             return JsonResponse({'success': result["ok"], 'errors': result['errors']})
         else:

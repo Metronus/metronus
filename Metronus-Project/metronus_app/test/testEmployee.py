@@ -92,6 +92,7 @@ class EmployeeTestCase(TestCase):
         })
 
         self.assertEquals(response.status_code, 200)
+        self.assertTrue(response.context["success"])
 
         # Check that the employee has been successfully created
 
@@ -107,6 +108,119 @@ class EmployeeTestCase(TestCase):
         logs_after = EmployeeLog.objects.all().count()
 
         self.assertEquals(logs_before + 1, logs_after)
+
+    def test_create_employee_with_redirect_positive(self):
+        # Logged in as an administrator, try to create an employee
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        logs_before = EmployeeLog.objects.all().count()
+
+        response = c.post("/employee/create?redirect=true", {
+            "username": "employee11343154",
+            "password1": "ihatemyboss",
+            "password2": "ihatemyboss",
+            "first_name": "Francisco2",
+            "last_name": "Romualdo2",
+            "email": "frc2@empresa.com",
+            "identifier": "frc02",
+            "phone": "654321987",
+        })
+
+        self.assertRedirects(response, "/employee/view/employee11343154/", fetch_redirect_response=False)
+
+        # Check that the employee has been successfully created
+
+        employee = Employee.objects.get(identifier="frc02")
+        self.assertEquals(employee.user_type, "E")
+        self.assertEquals(employee.phone, "654321987")
+        self.assertEquals(employee.company_id, Administrator.objects.get(identifier="adm01").company_id)
+        self.assertEquals(employee.user.username, "employee11343154")
+        self.assertEquals(employee.user.first_name, "Francisco2")
+        self.assertEquals(employee.user.last_name, "Romualdo2")
+        self.assertEquals(employee.user.email, "frc2@empresa.com")
+
+        logs_after = EmployeeLog.objects.all().count()
+
+        self.assertEquals(logs_before + 1, logs_after)
+
+    def test_create_employee_password_not_match_negative(self):
+        # Logged in as an administrator, try to create an employee
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        logs_before = EmployeeLog.objects.all().count()
+
+        response = c.post("/employee/create", {
+            "username": "employee_creating",
+            "password1": "ihatemyboss",
+            "password2": "dontmatch",
+            "first_name": "Francisco",
+            "last_name": "Romualdo",
+            "email": "frc@empresa.com",
+            "identifier": "frc01",
+            "phone": "654321987",
+        })
+
+        self.assertEquals(response.status_code, 200)
+        self.assertTrue('employeeCreation_passwordsDontMatch' in response.context["errors"])
+
+        # Check that the employee has not been created
+
+        logs_after = EmployeeLog.objects.all().count()
+        self.assertEquals(logs_before, logs_after)
+
+    def test_create_employee_username_taken_negative(self):
+        # Logged in as an administrator, try to create an employee
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        logs_before = EmployeeLog.objects.all().count()
+
+        response = c.post("/employee/create", {
+            "username": "emp1",
+            "password1": "ihatemyboss",
+            "password2": "ihatemyboss",
+            "first_name": "Francisco",
+            "last_name": "Romualdo",
+            "email": "frc@empresa.com",
+            "identifier": "frc01",
+            "phone": "654321987",
+        })
+
+        self.assertEquals(response.status_code, 200)
+        self.assertTrue('employeeCreation_usernameNotUnique' in response.context["errors"])
+
+        # Check that the employee has not been created
+
+        logs_after = EmployeeLog.objects.all().count()
+        self.assertEquals(logs_before, logs_after)
+
+    def test_create_employee_invalid_form_negative(self):
+        # Logged in as an administrator, try to create an employee
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        logs_before = EmployeeLog.objects.all().count()
+
+        response = c.post("/employee/create", {
+            "username": "adsfafafaf",
+            "password1": "ihatemyboss",
+            "password2": "ihatemyboss",
+            "first_name": "",
+            "last_name": "",
+            "email": "frc@empresa.com",
+            "identifier": "frc01",
+            "phone": "654321987",
+        })
+
+        self.assertEquals(response.status_code, 200)
+        self.assertTrue('employeeCreation_formNotValid' in response.context["errors"])
+
+        # Check that the employee has not been created
+
+        logs_after = EmployeeLog.objects.all().count()
+        self.assertEquals(logs_before, logs_after)
 
 
     def test_list_employees_positive(self):
@@ -171,8 +285,6 @@ class EmployeeTestCase(TestCase):
         initialpass = User.objects.get(username="emp1").password
 
         response = c.post("/employee/edit/emp1/", {
-            "password1": "",
-            "password2": "",
             "first_name": "NuevoNombre",
             "last_name": "NuevoApellido",
             "email": "nuevocorreo@empresa.com",
@@ -190,31 +302,33 @@ class EmployeeTestCase(TestCase):
         self.assertEquals(final.user.email, "nuevocorreo@empresa.com")
         self.assertEquals(final.user.password, initialpass)
 
-    def test_edit_employee_positive_with_pass(self):
+    def test_edit_employee_pass_positive(self):
         c = Client()
         c.login(username="admin1", password="123456")
 
         initialpass = User.objects.get(username="emp1").password
 
-        response = c.post("/employee/edit/emp1/", {
+        response = c.post("/employee/updatePassword/emp1/", {
             "password1": "nuevapassword",
             "password2": "nuevapassword",
-            "first_name": "NuevoNombre2",
-            "last_name": "NuevoApellido2",
-            "email": "nuevocorreo2@empresa.com",
-            "identifier": "nuevoid2",
-            "phone": "nuevotelefono2",
         })
 
-        self.assertRedirects(response, "/employee/view/emp1/", fetch_redirect_response=False)
+        final = Employee.objects.get(user__username="emp1")
+        self.assertTrue(final.user.password != initialpass)
+
+    def test_edit_employee_pass_negative(self):
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        initialpass = User.objects.get(username="emp1").password
+
+        response = c.post("/employee/updatePassword/emp1/", {
+            "password1": "mequiero",
+            "password2": "morirmucho",
+        })
 
         final = Employee.objects.get(user__username="emp1")
-        self.assertEquals(final.identifier, "nuevoid2")
-        self.assertEquals(final.phone, "nuevotelefono2")
-        self.assertEquals(final.user.first_name, "NuevoNombre2")
-        self.assertEquals(final.user.last_name, "NuevoApellido2")
-        self.assertEquals(final.user.email, "nuevocorreo2@empresa.com")
-        self.assertTrue(final.user.password != initialpass)
+        self.assertTrue(final.user.password == initialpass)
 
     def test_edit_employee_not_allowed(self):
         c = Client()
