@@ -100,10 +100,13 @@ def list_all(request):
                                    active=True).distinct()
     my_tasks = [myTask(x) for x in tareas]
     month = [x for x in range(1,calendar.monthrange(today.year,today.month)[1]+1)]
+    month.append("Total")
     total = [sum([x.durations[i] for x in my_tasks]) for i in range(0,calendar.monthrange(today.year,today.month)[1]) ]
     monthTotal = sum(total)
     total.append(monthTotal)
-    return render(request, "timeLog/timeLog_list_all.html", {"my_tasks": my_tasks, "month":month,"total":total})
+    currentMonth = date.today().month
+    currentYear = date.today().year
+    return render(request, "timeLog/timeLog_list_all.html", {"my_tasks": my_tasks, "month":month,"total":total, "currentMonth":currentMonth, "currentYear":currentYear})
 
 def edit(request, timeLog_id):
     """
