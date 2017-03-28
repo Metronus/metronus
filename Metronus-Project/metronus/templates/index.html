@@ -3,14 +3,12 @@
 {% load compress %}
 
 <!DOCTYPE html>
-<html>
+<html lang="es">
 	<head>
 		<title>Metronus</title>
 
 		<!-- meta -->
 		<meta charset="UTF-8">
-	  <meta name="viewport" content="width=device-width, initial-scale=1">
-
 		<!--Let browser know website is optimized for mobile-->
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
@@ -46,8 +44,8 @@
 		        					<li><a href="#price_table">{% trans 'landingPricing' %}</a></li>
 		        					<li><a href="/register">{% trans 'landingRegister' %}</a></li>
 		        					<li><a href="/login">{% trans 'landingLogin' %}</a></li>
-		        					<li><img id="flag_es" class="img-responsive" style="width: 65%; cursor: pointer;" src="/static/landing/img/flag_es.png"></li>
-		      						<li><img id="flag_en" class="img-responsive" style="width: 65%; cursor: pointer;" src="/static/landing/img/flag_en.png"></li>
+		        					<li><a href="#"><img id="flag_es" alt ="Spanish" class="img-responsive" style="height: 20px; cursor: pointer;" src="/static/landing/img/flag_es.png"></a></li>
+		      						<li><a href="#"><img id="flag_en" alt="English" class="img-responsive" style="height: 20px; cursor: pointer;" src="/static/landing/img/flag_en.png"></a></li>
 							    </ul>
 	    					</div>	<!-- collapse navbar-collapse -->
 	  					</div>	<!-- container-fluid -->
@@ -357,13 +355,13 @@
 
 		<!-- js -->
 		{% compress js %}
-		<script src="/static/landing/js/jquery.min.js" async></script>
-		<script src="/static/landing/js/bootstrap.min.js" async></script>
-		<script src="/static/landing/js/owl.carousel.min.js" async></script>
-		<script src="/static/landing/js/script.js" async></script>
-		<script src="/static/landing/js/cookies.min.js" async></script>
-		<script src="/static/landing/js/wow.min.js" async></script>
-		<script src="/static/landing/js/jquery.actual.min.js" async></script>
+		<script src="/static/landing/js/jquery.min.js"></script>
+		<script src="/static/landing/js/bootstrap.min.js"></script>
+		<script src="/static/landing/js/owl.carousel.min.js"></script>
+		<script src="/static/landing/js/script.js"></script>
+		<script src="/static/landing/js/cookies.min.js"></script>
+		<script src="/static/landing/js/wow.min.js"></script>
+		<script src="/static/landing/js/jquery.actual.min.js"></script>
 		{% endcompress %}
 
 		<script>
