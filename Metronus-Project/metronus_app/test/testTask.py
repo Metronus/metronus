@@ -199,10 +199,8 @@ class TaskTestCase(TestCase):
         c.login(username="metronus", password="metronus")
 
         pro_id=Project.objects.get(name="Metronus").id,
-
         dep_id=Department.objects.get(name="Frontend").id
-        response = c.get("/task/list")
-        task_id=response.context["tasks"][0].id
+        task_id=Task.objects.filter("Hacer cosas de cua").first().id
 
         logs_before = GoalEvolution.objects.all().count()
 
@@ -212,7 +210,7 @@ class TaskTestCase(TestCase):
             "description":"alguno",
             "project_id":pro_id,
             "department_id":dep_id,
-            "production_goal":"2.0",
+            "production_goal":"3.0",
             "goal_description":"kgs",
               })
 
@@ -230,8 +228,9 @@ class TaskTestCase(TestCase):
         pro_id=Project.objects.get(name="Metronus").id,
 
         dep_id=Department.objects.get(name="Frontend").id
-        response = c.get("/task/list")
-        task_id=response.context["tasks"][0].id
+
+      
+        task_id=Task.objects.filter("Hacer cosas de frontend").first().id
 
         logs_before = GoalEvolution.objects.all().count()
 
@@ -241,6 +240,8 @@ class TaskTestCase(TestCase):
             "description":"alguno",
             "project_id":pro_id,
             "department_id":dep_id,
+            "production_goal"="2.0",
+            "goal_description"="kgs"
               })
 
         self.assertEquals(response.status_code, 302)

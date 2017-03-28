@@ -141,7 +141,7 @@ def view(request,department_id):
     coordinator=get_coordinator(department)
     tasks=Task.objects.filter(active=True, projectDepartment_id__department_id__id=department_id)
     employees = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__department_id=department).distinct()
-
+    print(coordinator)
     return render(request, 'department_view.html', {'department': department, 'employees': employees,
         'tasks':tasks,'coordinator':coordinator})
 

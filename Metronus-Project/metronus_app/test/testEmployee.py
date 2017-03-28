@@ -350,7 +350,7 @@ class EmployeeTestCase(TestCase):
         self.assertTrue(User.objects.get(username="emp1").is_active)
 
         response = c.get("/employee/delete/emp1/")
-        self.assertRedirects(response, "/employee/list/", fetch_redirect_response=False)
+        self.assertRedirects(response, "/employee/list", fetch_redirect_response=False)
 
         self.assertFalse(User.objects.get(username="emp1").is_active)
         logs_after = EmployeeLog.objects.all().count()
