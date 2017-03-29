@@ -26,7 +26,8 @@ class TimeLog2Form(forms.Form):
     timeLog_id = forms.IntegerField(widget=forms.HiddenInput())
 
 
-    produced_units = forms.FloatField(label=_("produced_units"),required=False,initial="")
+    produced_units = forms.FloatField(label=_("produced_units"),required=False,initial="",
+                                      widget=forms.NumberInput(attrs={'class':'form-control'}))
     def __init__(self, request,*args, **kwargs):
         super(TimeLog2Form, self).__init__(*args, **kwargs)
         actor=None
