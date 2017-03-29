@@ -49,7 +49,7 @@ def create_all(request):
 
 def create_by_task(request,task_id):
     """
-    valid_production_units: devuelve si se especificó production units y es necesario, 
+    valid_production_units: devuelve si se especificó production units y es necesario,
     o si no se especificó y no era necesario
     """
     valid_production_units=True
@@ -92,6 +92,15 @@ def list(request, task_id):
 
 def list_all(request):
     today = datetime.today()
+    if(request.GET.get('monthFilter')):
+        monthFilter = request.GET['monthFilter']
+    else:
+        monthFilter = today.month
+
+    if (request.GET.get('yearFilter')):
+        yearFilter = request.GET['yearFilter']
+    else:
+        yearFilter = today.year
 
     try:
         actor = Actor.objects.get(user=request.user)
@@ -100,7 +109,7 @@ def list_all(request):
     tareas=Task.objects.filter(actor_id__company_id=actor.company_id,
                                    projectDepartment_id__projectdepartmentemployeerole__employee_id=actor,
                                    active=True).distinct()
-    my_tasks = [myTask(x,today.month,today.year) for x in tareas]
+    my_tasks = [myTask(x,monthFilter,yearFilter) for x in tareas]
     month = [x for x in range(1,calendar.monthrange(today.year,today.month)[1]+1)]
     month.append("Total")
     total = [sum([x.durations[i] for x in my_tasks]) for i in range(0,calendar.monthrange(today.year,today.month)[1]) ]
