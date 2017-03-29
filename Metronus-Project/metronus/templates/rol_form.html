@@ -128,9 +128,9 @@ function removeOptions(selectbox)
   <div class="x_panel">
     <div class="x_title">
       {% if  form.employeeRole_id.value == 0 %}
-		  <h2 > {% trans 'addRole' %} </h2>
+		  <h2 > {% trans 'addRole' %}  : {{employee.user.first_name}} {{employee.user.last_name}}</h2>
 	  {% else %}
-		  <h2 > {% trans 'editRole' %} </h2>
+		  <h2 > {% trans 'editRole' %} : {{employee.user.first_name}} {{employee.user.last_name}}</h2>
 	  {% endif %}
       <div class="clearfix"></div>
     </div>
