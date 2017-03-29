@@ -135,6 +135,18 @@ msgstr "Admin information"
 msgid "registerCompanyAdminInfo"
 msgstr "Someone has to rule your app"
 
+# Contact form
+msgid "contact_form"
+msgstr "Contact form"
+msgid "email_subject"
+msgstr "Subject"
+msgid "email_body"
+msgstr "Write your message..."
+msgid "copy_to_user"
+msgstr "Check if you want a copy of the email"
+msgid "send"
+msgstr "Send"
+
 #: metronus/settings.py:33
 msgid "English"
 msgstr ""

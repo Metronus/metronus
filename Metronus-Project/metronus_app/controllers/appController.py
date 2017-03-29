@@ -38,14 +38,14 @@ def contact(request):
             # process the data in form.cleaned_data as required
             name = form.cleaned_data['name']
             email = form.cleaned_data['email']
-            suject = form.cleaned_data['suject']
+            subject = form.cleaned_data['subject']
             body = form.cleaned_data['body']
 
             copy_to_user = form.cleaned_data['copy_to_user']
 
             context = {}
 
-            send_mail(suject+" - "+name, body, copy_to_user if [DEFAULT_FROM_EMAIL,email] else [DEFAULT_FROM_EMAIL,email], None, context, email)
+            send_mail(subject+" - "+name, body, copy_to_user if [DEFAULT_FROM_EMAIL,email] else [DEFAULT_FROM_EMAIL,email], None, context, email)
 
             # redirect to a new URL:
             return HttpResponseRedirect('/contact-done/')

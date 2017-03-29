@@ -136,6 +136,21 @@ msgstr "Información del Administrador"
 msgid "registerCompanyAdminInfo"
 msgstr "¡Alguien debe gestionar tu compañía!"
 
+# Contact form
+msgid "contact_form"
+msgstr "Formulario de contacto"
+msgid "email_subject"
+msgstr "Asunto"
+msgid "email_body"
+msgstr "Escribe tu mensaje..."
+msgid "copy_to_user"
+msgstr "Marcar si desea una copia del correo"
+msgid "send"
+msgstr "Enviar"
+msgid "contact_done"
+msgstr "¡Gracias! Hemos recibido su mensaje. Nos pondremos en contacto lo antes posible."
+
+
 #: metronus/settings.py:33
 msgid "English"
 msgstr ""
