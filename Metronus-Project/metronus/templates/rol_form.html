@@ -57,6 +57,16 @@ function ajax(){
     	document.getElementById('register_form').reset();
     	$('#id_{{ form.department_id.name }}').attr('disabled', true);
     	$('#id_{{ form.role_id.name }}').attr('disabled', true);
+    	$('#id_{{ form.department_id.name }}')
+    	.find('option')
+    	.remove()
+    	.end()
+    	.append("<option value='' selected>{% trans 'selectProject' %}</option>");
+    	$('#id_{{ form.role_id.name }}')
+    	.find('option')
+    	.remove()
+    	.end()
+    	.append("<option value='' selected>{% trans 'selectProject' %}</option>");
         $("#register_form").data('bootstrapValidator').resetForm();
     	console.log(data)
     	if(JSON.stringify(data['success'])=="true"){
