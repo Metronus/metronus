@@ -122,6 +122,9 @@ urlpatterns += [#i18n_patterns(
     url(r'^reset-done/$', password_reset_complete, {'template_name': 'auth/password_reset_complete.html'}
         , name='password_reset_complete'),
 
+    url(r'^contact/$', appController.contact, name='contact'),
+    url(r'^contact-done/$', appController.contact_done, name='contact_done'),
+
     url(r'^register$', companyController.create),
     url(r'^ajax/validate_cif/$', companyController.validateCIF, name='validate_cif'),
     url(r'^ajax/validate_admin/$', companyController.validateAdmin, name='validate_admin'),
