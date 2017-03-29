@@ -1,7 +1,8 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
-
+from metronus_app.model.project import Project
 from metronus_app.model.actor import Actor
+from metronus_app.model.department import Department
 from django.forms import ModelChoiceField
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 from metronus_app.model.task import Task
@@ -20,6 +21,9 @@ class TimeLog2Form(forms.Form):
 
     timeLog_id = forms.IntegerField(widget=forms.HiddenInput())
     task_id = MyModelChoiceField(queryset=None, widget=forms.Select(attrs={'class':'form-control'}))
+    project_id = MyModelChoiceField(queryset=None, widget=forms.Select(attrs={'class':'form-control'}))
+    department_id = MyModelChoiceField(queryset=None, widget=forms.Select(attrs={'class':'form-control'}))
+
 
     produced_units = forms.FloatField(label=_("produced_units"),required=False,initial="")
     def __init__(self, request,*args, **kwargs):
@@ -31,8 +35,6 @@ class TimeLog2Form(forms.Form):
             actor= Actor.objects.get(user=request.user)
         except ObjectDoesNotExist:
             raise PermissionDenied
-        tasks = Task.objects.filter(actor_id__company_id=actor.company_id,
-                                   projectDepartment_id__projectdepartmentemployeerole__employee_id=actor,
-                                   active=True).distinct()
+        projects = Project.objects.filter(company_id=actor.company_id,deleted=False)
 
-        self.fields['task_id'].queryset = tasks
+        self.fields['project_id'].queryset = projects
