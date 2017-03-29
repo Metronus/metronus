@@ -6,17 +6,19 @@ from metronus_app.model.administrator import Administrator
 from django.contrib.auth.models import User
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.contrib.sites.shortcuts import get_current_site
 
 from django.contrib.auth.decorators import login_required
 
-from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import get_object_or_404
 from metronus_app.common_utils import get_current_admin_or_403, get_or_none, checkImage, send_mail
 from django.core.exceptions import PermissionDenied
 
 
-def create(request):
+def create(request,
+           email_template_name='company/company_register_email.html',
+           html_email_template_name='company/company_register_email.html'):
     """
     parameters/returns:
     form: el formulario con los datos de la compañía y el administrador de la compañía
@@ -42,11 +44,21 @@ def create(request):
 
                 # This sends an information email to the company and to the admin
 
-                send_mail('Metronus Info.',
-                          'Su compañía sido registrada exitosamente en la aplicación.\n'
-                          'Como administrador podrá comenzar a usar Metronus a través del siguiente enlace.\n\n'
-                          + request.get_host() + '/' + company.short_name + '/login/'
-                          , [company.email, administrator.user.email], fail_silently=False)
+                current_site = get_current_site(request)
+                site_name = current_site.name
+                domain = current_site.domain
+
+                use_https = True
+                context = {
+                    'domain': domain,
+                    'site_name': site_name,
+                    'admin': administrator,
+                    'company': company.short_name,
+                    'protocol': 'https' if use_https else 'http',
+                }
+
+                send_mail('Metronus Info.', email_template_name,
+                          [company.email, administrator.user.email], html_email_template_name, context)
 
                 return HttpResponseRedirect('/' + company.short_name + '/login/')
             else:

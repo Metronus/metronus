@@ -8,6 +8,7 @@ from django.http import HttpResponseRedirect
 from metronus_app.model.administrator import Administrator
 from metronus_app.model.timeLog import TimeLog
 from metronus_app.model.projectDepartment import ProjectDepartment
+from metronus_app.model.department import Department
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 from populate_database import basicLoad
 from django.core.exceptions             import ObjectDoesNotExist, PermissionDenied
@@ -15,7 +16,11 @@ from django.http                        import HttpResponseForbidden
 from django.contrib.auth import authenticate,login
 from datetime import date,datetime
 from metronus_app.model.actor import Actor
+import json
+from django.http import HttpResponse
 import calendar
+from django.core import serializers
+
 
 def create_all(request):
     valid_production_units=True
@@ -46,7 +51,7 @@ def create_all(request):
 
 def create_by_task(request,task_id):
     """
-    valid_production_units: devuelve si se especificó production units y es necesario, 
+    valid_production_units: devuelve si se especificó production units y es necesario,
     o si no se especificó y no era necesario
     """
     valid_production_units=True
@@ -89,25 +94,80 @@ def list(request, task_id):
 
 def list_all(request):
     today = datetime.today()
+    employee = get_current_employee_or_403(request)
+    if(request.GET.get('currentMonth')):
+        currentMonth = request.GET['currentMonth']
+    else:
+        currentMonth = today.month
 
+    if (request.GET.get('currentYear')):
+        currentYear = request.GET['currentYear']
+    else:
+        currentYear = today.year
 
     try:
         actor = Actor.objects.get(user=request.user)
     except ObjectDoesNotExist:
         raise PermissionDenied
+
+
+    if request.method == 'POST' and request.is_ajax():
+        project = request.POST.get("project")
+        department = request.POST.get("department")
+
+        if project=='':
+            return
+        else:
+            print (project)
+            print (department)
+            if department is None:
+                print (project)
+                departments = Department.objects.filter(company_id=actor.company_id,
+                                                projectdepartment__project_id=project)
+
+                data = serializers.serialize('json', departments, fields=('id','name',))
+
+
+
+                return HttpResponse(data)
+            else:
+                print (department)
+                tasks = Task.objects.filter(projectDepartment_id__department_id=department,
+                                            projectDepartment_id__project_id=project,active=True)
+                data = serializers.serialize('json', tasks, fields=('id', 'name',))
+
+                return HttpResponse(data)
+
+    if request.method == 'POST':
+        form = TimeLogForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            # ...
+            # redirect to a new URL:
+            valid_production_units = checkProducedUnits(form)
+            if valid_production_units:
+                createTimeLog(form, employee)
+                return redirect('timeLog_list_all')
+
+    today = datetime.today()
+
+
     tareas=Task.objects.filter(actor_id__company_id=actor.company_id,
                                    projectDepartment_id__projectdepartmentemployeerole__employee_id=actor,
                                    active=True).distinct()
-    my_tasks = [myTask(x) for x in tareas]
+    my_tasks = [myTask(x,currentMonth,currentYear) for x in tareas]
+
     month = [x for x in range(1,calendar.monthrange(today.year,today.month)[1]+1)]
     month.append("Total")
     total = [sum([x.durations[i] for x in my_tasks]) for i in range(0,calendar.monthrange(today.year,today.month)[1]) ]
     monthTotal = sum(total)
     total.append(monthTotal)
-    currentMonth = date.today().month
-    currentYear = date.today().year
+
     form = TimeLog2Form(request, initial={"timeLog_id": 0, "workDate": datetime.now()})
+
     return render(request, "timeLog/timeLog_list_all.html", {"my_tasks": my_tasks, "month":month,"total":total, "currentMonth":currentMonth, "currentYear":currentYear, "form":form})
+
 
 def edit(request, timeLog_id):
     """
@@ -123,7 +183,7 @@ def edit(request, timeLog_id):
         if request.method == 'POST':
             form = TimeLogForm(request.POST)
             if form.is_valid():
-                valid_production_units=checkProducedUnits(form,timeLog.task_id)
+                valid_production_units=checkProducedUnits(form)
                 if valid_production_units:
                     log = get_object_or_404(TimeLog,pk=form.cleaned_data['timeLog_id'])
                     updateTimeLog(log,form)
@@ -163,7 +223,7 @@ def findTask(task_id):
     return task
 
 #Método auxiliar para la creación de registros
-def createTimeLog(form, task, employee):
+def createTimeLog(form, employee):
     fdescription = form.cleaned_data['description']
     fworkDate = form.cleaned_data['workDate']
     if (fworkDate.date() > date.today()):
@@ -171,6 +231,7 @@ def createTimeLog(form, task, employee):
     fduration = form.cleaned_data['duration']
     funits=form.cleaned_data['produced_units']
     timeLog = findTimeLogByDescriptionAndDate(fdescription,fworkDate)
+    task = findTask(form.cleaned_data['task_id'])
     if(timeLog is not None):
         timeLog.duration += fduration
         timeLog.produced_units+=funits
@@ -179,10 +240,11 @@ def createTimeLog(form, task, employee):
         TimeLog.objects.create(description=fdescription,workDate=fworkDate,duration=fduration,task_id=task,employee_id=employee)
 
 
-def checkProducedUnits(form,task):
+def checkProducedUnits(form):
     """
     Comprobación para saber si el empleado debe añadir un objetivo de producción
     """
+    task = findTask(form.cleaned_data['task_id'])
     prod_units=form.cleaned_data['produced_units']
     return (prod_units!="" and task.production_goal!="") or (not prod_units and not task.production_goal)
 
@@ -228,13 +290,14 @@ class myTask():
     name = ""
     durations = []
 
-    def __init__(self, task):
+    def __init__(self, task, month, year):
         today = datetime.today()
         self.name = task.name
         self.durations = [0 for x in range(0,calendar.monthrange(today.year,today.month)[1])]
+        timeLogs = TimeLog.objects.filter(workDate__year__gte=year,workDate__month__gte=month,
+                                     workDate__year__lte=year, workDate__month__lte=month,task_id=task.id)
 
-
-        for tl in task.timelog_set.all():
+        for tl in timeLogs:
             index = int(tl.workDate.day)-1
             self.durations[index] += tl.duration
         totalDuration = sum(self.durations)

@@ -3,8 +3,9 @@ from metronus_app.model.administrator            import Administrator
 from metronus_app.model.employee                 import Employee
 from django.core.exceptions                      import ObjectDoesNotExist
 from metronus.settings                           import DEFAULT_FROM_EMAIL
-from django.core                                 import mail
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
+from django.template import loader
+from django.core.mail import EmailMultiAlternatives
 
 from PIL import Image
 
@@ -84,5 +85,15 @@ def checkImage(form, param):
     else:
         return True
 
-def send_mail(subject, message, recipients, **kwargs):
-    mail.send_mail(subject, message, DEFAULT_FROM_EMAIL, recipients, **kwargs)
+
+def send_mail(subject, email_template_name, recipients, html_email_template_name,
+              context, email_from=DEFAULT_FROM_EMAIL, **kwargs):
+
+    body = loader.render_to_string(email_template_name, context)
+
+    email_message = EmailMultiAlternatives(subject, body, email_from, recipients)
+    if html_email_template_name is not None:
+        html_email = loader.render_to_string(html_email_template_name, context)
+        email_message.attach_alternative(html_email, 'text/html')
+
+    email_message.send(fail_silently=False)

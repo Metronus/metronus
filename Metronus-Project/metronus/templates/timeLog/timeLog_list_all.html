@@ -29,9 +29,9 @@
                 <div class="x_content">
                     <div class="text-center">
                         <ul class="pagination pagination-split">
-                            <li><a href="#">{{ currentMonth|add:"-1" }}</a></li>
+                            <li><a href="?currentMonth={{ currentMonth|add:"-1" }}">{{ currentMonth|add:"-1" }}</a></li>
                             <li><a>{{ currentMonth }}</a></li>
-                            <li><a href="#">{{ currentMonth|add:"1" }}</a></li>
+                            <li><a href="?currentMonth={{ currentMonth|add:"1" }}">{{ currentMonth|add:"1" }}</a></li>
                         </ul>
                     </div>
 
@@ -86,7 +86,8 @@
                  <div class="clearfix"></div>
 
                 <div class="x_content">
-                    <form id="form" class="form-horizontal form-label-left" novalidate method="POST">{% csrf_token %}
+                    <form id="form" class="form-horizontal form-label-left"
+                          novalidate method="POST" action="{% url 'timeLog_list_all' %}">{% csrf_token %}
                         {% for field in form.visible_fields %}
                             <div class="{{ field.name }} form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="{{ form.name.auto_id }}">
@@ -102,7 +103,7 @@
                         <div class="ln_solid"></div>
 
                         <div class="form-group">
-                            <div class="col-md-6 col-md-offset-3">
+                            <div class="col-md-12 text-center">
                                 <a class="btn btn-danger" href="{% url 'project_list' %}">{% trans 'cancel' %}</a>
                                 <button type="submit" class="btn btn-success">{% trans 'confirm' %}</button>
                             </div>
@@ -115,4 +116,51 @@
         <div class="clearfix"></div>
 
     </div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+    $(document).ready(function() {
+        $("#id_project_id").change(function(){
+            $.ajax({
+                type: 'POST',
+                data:  {
+                    project:$('#id_project_id option:selected').val(),
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+
+                success: function(resp){
+                    var name, select, option;
+                    console.log(resp);
+                    select = document.getElementById('id_department_id');
+                    $.each($.parseJSON(resp), function(key,value){
+                        select.options.add(new Option(value.fields['name'],value.pk));
+                    });
+                }
+            });
+        });
+    });
+
+    $(document).ready(function() {
+        $("#id_department_id").change(function(){
+            $.ajax({
+                type: 'POST',
+                data:  {
+                    project:$('#id_project_id option:selected').val(),
+                    department:$('#id_department_id option:selected').val(),
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+
+                success: function(resp){
+                    var name, select, option;
+                    console.log(resp);
+                    select = document.getElementById('id_task_id');
+                    $.each($.parseJSON(resp), function(key,value){
+                        select.options.add(new Option(value.fields['name'],value.pk));
+                    });
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}

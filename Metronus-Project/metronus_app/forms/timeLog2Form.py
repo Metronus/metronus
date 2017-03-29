@@ -1,7 +1,8 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
-
+from metronus_app.model.project import Project
 from metronus_app.model.actor import Actor
+from metronus_app.model.department import Department
 from django.forms import ModelChoiceField
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 from metronus_app.model.task import Task
@@ -12,6 +13,10 @@ class MyModelChoiceField(ModelChoiceField):
         return  obj.name
 
 class TimeLog2Form(forms.Form):
+    project_id = MyModelChoiceField(queryset=None, widget=forms.Select(attrs={'class':'form-control'}))
+    department_id = MyModelChoiceField(queryset=None, widget=forms.Select(attrs={'class':'form-control'}))
+    task_id = MyModelChoiceField(queryset=None, widget=forms.Select(attrs={'class':'form-control'}))
+
     description = forms.CharField(label=_("description"),max_length=200,
                                   widget=forms.TextInput(attrs={'class':'form-control'}))
     workDate = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'class':'form-control timepicker'}))
@@ -19,9 +24,10 @@ class TimeLog2Form(forms.Form):
                                   widget=forms.NumberInput(attrs={'class':'form-control'}))
 
     timeLog_id = forms.IntegerField(widget=forms.HiddenInput())
-    task_id = MyModelChoiceField(queryset=None, widget=forms.Select(attrs={'class':'form-control'}))
 
-    produced_units = forms.FloatField(label=_("produced_units"),required=False,initial="")
+
+    produced_units = forms.FloatField(label=_("produced_units"),required=False,initial="",
+                                      widget=forms.NumberInput(attrs={'class':'form-control'}))
     def __init__(self, request,*args, **kwargs):
         super(TimeLog2Form, self).__init__(*args, **kwargs)
         actor=None
@@ -31,8 +37,9 @@ class TimeLog2Form(forms.Form):
             actor= Actor.objects.get(user=request.user)
         except ObjectDoesNotExist:
             raise PermissionDenied
-        tasks = Task.objects.filter(actor_id__company_id=actor.company_id,
-                                   projectDepartment_id__projectdepartmentemployeerole__employee_id=actor,
-                                   active=True).distinct()
+        projects = Project.objects.filter(company_id=actor.company_id,deleted=False)
+        none = Project.objects.none()
 
-        self.fields['task_id'].queryset = tasks
+        self.fields['project_id'].queryset = projects
+        self.fields['task_id'].queryset = none
+        self.fields['department_id'].queryset = none
