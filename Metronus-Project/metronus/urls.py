@@ -56,6 +56,7 @@ urlpatterns += [#i18n_patterns(
     url(r'^task/view/(?P<task_id>\w{0,50})/$', taskController.view, name='task_view'),
     url(r'^task/edit/(?P<task_id>\w{0,50})/$', taskController.edit, name='task_edit'),
     url(r'^task/delete/(?P<task_id>\w{0,50})/$', taskController.delete, name='task_delete'),
+    url(r'^task/getdepartments$', taskController.form_departments),
 
     url(r'^project/list$', projectController.list, name='project_list'),
     url(r'^project/edit/(?P<project_id>\w{0,50})/$', projectController.edit, name='project_edit'),
@@ -121,6 +122,9 @@ urlpatterns += [#i18n_patterns(
         , name='password_reset_confirm'),
     url(r'^reset-done/$', password_reset_complete, {'template_name': 'auth/password_reset_complete.html'}
         , name='password_reset_complete'),
+
+    url(r'^contact/$', appController.contact, name='contact'),
+    url(r'^contact-done/$', appController.contact_done, name='contact_done'),
 
     url(r'^register$', companyController.create),
     url(r'^ajax/validate_cif/$', companyController.validateCIF, name='validate_cif'),

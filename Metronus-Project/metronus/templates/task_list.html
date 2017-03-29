@@ -17,7 +17,6 @@
       <table class="table table-striped table-hover">
         <thead>
           <tr>
-            <th>#</th>
             <th>{% trans 'task' %}</th>
             <th>{% trans 'projectDeparment' %}</th>
             <th>{% trans 'creationDate' %}</th>
@@ -29,10 +28,9 @@
 
           {% for task in tasks %}
           <tr>
-            <th scope="row">{{forloop.counter}}</th>
             <td>{{task.name}}</td>
 
-            <td>{{task.projectDepartment_id}}</td>
+            <td>{{task.projectDepartment_id.project_id.name}} / {{task.projectDepartment_id.department_id.name}}</td>
 
             <td>{{task.actor_id}}</td>
 

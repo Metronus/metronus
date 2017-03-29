@@ -86,11 +86,12 @@ def checkImage(form, param):
         return True
 
 
-def send_mail(subject, email_template_name, recipients, html_email_template_name, context, **kwargs):
+def send_mail(subject, email_template_name, recipients, html_email_template_name,
+              context, email_from=DEFAULT_FROM_EMAIL, **kwargs):
 
     body = loader.render_to_string(email_template_name, context)
 
-    email_message = EmailMultiAlternatives(subject, body, DEFAULT_FROM_EMAIL, recipients)
+    email_message = EmailMultiAlternatives(subject, body, email_from, recipients)
     if html_email_template_name is not None:
         html_email = loader.render_to_string(html_email_template_name, context)
         email_message.attach_alternative(html_email, 'text/html')

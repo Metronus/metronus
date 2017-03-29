@@ -13,20 +13,22 @@ class MyModelChoiceField(ModelChoiceField):
         return  obj.name
 
 class TimeLog2Form(forms.Form):
-    project_id = MyModelChoiceField(queryset=None, widget=forms.Select(attrs={'class':'form-control'}))
-    department_id = MyModelChoiceField(queryset=None, widget=forms.Select(attrs={'class':'form-control'}))
-    task_id = MyModelChoiceField(queryset=None, widget=forms.Select(attrs={'class':'form-control'}))
+    project_id = MyModelChoiceField(label=_("project"),queryset=None, widget=forms.Select(attrs={'class':'form-control'}))
+    department_id = MyModelChoiceField(label=_("department"),queryset=None, widget=forms.Select(attrs={'class':'form-control'}))
+    task_id = MyModelChoiceField(label=_("task"),queryset=None, widget=forms.Select(attrs={'class':'form-control'}))
 
     description = forms.CharField(label=_("description"),max_length=200,
                                   widget=forms.TextInput(attrs={'class':'form-control'}))
-    workDate = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'class':'form-control timepicker'}))
+    workDate = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'class':'form-control form_datetime',
+                                                                     'readonly':'readonly'}))
     duration = forms.IntegerField(label=_("duration"),
                                   widget=forms.NumberInput(attrs={'class':'form-control'}))
 
     timeLog_id = forms.IntegerField(widget=forms.HiddenInput())
 
 
-    produced_units = forms.FloatField(label=_("produced_units"),required=False,initial="")
+    produced_units = forms.FloatField(label=_("produced_units"),required=False,initial="",
+                                      widget=forms.NumberInput(attrs={'class':'form-control'}))
     def __init__(self, request,*args, **kwargs):
         super(TimeLog2Form, self).__init__(*args, **kwargs)
         actor=None

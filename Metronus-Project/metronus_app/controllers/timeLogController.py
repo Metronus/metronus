@@ -95,15 +95,15 @@ def list(request, task_id):
 def list_all(request):
     today = datetime.today()
     employee = get_current_employee_or_403(request)
-    if(request.GET.get('monthFilter')):
-        monthFilter = request.GET['monthFilter']
+    if(request.GET.get('currentMonth')):
+        currentMonth = int(request.GET['currentMonth'])
     else:
-        monthFilter = today.month
+        currentMonth = today.month
 
-    if (request.GET.get('yearFilter')):
-        yearFilter = request.GET['yearFilter']
+    if (request.GET.get('currentYear')):
+        currentYear = int(request.GET['currentYear'])
     else:
-        yearFilter = today.year
+        currentYear = today.year
 
     try:
         actor = Actor.objects.get(user=request.user)
@@ -115,7 +115,8 @@ def list_all(request):
         project = request.POST.get("project")
         department = request.POST.get("department")
 
-        if project=='': return
+        if project=='':
+            return
         else:
             print (project)
             print (department)
@@ -131,7 +132,8 @@ def list_all(request):
                 return HttpResponse(data)
             else:
                 print (department)
-                tasks = Task.objects.filter(projectDepartment_id__department_id=department,projectDepartment_id__project_id=project,active=True)
+                tasks = Task.objects.filter(projectDepartment_id__department_id=department,
+                                            projectDepartment_id__project_id=project,active=True)
                 data = serializers.serialize('json', tasks, fields=('id', 'name',))
 
                 return HttpResponse(data)
@@ -154,15 +156,14 @@ def list_all(request):
     tareas=Task.objects.filter(actor_id__company_id=actor.company_id,
                                    projectDepartment_id__projectdepartmentemployeerole__employee_id=actor,
                                    active=True).distinct()
-    my_tasks = [myTask(x,monthFilter,yearFilter) for x in tareas]
+    my_tasks = [myTask(x,currentMonth,currentYear) for x in tareas]
 
-    month = [x for x in range(1,calendar.monthrange(today.year,today.month)[1]+1)]
+    month = [x for x in range(1,calendar.monthrange(currentYear,currentMonth)[1]+1)]
     month.append("Total")
-    total = [sum([x.durations[i] for x in my_tasks]) for i in range(0,calendar.monthrange(today.year,today.month)[1]) ]
+    total = [sum([x.durations[i] for x in my_tasks]) for i in range(0,calendar.monthrange(currentYear,currentMonth)[1]) ]
     monthTotal = sum(total)
     total.append(monthTotal)
-    currentMonth = date.today().month
-    currentYear = date.today().year
+
     form = TimeLog2Form(request, initial={"timeLog_id": 0, "workDate": datetime.now()})
 
     return render(request, "timeLog/timeLog_list_all.html", {"my_tasks": my_tasks, "month":month,"total":total, "currentMonth":currentMonth, "currentYear":currentYear, "form":form})
@@ -286,13 +287,15 @@ def updateTimeLog(timeLog,form):
         timeLog.save()
 
 class myTask():
+    id = 0
     name = ""
     durations = []
 
     def __init__(self, task, month, year):
+        self.id = task.id
         today = datetime.today()
         self.name = task.name
-        self.durations = [0 for x in range(0,calendar.monthrange(today.year,today.month)[1])]
+        self.durations = [0 for x in range(0,calendar.monthrange(year,month)[1])]
         timeLogs = TimeLog.objects.filter(workDate__year__gte=year,workDate__month__gte=month,
                                      workDate__year__lte=year, workDate__month__lte=month,task_id=task.id)
 

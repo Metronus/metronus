@@ -36,4 +36,32 @@ def is_weekend(day,month,year):
         result = fecha.weekday() in (5,6)
     return "success" if result else ""
 
+@register.simple_tag
+def get_month(month,year,bool):
+    nextMonth = month
+    if bool:
+        nextMonth+=1
+        if nextMonth==13:
+            nextMonth = 1
+    else:
+        nextMonth-=1
+        if nextMonth==0:
+            nextMonth==12
+    return nextMonth
+
+@register.simple_tag
+def get_year(month,year,bool):
+    nextMonth = month
+    nextYear = year
+    if bool:
+        nextMonth+=1
+        if nextMonth==13:
+            nextYear+=1
+    else:
+        nextMonth-=1
+        if nextMonth==0:
+            nextMonth==12
+            nextYear-=1
+    return nextYear
+
 
