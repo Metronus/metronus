@@ -116,3 +116,22 @@
 
     </div>
 {% endblock %}
+
+{% block javascript %}
+<script>
+    $(document).ready(function() {
+        $("#id_project_id").change(function(){
+            $.ajax({
+                type: 'POST',
+                data:  {keyname:$('#id_project_id option:selected').val()},
+
+                success: function(resp){
+                    for (var i=0; i < resp['departments'].length;++i){
+                        addOption(document.getElementById("id_department_id"), resp['departments'][i], resp['departments'][i]);
+                    }
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
