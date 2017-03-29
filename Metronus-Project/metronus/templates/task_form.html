@@ -41,6 +41,22 @@
             }
         }
     })
+
+    // Falta poner URL
+    var dep_select = $("#id_{{ form.department_id.name }}")
+    $("#id_{{ form.project_id.name }}").change(function () {
+        $.get({
+            url: "",
+            data: {project_id: this.val()},
+            success: function ( data )  {
+                dep_select.empty()
+                dep_select.append($("<option value='' selected>{% trans 'selectProject' %}</option>"))
+                data.forEach(function (department) {
+                    dep_select.append($('<option value="'+department.id+'">'+department.name+'</option>'))
+                })                
+            }
+        })
+    })
   });
   function ajax(){
     $.post('/task/createAsync', $('#register_form').serialize(), function(data, status){
@@ -120,7 +136,7 @@
         <select class="form-control" name="{{ form.project_id.name }}" id="id_{{ form.project_id.name }}" required>
                 <option value="" selected>{% trans 'selectProject' %}</option>
                 {% for project in projects %}
-                <option value="{{ project.id }}"{% if form.project_id.value == project.id %} selected{% endif %}>{{ project.name }}</option>
+                <option value="{{ project.id }}">{{ project.name }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -131,10 +147,21 @@
         <div class="col-sm-6">
             <select class="form-control" name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}" required>
                 <option value="" selected>{% trans 'selectDepartment' %}</option>
-                {% for department in departments %}
-                <option value="{{ department.id }}"{% if form.department_id.value == department.id %} selected{% endif %}>{{ department.name }}</option>
-                {% endfor %}
             </select>
+        </div>
+    </div>
+
+    <div class="form-group" >
+        <label class="control-label col-sm-4" for="id_{{ form.production_goal.name }}">{% trans 'production_goal' %}</label>
+        <div class="col-sm-6">
+            <input type="number" class="form-control col-md-6" name="{{ form.production_goal.name }}" id="id_{{ form.production_goal.name }}" value="{{ form.production_goal.value }}">
+        </div>
+    </div>
+
+    <div class="form-group" >
+        <label class="control-label col-sm-4" for="id_{{ form.goal_description.name }}">{% trans 'goal_description' %}</label>
+        <div class="col-sm-6">
+            <input type="text" class="form-control col-md-6" name="{{ form.goal_description.name }}" id="id_{{ form.goal_description.name }}" value="{{ form.goal_description.value }}">
         </div>
     </div>
 
