@@ -146,6 +146,8 @@ msgid "copy_to_user"
 msgstr "Check if you want a copy of the email"
 msgid "send"
 msgstr "Send"
+msgid "contact_done"
+msgstr "Thanks! We have received your email. We will answer you as soon as possible."
 
 #: metronus/settings.py:33
 msgid "English"
