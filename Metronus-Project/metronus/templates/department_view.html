@@ -10,40 +10,86 @@
 <div class="col-md-12 col-sm-12 col-xs-12">
   <div class="x_panel">
     <div class="x_title">
-      <h2>{% trans 'employeeList' %}</h2>
-      <div class="clearfix"></div>
-    </div>
-    <div class="x_content">
 
+      <h2>{% trans 'taskList' %}</h2>
+      <ul class="nav navbar-right panel_toolbox">
+                    
+                    <li><a class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                  </ul>
+      <div class="clearfix"></div>
+      </div>
       <table class="table table-striped table-hover">
         <thead>
           <tr>
-            <th>#</th>
-            <th>{% trans 'username' %}</th>
-            <th>{% trans 'identifier' %}</th>
-            <th>{% trans 'phone' %}</th>
-            <th class="hidden-xs">{% trans 'registryDate' %}</th>
+            <th>{% trans 'task' %}</th>
+            <th>{% trans 'projectDeparment' %}</th>
+            <th>{% trans 'creationDate' %}</th>
+            <th>{% trans 'creator' %}</th>
+            <th>{% trans 'timeLog' %}</th>
           </tr>
         </thead>
         <tbody>
-          {% for employee in employees %}
-          <tr data-href="/employee/view/{{employee.user}}" style="cursor: pointer;">
-            <th scope="row">{{forloop.counter}}</th>
 
-            <td><img src="{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
+          {% for task in tasks %}
+          <tr>
+            <td>{{task.name}}</td>
 
-            <td>{{employee.identifier}}</td>
+            <td>{{task.projectDepartment_id}}</td>
 
-            <td>{{employee.phone}}</td>
+            <td>{{task.actor_id}}</td>
 
-            <td class="hidden-xs">{{employee.registryDate}}</td>
+            <td>{{task.registryDate}}</td>
 
+            <td>
+              <a href="{% url 'timeLog_list' task.id %}" type="button" class="btn btn-success">{% trans 'timeLog' %}</a>
+    
+
+            </td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
+      </div>
 
 
+<div class="x_panel">
+    <div class="x_title">
+
+      <h2>{% trans 'employeeList' %}</h2>
+      <ul class="nav navbar-right panel_toolbox">
+                    
+                    <li><a class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                  </ul>
+      <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
+
+      
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>{% trans 'username' %}</th>
+                                    <th>{% trans 'identifier' %}</th>
+                                    <th>{% trans 'phone' %}</th>
+                                    <th class="hidden-xs">{% trans 'registryDate' %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for employee in employees %}
+                                    <tr data-href="{% url 'employee_view' employee.user %}" style="cursor: pointer;">
+                                        <td><img src="{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
+                                        <td>{{employee.identifier}}</td>
+                                        <td>{{employee.phone}}</td>
+                                        <td class="hidden-xs">{{employee.registryDate}}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    
+
+</div>
     </div>
   </div>
 

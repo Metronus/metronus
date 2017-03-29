@@ -55,15 +55,18 @@ $(document).ready(function() {
 function ajax(){
     $.post('/roles/manageAsync', $('#register_form').serialize(), function(data, status){
     	document.getElementById('register_form').reset();
+    	$('#id_{{ form.department_id.name }}').attr('disabled', true);
+    	$('#id_{{ form.role_id.name }}').attr('disabled', true);
         $("#register_form").data('bootstrapValidator').resetForm();
     	console.log(data)
     	if(JSON.stringify(data['success'])=="true"){
     		$('#errorDiv').attr('hidden', true);
-    		$('#error2Div').attr('hidden', true);
+    		$('#errorDiv2').attr('hidden', true);
     		$('#successDiv').attr('hidden', false).html("<strong>{% trans 'success' %} | </strong>{% trans 'roleSaved' %}");
     	}else{
     		$('#successDiv').attr('hidden', true);
     		$('#errorDiv').attr('hidden', false).html("<strong>{% trans 'fail' %} | </strong>{% trans 'roleError' %}"); 
+    		$('#errorDiv2').attr('hidden', true);
     	}
        	
     });
@@ -105,7 +108,14 @@ function ajaxRole(){
     });
 };
 
-    
+function removeOptions(selectbox)
+{
+    var i;
+    for(i = selectbox.options.length - 1 ; i >= 0 ; i--)
+    {
+        selectbox.remove(i);
+    }
+}    
 </script>
 
 {% endblock %}
@@ -130,10 +140,14 @@ function ajaxRole(){
    <form id="register_form" method="POST" action="" class="form-horizontal">
 
     {% csrf_token %}
-    {% if  errors %}
+    <div id="successDiv" class="alert alert-success" hidden='true'>
+            </div>
         <div id="errorDiv" class="alert alert-danger"  hidden='true'>
+            </div>
+    {% if  errors %}
+        <div id="errorDiv2" class="alert alert-danger">
         {% for error in errors %}
-          <p>{% trans '{{error}}' %}</p>
+          <p>{{error}}</p>
         {% endfor %}
         </div>
     {% endif %}
@@ -145,6 +159,7 @@ function ajaxRole(){
           <label class="control-label col-md-4 col-sm-4 col-xs-12" for="id_{{ form.project_id.name }}">{% trans 'project' %}</label>
             <div class="col-sm-6">
               <select class="form-control" name="{{ form.project_id.name }}" id="id_{{ form.project_id.name }}"{% if  form.employeeRole_id.value != 0 %} disabled="true" {% endif %} required onchange="ajaxDepartment();">
+
 	              		<option value="" selected>{% trans 'selectProject' %}</option>
 	              		{% for dep in projects %}
 	    				<option value="{{ dep.id }}"{% if form.project_id.value == dep.id %} selected{% endif %}>{{ dep.name }}</option>
