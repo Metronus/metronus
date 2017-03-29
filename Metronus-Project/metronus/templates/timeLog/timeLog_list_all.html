@@ -58,7 +58,11 @@
 
                                         {% for duration in my_task.durations %}
                                             <td class="{% is_weekend forloop.counter currentMonth currentYear %}">
-                                                <a {% if duration != 0 %} href="{% url 'timeLog_delete' my_task.id %}"{% endif %}>
+                                                <a {% if duration != 0 %}
+                                                        data-href="{% url 'timeLog_delete' my_task.id %}"
+                                                        data-toggle="modal" data-target="#confirm-delete"
+                                                    {% endif %}>
+
                                                     {% converto_to_hours duration %}
                                                 </a>
                                             </td>
@@ -110,7 +114,7 @@
 
                         <div class="form-group">
                             <div class="col-md-12 text-center">
-                                <a class="btn btn-danger" href="{% url 'project_list' %}">{% trans 'cancel' %}</a>
+                                <a class="btn btn-danger" href="{% url 'timeLog_list_all' %}">{% trans 'cancel' %}</a>
                                 <button type="submit" class="btn btn-success">{% trans 'confirm' %}</button>
                             </div>
                         </div>
@@ -123,12 +127,29 @@
 
     </div>
 </div>
+
+<div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">{% trans 'delete' %}</div>
+            <div class="modal-body">{% trans 'projectConfirm' %}</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'cancel' %}</button>
+                <a class="btn btn-danger btn-ok">{% trans 'delete' %}</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block javascript %}
 <script>
     $("#id_workDate").datetimepicker({format: 'yyyy-mm-dd hh:ii'});
 
+    $('#confirm-delete').on('show.bs.modal', function(e) {
+        $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+    });
 
     $(document).ready(function() {
         $("#id_project_id").change(function(){
