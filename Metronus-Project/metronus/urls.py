@@ -109,14 +109,17 @@ urlpatterns += [#i18n_patterns(
 
     # Pass recovery
     url(r'^lost-password/$', password_reset, {'template_name': 'auth/password_reset.html',
-        'post_reset_redirect': '/reset-password/', 'from_email': 'DEFAULT_FROM_EMAIL'}
-        , name='lost_password_1'),
+        'post_reset_redirect': '/reset-password/', 'from_email': 'DEFAULT_FROM_EMAIL',
+        'email_template_name': 'auth/password_reset_email.html',
+        'subject_template_name': 'auth/password_reset_subject.txt'}
+        , name='password_reset'),
     url(r'^reset-password/$', password_reset_done, {'template_name': 'auth/info_reset_password.html'}
-        , name='lost_password_2'),
-    url(r'^user/password/reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', password_reset_confirm, {'template_name': 'auth/password_reset_confirm.html'}
-        , name='lost_password_3'),
-    url(r'^user/password/done/$', password_reset_complete, {'template_name': 'auth/password_reset_complete.html'}
-        , name='lost_password_4'),
+        , name='password_reset_done'),
+    url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', password_reset_confirm,
+        {'template_name': 'auth/password_reset_confirm.html', 'post_reset_redirect': '/reset-done/'}
+        , name='password_reset_confirm'),
+    url(r'^reset-done/$', password_reset_complete, {'template_name': 'auth/password_reset_complete.html'}
+        , name='password_reset_complete'),
 
     url(r'^register$', companyController.create),
     url(r'^ajax/validate_cif/$', companyController.validateCIF, name='validate_cif'),
