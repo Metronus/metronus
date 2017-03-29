@@ -96,12 +96,12 @@ def list_all(request):
     today = datetime.today()
     employee = get_current_employee_or_403(request)
     if(request.GET.get('currentMonth')):
-        currentMonth = request.GET['currentMonth']
+        currentMonth = int(request.GET['currentMonth'])
     else:
         currentMonth = today.month
 
     if (request.GET.get('currentYear')):
-        currentYear = request.GET['currentYear']
+        currentYear = int(request.GET['currentYear'])
     else:
         currentYear = today.year
 
@@ -158,9 +158,9 @@ def list_all(request):
                                    active=True).distinct()
     my_tasks = [myTask(x,currentMonth,currentYear) for x in tareas]
 
-    month = [x for x in range(1,calendar.monthrange(today.year,today.month)[1]+1)]
+    month = [x for x in range(1,calendar.monthrange(currentYear,currentMonth)[1]+1)]
     month.append("Total")
-    total = [sum([x.durations[i] for x in my_tasks]) for i in range(0,calendar.monthrange(today.year,today.month)[1]) ]
+    total = [sum([x.durations[i] for x in my_tasks]) for i in range(0,calendar.monthrange(currentYear,currentMonth)[1]) ]
     monthTotal = sum(total)
     total.append(monthTotal)
 
@@ -293,7 +293,7 @@ class myTask():
     def __init__(self, task, month, year):
         today = datetime.today()
         self.name = task.name
-        self.durations = [0 for x in range(0,calendar.monthrange(today.year,today.month)[1])]
+        self.durations = [0 for x in range(0,calendar.monthrange(year,month)[1])]
         timeLogs = TimeLog.objects.filter(workDate__year__gte=year,workDate__month__gte=month,
                                      workDate__year__lte=year, workDate__month__lte=month,task_id=task.id)
 
