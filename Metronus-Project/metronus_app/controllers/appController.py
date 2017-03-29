@@ -43,9 +43,11 @@ def contact(request):
 
             copy_to_user = form.cleaned_data['copy_to_user']
 
-            context = {}
+            context = {
+                "html": False
+            }
 
-            send_mail(subject+" - "+name, body, copy_to_user if [DEFAULT_FROM_EMAIL,email] else [DEFAULT_FROM_EMAIL,email], None, context, email)
+            send_mail(subject+" - "+name, body, copy_to_user if [DEFAULT_FROM_EMAIL, email] else [DEFAULT_FROM_EMAIL,email], None, context, email)
 
             # redirect to a new URL:
             return HttpResponseRedirect('/contact-done/')
