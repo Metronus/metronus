@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load l10n %}
+{% load compress %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -8,6 +9,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
 
 		<title> {% block title %}{% endblock %} </title>
 
@@ -27,7 +29,15 @@
         <div class="col-md-3 left_col">
           <div class="left_col scroll-view">
             <div class="navbar nav_title" style="border: 0;">
-              <a href="index.html" class="site_title"><i class="fa fa-paw"></i> <span>{{user.actor.company_id.company_name}}</span></a>
+              <a href="index.html" class="site_title">
+                {% if user.actor.company_id.logo == "" %}
+                  <img src="/static/landing/img/favicon/android-icon-192x192.png" class="img-circle" width="40" height="40">
+                {% else %}
+                  <img src="{{user.actor.company_id.logo}}" class="img-circle" width="40" height="40">
+                {% endif %}
+
+
+              <span>{{user.actor.company_id.company_name}}</span></a>
             </div>
 
             <div class="clearfix"></div>
@@ -98,7 +108,12 @@
                 <a id="menu_toggle"><i class="fa fa-bars"></i></a>
               </div>
 
+
               <ul class="nav navbar-nav navbar-right">
+
+                <li><a href="#"><img id="flag_es" alt="Spanish" class="img-responsive" src="/static/landing/img/flag_es.png" height="40" width="40"></a></li>
+                <li><a href="#"><img id="flag_en" alt="Spanish" class="img-responsive" src="/static/landing/img/flag_en.png" height="40" width="40"></a></li>
+
                 <li class="">
                   <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                     <img src="{{user.actor.picture}}" alt="">{{user.first_name}} {{user.last_name}}
@@ -153,6 +168,32 @@
 		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/js/bootstrapvalidator.min.js"></script>
 		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/4.3.8/js/fileinput.min.js"></script>
 
-    {% block javascript %}{% endblock %}
+    {% block javascript %}
+
+    {% endblock %}
+
+    <!-- js -->
+    {% compress js %}    
+    <script src="/static/landing/js/cookies.min.js"></script>
+    <script src="/static/landing/js/wow.min.js"></script>
+    {% endcompress %}
+
+    <script>
+      $( document ).ready(function() {
+        new WOW().init();
+
+        $("#flag_es").click(function() {
+          console.log("joll");
+          Cookies.set('lang', 'es-es');
+          location.reload(true);
+        });
+
+        $("#flag_en").click(function() {
+          Cookies.set('lang', 'en-us');
+          location.reload(true);
+        });
+      });
+    </script>
+
   </body>
 </html>
