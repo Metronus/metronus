@@ -13,9 +13,9 @@ class MyModelChoiceField(ModelChoiceField):
         return  obj.name
 
 class TimeLog2Form(forms.Form):
-    project_id = MyModelChoiceField(queryset=None, widget=forms.Select(attrs={'class':'form-control'}))
-    department_id = MyModelChoiceField(queryset=None, widget=forms.Select(attrs={'class':'form-control'}))
-    task_id = MyModelChoiceField(queryset=None, widget=forms.Select(attrs={'class':'form-control'}))
+    project_id = MyModelChoiceField(label=_("project"),queryset=None, widget=forms.Select(attrs={'class':'form-control'}))
+    department_id = MyModelChoiceField(label=_("department"),queryset=None, widget=forms.Select(attrs={'class':'form-control'}))
+    task_id = MyModelChoiceField(label=_("task"),queryset=None, widget=forms.Select(attrs={'class':'form-control'}))
 
     description = forms.CharField(label=_("description"),max_length=200,
                                   widget=forms.TextInput(attrs={'class':'form-control'}))
