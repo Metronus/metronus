@@ -212,6 +212,11 @@ msgstr "Anterior"
 msgid "finish"
 msgstr "Finalizar"
 
+# Password recover
+msgid "recover_password_instructions"
+msgstr "Introduza el email asociado a su cuenta. Le mandaremos un correo con un link para reestablecer su contraseña"
+msgid "recover_password_info"
+msgstr "Le hemos mandado un email con la información necesaria. ¡Compruebe su bandeja de entrada!"
 
 msgid "username_error"
 msgstr "El usuario no puede ser vacio"
@@ -221,6 +226,10 @@ msgid "passwotdRepeat_error"
 msgstr "Debe confirmar la contraseña"
 msgid "fieldEmpty"
 msgstr "Este campo no puede estar vacío"
+msgid "recover_password_confirm"
+msgstr "Introduzca una nueva contraseña"
+msgid "recover_password_complete"
+msgstr "¡Enhorabuena! Su contraseña ha sido restaurada"
 
 
 #: Department
