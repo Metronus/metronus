@@ -19,6 +19,8 @@ from metronus_app.model.actor import Actor
 import json
 from django.http import HttpResponse
 import calendar
+from django.core import serializers
+
 
 def create_all(request):
     valid_production_units=True
@@ -91,15 +93,31 @@ def list(request, task_id):
     return render(request, "timeLog/timeLog_list.html", {"timeLogs": lista,"task":task})
 
 def list_all(request):
-    today = datetime.today()
-
     try:
         actor = Actor.objects.get(user=request.user)
     except ObjectDoesNotExist:
         raise PermissionDenied
+
+
+    if request.method == 'POST' and request.is_ajax():
+        project = request.POST.get("project")
+
+        if project=='': return
+
+        departments = Department.objects.filter(company_id=actor.company_id,
+                                                projectdepartment__project_id=project)
+
+        data = serializers.serialize('json', departments, fields=('id','name',))
+
+        return HttpResponse(data)
+
+    today = datetime.today()
+
+
     tareas=Task.objects.filter(actor_id__company_id=actor.company_id,
                                    projectDepartment_id__projectdepartmentemployeerole__employee_id=actor,
                                    active=True).distinct()
+
     my_tasks = [myTask(x,today.month,today.year) for x in tareas]
     month = [x for x in range(1,calendar.monthrange(today.year,today.month)[1]+1)]
     month.append("Total")
@@ -109,22 +127,8 @@ def list_all(request):
     currentMonth = date.today().month
     currentYear = date.today().year
     form = TimeLog2Form(request, initial={"timeLog_id": 0, "workDate": datetime.now()})
-    if request.method == 'POST':
-        if request.is_ajax():
 
-            project = request.POST.values()[0]
-
-            departments = Department.objects.filter(actor_id__company_id=actor.company_id,projectDepartment__project_id=project)
-            r = {'departments': departments}
-
-            return HttpResponse(json.dumps(r), mimetype="application/json")
-        else:
-
-            return render(request, "timeLog/timeLog_list_all.html",
-                          {"my_tasks": my_tasks, "month": month, "total": total, "currentMonth": currentMonth,
-                           "currentYear": currentYear, "form": form})
-    else:
-        return render(request, "timeLog/timeLog_list_all.html", {"my_tasks": my_tasks, "month":month,"total":total, "currentMonth":currentMonth, "currentYear":currentYear, "form":form})
+    return render(request, "timeLog/timeLog_list_all.html", {"my_tasks": my_tasks, "month":month,"total":total, "currentMonth":currentMonth, "currentYear":currentYear, "form":form})
 
 
 def edit(request, timeLog_id):

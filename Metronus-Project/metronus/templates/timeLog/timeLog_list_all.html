@@ -86,7 +86,8 @@
                  <div class="clearfix"></div>
 
                 <div class="x_content">
-                    <form id="form" class="form-horizontal form-label-left" novalidate method="POST">{% csrf_token %}
+                    <form id="form" class="form-horizontal form-label-left"
+                          novalidate method="POST" action="{% url 'timeLog_list_all' %}">{% csrf_token %}
                         {% for field in form.visible_fields %}
                             <div class="{{ field.name }} form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="{{ form.name.auto_id }}">
@@ -123,12 +124,18 @@
         $("#id_project_id").change(function(){
             $.ajax({
                 type: 'POST',
-                data:  {keyname:$('#id_project_id option:selected').val()},
+                data:  {
+                    project:$('#id_project_id option:selected').val(),
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
 
                 success: function(resp){
-                    for (var i=0; i < resp['departments'].length;++i){
-                        addOption(document.getElementById("id_department_id"), resp['departments'][i], resp['departments'][i]);
-                    }
+                    var name, select, option;
+                    console.log(resp);
+                    select = document.getElementById('id_department_id');
+                    $.each($.parseJSON(resp), function(key,value){
+                        select.options.add(new Option(value.fields['name'],value.pk));
+                    });
                 }
             });
         });
