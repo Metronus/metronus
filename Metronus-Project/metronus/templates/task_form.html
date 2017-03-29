@@ -18,6 +18,40 @@
   //Esto es para validar en cliente de forma bonita con bootstrap :)
 
   $(document).ready(function() {
+    
+    var dep_select = $("#id_{{ form.department_id.name }}")
+    {% if  form.task_id.value != '0' %}
+        $.get({
+            url: "/task/getdepartments",
+            data: {project_id: {{form.project_id.value}}},
+            success: function ( data )  {
+                console.log(JSON.stringify(data))
+                dep_select.empty()
+                data.forEach(function (department) {
+                    dep_select.append($('<option value="'+department.pk+'"{% if form.department_id.value == department.id %}selected{% endif %}>'+department.fields.name+'</option>'))
+                })                
+            }
+        })
+    {% endif %}
+
+    // Carga el select de departamentos con los correspondientes al proyecto seleccionado
+    var proj_select = $("#id_{{ form.project_id.name }}")
+    proj_select.change(function () {
+        console.log(proj_select.val())
+        $.get({
+            url: "/task/getdepartments",
+            data: {project_id: proj_select.val()},
+            success: function ( data )  {
+                console.log(JSON.stringify(data))
+                dep_select.empty()
+                dep_select.append($("<option value='' selected>{% trans 'selectProject' %}</option>"))
+                data.forEach(function (department) {
+                    dep_select.append($('<option value="'+department.pk+'">'+department.fields.name+'</option>'))
+                })                
+            }
+        })
+    })
+
     $('#register_form').bootstrapValidator({
         feedbackIcons: {
             valid: 'glyphicon glyphicon-ok',
@@ -25,7 +59,7 @@
             validating: 'glyphicon glyphicon-refresh'
         },
         fields: {
-          	name: {
+            name: {
                 validators: {
                     notEmpty: {
                         message: "{% trans 'taskName_not_empty'%}"
@@ -42,28 +76,13 @@
         }
     })
 
-    // Falta poner URL
-    var dep_select = $("#id_{{ form.department_id.name }}")
-    $("#id_{{ form.project_id.name }}").change(function () {
-        $.get({
-            url: "",
-            data: {project_id: this.val()},
-            success: function ( data )  {
-                dep_select.empty()
-                dep_select.append($("<option value='' selected>{% trans 'selectProject' %}</option>"))
-                data.forEach(function (department) {
-                    dep_select.append($('<option value="'+department.id+'">'+department.name+'</option>'))
-                })                
-            }
-        })
-    })
   });
   function ajax(){
     $.post('/task/createAsync', $('#register_form').serialize(), function(data, status){
-        document.getElementById('register_form').reset();
-        $("#register_form").data('bootstrapValidator').resetForm();
         console.log(data)
         if(JSON.stringify(data['success'])=="true"){
+            document.getElementById('register_form').reset();
+            $("#register_form").data('bootstrapValidator').resetForm();
             $('#errorDiv').attr('hidden', true);
             $('#error2Div').attr('hidden', true);
             $('#successDiv').attr('hidden', false).html("<strong>{% trans 'success' %} | </strong>{% trans 'taskSaved' %}");
@@ -134,16 +153,15 @@
         <label class="control-label col-sm-4" for="id_{{ form.project_id.name }}">{% trans 'project' %}</label>
         <div class="col-sm-6">
         <select class="form-control" name="{{ form.project_id.name }}" id="id_{{ form.project_id.name }}" required>
-            {% if  request.path == '/task/create'%}
+            {% if  form.task_id.value == '0' %}
                 <option value="" selected>{% trans 'selectProject' %}</option>
                 {% for project in projects %}
                 <option value="{{ project.id }}">{{ project.name }}</option>
                 {% endfor %}
             {% endif %}
-            {% if  request.path == '/task/edit'%}
-                <option value="{{ task.project_id.id }}" selected>{{ task.project_id.name }}</option>
+            {% if  form.task_id.value != '0' %}
                 {% for project in projects %}
-                <option value="{{ project.id }}" {% if task.project_id.id == project.id %}selected{% endif %}>
+                <option value="{{ project.id }}" {% if form.project_id.value == project.id %}selected{% endif %}>
                 {{ project.name }}
                 </option>
                 {% endfor %}
@@ -156,11 +174,10 @@
         <label class="control-label col-sm-4" for="id_{{ form.department_id.name }}">{% trans 'department' %}</label>
         <div class="col-sm-6">
             <select class="form-control" name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}" required>
-            {% if  request.path == '/task/create'%}
+            {% if  form.task_id.value == '0' %}
                 <option value="" selected>{% trans 'selectDepartment' %}</option>
             {% endif %}
-            {% if  request.path == '/task/edit'%}
-                <option value="{{ task.department_id.id }}" selected>{{ task.department_id.name }}</option>
+            {% if  form.task_id.value != '0' %}
             {% endif %}
             </select>
         </div>
@@ -169,7 +186,7 @@
     <div class="form-group" >
         <label class="control-label col-sm-4" for="id_{{ form.production_goal.name }}">{% trans 'production_goal' %}</label>
         <div class="col-sm-6">
-            <input type="number" class="form-control col-md-6" name="{{ form.production_goal.name }}" id="id_{{ form.production_goal.name }}" value="{{ form.production_goal.value }}">
+            <input type="text" class="form-control col-md-6" name="{{ form.production_goal.name }}" id="id_{{ form.production_goal.name }}" value="{{ form.production_goal.value }}">
         </div>
     </div>
 
@@ -187,11 +204,11 @@
     </br>
     <div class="col-sm-4" ></div>
         <div class="col-sm-6" align="center" >
-            {% if  request.path == '/task/create'%}
+            {% if  form.task_id.value == '0' %}
             <button type="submit" class="btn btn-success submit-button" >{% trans 'confirm' %}</button>
                 <input type="button" class="btn btn-success submit-button" value="{% trans 'taskAdd' %}" onclick="ajax();" />
             {% endif %}
-            {% if  request.path == '/task/edit'%}
+            {% if  form.task_id.value != '0' %}
                 <button type="submit" class="btn btn-success submit-button" >{% trans 'edit' %}</button>
             {% endif %}
 
@@ -202,4 +219,5 @@
  </div>
  </div>
  </div>
+
 {% endblock %}
