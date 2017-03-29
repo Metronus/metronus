@@ -287,10 +287,12 @@ def updateTimeLog(timeLog,form):
         timeLog.save()
 
 class myTask():
+    id = 0
     name = ""
     durations = []
 
     def __init__(self, task, month, year):
+        self.id = task.id
         today = datetime.today()
         self.name = task.name
         self.durations = [0 for x in range(0,calendar.monthrange(year,month)[1])]
