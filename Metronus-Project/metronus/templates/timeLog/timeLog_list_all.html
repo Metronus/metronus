@@ -20,7 +20,7 @@
         <div class="col-md-12">
             <div class="x_panel">
                 <div class="x_title">
-                    <h2>{% trans 'dashTimeControlList' %}</h2>
+                    <h2>{% trans 'dashTimeControlList' %}<small>{{ currentYear }}</small></h2>
                     <div class="clearfix"></div>
                 </div>
 
@@ -29,9 +29,13 @@
                 <div class="x_content">
                     <div class="text-center">
                         <ul class="pagination pagination-split">
-                            <li><a href="?currentMonth={{ currentMonth|add:"-1" }}">{{ currentMonth|add:"-1" }}</a></li>
+                            <li><a href="?currentMonth={% get_month currentMonth currentYear False %}&currentYear={% get_year currentMonth currentYear False %}">
+                                {% get_month currentMonth currentYear False %}
+                            </a></li>
                             <li><a><strong>{{ currentMonth }}</strong></a></li>
-                            <li><a href="?currentMonth={{ currentMonth|add:"1" }}">{{ currentMonth|add:"1" }}</a></li>
+                            <li><a href="?currentMonth={% get_month currentMonth currentYear True %}&currentYear={% get_year currentMonth currentYear False %}">
+                                {% get_month currentMonth currentYear True %}
+                            </a></li>
                         </ul>
                     </div>
 
@@ -54,7 +58,9 @@
 
                                         {% for duration in my_task.durations %}
                                             <td class="{% is_weekend forloop.counter currentMonth currentYear %}">
-                                                {% converto_to_hours duration %}
+                                                <a {% if duration != 0 %} href="{% url 'timeLog_delete' my_task.id %}"{% endif %}>
+                                                    {% converto_to_hours duration %}
+                                                </a>
                                             </td>
                                         {% endfor %}
                                     </tr>
