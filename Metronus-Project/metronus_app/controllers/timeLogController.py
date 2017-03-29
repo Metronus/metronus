@@ -209,13 +209,7 @@ def delete(request, timeLog_id):
             return redirect('timeLog_list',task.id)
     else:
         raise PermissionDenied
-    if (checkRoleForTask(employee, task)):
-        lista = TimeLog.objects.filter(
-            task_id=task.id)  # Mando superior: Puede ver las imputaciones de cualquiera en esa tarea
-    else:
-        lista = TimeLog.objects.filter(task_id=task.id,
-                                       employee_id=employee.id)  # Empleado normal: Solo puede ver sus imputaciones en esa tarea
-    return render(request, "timeLog/timeLog_list.html", {"timeLogs": lista, "task": task})
+    return redirect('timeLog_list_all')
 
 #Método auxiliar para encontrar una tarea
 def findTask(task_id):
