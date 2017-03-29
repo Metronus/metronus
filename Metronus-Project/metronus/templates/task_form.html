@@ -3,10 +3,10 @@
 {% load l10n %}
 
 {% block title %}
-    {% trans 'createTask' %}
+    {% if  request.path == '/task/create'%}{% trans 'createTask' %}{% endif %}{% if  request.path == '/task/edit'%}{% trans 'editTask' %}{% endif %}
 {% endblock %}
 {% block contentTitle %}
-    {% trans 'createTask' %}
+    {% if  request.path == '/task/create'%}{% trans 'createTask' %}{% endif %}{% if  request.path == '/task/edit'%}{% trans 'editTask' %}{% endif %}
 {% endblock %}
 
 {% load static }
@@ -110,7 +110,7 @@
 <div class="col-md-12 col-sm-12 col-xs-12">
   <div class="x_panel">
     <div class="x_title">
-      <h2>{% trans 'createTask' %}</h2>
+      <h2>{% if  request.path == '/task/create'%}{% trans 'createTask' %}{% endif %}{% if  request.path == '/task/edit'%}{% trans 'editTask' %}{% endif %}</h2>
       <div class="clearfix"></div>
     </div>
     <div class="x_content">
@@ -134,10 +134,20 @@
         <label class="control-label col-sm-4" for="id_{{ form.project_id.name }}">{% trans 'project' %}</label>
         <div class="col-sm-6">
         <select class="form-control" name="{{ form.project_id.name }}" id="id_{{ form.project_id.name }}" required>
+            {% if  request.path == '/task/create'%}
                 <option value="" selected>{% trans 'selectProject' %}</option>
                 {% for project in projects %}
                 <option value="{{ project.id }}">{{ project.name }}</option>
                 {% endfor %}
+            {% endif %}
+            {% if  request.path == '/task/edit'%}
+                <option value="{{ task.project_id.id }}" selected>{{ task.project_id.name }}</option>
+                {% for project in projects %}
+                <option value="{{ project.id }}" {% if task.project_id.id == project.id %}selected{% endif %}>
+                {{ project.name }}
+                </option>
+                {% endfor %}
+            {% endif %}
             </select>
         </div>
     </div>
@@ -146,7 +156,12 @@
         <label class="control-label col-sm-4" for="id_{{ form.department_id.name }}">{% trans 'department' %}</label>
         <div class="col-sm-6">
             <select class="form-control" name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}" required>
+            {% if  request.path == '/task/create'%}
                 <option value="" selected>{% trans 'selectDepartment' %}</option>
+            {% endif %}
+            {% if  request.path == '/task/edit'%}
+                <option value="{{ task.department_id.id }}" selected>{{ task.department_id.name }}</option>
+            {% endif %}
             </select>
         </div>
     </div>
@@ -170,11 +185,16 @@
 
 
     </br>
-        <div align="center" >
-            <button type="submit" class="btn btn-success submit-button" >{% trans 'confirm' %}</button>
+    <div class="col-sm-4" ></div>
+        <div class="col-sm-6" align="center" >
             {% if  request.path == '/task/create'%}
+            <button type="submit" class="btn btn-success submit-button" >{% trans 'confirm' %}</button>
                 <input type="button" class="btn btn-success submit-button" value="{% trans 'taskAdd' %}" onclick="ajax();" />
             {% endif %}
+            {% if  request.path == '/task/edit'%}
+                <button type="submit" class="btn btn-success submit-button" >{% trans 'edit' %}</button>
+            {% endif %}
+
         </div>
 </form>
 
