@@ -19,7 +19,8 @@ class TimeLog2Form(forms.Form):
 
     description = forms.CharField(label=_("description"),max_length=200,
                                   widget=forms.TextInput(attrs={'class':'form-control'}))
-    workDate = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'class':'form-control timepicker'}))
+    workDate = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'class':'form-control form_datetime',
+                                                                     'readonly':'readonly'}))
     duration = forms.IntegerField(label=_("duration"),
                                   widget=forms.NumberInput(attrs={'class':'form-control'}))
 
