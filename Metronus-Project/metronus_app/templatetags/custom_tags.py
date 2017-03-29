@@ -46,7 +46,7 @@ def get_month(month,year,bool):
     else:
         nextMonth-=1
         if nextMonth==0:
-            nextMonth==12
+            nextMonth=12
     return nextMonth
 
 @register.simple_tag
@@ -60,7 +60,6 @@ def get_year(month,year,bool):
     else:
         nextMonth-=1
         if nextMonth==0:
-            nextMonth==12
             nextYear-=1
     return nextYear
 

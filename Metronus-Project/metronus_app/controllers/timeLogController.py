@@ -202,11 +202,11 @@ def delete(request, timeLog_id):
     timeLog = findTimeLog(timeLog_id)
     task = timeLog.task_id
     if(employee.id==timeLog.employee_id.id):
-        if(timeLog.registryDate.date() < date.today()):
-            raise PermissionDenied
-        else:
+        if checkTimeLogOvertime(timeLog):
             timeLog.delete()
-            return redirect('timeLog_list',task.id)
+            return redirect('timeLog_list_all')
+        else:
+            raise PermissionDenied
     else:
         raise PermissionDenied
     return redirect('timeLog_list_all')
@@ -305,3 +305,10 @@ def findTimeLogByDescriptionAndDate(tDescription,tDate):
                                      workDate__year__lte=tDate.date().year, workDate__month__lte=tDate.date().month,
                                      workDate__day__lte=tDate.date().day).first()
     return timeLog
+
+def checkTimeLogOvertime(timeLog):
+    today = datetime.today()
+    result = False
+    if(timeLog.registryDate.date().day==today.day and timeLog.registryDate.date().month==today.month and timeLog.registryDate.date().year==today.year):
+        result = True
+    return result
