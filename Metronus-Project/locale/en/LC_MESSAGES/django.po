@@ -212,6 +212,16 @@ msgstr "Previous"
 msgid "finish"
 msgstr "Finish"
 
+# Password recover
+msgid "recover_password_instructions"
+msgstr "Introduce your account email. We will send you an email with a link to restore your password"
+msgid "recover_password_info"
+msgstr "We sent you an email with the required information. Check your inbox!"
+msgid "recover_password_confirm"
+msgstr "Introduce a new password"
+msgid "recover_password_complete"
+msgstr "Congratulations! Your password has been restored!"
+
 msgid "username_error"
 msgstr "The username cannot be empty"
 msgid "password_error"
