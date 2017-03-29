@@ -8,6 +8,7 @@ from django.http import HttpResponseRedirect
 from metronus_app.model.administrator import Administrator
 from metronus_app.model.timeLog import TimeLog
 from metronus_app.model.projectDepartment import ProjectDepartment
+from metronus_app.model.department import Department
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 from populate_database import basicLoad
 from django.core.exceptions             import ObjectDoesNotExist, PermissionDenied
@@ -15,6 +16,8 @@ from django.http                        import HttpResponseForbidden
 from django.contrib.auth import authenticate,login
 from datetime import date,datetime
 from metronus_app.model.actor import Actor
+import json
+from django.http import HttpResponse
 import calendar
 
 def create_all(request):
@@ -90,7 +93,6 @@ def list(request, task_id):
 def list_all(request):
     today = datetime.today()
 
-
     try:
         actor = Actor.objects.get(user=request.user)
     except ObjectDoesNotExist:
@@ -98,7 +100,7 @@ def list_all(request):
     tareas=Task.objects.filter(actor_id__company_id=actor.company_id,
                                    projectDepartment_id__projectdepartmentemployeerole__employee_id=actor,
                                    active=True).distinct()
-    my_tasks = [myTask(x) for x in tareas]
+    my_tasks = [myTask(x,today.month,today.year) for x in tareas]
     month = [x for x in range(1,calendar.monthrange(today.year,today.month)[1]+1)]
     month.append("Total")
     total = [sum([x.durations[i] for x in my_tasks]) for i in range(0,calendar.monthrange(today.year,today.month)[1]) ]
@@ -107,7 +109,23 @@ def list_all(request):
     currentMonth = date.today().month
     currentYear = date.today().year
     form = TimeLog2Form(request, initial={"timeLog_id": 0, "workDate": datetime.now()})
-    return render(request, "timeLog/timeLog_list_all.html", {"my_tasks": my_tasks, "month":month,"total":total, "currentMonth":currentMonth, "currentYear":currentYear, "form":form})
+    if request.method == 'POST':
+        if request.is_ajax():
+
+            project = request.POST.values()[0]
+
+            departments = Department.objects.filter(actor_id__company_id=actor.company_id,projectDepartment__project_id=project)
+            r = {'departments': departments}
+
+            return HttpResponse(json.dumps(r), mimetype="application/json")
+        else:
+
+            return render(request, "timeLog/timeLog_list_all.html",
+                          {"my_tasks": my_tasks, "month": month, "total": total, "currentMonth": currentMonth,
+                           "currentYear": currentYear, "form": form})
+    else:
+        return render(request, "timeLog/timeLog_list_all.html", {"my_tasks": my_tasks, "month":month,"total":total, "currentMonth":currentMonth, "currentYear":currentYear, "form":form})
+
 
 def edit(request, timeLog_id):
     """
@@ -228,15 +246,22 @@ class myTask():
     name = ""
     durations = []
 
-    def __init__(self, task):
+    def __init__(self, task, month, year):
         today = datetime.today()
         self.name = task.name
         self.durations = [0 for x in range(0,calendar.monthrange(today.year,today.month)[1])]
+        if (year is None):
+            year = today.year
+        if (month is None):
+            month = today.month
+
+
 
 
         for tl in task.timelog_set.all():
-            index = int(tl.workDate.day)-1
-            self.durations[index] += tl.duration
+            if(tl.workDate.date().year==year & tl.workDate.date().month==month):
+                index = int(tl.workDate.day)-1
+                self.durations[index] += tl.duration
         totalDuration = sum(self.durations)
         self.durations.append(totalDuration)
 
