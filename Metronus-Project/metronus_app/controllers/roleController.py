@@ -45,7 +45,6 @@ def manage(request):
         notAuthorizedRole - el usuario está autorizado a crear roles pero el que intenta crear es igual o superior al suyo
         alreadyExists - ya existe un rol para ese usuario, departamento y proyecto (sólo aparece al crear roles, no al editar)
         editingHigherRole - el usuario está intentando editar un rol de otro usuario que está por encima de él
-
     """
 
     logged = get_authorized_or_403(request)
@@ -282,6 +281,7 @@ def return_invalid_form(request, form, logged, errors=None):
                                              'form': form,
                                              'employee': employee,
                                              'errors': errors,
+                                             'editing': form.cleaned_data["employeeRole_id"] != 0
                                              })
 
 def get_form(request, logged):
@@ -313,7 +313,12 @@ def get_form(request, logged):
             'employeeRole_id': role.id,
         })
 
-    return render(request, 'role/rol_form.html', {'employee': employee, 'departments': departments, 'projects': projects, 'roles': roles, 'form': form})
+    # Pass a boolean parameter to the frontent that indicates whether we are editing o creating a role
+    # This was a direct request from the frontend team
+
+    editing = 'role_id' in request.GET
+
+    return render(request, 'role/rol_form.html', {'employee': employee, 'departments': departments, 'projects': projects, 'roles': roles, 'form': form, 'editing': editing})
 
 
 def check_companies_match(act1, act2):
