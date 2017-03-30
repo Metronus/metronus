@@ -43,11 +43,16 @@ def contact(request):
 
             copy_to_user = form.cleaned_data['copy_to_user']
 
+            print(form.cleaned_data['copy_to_user'])
             context = {
                 "html": False
             }
 
-            send_mail(subject+" - "+name, body, copy_to_user if [DEFAULT_FROM_EMAIL, email] else [DEFAULT_FROM_EMAIL,email], None, context, email)
+            recipients = [DEFAULT_FROM_EMAIL]
+            if copy_to_user:
+                recipients.append(email)
+
+            send_mail("Metronus Contact: "+subject+" - "+name, body, recipients, None, context, email)
 
             # redirect to a new URL:
             return HttpResponseRedirect('/contact-done/')
