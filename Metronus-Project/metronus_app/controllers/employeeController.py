@@ -5,6 +5,7 @@ from django.core.urlresolvers                    import reverse
 from django.http                                 import HttpResponseRedirect, JsonResponse
 from django.template.context                     import RequestContext
 from django.core.exceptions                      import ObjectDoesNotExist, PermissionDenied
+from django.utils.translation                    import ugettext_lazy
 
 from metronus_app.forms.employeeRegisterForm     import EmployeeRegisterForm
 from metronus_app.forms.employeeEditForm         import EmployeeEditForm
@@ -14,7 +15,7 @@ from metronus_app.model.employeeLog              import EmployeeLog
 from metronus_app.model.administrator            import Administrator
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 
-from metronus_app.common_utils                   import get_current_admin_or_403, checkImage, get_current_employee_or_403
+from metronus_app.common_utils                   import get_current_admin_or_403, checkImage, get_current_employee_or_403, send_mail
 
 def create(request):
     """
@@ -40,7 +41,7 @@ def create(request):
 
     # If it's a GET request, return an empty form
     if request.method == "GET":
-        return render(request, 'employee_register.html', {'form': EmployeeRegisterForm()})
+        return render(request, 'employee/employee_register.html', {'form': EmployeeRegisterForm()})
 
     elif request.method == "POST":
     # We are serving a POST request
@@ -67,18 +68,19 @@ def create(request):
                 employeeUser = createEmployeeUser(form)
                 employee = createEmployee(employeeUser, admin, form)
                 EmployeeLog.objects.create(employee_id=employee, event="A")
+                send_register_email(form.cleaned_data["email"], form.cleaned_data["first_name"])
 
                 if "redirect" in request.GET: # Redirect to the created employee
                     return HttpResponseRedirect('/employee/view/' + form.cleaned_data["username"] + '/')
                 else: # Return a new form
-                    return render(request, 'employee_register.html', {'form': EmployeeRegisterForm(), 'success': True})
+                    return render(request, 'employee/employee_register.html', {'form': EmployeeRegisterForm(), 'success': True})
             else:
                 # There are errors
-                return render(request, 'employee_register.html', {'form': form, 'errors': errors})
+                return render(request, 'employee/employee_register.html', {'form': form, 'errors': errors})
 
         # Form is not valid
         else:
-            return render(request, 'employee_register.html', {'form': form, 'errors': ['employeeCreation_formNotValid']})
+            return render(request, 'employee/employee_register.html', {'form': form, 'errors': ['employeeCreation_formNotValid']})
     else:
         # Another request method
         raise PermissionDenied
@@ -96,7 +98,7 @@ def list(request):
     # Check that the user is logged in and it's an administrator
     admin = get_current_admin_or_403(request)
     employees = Employee.objects.filter(company_id=admin.company_id, user__is_active=True)
-    return render(request, 'employee_list.html', {'employees': employees})
+    return render(request, 'employee/employee_list.html', {'employees': employees})
 
 def view(request, username):
     """
@@ -122,7 +124,7 @@ def view(request, username):
 
     employee_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee)
 
-    return render(request, 'employee_view.html', {'employee': employee, 'employee_roles': employee_roles})
+    return render(request, 'employee/employee_view.html', {'employee': employee, 'employee_roles': employee_roles})
 
 def edit(request, username):
     """
@@ -155,7 +157,7 @@ def edit(request, username):
             'phone': employee.phone
         })
 
-        return render(request, 'employee_edit.html', {'form': form})
+        return render(request, 'employee/employee_edit.html', {'form': form})
 
     elif request.method == "POST":
         # Process the received form
@@ -180,7 +182,7 @@ def edit(request, username):
 
         else:
             # Form is not valid
-            return render(request, 'employee_edit.html', {'form': form, 'errors': ['employeeCreation_formNotValid']})
+            return render(request, 'employee/employee_edit.html', {'form': form, 'errors': ['employeeCreation_formNotValid']})
 
     else:
         raise PermissionDenied
@@ -225,6 +227,7 @@ def updatePassword(request, username):
             user = employee.user
             user.set_password(pass1)
             user.save()
+            notify_password_change(user.email, user.first_name)
 
             return JsonResponse({'success': True, 'errors': []})
         else:
@@ -283,8 +286,13 @@ def createEmployee(employeeUser, admin, form):
 def checkPasswords(form):
     return form.cleaned_data['password1'] == form.cleaned_data['password2']
 
-def notify_password_change(email):
-    pass # TODO
+def notify_password_change(email, name):
+    send_mail(ugettext_lazy("register_changepw_subject"), "employee/employee_changepw_email.html", [email], "employee/employee_changepw_email.html",
+              {'html': True, 'employee_name': name})
+
+def send_register_email(email, name):
+    send_mail(ugettext_lazy("register_mail_subject"), "employee/employee_register_email.html", [email], "employee/employee_register_email.html",
+              {'html': True, 'employee_name': name})
 
 def is_username_unique(username):
     return User.objects.filter(username=username).count() == 0

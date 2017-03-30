@@ -35,5 +35,6 @@ before_script:
 script:
   - python3 manage.py makemigrations --noinput && python3 manage.py makemigrations metronus_app --noinput
   - python3 manage.py migrate --noinput
+  - python3 manage.py compilemessages
   - python3 manage.py populate
   - python3 manage.py test

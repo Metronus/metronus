@@ -55,7 +55,7 @@ def create(request):
         form = DepartmentForm(initial={"department_id":0,"name":""})
 
 
-    return render(request, 'department_form.html', {'form': form,'repeated_name':repeated_name})
+    return render(request, 'department/department_form.html', {'form': form,'repeated_name':repeated_name})
 
 def createAsync(request):
     """
@@ -119,7 +119,7 @@ def list(request):
 
     # Check that the current user has permissions
     lista=getListForRole(request)
-    return render(request, "department_list.html", {"departments": lista})
+    return render(request, "department/department_list.html", {"departments": lista})
 
 def view(request,department_id):
     """
@@ -142,7 +142,7 @@ def view(request,department_id):
     tasks=Task.objects.filter(active=True, projectDepartment_id__department_id__id=department_id)
     employees = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__department_id=department).distinct()
     
-    return render(request, 'department_view.html', {'department': department, 'employees': employees,
+    return render(request, 'department/department_view.html', {'department': department, 'employees': employees,
         'tasks':tasks,'coordinator':coordinator})
 
 def edit(request,department_id):
@@ -187,7 +187,7 @@ def edit(request,department_id):
         form = DepartmentForm(initial={"name":department.name,"department_id":department.id})
 
 
-    return render(request, 'department_form.html', {'form': form,'repeated_name':repeated_name})
+    return render(request, 'department/department_form.html', {'form': form,'repeated_name':repeated_name})
 
 def delete(request,department_id):
     """

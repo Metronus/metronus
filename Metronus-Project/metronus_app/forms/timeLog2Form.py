@@ -7,6 +7,7 @@ from django.forms import ModelChoiceField
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 from metronus_app.model.task import Task
 from django.core.exceptions                      import PermissionDenied, ObjectDoesNotExist
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 class MyModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
@@ -21,7 +22,7 @@ class TimeLog2Form(forms.Form):
                                   widget=forms.TextInput(attrs={'class':'form-control'}))
     workDate = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'class':'form-control form_datetime',
                                                                      'readonly':'readonly'}))
-    duration = forms.IntegerField(label=_("duration"),
+    duration = forms.IntegerField(label=_("duration"),validators = [MinValueValidator(0), MaxValueValidator(1440)],
                                   widget=forms.NumberInput(attrs={'class':'form-control'}))
 
     timeLog_id = forms.IntegerField(widget=forms.HiddenInput())

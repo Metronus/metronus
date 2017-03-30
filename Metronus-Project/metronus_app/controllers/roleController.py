@@ -116,7 +116,7 @@ def ajax_departments_from_projects(request):
         ids = ProjectDepartmentEmployeeRole.objects.values_list('projectDepartment_id__department_id', flat=True).filter(employee_id=logged, role_id__tier__gt=10, projectDepartment_id__department_id__active=True, projectDepartment_id__project_id__id=request.GET["project_id"])
         dpts = Department.objects.filter(id__in=ids)
     else:
-        dpts = Department.objects.filter(active=True)
+        dpts = Department.objects.filter(active=True, company_id=logged.company_id)
 
     data = []
     for d in dpts:
@@ -276,7 +276,7 @@ def process_post_form(logged, form):
 
 def return_invalid_form(request, form, logged, errors=None):
     employee = get_object_or_404(Employee, id=form.cleaned_data.get('employee_id', 0), user__is_active=True)
-    return render(request, 'rol_form.html', {'departments': get_allowed_departments(logged), 
+    return render(request, 'role/rol_form.html', {'departments': get_allowed_departments(logged), 
                                              'projects': get_allowed_projects(logged), 
                                              'roles': Role.objects.all(), 
                                              'form': form,
@@ -313,7 +313,7 @@ def get_form(request, logged):
             'employeeRole_id': role.id,
         })
 
-    return render(request, 'rol_form.html', {'employee': employee, 'departments': departments, 'projects': projects, 'roles': roles, 'form': form})
+    return render(request, 'role/rol_form.html', {'employee': employee, 'departments': departments, 'projects': projects, 'roles': roles, 'form': form})
 
 
 def check_companies_match(act1, act2):

@@ -9,6 +9,8 @@ from django.core.mail import EmailMultiAlternatives
 
 from PIL import Image
 
+import sys
+
 
 # Image limit parameters
 FILE_SIZE = 100000000
@@ -88,6 +90,8 @@ def checkImage(form, param):
 
 def send_mail(subject, email_template_name, recipients, html_email_template_name,
               context, email_from=DEFAULT_FROM_EMAIL, **kwargs):
+
+    if 'test' in sys.argv: return # Don't send mails if we are testing to prevent spam
 
     if context['html']:
         body = loader.render_to_string(email_template_name, context)
