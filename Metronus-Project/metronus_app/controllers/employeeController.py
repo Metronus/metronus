@@ -227,6 +227,7 @@ def updatePassword(request, username):
             user = employee.user
             user.set_password(pass1)
             user.save()
+            notify_password_change(user.email, user.first_name)
 
             return JsonResponse({'success': True, 'errors': []})
         else:
@@ -285,8 +286,9 @@ def createEmployee(employeeUser, admin, form):
 def checkPasswords(form):
     return form.cleaned_data['password1'] == form.cleaned_data['password2']
 
-def notify_password_change(email):
-    pass # TODO
+def notify_password_change(email, name):
+    send_mail(ugettext_lazy("register_changepw_subject"), "employee/employee_changepw_email.html", [email], "employee/employee_changepw_email.html",
+              {'html': True, 'employee_name': name})
 
 def send_register_email(email, name):
     send_mail(ugettext_lazy("register_mail_subject"), "employee/employee_register_email.html", [email], "employee/employee_register_email.html",

@@ -323,6 +323,12 @@ msgid "register_mail_farewell"
 msgstr "We hope to see you very soon!"
 msgid "register_mail_end"
 msgstr "Metronus. Time matters."
+msgid "changepw_mail_greeting"
+msgstr "Hello"
+msgid "changepw_mail_body"
+msgstr "Your password has been changed by an administrator. Please contact your superiors to acquire information on this change."
+msgid "changepw_mail_subject"
+msgstr "Your password has been changed"
 
 
 #: Project

@@ -324,6 +324,12 @@ msgid "register_mail_end"
 msgstr "Metronus. El tiempo importa."
 msgid "register_mail_subject"
 msgstr "Bienvenida/o a Metronus"
+msgid "changepw_mail_greeting"
+msgstr "Hola"
+msgid "changepw_mail_body"
+msgstr "Tu contraseña ha sido cambiada por un administrador. Por favor, contacta a tus superiores para obtener información sobre este cambio."
+msgid "changepw_mail_subject"
+msgstr "Tu contraseña ha cambiado"
 
 
 #: Project
