@@ -3,7 +3,7 @@
 {% load l10n %}
 {% load static }
 {% block title %}
-{% if  form.employeeRole_id.value == 0 %}
+{% if  editing == False %}
 {% trans 'addRole' %}
 {% else %}
 {% trans 'editRole' %}
@@ -147,7 +147,7 @@ function removeOptions(selectbox)
 <div class="col-md-12 col-sm-12 col-xs-12">
   <div class="x_panel">
     <div class="x_title">
-      {% if  form.employeeRole_id.value == 0 %}
+      {% if  editing == False %}
 		  <h2 > {% trans 'addRole' %}  : {{employee.user.first_name}} {{employee.user.last_name}}</h2>
 	  {% else %}
 		  <h2 > {% trans 'editRole' %} : {{employee.user.first_name}} {{employee.user.last_name}}</h2>
@@ -178,7 +178,7 @@ function removeOptions(selectbox)
           
           <label class="control-label col-md-4 col-sm-4 col-xs-12" for="id_{{ form.project_id.name }}">{% trans 'project' %}</label>
             <div class="col-sm-6">
-              <select class="form-control" name="{{ form.project_id.name }}" id="id_{{ form.project_id.name }}"{% if  form.employeeRole_id.value != 0 %} disabled="true" {% endif %} required onchange="ajaxDepartment();">
+              <select class="form-control" name="{{ form.project_id.name }}" id="id_{{ form.project_id.name }}"{% if  editing == True %} disabled="true" {% endif %} required onchange="ajaxDepartment();">
 
 	              		<option value="" selected>{% trans 'selectProject' %}</option>
 	              		{% for dep in projects %}
@@ -209,7 +209,7 @@ function removeOptions(selectbox)
         <div class="form-group required form-class">
           <label class="control-label col-sm-4" for="id_{{ form.role_id.name }}">{% trans 'rol' %}</label>
             <div class="col-sm-6">
-              <select class="form-control" name="{{ form.role_id.name }}" id="id_{{ form.role_id.name }}" required disabled="true">
+              <select class="form-control" name="{{ form.role_id.name }}" id="id_{{ form.role_id.name }}"  disabled="true" required>
 		              <option value="" selected>{% trans 'selectRole' %}</option>
 		             	
 	              </select>
@@ -224,7 +224,7 @@ function removeOptions(selectbox)
             <div class="col-sm-offset-4 col-sm-10">
 
             <input type="submit" class="btn btn-success submit-button" value="{% trans 'confirm' %}" />
-	    	{% if  form.employeeRole_id.value == 0 %}
+	    	{% if  editing == False %}
 		    	<input type="button" class="btn btn-success submit-button" value="{% trans 'roleAdd' %}" onclick="ajax();" />
 		    {% endif %}
 
