@@ -98,6 +98,7 @@ def send_mail(subject, email_template_name, recipients, html_email_template_name
     else:
         body = email_template_name
 
+    print(recipients)
     email_message = EmailMultiAlternatives(subject, body, email_from, recipients)
     if html_email_template_name is not None:
         html_email = loader.render_to_string(html_email_template_name, context)
