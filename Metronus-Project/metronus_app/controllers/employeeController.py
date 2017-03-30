@@ -5,6 +5,7 @@ from django.core.urlresolvers                    import reverse
 from django.http                                 import HttpResponseRedirect, JsonResponse
 from django.template.context                     import RequestContext
 from django.core.exceptions                      import ObjectDoesNotExist, PermissionDenied
+from django.utils.translation                    import ugettext_lazy
 
 from metronus_app.forms.employeeRegisterForm     import EmployeeRegisterForm
 from metronus_app.forms.employeeEditForm         import EmployeeEditForm
@@ -14,7 +15,7 @@ from metronus_app.model.employeeLog              import EmployeeLog
 from metronus_app.model.administrator            import Administrator
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 
-from metronus_app.common_utils                   import get_current_admin_or_403, checkImage, get_current_employee_or_403
+from metronus_app.common_utils                   import get_current_admin_or_403, checkImage, get_current_employee_or_403, send_mail
 
 def create(request):
     """
@@ -67,6 +68,7 @@ def create(request):
                 employeeUser = createEmployeeUser(form)
                 employee = createEmployee(employeeUser, admin, form)
                 EmployeeLog.objects.create(employee_id=employee, event="A")
+                send_register_email(form.cleaned_data["email"], form.cleaned_data["first_name"])
 
                 if "redirect" in request.GET: # Redirect to the created employee
                     return HttpResponseRedirect('/employee/view/' + form.cleaned_data["username"] + '/')
@@ -285,6 +287,10 @@ def checkPasswords(form):
 
 def notify_password_change(email):
     pass # TODO
+
+def send_register_email(email, name):
+    send_mail(ugettext_lazy("register_mail_subject"), "employee/employee_register_email.html", [email], "employee/employee_register_email.html",
+              {'html': True, 'employee_name': name})
 
 def is_username_unique(username):
     return User.objects.filter(username=username).count() == 0
