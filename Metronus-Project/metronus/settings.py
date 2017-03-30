@@ -93,7 +93,7 @@ if production or heroku:
         },
     ]
 
-    COMPRESS_ENABLED = not production
+    COMPRESS_ENABLED = True
     STATICFILES_FINDERS = (
         'django.contrib.staticfiles.finders.FileSystemFinder',
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
