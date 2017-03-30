@@ -40,7 +40,7 @@ def create(request):
 
     # If it's a GET request, return an empty form
     if request.method == "GET":
-        return render(request, 'employee_register.html', {'form': EmployeeRegisterForm()})
+        return render(request, 'employee/employee_register.html', {'form': EmployeeRegisterForm()})
 
     elif request.method == "POST":
     # We are serving a POST request
@@ -71,14 +71,14 @@ def create(request):
                 if "redirect" in request.GET: # Redirect to the created employee
                     return HttpResponseRedirect('/employee/view/' + form.cleaned_data["username"] + '/')
                 else: # Return a new form
-                    return render(request, 'employee_register.html', {'form': EmployeeRegisterForm(), 'success': True})
+                    return render(request, 'employee/employee_register.html', {'form': EmployeeRegisterForm(), 'success': True})
             else:
                 # There are errors
-                return render(request, 'employee_register.html', {'form': form, 'errors': errors})
+                return render(request, 'employee/employee_register.html', {'form': form, 'errors': errors})
 
         # Form is not valid
         else:
-            return render(request, 'employee_register.html', {'form': form, 'errors': ['employeeCreation_formNotValid']})
+            return render(request, 'employee/employee_register.html', {'form': form, 'errors': ['employeeCreation_formNotValid']})
     else:
         # Another request method
         raise PermissionDenied
@@ -96,7 +96,7 @@ def list(request):
     # Check that the user is logged in and it's an administrator
     admin = get_current_admin_or_403(request)
     employees = Employee.objects.filter(company_id=admin.company_id, user__is_active=True)
-    return render(request, 'employee_list.html', {'employees': employees})
+    return render(request, 'employee/employee_list.html', {'employees': employees})
 
 def view(request, username):
     """
@@ -122,7 +122,7 @@ def view(request, username):
 
     employee_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee)
 
-    return render(request, 'employee_view.html', {'employee': employee, 'employee_roles': employee_roles})
+    return render(request, 'employee/employee_view.html', {'employee': employee, 'employee_roles': employee_roles})
 
 def edit(request, username):
     """
@@ -155,7 +155,7 @@ def edit(request, username):
             'phone': employee.phone
         })
 
-        return render(request, 'employee_edit.html', {'form': form})
+        return render(request, 'employee/employee_edit.html', {'form': form})
 
     elif request.method == "POST":
         # Process the received form
@@ -180,7 +180,7 @@ def edit(request, username):
 
         else:
             # Form is not valid
-            return render(request, 'employee_edit.html', {'form': form, 'errors': ['employeeCreation_formNotValid']})
+            return render(request, 'employee/employee_edit.html', {'form': form, 'errors': ['employeeCreation_formNotValid']})
 
     else:
         raise PermissionDenied
