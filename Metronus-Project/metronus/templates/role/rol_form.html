@@ -87,6 +87,11 @@ function ajax(){
 
 function ajaxDepartment(){
 	console.log($("#id_{{ form.project_id.name }}").val()); 
+    $('#id_{{ form.department_id.name }}')
+        .find('option')
+        .remove()
+        .end()
+        .append("<option value='' selected>{% trans 'selectProject' %}</option>");
 	$.get('/roles/availableDepartments', { project_id : $("#id_{{ form.project_id.name }}").val()}, 
     function(returnedData){
 	     $.each(returnedData, function(i, obj){
@@ -103,6 +108,11 @@ function ajaxDepartment(){
 };
 function ajaxRole(){
     console.log($("#id_{{ form.project_id.name }}").val()); 
+    $('#id_{{ form.role_id.name }}')
+        .find('option')
+        .remove()
+        .end()
+        .append("<option value='' selected>{% trans 'selectProject' %}</option>");
     $.get('/roles/availableRoles', { project_id : $("#id_{{ form.project_id.name }}").val(), department_id : $("#id_{{ form.department_id.name }}").val()}, 
     function(returnedData){
          $.each(returnedData, function(i, obj){
