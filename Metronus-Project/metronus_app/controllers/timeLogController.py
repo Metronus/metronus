@@ -35,11 +35,11 @@ def create_all(request):
             # ...
             # redirect to a new URL:
             task = form.cleaned_data['task_id']
-            valid_production_units=checkProducedUnits(form,task)
+            valid_production_units=checkProducedUnits(form)
             if valid_production_units:
                 if task is not None:
                     if task.active:
-                        createTimeLog(form,task,employee)
+                        createTimeLog(form,employee)
                         return redirect('timeLog_list_all')
 
     # if a GET (or any other method) we'll create a blank form
@@ -66,11 +66,11 @@ def create_by_task(request,task_id):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-            valid_production_units=checkProducedUnits(form,task)
+            valid_production_units=checkProducedUnits(form)
             if valid_production_units:
                 if task is not None:
                     if task.active:
-                        createTimeLog(form, task, employee)
+                        createTimeLog(form, employee)
                         return redirect('timeLog_list', task_id)
 
 
@@ -93,6 +93,13 @@ def list(request, task_id):
     return render(request, "timeLog/timeLog_list.html", {"timeLogs": lista,"task":task})
 
 def list_all(request):
+    """
+    valid_production_units: devuelve si se especificó production units y es necesario,
+    o si no se especificó y no era necesario
+    over_day_limit:True si se paso del límite de 1440 horas al día
+    """
+    valid_production_units=True
+    over_day_limit=False
     today = datetime.today()
     employee = get_current_employee_or_403(request)
     if(request.GET.get('currentMonth')):
@@ -105,6 +112,7 @@ def list_all(request):
     else:
         currentYear = today.year
 
+    #pa que quieres esto si ya se comprueba como empleado
     try:
         actor = Actor.objects.get(user=request.user)
     except ObjectDoesNotExist:
@@ -123,7 +131,8 @@ def list_all(request):
             if department is None:
                 print (project)
                 departments = Department.objects.filter(company_id=actor.company_id,
-                                                projectdepartment__project_id=project)
+                                                projectdepartment__project_id=project,
+                                                projectdepartment__projectdepartmentemployeerole__employee_id=employee)
 
                 data = serializers.serialize('json', departments, fields=('id','name',))
 
@@ -146,7 +155,8 @@ def list_all(request):
             # ...
             # redirect to a new URL:
             valid_production_units = checkProducedUnits(form)
-            if valid_production_units:
+            over_day_limit=checkDayLimit(form,employee)
+            if valid_production_units and not over_day_limit:
                 createTimeLog(form, employee)
                 return redirect('timeLog_list_all')
 
@@ -166,7 +176,8 @@ def list_all(request):
 
     form = TimeLog2Form(request, initial={"timeLog_id": 0, "workDate": datetime.now()})
 
-    return render(request, "timeLog/timeLog_list_all.html", {"my_tasks": my_tasks, "month":month,"total":total, "currentMonth":currentMonth, "currentYear":currentYear, "form":form})
+    return render(request, "timeLog/timeLog_list_all.html", {"my_tasks": my_tasks, "month":month,"total":total, "currentMonth":currentMonth, "currentYear":currentYear, 
+        "form":form,"valid_production_units":valid_production_units,"over_day_limit":over_day_limit})
 
 
 def edit(request, timeLog_id):
@@ -231,7 +242,7 @@ def createTimeLog(form, employee):
         timeLog.produced_units+=funits
         timeLog.save()
     else:
-        TimeLog.objects.create(description=fdescription,workDate=fworkDate,duration=fduration,task_id=task,employee_id=employee)
+        TimeLog.objects.create(description=fdescription,workDate=fworkDate,duration=fduration,task_id=task,employee_id=employee,produced_units=funits)
 
 
 def checkProducedUnits(form):
@@ -240,7 +251,7 @@ def checkProducedUnits(form):
     """
     task = findTask(form.cleaned_data['task_id'])
     prod_units=form.cleaned_data['produced_units']
-    return (prod_units!="" and task.production_goal!="") or (not prod_units and not task.production_goal)
+    return (prod_units and task.production_goal) or (not prod_units and not task.production_goal)
 
 #Comprobación para saber si el empleado puede imputar horas
 def checkPermissionForTask(employee, task):
@@ -312,3 +323,17 @@ def checkTimeLogOvertime(timeLog):
     if(timeLog.registryDate.date().day==today.day and timeLog.registryDate.date().month==today.month and timeLog.registryDate.date().year==today.year):
         result = True
     return result
+
+from django.db.models import Sum
+def checkDayLimit(form,employee):
+    """
+    checks the employee cannot work more than 1440 minutes a day (one day in minutes)
+    True if the limit was passed
+    """
+    tDate = form.cleaned_data['workDate']
+    time_sum=TimeLog.objects.filter(employee_id=employee,
+        workDate__year=tDate.date().year,
+        workDate__month=tDate.date().month,
+        workDate__day=tDate.date().day).aggregate(current_sum=Sum("duration"))
+    current_sum=time_sum["current_sum"] if time_sum["current_sum"] is not None else 0
+    return form.cleaned_data["duration"]+current_sum>1440

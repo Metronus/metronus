@@ -164,6 +164,13 @@
                     var name, select, option;
                     console.log(resp);
                     select = document.getElementById('id_department_id');
+                     /**
+                    clear all options before repopulating
+                    */
+                    for(i = select.options.length - 1 ; i >= 1 ; i--)
+                        {
+                            select.remove(i);
+                        }
                     $.each($.parseJSON(resp), function(key,value){
                         select.options.add(new Option(value.fields['name'],value.pk));
                     });
@@ -186,6 +193,13 @@
                     var name, select, option;
                     console.log(resp);
                     select = document.getElementById('id_task_id');
+                    /**
+                    clear all options before repopulating
+                    */
+                    for(i = select.options.length - 1 ; i >= 1 ; i--)
+                        {
+                            select.remove(i);
+                        }
                     $.each($.parseJSON(resp), function(key,value){
                         select.options.add(new Option(value.fields['name'],value.pk));
                     });
