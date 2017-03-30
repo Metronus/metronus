@@ -110,7 +110,7 @@ urlpatterns += [#i18n_patterns(
 
     # Pass recovery
     url(r'^lost-password/$', password_reset, {'template_name': 'auth/password_reset.html',
-        'post_reset_redirect': '/reset-password/', 'from_email': 'DEFAULT_FROM_EMAIL',
+        'post_reset_redirect': '/reset-password/', 'from_email': DEFAULT_FROM_EMAIL,
         'email_template_name': 'auth/password_reset_email.html',
         'subject_template_name': 'auth/password_reset_subject.txt',
         'html_email_template_name': 'auth/password_reset_email.html'}
