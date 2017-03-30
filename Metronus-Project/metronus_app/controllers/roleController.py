@@ -116,7 +116,7 @@ def ajax_departments_from_projects(request):
         ids = ProjectDepartmentEmployeeRole.objects.values_list('projectDepartment_id__department_id', flat=True).filter(employee_id=logged, role_id__tier__gt=10, projectDepartment_id__department_id__active=True, projectDepartment_id__project_id__id=request.GET["project_id"])
         dpts = Department.objects.filter(id__in=ids)
     else:
-        dpts = Department.objects.filter(active=True)
+        dpts = Department.objects.filter(active=True, company_id=logged.company_id)
 
     data = []
     for d in dpts:
