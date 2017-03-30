@@ -124,6 +124,8 @@ msgid "dashSettings"
 msgstr "Settings"
 msgid "dashLogout"
 msgstr "Logout"
+msgid "mailsignature"
+msgstr "Metronus. Time matters."
 
 #: Register
 msgid "registerCompanyMenu"
@@ -273,6 +275,8 @@ msgid "selectDepartment"
 msgstr "Choose a department"
 msgid "departmentNotNull"
 msgstr "Department can't be null"
+msgid "register_mail_subject"
+msgstr "Welcome to Metronus"
 
 #: Employee
 msgid "registryDate"
@@ -311,6 +315,20 @@ msgid "password_not_empty"
 msgstr "Pasword can't be empty"
 msgid "username_not_empty"
 msgstr " Username can't be empty"
+msgid "register_mail_greeting1"
+msgstr "Hello"
+msgid "register_mail_greeting2"
+msgstr "welcome to Metronus!"
+msgid "register_mail_body"
+msgstr "Metronus is a tool that will help you have a precise track of your working time. Please, contact your superiors to acquire information on your login details if you don't have it yet."
+msgid "register_mail_farewell"
+msgstr "We hope to see you very soon!"
+msgid "changepw_mail_greeting"
+msgstr "Hello"
+msgid "changepw_mail_body"
+msgstr "Your password has been changed by an administrator. Please contact your superiors to acquire information on this change."
+msgid "changepw_mail_subject"
+msgstr "Your password has been changed"
 
 
 #: Project

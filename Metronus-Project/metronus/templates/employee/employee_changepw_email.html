@@ -1,0 +1,10 @@
+{% extends "email_master.html" %}
+
+{% load i18n %}
+{% load l10n %}
+
+{% block content %}
+    <p>{% trans 'changepw_mail_greeting' %}, {{ employee_name}}.<p>
+    <br/>
+    <p>{% trans 'changepw_mail_body' %}</p>
+{% endblock %}
