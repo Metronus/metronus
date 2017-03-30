@@ -124,6 +124,8 @@ msgid "dashSettings"
 msgstr "Configuración"
 msgid "dashLogout"
 msgstr "Salir"
+msgid "mailsignature"
+msgstr "Metronus. El tiempo importa."
 
 
 #: Register
@@ -320,8 +322,6 @@ msgid "register_mail_body"
 msgstr "Metronus es una herramienta que te ayudará a mantener un control exhaustivo de tus horas de trabajo. Por favor, contacta a tus superiores para obtener tus datos de acceso si no los tienes aún."
 msgid "register_mail_farewell"
 msgstr "¡Esperamos verte muy pronto!"
-msgid "register_mail_end"
-msgstr "Metronus. El tiempo importa."
 msgid "register_mail_subject"
 msgstr "Bienvenida/o a Metronus"
 msgid "changepw_mail_greeting"

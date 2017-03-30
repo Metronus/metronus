@@ -1,3 +1,6 @@
+{% load i18n %}
+{% load l10n %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,7 +25,9 @@
                                           <p style="margin:20px 0">
                                           </p>
                                           {% block content %}{% endblock %}
-
+                                          <br/>
+                                          <br/>
+                                          <p>{% trans 'mailsignature' %} <a href="https://metronus.es">https://metronus.es</a></p>
                                           </td>
                                         </tr>
                                       </tbody></table>
