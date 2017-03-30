@@ -194,7 +194,7 @@ function removeOptions(selectbox)
             <div class="col-sm-6">
               <select class="form-control" name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}" disabled="true" required onchange="ajaxRole();">
 	              		<option value="" selected>{% trans 'selectDepartment' %}</option>
-                        {% if  form.employeeRole_id.value == 0 %}
+                        {% if  editing == True %}
                             {% for dep in departments %}
                             {% if form.department_id.value == dep.id %} 
                             <option value="{{ dep.id }}"selected>{{ dep.name }}</option>
@@ -209,9 +209,17 @@ function removeOptions(selectbox)
         <div class="form-group required form-class">
           <label class="control-label col-sm-4" for="id_{{ form.role_id.name }}">{% trans 'rol' %}</label>
             <div class="col-sm-6">
-              <select class="form-control" name="{{ form.role_id.name }}" id="id_{{ form.role_id.name }}"  disabled="true" required>
+              <select class="form-control" name="{{ form.role_id.name }}" id="id_{{ form.role_id.name }}"  {% if  editing == False %}disabled="true" {% endif %} required>
 		              <option value="" selected>{% trans 'selectRole' %}</option>
-		             	
+		              {% if  editing == True %}
+                            {% for dep in roles %}
+                            {% if form.role_id.value == dep.id %} 
+                            <option value="{{ dep.id }}"selected>{{ dep.name }}</option>
+                            {% else %}
+                            <option value="{{ dep.id }}">{{ dep.name }}</option>
+                            {% endif %}
+                            {% endfor %}
+                        {% endif %}
 	              </select>
             </div>
         </div>
