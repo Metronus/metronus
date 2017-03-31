@@ -7,7 +7,7 @@ from django.http import HttpResponseRedirect
 from metronus_app.model.administrator import Administrator
 from populate_database import basicLoad
 from django.core.exceptions             import ObjectDoesNotExist, PermissionDenied
-from django.http                        import HttpResponseForbidden
+from django.http                        import HttpResponseForbidden, HttpResponseBadRequest
 from django.contrib.auth import authenticate,login
 from metronus_app.model.employee import Employee
 from django.http import JsonResponse
@@ -188,7 +188,51 @@ def delete(request,project_id):
 
     return HttpResponseRedirect('/project/list')
 
+### Ajax methods for graphics
+
+def ajax_employees_per_department(request):
+    # Devuelve un objeto {id_dpto: empleados...}
+
+
+    if "project_id" not in request.GET:
+        return HttpResponseBadRequest()
+
+    project_id = request.GET["project_id"]
+    check_metrics_authorized_for_project(request.user, project_id)
+
+    logged = request.user.actor
+    company_departments = Department.objects.filter(active=True, company_id=logged.company_id)
+
+    # The first method checks that the project is fine
+    project = Project.objects.get(id=project_id)
+
+    data = {}
+
+    for dpmt in company_departments:
+        data[dpmt.id] = ProjectDepartmentEmployeeRole.objects.filter(projectDepartment_id__project_id=project, projectDepartment_id__department_id=dpmt).count()
+
+    return JsonResponse(data)
+
 #Auxiliar methods, containing the operation logic
+
+def check_metrics_authorized_for_project(user, project_id):
+    # Raises 403 if the current actor is not allowed to obtain metrics for the project
+    if not user.is_authenticated():
+        raise PermissionDenied
+
+    project = get_object_or_404(Project, deleted=False, id=project_id)
+    logged = user.actor
+
+    # Check that the companies match
+    if logged.company_id != project.company_id:
+        raise PermissionDenied
+
+    if logged.user_type == 'E':
+        # If it's not an admin, check that it has role EXECUTIVE (50) or higher
+        try:
+            ProjectDepartmentEmployeeRole.objects.get(employee_id=logged, role_id__tier__gte=50, projectDepartment_id__project_id=project)
+        except ObjectDoesNotExist:
+            raise PermissionDenied
 
 def createProject(form, admin):
     pname=form.cleaned_data['name']
