@@ -108,7 +108,7 @@ $('#confirm-delete').on('show.bs.modal', function(e) {
             <tr>
               <td>{{rol.projectDepartment_id.department_id.name}}</td>
               <td>{{rol.projectDepartment_id.project_id.name}}</td>
-              <td>{{rol.role_id.name}}</td>
+              <td>{% trans rol.role_id.name %}</td>
               <td><div align="right"><a align="right" class="btn btn-primary" href="/roles/manage?role_id={{rol.id}}">{% trans 'update' %}</a>
                 <a href="#" align="right" class="btn btn-danger" data-href="/roles/delete/{{rol.id}}" data-toggle="modal" data-target="#confirm-delete">{% trans 'delete' %}</a>
               </tr>
