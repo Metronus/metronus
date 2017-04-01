@@ -173,7 +173,8 @@ def view(request,task_id):
     task_id: the task id to delete
 
     returns:
-    task
+    task:the task
+    goal_evolution: the production goal evolution for this task
 
     template:
     task_view.html
