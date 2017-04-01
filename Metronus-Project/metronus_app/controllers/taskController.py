@@ -179,10 +179,10 @@ def view(request,task_id):
     task_view.html
     """
     task=get_object_or_404(Task,pk=task_id)
-    tasks=checkRoleForList(request)
-    if tasks.filter(pk=task.id).count()==0:
-        raise PermissionDenied
-    return render(request, "task_view.html", {"task": task})
+    checkTask(task,request)
+    goal_evolution=GoalEvolution.objects.filter(task_id=task.id)
+  
+    return render(request, "task_view.html", {"task": task,"goal_evolution":goal_evolution})
 
 def edit(request,task_id):
     """

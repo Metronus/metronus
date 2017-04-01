@@ -151,18 +151,15 @@ class TaskTestCase(TestCase):
         form = response.context["task"]
 
         self.assertEquals(form.id, dep_id)
+        self.assertEquals(response.context["goal_evolution"]==None,False)
 
-
-    def test_view_task_positive_2(self):
+    def test_view_task_negative_2(self):
         c = Client()
         c.login(username="anddonram", password="123456")
         response = c.get("/task/list")
         dep_id=response.context["tasks"][0].id
         response = c.get("/task/view/"+str(dep_id)+"/")
-        self.assertEquals(response.status_code, 200)
-        form = response.context["task"]
-
-        self.assertEquals(form.id, dep_id)
+        self.assertEquals(response.status_code, 403)
 
     def test_view_task_negative(self):
         c = Client()
