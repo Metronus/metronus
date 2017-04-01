@@ -191,7 +191,7 @@ def delete(request,project_id):
 ### Ajax methods for graphics
 
 def ajax_employees_per_department(request):
-    # Devuelve un objeto {id_dpto: empleados...}
+    # Devuelve un objeto cuyas claves son las ID de los departamentos y sus valores un objeto {'name': ..., 'employees': X}
 
 
     if "project_id" not in request.GET:
@@ -209,7 +209,10 @@ def ajax_employees_per_department(request):
     data = {}
 
     for dpmt in company_departments:
-        data[dpmt.id] = ProjectDepartmentEmployeeRole.objects.filter(projectDepartment_id__project_id=project, projectDepartment_id__department_id=dpmt).count()
+        data[dpmt.id] = {
+                            'name': dpmt.name,
+                            'employees': ProjectDepartmentEmployeeRole.objects.filter(projectDepartment_id__project_id=project, projectDepartment_id__department_id=dpmt).count()
+                        }
 
     return JsonResponse(data)
 

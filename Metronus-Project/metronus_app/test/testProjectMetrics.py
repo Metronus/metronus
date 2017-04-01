@@ -207,7 +207,8 @@ class ProjectMetricsTestCase(TestCase):
 
 
         # Do the random test 10 times
-        for _ in range(10):
+        for k in range(10):
+            ProjectDepartmentEmployeeRole.objects.all().delete()
             employees_per_project = [random.choice(range(11)) for _ in range(len(departments))]
             true_data = {}
 
@@ -215,7 +216,10 @@ class ProjectMetricsTestCase(TestCase):
                 dpmt = departments[i]
                 employee_count = employees_per_project[i]
 
-                true_data[dpmt.id] = employee_count
+                true_data[str(dpmt.id)] = {
+                                        'name': dpmt.name,
+                                        'employees': employee_count
+                                     }
 
                 for _ in range(employee_count):
                     createEmployeeInProjDept(project, dpmt)
@@ -224,4 +228,4 @@ class ProjectMetricsTestCase(TestCase):
 
             response = c.get("/project/ajaxEmployeesPerDpmt?project_id=%d" % project.id)
             self.assertEquals(response.status_code, 200)
-            #self.assertJSONEqual(str(response.content, encoding='utf8'), true_data)
+            self.assertJSONEqual(str(response.content, encoding='utf8'), true_data)
