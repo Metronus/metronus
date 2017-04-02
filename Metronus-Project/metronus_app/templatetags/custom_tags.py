@@ -63,4 +63,6 @@ def get_year(month,year,bool):
             nextYear-=1
     return nextYear
 
-
+@register.assignment_tag
+def isAdmin(actor):
+    return actor.user_type == 'A'

@@ -1,6 +1,7 @@
 {% load i18n %}
 {% load l10n %}
 {% load compress %}
+{% load custom_tags %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -24,6 +25,9 @@
   </head>
 
   <body class="nav-md">
+
+  {% isAdmin user.actor as admin %}
+
     <div class="container body">
       <div class="main_container">
         <div class="col-md-3 left_col">
@@ -63,7 +67,8 @@
                 <ul class="nav side-menu">
                   <li><a><i class="fa fa-home"></i>{% trans 'dashIndex' %}</span></a>
                   </li>
-                  <li><a><i class="fa fa-desktop"></i>{% trans 'dashProjects' %}<span class="fa fa-chevron-down"></span></a>
+                  <li>
+                  <a><i class="fa fa-desktop"></i>{% trans 'dashProjects' %}<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/project/list">{% trans 'dashProjectsList' %}</a></li>
                       <li><a href="/project/create">{% trans 'dashProjectCreate' %}</a></li>
