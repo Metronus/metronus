@@ -33,11 +33,14 @@
 
     {% csrf_token %}
     <div id="successDiv" class="alert alert-success" hidden='true'>
+    <a class="close" data-dismiss="alert">x</a>
             </div>
-        <div id="errorDiv" class="alert alert-danger"  hidden='true'>
+        <div id="errorDiv" class="alert alert-error alert-dismissible" role="alert"  hidden='true'>
+        <a class="close" data-dismiss="alert">x</a>
             </div>
     {% if  errors %}
-        <div id="errorDiv2" class="alert alert-danger">
+        <div id="errorDiv2" class="alert alert-error alert-dismissible" role="alert">
+        <a class="close" data-dismiss="alert">x</a>
         {% for error in errors %}
           {% trans error %}
         {% endfor %}
@@ -50,7 +53,7 @@
           
           <label class="control-label col-md-4 col-sm-4 col-xs-12" for="id_{{ form.project_id.name }}">{% trans 'project' %}</label>
             <div class="col-sm-6">
-              <select class="form-control" name="{{ form.project_id.name }}" id="id_{{ form.project_id.name }}"{% if  editing == True %} disabled="true" {% endif %} required onchange="ajaxDepartment();">
+              <select class="form-control col-sm-6 col-md-6" name="{{ form.project_id.name }}" id="id_{{ form.project_id.name }}"{% if  editing == True %} disabled="true" {% endif %} required onchange="ajaxDepartment();">
 
 	              		<option value="" selected>{% trans 'selectProject' %}</option>
 	              		{% for dep in projects %}
@@ -64,7 +67,7 @@
           
           <label class="control-label col-md-4 col-sm-4 col-xs-12" for="id_{{ form.department_id.name }}">{% trans 'department' %}</label>
             <div class="col-sm-6">
-              <select class="form-control" name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}" required disabled="true"  onchange="ajaxRole();">
+              <select class="form-control col-sm-6 col-md-6" name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}" required disabled="true"  onchange="ajaxRole();">
 	              		<option value="" selected>{% trans 'selectDepartment' %}</option>
                         {% if  editing == True %}
                             {% for dep in departments %}
@@ -81,7 +84,7 @@
         <div class="form-group required form-class">
           <label class="control-label col-sm-4" for="id_{{ form.role_id.name }}">{% trans 'rol' %}</label>
             <div class="col-sm-6">
-              <select class="form-control" required name="{{ form.role_id.name }}" id="id_{{ form.role_id.name }}"  {% if  editing == False %}disabled="true" {% endif %} >
+              <select class="form-control col-sm-6 col-md-6" required name="{{ form.role_id.name }}" id="id_{{ form.role_id.name }}"  {% if  editing == False %}disabled="true" {% endif %} >
 		              <option value="" selected>{% trans 'selectRole' %}</option>
 		              {% if  editing == True %}
                             {% for dep in roles %}
@@ -114,6 +117,7 @@
         </div>
 
     </form>
+    
  </div>
  </div>
  </div>
