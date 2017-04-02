@@ -66,3 +66,7 @@ def get_year(month,year,bool):
 @register.assignment_tag
 def isAdmin(actor):
     return actor.user_type == 'A'
+
+@register.assignment_tag
+def isEmployee(actor):
+    return actor.user_type == 'E'
