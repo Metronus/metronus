@@ -6,6 +6,8 @@ from django.http                                 import HttpResponseRedirect, Js
 from django.template.context                     import RequestContext
 from django.core.exceptions                      import ObjectDoesNotExist, PermissionDenied
 from django.utils.translation                    import ugettext_lazy
+from django.db.models                            import Sum,Max
+
 
 from metronus_app.forms.employeeRegisterForm     import EmployeeRegisterForm
 from metronus_app.forms.employeeEditForm         import EmployeeEditForm
@@ -13,9 +15,16 @@ from metronus_app.forms.employeePasswordForm     import EmployeePasswordForm
 from metronus_app.model.employee                 import Employee
 from metronus_app.model.employeeLog              import EmployeeLog
 from metronus_app.model.administrator            import Administrator
+from metronus_app.model.task                            import Task
+from metronus_app.model.goalEvolution                            import GoalEvolution
+from metronus_app.model.timeLog                         import TimeLog
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 
 from metronus_app.common_utils                   import get_current_admin_or_403, checkImage, get_current_employee_or_403, send_mail
+
+from datetime                                           import date, timedelta
+
+import re
 
 def create(request):
     """
@@ -107,6 +116,7 @@ def view(request, username):
     parameters/returns:
     employee: datos del empleado
     employee_roles: objetos ProjectDepartmentEmployeeRole (bibah) con todos los roles del empleado
+    producti
 
     template: employee_view.html
     """
@@ -258,6 +268,143 @@ def delete(request, username):
 
     EmployeeLog.objects.create(employee_id=employee, event="B")
     return HttpResponseRedirect('/employee/list/')
+
+###AJAX methods
+def ajax_productivity_per_task(request,username):
+    # url = employee/ajax_productivity_per_task/<username>
+    # Devuelve un objeto cuyas claves son las ID de los proyectos y sus valores un objeto 
+    #{'name': ..., 'total_productivity': X,'expected_productivity':Y} (X e Y en unidades goal_description/hora)
+    
+    #Ejemplo:
+    #/employee/ajax_productivity_per_task/JoseGavilan
+    
+    #devuelve lo siguiente
+    #{"3": {"total_productivity": 0.7125, "expected_productivity": 2.0, "name": "Hacer cosas de front"}}
+    
+    # Check that the user is logged in and it's an administrator or with permissions
+    try:
+        logged = get_current_admin_or_403(request)
+    except PermissionDenied:
+        logged = get_current_employee_or_403(request)
+    employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
+
+    # Check the company is the same for logged and the searched employee
+    if employee.company_id != logged.company_id:
+        raise PermissionDenied
+
+    #Find tasks with timelog in date range and annotate the sum of the production and time
+    tasks = Task.objects.filter(active=True,timelog__employee_id=employee,production_goal__isnull=False
+        ).annotate(total_produced_units=Sum("timelog__produced_units"),total_duration=Sum("timelog__duration"))
+
+    data = {}
+    #Save productivity for each task
+    for task in tasks:
+        
+        total_produced_units= task.total_produced_units
+        total_duration= task.total_duration
+        if total_duration is None or total_produced_units is None or total_duration==0: 
+            total_productivity = 0
+        else:
+            #duration is in minutes,so we multiply by 60 (duration is in the denominator)
+            total_productivity = 60*total_produced_units/total_duration
+
+        data[task.id] = {
+                            'name': task.name,
+                            'expected_productivity':task.production_goal,
+                            'total_productivity': total_productivity
+                        }
+
+    return JsonResponse(data)
+
+def ajax_productivity_per_task_and_date(request,username):
+    # url = employee/ajax_productivity_per_task/<username>
+    # Devuelve un objeto cuyas claves son las ID de los proyectos y sus valores un objeto 
+    #{'name': ..., 'total_productivity': X,'expected_productivity':Y} (X en unidades goal_description/hora)
+
+    # Parámetros opcionales: 
+    # start_date - fecha en formato YYYY-MM-DD que indica el inicio de la medición. Por defecto, 30 días antes de la fecha actual.
+    # end_date - fecha en formato YYYY-MM-DD que indica el final de la medición. Por defecto, fecha actual.
+    # offset - desplazamiento (huso) horario en formato +/-HH:MM - Por defecto +00:00
+
+    # Si se proporcionan pero no tienen el formato correcto se lanzará un error HTTP 400 Bad Request
+
+    #Ejemplo
+    #/employee/ajax_productivity_per_task_and_date/JoseGavilan?start_date=2015-01-01&end_date=2018-01-01
+    
+    #devuelve lo siguiente
+    #{"3": 
+    #   {"2017-02-12": 
+    #       {"workDate": "2017-02-12T15:30:00Z", "total_productivity": 1.2, "expected_productivity": 9.0}, 
+    #   "name": "Hacer cosas de front", 
+    #   "2017-02-14": 
+    #       {"workDate": "2017-02-14T15:30:00Z", "total_productivity": 0.225, "expected_productivity": 4.0}}}
+
+    # Get and parse the dates
+    start_date = request.GET.get("start_date", str(date.today()))
+    end_date = request.GET.get("end_date", str(date.today() - timedelta(days=30)))
+    date_regex = re.compile("^\d{4}-\d{2}-\d{2}$")
+
+    if date_regex.match(start_date) is None or date_regex.match(end_date) is None:
+        return HttpResponseBadRequest("Start/end date are not valid")
+
+    offset = request.GET.get("offset", "+00:00")
+    offset_regex = re.compile("^(\+|-)\d{2}:\d{2}$")
+
+    if offset_regex.match(offset) is None:
+        return HttpResponseBadRequest("Time offset is not valid")
+
+    # Append time offsets
+    start_date += " 00:00" + offset
+    end_date += " 00:00" + offset
+
+    # Check that the user is logged in and it's an administrator or with permissions
+    try:
+        logged = get_current_admin_or_403(request)
+    except PermissionDenied:
+        logged = get_current_employee_or_403(request)
+    employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
+
+    # Check the company is the same for logged and the searched employee
+    if employee.company_id != logged.company_id:
+        raise PermissionDenied
+
+    
+    #Find tasks with timelog in date range and annotate the sum of the production and time
+    tasks = Task.objects.filter(active=True,timelog__employee_id=employee,production_goal__isnull=False,
+        timelog__workDate__range=[start_date,end_date]).values("timelog__workDate","id","registryDate","production_goal","name","timelog__produced_units","timelog__duration")
+    #print(tasks)
+
+    data = {}
+    #Save productivity for each task
+    for task in tasks:
+        
+        total_produced_units= task["timelog__produced_units"]
+        total_duration= task["timelog__duration"]
+        if total_duration is None or total_produced_units is None or total_duration==0: 
+            total_productivity = 0
+        else:
+            #duration is in minutes, so we multiply by 60 (duration is in the denominator)
+            total_productivity = 60*total_produced_units/total_duration
+        
+        #find the registry date of production goal evolution which is closest to the workDate
+        expected_productivity=GoalEvolution.objects.filter(task_id_id=task["id"],
+            registryDate__lte=task["timelog__workDate"]).last()
+
+        #if we do not find the goal or if the workDate is after the last task update, it may be the current task goal
+        if expected_productivity is None or task["registryDate"]<=task["timelog__workDate"]:
+            expected_productivity=task["production_goal"]
+        else:
+            expected_productivity=expected_productivity.production_goal
+
+        if data.get(task["id"]) is None:
+            data[task["id"]]={'name': task["name"]}
+        data[task["id"]][task["timelog__workDate"].date().strftime("%Y-%m-%d")] = {
+                            'expected_productivity':expected_productivity,
+                            'workDate':task["timelog__workDate"],
+                            'total_productivity': total_productivity
+                        }
+
+    return JsonResponse(data)
 
 
 ########################################################################################################################################
