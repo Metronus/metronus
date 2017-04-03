@@ -1,3 +1,120 @@
 {% extends "layout_base.html" %}
 {% load i18n %}
 {% load l10n %}
+{% block title %}{% trans 'task' %}: {{ project.name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="page-title">
+        <div class="title_left">
+            <h3><strong>{% trans 'task' %}: </strong> {{ project.name }}</h3>
+        </div>
+
+        <div class="clearfix"></div><br>
+
+        <div class="">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_title">{% trans 'projectManager' %}</div>
+
+                    <div class="clearfix"></div>
+
+                    <div class="x_content">
+                        <div id="echart_line" style="height:350px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+    var echartLine = echarts.init(document.getElementById('echart_line'), theme);
+
+    echartLine.setOption({
+        title: {
+            text: 'Line Graph',
+            subtext: 'Subtitle'
+        },
+        tooltip: {
+            trigger: 'axis'
+        },
+        legend: {
+            x: 220,
+            y: 40,
+            data: ['Intent', 'Pre-order', 'Deal']
+        },
+        toolbox: {
+            show: true,
+            feature: {
+                magicType: {
+                    show: true,
+                    title: {
+                        line: 'Line',
+                        bar: 'Bar',
+                        stack: 'Stack',
+                        tiled: 'Tiled'
+                    },
+                    type: ['line', 'bar', 'stack', 'tiled']
+                },
+                restore: {
+                    show: true,
+                    title: "Restore"
+                },
+                saveAsImage: {
+                    show: true,
+                    title: "Save Image"
+                }
+            }
+        },
+        calculable: true,
+        xAxis: [{
+            type: 'category',
+            boundaryGap: false,
+            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        }],
+        yAxis: [{
+            type: 'value'
+        }],
+        series: [{
+            name: 'Deal',
+            type: 'line',
+            smooth: true,
+            itemStyle: {
+                normal: {
+                    areaStyle: {
+                        type: 'default'
+                    }
+                }
+            },
+            data: [10, 12, 21, 54, 260, 830, 710]
+        },{
+            name: 'Pre-order',
+            type: 'line',
+            smooth: true,
+            itemStyle: {
+                normal: {
+                    areaStyle: {
+                        type: 'default'
+                    }
+                }
+            },
+            data: [30, 182, 434, 791, 390, 30, 10]
+        }, {
+            name: 'Intent',
+            type: 'line',
+            smooth: true,
+            itemStyle: {
+                normal: {
+                    areaStyle: {
+                        type: 'default'
+                    }
+                }
+            },
+            data: [1320, 1132, 601, 234, 120, 90, 20]
+        }]
+    });
+</script>
+{% endblock %}
