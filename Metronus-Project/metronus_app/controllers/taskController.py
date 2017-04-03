@@ -7,18 +7,23 @@ from django.http import HttpResponseRedirect
 from metronus_app.model.administrator import Administrator
 from metronus_app.model.actor import Actor
 from metronus_app.model.project import Project
+from metronus_app.model.timeLog import TimeLog
 from metronus_app.model.department import Department
 from metronus_app.model.goalEvolution import GoalEvolution
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 from populate_database import basicLoad
 from django.core.exceptions             import ObjectDoesNotExist, PermissionDenied
-from django.http                        import HttpResponseForbidden
+from django.http                        import HttpResponseForbidden,HttpResponseBadRequest
 
 from django.contrib.auth import authenticate,login
 from django.http import JsonResponse
 from django.core import serializers
 from django.http import HttpResponse
+
+from datetime                                           import date, timedelta
+import re
+
 
 def create(request):
     """
@@ -179,9 +184,16 @@ def view(request,task_id):
     template:
     task_view.html
     """
+
+    #HAY QUE COMPROBAR SI EL EMPLEADO CORRESPONDE CON LA TAREA
+
+
     task=get_object_or_404(Task,pk=task_id)
     checkTask(task,request)
     goal_evolution=GoalEvolution.objects.filter(task_id=task.id)
+
+    # Se obtienen todos los logs correspondientes a la tarea en un rango de tres meses
+    productivity = productivity_task_metric(task.id)
   
     return render(request, "task_view.html", {"task": task,"goal_evolution":goal_evolution})
 
@@ -256,6 +268,47 @@ def delete(request,task_id):
     deleteTask(task)
 
     return HttpResponseRedirect('/task/list')
+
+#Métodos para métricas
+
+def productivity_task_metric(task_id):
+
+    # ------------------------- Cortesía de Agu ------------------------------
+
+    # Get and parse the dates and the offset
+    start_date = str(date.today())
+    end_date = str(date.today() - timedelta(days=120)) # Puesto a 3 meses vista
+    date_regex = re.compile("^\d{4}-\d{2}-\d{2}$")
+
+    if date_regex.match(start_date) is None or date_regex.match(end_date) is None:
+        return HttpResponseBadRequest("Start/end date are not valid")
+
+    offset = "+00:00"
+    offset_regex = re.compile("^(\+|-)\d{2}:\d{2}$")
+
+    if offset_regex.match(offset) is None:
+        return HttpResponseBadRequest("Time offset is not valid")
+
+    # Append time offsets
+    start_date += " 00:00" + offset
+    end_date += " 00:00" + offset
+
+    # --------------------------------------------------------------------------
+
+
+    production = TimeLog.objects.filter(task_id=task_id, workDate__range=[start_date, end_date])
+
+
+
+
+
+    #TODO
+
+
+
+
+
+    return production
 
 #Auxiliar methods, containing the operation logic
 
