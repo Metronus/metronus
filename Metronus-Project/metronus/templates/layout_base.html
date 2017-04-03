@@ -39,7 +39,7 @@
                 {% if user.actor.company_id.logo == "" %}
                   <img src="/static/landing/img/favicon/android-icon-192x192.png" class="img-circle" width="40" height="40">
                 {% else %}
-                  <img src="{{user.actor.company_id.logo}}" class="img-circle" width="40" height="40">
+                  <img src="{{ MEDIA_URL }}{{user.actor.company_id.logo}}" class="img-circle" width="40" height="40">
                 {% endif %}
 
 
@@ -51,7 +51,7 @@
             <!-- menu profile quick info -->
             <div class="profile clearfix">
               <div class="profile_pic">
-                <img src="{{user.actor.picture}}" alt="{{user.get_username}}" class="img-circle profile_img">
+                <img src="{{ MEDIA_URL }}{{user.actor.picture}}" alt="{{user.get_username}}" class="img-circle profile_img">
               </div>
               <div class="profile_info">
                 <span>{% trans 'dashWelcome' %}, </span>
@@ -123,7 +123,7 @@
 
                 <li class="">
                   <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <img src="{{user.actor.picture}}" alt="">{{user.first_name}} {{user.last_name}}
+                    <img src="{{ MEDIA_URL }}{{user.actor.picture}}" alt="">{{user.first_name}} {{user.last_name}}
                     <span class=" fa fa-angle-down"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-usermenu pull-right">
@@ -171,6 +171,7 @@
 		<script src="/static/js/custom.min.js"></script>
 		<script src="/static/js/validator.js"></script>
 		<script src="/static/js/bootstrap-datetimepicker.min.js"></script>
+        <script src="/static/js/echarts.min.js"></script>
 		<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/css/bootstrapvalidator.min.css"/>
 		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/js/bootstrapvalidator.min.js"></script>
 		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/4.3.8/js/fileinput.min.js"></script>

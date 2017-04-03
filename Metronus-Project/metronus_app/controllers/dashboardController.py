@@ -15,8 +15,9 @@ from metronus_app.model.timeLog                         import TimeLog
 from metronus_app.model.department                      import Department
 from metronus_app.model.projectDepartmentEmployeeRole   import ProjectDepartmentEmployeeRole
 from metronus_app.model.actor                           import Actor
-
+from django.shortcuts                                   import render_to_response, get_object_or_404, render,redirect
 from datetime                                           import date, timedelta
+from django.core import serializers
 
 import re
 
@@ -69,3 +70,15 @@ def ajax_time_per_project(request):
                         }
 
     return JsonResponse(data)
+
+def ajax_employees_per_project(request):
+    get_current_admin_or_403(request)
+    logged = request.user.actor
+    company_projects = Project.objects.filter(deleted=False, company_id=logged.company_id)
+    data = {}
+    for project in company_projects:
+        data[project.id] = {
+            'name': project.name,
+            'employees': serializers.serialize('json',ProjectDepartmentEmployeeRole.objects.filter(projectDepartment_id__project_id=project))
+        }
+    return JsonResponse(data, safe=False)

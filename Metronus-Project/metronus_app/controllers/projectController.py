@@ -198,6 +198,8 @@ def delete(request,project_id):
 def ajax_employees_per_department(request):
     # Devuelve un objeto cuyas claves son las ID de los departamentos y sus valores un objeto {'name': ..., 'employees': X}
 
+    # Parámetros obligatorios:
+    # project_id - ID del proyecto
 
     if "project_id" not in request.GET:
         return HttpResponseBadRequest()
@@ -224,6 +226,8 @@ def ajax_employees_per_department(request):
 def ajax_tasks_per_department(request):
     # Devuelve un objeto cuyas claves son las ID de los departamentos y sus valores un objeto {'name': ..., 'tasks': X}
 
+    # Parámetros obligatorios:
+    # project_id - ID del proyecto
 
     if "project_id" not in request.GET:
         return HttpResponseBadRequest()
@@ -249,6 +253,9 @@ def ajax_tasks_per_department(request):
 
 def ajax_time_per_department(request):
     # Devuelve un objeto cuyas claves son las ID de los departamentos y sus valores un objeto {'name': ..., 'time': X} (X en minutos)
+
+    # Parámetros obligatorios:
+    # project_id - ID del proyecto
 
     # Parámetros opcionales: 
     # start_date - fecha en formato YYYY-MM-DD que indica el inicio de la medición. Por defecto, 30 días antes de la fecha actual.

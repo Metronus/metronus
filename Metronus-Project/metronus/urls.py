@@ -33,7 +33,9 @@ from metronus_app.controllers       import taskController
 from metronus_app.controllers       import timeLogController
 from metronus_app.controllers       import loginController
 from metronus_app.controllers       import dashboardController
-from metronus.settings              import DEFAULT_FROM_EMAIL
+from metronus.settings              import DEFAULT_FROM_EMAIL, MEDIA_ROOT, MEDIA_URL
+
+from django.conf.urls.static import static
 
 
 urlpatterns = [url(r'^i18n/', include('django.conf.urls.i18n')),
@@ -51,6 +53,8 @@ urlpatterns += [#i18n_patterns(
     url(r'^department/edit/(?P<department_id>\w{0,50})/$', departmentController.edit, name='department_edit'),
     url(r'^department/view/(?P<department_id>\w{0,50})/$', departmentController.view, name='department_view'),
     url(r'^department/delete/(?P<department_id>\w{0,50})/$', departmentController.delete, name='department_delete'),
+    url(r'^department/ajaxEmployeesPerTask$', departmentController.ajax_employees_per_task, name='department_employees_per_task'),
+    url(r'^department/ajaxTimePerTask$', departmentController.ajax_time_per_task, name='department_time_per_task'),
 
     #Task
     url(r'^task/create$', taskController.create, name='task_create'),
@@ -114,6 +118,7 @@ urlpatterns += [#i18n_patterns(
 
     #Dashboard
     url(r'^dashboard/ajaxTimePerProject$', dashboardController.ajax_time_per_project, name='dashboard_time_per_project'),
+    url(r'^dashboard/ajaxEmployeesPerProject$', dashboardController.ajax_employees_per_project, name='dashboard_employees_per_project'),
     
     # Login
     url(r'^login/$', loginController.login, {'template_name': 'login.html', }, name="login"),
@@ -147,3 +152,5 @@ urlpatterns += [#i18n_patterns(
 
 #)
 ]
+
+urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)
