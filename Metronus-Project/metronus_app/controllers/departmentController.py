@@ -1,18 +1,19 @@
-from django.shortcuts import render
-from metronus_app.forms.departmentForm import DepartmentForm
-from metronus_app.model.department import Department
-from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
-from metronus_app.model.employee import Employee
-from metronus_app.model.actor import Actor
-from metronus_app.model.task import Task
-from metronus_app.model.administrator import Administrator
-from populate_database import basicLoad
-from django.shortcuts                            import render_to_response, get_object_or_404
-from metronus_app.common_utils                   import get_current_admin_or_403,get_current_employee_or_403
-from django.http import HttpResponseRedirect
-from django.core.exceptions                      import ObjectDoesNotExist, PermissionDenied
-from django.contrib.auth import authenticate,login
-from django.http import JsonResponse
+from django.shortcuts                                   import render, get_object_or_404
+from django.http                                        import HttpResponseRedirect, JsonResponse, HttpResponseBadRequest
+from django.core.exceptions                             import ObjectDoesNotExist, PermissionDenied
+from django.contrib.auth                                import authenticate,login
+
+from metronus_app.forms.departmentForm                  import DepartmentForm
+from metronus_app.model.department                      import Department
+from metronus_app.model.projectDepartmentEmployeeRole   import ProjectDepartmentEmployeeRole
+from metronus_app.model.employee                        import Employee
+from metronus_app.model.actor                           import Actor
+from metronus_app.model.task                            import Task
+from metronus_app.model.timeLog                         import TimeLog
+from metronus_app.model.administrator                   import Administrator
+from metronus_app.common_utils                          import get_current_admin_or_403,get_current_employee_or_403
+
+from populate_database                                  import basicLoad
 
 def create(request):
     """
@@ -209,7 +210,59 @@ def delete(request,department_id):
 
     return HttpResponseRedirect('/department/list')
 
+##################################################################################################################
+### Ajax methods for metric graphics
+##################################################################################################################
+
+def ajax_employees_per_task(request):
+    # Devuelve un objeto cuyas claves son las ID de las tareas y sus valores un objeto {'name': ..., 'employees': X}
+
+    # Parámetros obligatorios:
+    # department_id - ID del departamento
+
+    if "department_id" not in request.GET:
+        return HttpResponseBadRequest()
+
+    department_id = request.GET["department_id"]
+    check_metrics_authorized_for_department(request.user, department_id)
+
+    logged = request.user.actor
+    dpmt_tasks = Task.objects.filter(active = True, projectDepartment_id__department_id__id = department_id)
+
+    data = {}
+
+    for task in dpmt_tasks:
+        data[task.id] = {   
+                            'name': task.name, 
+                            'employees': TimeLog.objects.filter(task_id = task).distinct('employee_id').count()
+                        }
+
+    return JsonResponse(data)
+
+
+##################################################################################################################
 #Auxiliar methods, containing the operation logic
+##################################################################################################################
+
+def check_metrics_authorized_for_department(user, dpmt_id):
+    # Raises 403 if the current actor is not allowed to obtain metrics for the project
+    if not user.is_authenticated():
+        raise PermissionDenied
+
+    department = get_object_or_404(Department, active=True, id=dpmt_id)
+    logged = user.actor
+
+    # Check that the companies match
+    if logged.company_id != department.company_id:
+        raise PermissionDenied
+
+    if logged.user_type == 'E':
+        # If it's not an admin, check that it has role EXECUTIVE (50) or higher for any project in the department
+        try:
+            ProjectDepartmentEmployeeRole.objects.get(employee_id=logged, role_id__tier__gte=50, projectDepartment_id__department_id=department)
+        except ObjectDoesNotExist:
+            raise PermissionDenied
+
 def findName(dname,admin):
     return Department.objects.filter(name=dname,company_id=admin.company_id).first()
 
