@@ -26,8 +26,8 @@
 
   <body class="nav-md">
 
-  {% isAdmin user.actor as admin %}
-  {% isEmployee user.actor as employee %}
+  {% isAdmin user.actor as _is_admin %}
+  {% isEmployee user.actor as _is_employee %}
 
 
     <div class="container body">
