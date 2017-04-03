@@ -117,6 +117,7 @@ urlpatterns += [#i18n_patterns(
     #Dashboard
     url(r'^dashboard/ajaxTimePerProject$', dashboardController.ajax_time_per_project, name='dashboard_time_per_project'),
     url(r'^dashboard/ajaxEmployeesPerProject$', dashboardController.ajax_employees_per_project, name='dashboard_employees_per_project'),
+    url(r'^dashboard/ajaxDepartmentsPerProject$', dashboardController.ajax_departments_per_project, name='dashboard_departments_per_project'),
     
     # Login
     url(r'^login/$', loginController.login, {'template_name': 'login.html', }, name="login"),

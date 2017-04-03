@@ -18,6 +18,7 @@ from metronus_app.model.actor                           import Actor
 from django.shortcuts                                   import render_to_response, get_object_or_404, render,redirect
 from datetime                                           import date, timedelta
 from django.core import serializers
+from metronus_app.model.projectDepartment             import ProjectDepartment
 
 import re
 
@@ -79,6 +80,18 @@ def ajax_employees_per_project(request):
     for project in company_projects:
         data[project.id] = {
             'name': project.name,
-            'employees': serializers.serialize('json',ProjectDepartmentEmployeeRole.objects.filter(projectDepartment_id__project_id=project))
+            'employees': list(Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__project_id = project).values('id','user__username'))
         }
-    return JsonResponse(data, safe=False)
+    return JsonResponse(data)
+
+def ajax_departments_per_project(request):
+    get_current_admin_or_403(request)
+    logged = request.user.actor
+    company_projects = Project.objects.filter(deleted=False, company_id=logged.company_id)
+    data = {}
+    for project in company_projects:
+        data[project.id] = {
+            'name': project.name,
+            'departments': list(Department.objects.filter(projectdepartment__project_id=project).values('id','name'))
+        }
+    return JsonResponse(data)
