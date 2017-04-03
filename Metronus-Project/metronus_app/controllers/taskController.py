@@ -13,15 +13,16 @@ from metronus_app.model.goalEvolution import GoalEvolution
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 from populate_database import basicLoad
-from django.core.exceptions             import ObjectDoesNotExist, PermissionDenied
-from django.http                        import HttpResponseForbidden,HttpResponseBadRequest
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.http import HttpResponseForbidden,HttpResponseBadRequest
 
 from django.contrib.auth import authenticate,login
 from django.http import JsonResponse
 from django.core import serializers
 from django.http import HttpResponse
+from django.db.models import Sum
 
-from datetime                                           import date, timedelta
+from datetime import date, timedelta
 import re
 
 
@@ -180,22 +181,20 @@ def view(request,task_id):
     returns:
     task:the task
     goal_evolution: the production goal evolution for this task
+    productivity: the evolution of productivity for this task
 
     template:
     task_view.html
     """
 
-    #HAY QUE COMPROBAR SI EL EMPLEADO CORRESPONDE CON LA TAREA
+    task = get_object_or_404(Task, pk=task_id)
+    checkTask(task, request)
+    goal_evolution = GoalEvolution.objects.filter(task_id=task.id)
 
-
-    task=get_object_or_404(Task,pk=task_id)
-    checkTask(task,request)
-    goal_evolution=GoalEvolution.objects.filter(task_id=task.id)
-
-    # Se obtienen todos los logs correspondientes a la tarea en un rango de tres meses
+    # Se obtienen todos los logs correspondientes a la tarea en un rango de un mes
     productivity = productivity_task_metric(task.id)
   
-    return render(request, "task_view.html", {"task": task,"goal_evolution":goal_evolution})
+    return render(request, "task_view.html", {"task": task, "goal_evolution": goal_evolution, "productivity": productivity})
 
 def edit(request,task_id):
     """
@@ -277,7 +276,7 @@ def productivity_task_metric(task_id):
 
     # Get and parse the dates and the offset
     start_date = str(date.today())
-    end_date = str(date.today() - timedelta(days=120)) # Puesto a 3 meses vista
+    end_date = str(date.today() - timedelta(days=30)) # Puesto a 3 meses vista
     date_regex = re.compile("^\d{4}-\d{2}-\d{2}$")
 
     if date_regex.match(start_date) is None or date_regex.match(end_date) is None:
@@ -296,19 +295,11 @@ def productivity_task_metric(task_id):
     # --------------------------------------------------------------------------
 
 
-    production = TimeLog.objects.filter(task_id=task_id, workDate__range=[start_date, end_date])
-
-
-
-
-
-    #TODO
-
-
-
-
+    production = TimeLog.objects.filter(task_id=task_id, workDate__range=[start_date,end_date])\
+                                .aggregate(production=Sum('duration', field="produced_units/duration"))['production']
 
     return production
+
 
 #Auxiliar methods, containing the operation logic
 
