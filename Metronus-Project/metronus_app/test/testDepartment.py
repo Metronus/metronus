@@ -212,8 +212,8 @@ class DepartmentTestCase(TestCase):
     def test_view_department_not_allowed(self):
         c = Client()
         c.login(username="emp2", password="123456")
-
-        response = c.get("/department/view/2/")
+        dep_id=Department.objects.all().first()
+        response = c.get("/department/view/"+str(dep_id.id)+"/")
         self.assertEquals(response.status_code, 403)
 
 

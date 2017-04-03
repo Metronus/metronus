@@ -258,10 +258,10 @@ def checkDepartmentForView(dep,request,forView):
         if not res:
             if forView:
                 roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                         role_id__tier__in=[40,20])
+                         role_id__tier__in=[50,40,20])
             else:
                 roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                        role_id__tier=40)
+                        role_id__tier__gte=40)
             res=roles.count()>0
         if not res:
             raise PermissionDenied
@@ -299,7 +299,7 @@ def getListForRole(request):
 
         if not res:
             roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                    role_id__tier__in=[40,20])
+                    role_id__tier__in=[50,40,20])
             res=roles.count()>0
             if not res:
                 raise PermissionDenied

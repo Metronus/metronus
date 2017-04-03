@@ -32,6 +32,7 @@ from metronus_app.controllers       import administratorController
 from metronus_app.controllers       import taskController
 from metronus_app.controllers       import timeLogController
 from metronus_app.controllers       import loginController
+from metronus_app.controllers       import dashboardController
 from metronus.settings              import DEFAULT_FROM_EMAIL
 
 
@@ -42,6 +43,8 @@ urlpatterns += [#i18n_patterns(
     url(r'^$', views.index),
     url(r'^index.html/$', views.index, name='home'),
     url(r'^app/$', appController.index, name='app_index'),
+ 
+    #Department
     url(r'^department/create$', departmentController.create, name='department_create'),
     url(r'^department/createAsync$', departmentController.createAsync),
     url(r'^department/list$', departmentController.list, name='department_list'),
@@ -49,7 +52,7 @@ urlpatterns += [#i18n_patterns(
     url(r'^department/view/(?P<department_id>\w{0,50})/$', departmentController.view, name='department_view'),
     url(r'^department/delete/(?P<department_id>\w{0,50})/$', departmentController.delete, name='department_delete'),
 
-    #a la espera de ponerle el name
+    #Task
     url(r'^task/create$', taskController.create, name='task_create'),
     url(r'^task/createAsync$', taskController.createAsync),
     url(r'^task/list$', taskController.list, name='task_list'),
@@ -58,6 +61,7 @@ urlpatterns += [#i18n_patterns(
     url(r'^task/delete/(?P<task_id>\w{0,50})/$', taskController.delete, name='task_delete'),
     url(r'^task/getdepartments$', taskController.form_departments),
 
+    #Project
     url(r'^project/list$', projectController.list, name='project_list'),
     url(r'^project/edit/(?P<project_id>\w{0,50})/$', projectController.edit, name='project_edit'),
     url(r'^project/show/(?P<project_id>\w{0,50})/$', projectController.show, name='project_show'),
@@ -68,11 +72,13 @@ urlpatterns += [#i18n_patterns(
     url(r'^project/ajaxTasksPerDpmt$', projectController.ajax_tasks_per_department, name='project_tasks_per_department'),
     url(r'^project/ajaxTimePerDpmt$', projectController.ajax_time_per_department, name='project_time_per_department'),
 
+    #Project-Department relationship
     url(r'^projectdepartment/create$', projectDepartmentController.create, name='projectdepartment_create'),
     url(r'^projectdepartment/list$', projectDepartmentController.list, name='projectdepartment_list'),
     #url(r'^projectdepartment/edit$', projectDepartmentController.edit, name='projectdepartment_edit'),No necesario, en un principio
     url(r'^projectdepartment/delete$', projectDepartmentController.delete, name='projectdepartment_delete'),
 
+    #Employee
     url(r'^employee/create$', employeeController.create, name='employee_create'),
     url(r'^employee/list$', employeeController.list, name='employee_list'),
     url(r'^employee/view/(?P<username>\w{0,50})/$', employeeController.view, name='employee_view'),
@@ -104,6 +110,9 @@ urlpatterns += [#i18n_patterns(
     url(r'^company/view/$', companyController.view, name='company_view'),
     url(r'^company/delete/$', companyController.view, name='company_delete'),
 
+    #Dashboard
+    url(r'^dashboard/ajaxTimePerProject$', dashboardController.ajax_time_per_project, name='dashboard_time_per_project'),
+    
     # Login
     url(r'^login/$', loginController.login, {'template_name': 'login.html', }, name="login"),
     url(r'^logout/$', loginController.logout, {'next_page': '/', }, name="logout"),

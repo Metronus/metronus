@@ -15,7 +15,6 @@ from metronus_app.model.department                      import Department
 from metronus_app.model.projectDepartmentEmployeeRole   import ProjectDepartmentEmployeeRole
 from metronus_app.model.actor                           import Actor
 
-from populate_database                                  import basicLoad
 from datetime                                           import date, timedelta
 
 import re
@@ -127,7 +126,7 @@ def list(request):
 
 def show(request,project_id):
     project = get_object_or_404(Project, pk=project_id)
-    project_manager = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__project_id=project, projectdepartmentemployeerole__role_id__tier=40).first()
+    project_manager = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__project_id=project, projectdepartmentemployeerole__role_id__tier__gte=40).first()
     employees = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__project_id=project).distinct()
     tasks=Task.objects.filter(active=True, projectDepartment_id__project_id__id=project_id)
     departments = Department.objects.filter(active=True, projectdepartment__project_id__id=project_id)
@@ -388,7 +387,7 @@ def getListForRole(request):
 
         if not res:
             roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                    role_id__tier__in=[40,20])
+                    role_id__tier__in=[50,40,20])
             res=roles.count()>0
             if not res:
                 raise PermissionDenied

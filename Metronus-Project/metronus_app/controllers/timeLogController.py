@@ -272,7 +272,7 @@ def checkRoleForTask(employee, task):
     if not res:
         roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee,
                                                              projectDepartment_id=task.projectDepartment_id,
-                                                             role_id__tier__in=[40,20])
+                                                             role_id__tier__in=[50,40,20])
         res = roles.count() > 0
     return res
 

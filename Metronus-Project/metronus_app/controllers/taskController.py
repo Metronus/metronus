@@ -353,7 +353,7 @@ def checkTask(task,request):
 
         if not res:
             roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                    role_id__tier__in=[40,20])
+                    role_id__tier__in=[50,40,20])
             res=roles.count()>0
         if not res:
             raise PermissionDenied
@@ -399,7 +399,7 @@ def find_collections(request):
         else:
             #not a manager
             rolesPro = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                     role_id__tier=40)
+                     role_id__tier__gte=40)
             rolesDep=ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
                      role_id__tier=20)
 
@@ -447,7 +447,7 @@ def find_departments(request):
         else:
             #not a manager
             rolesPro = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                     role_id__tier=40)
+                     role_id__tier__gte=40)
             rolesDep=ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
                      role_id__tier=20)
 
@@ -491,7 +491,7 @@ def find_projects(request):
         else:
             #not a manager
             rolesPro = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                     role_id__tier=40)
+                     role_id__tier__gte=40)
             rolesDep=ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
                      role_id__tier=20)
 
