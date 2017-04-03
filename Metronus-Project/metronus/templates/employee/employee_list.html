@@ -30,7 +30,7 @@
           <tr data-href="/employee/view/{{employee.user}}" style="cursor: pointer;">
             <th scope="row">{{forloop.counter}}</th>
 
-            <td><img src="{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
+            <td><img src="{{ MEDIA_URL }}{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
 
             <td>{{employee.identifier}}</td>
 

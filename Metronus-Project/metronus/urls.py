@@ -33,7 +33,9 @@ from metronus_app.controllers       import taskController
 from metronus_app.controllers       import timeLogController
 from metronus_app.controllers       import loginController
 from metronus_app.controllers       import dashboardController
-from metronus.settings              import DEFAULT_FROM_EMAIL
+from metronus.settings              import DEFAULT_FROM_EMAIL, MEDIA_ROOT, MEDIA_URL
+
+from django.conf.urls.static import static
 
 
 urlpatterns = [url(r'^i18n/', include('django.conf.urls.i18n')),
@@ -145,3 +147,5 @@ urlpatterns += [#i18n_patterns(
 
 #)
 ]
+
+urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)
