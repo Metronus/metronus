@@ -85,6 +85,8 @@ urlpatterns += [#i18n_patterns(
     url(r'^employee/edit/(?P<username>\w{0,50})/$', employeeController.edit, name='employee_edit'),
     url(r'^employee/updatePassword/(?P<username>\w{0,50})/$', employeeController.updatePassword, name='employee_updatePassword'),
     url(r'^employee/delete/(?P<username>\w{0,50})/$', employeeController.delete, name='employee_delete'),
+    url(r'^employee/ajax_productivity_per_task/(?P<username>\w{0,50})$', employeeController.ajax_productivity_per_task, name='employee_ajax_productivity_per_task'),
+    url(r'^employee/ajax_productivity_per_task_and_date/(?P<username>\w{0,50})$', employeeController.ajax_productivity_per_task_and_date, name='employee_ajax_productivity_per_task_and_date'),
 
     # TimeLogs
     url(r'^timeLog/list_all/$', timeLogController.list_all, name='timeLog_list_all'),

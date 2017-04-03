@@ -8,6 +8,7 @@ from metronus_app.model.administrator                 import Administrator
 from metronus_app.model.task                          import Task
 from metronus_app.model.timeLog                       import TimeLog
 from metronus_app.model.projectDepartment             import ProjectDepartment
+from metronus_app.model.goalEvolution             import GoalEvolution
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 from django.db                                        import transaction
 
@@ -215,7 +216,52 @@ def basicLoad():
         employee_id = emp3
     )
 
+    TimeLog.objects.create(
+        description = "me quiero morir mas que nunca",
+        workDate = "2017-02-14 15:30+00:00",
+        duration = 400,
+        task_id = task3,
+        produced_units="1.5",
+        employee_id = emp3
+    )
 
+    TimeLog.objects.create(
+        description = "me quiero morir algunos dias",
+        workDate = "2017-04-01 15:30+00:00",
+        duration = 300,
+        task_id = task3,
+        produced_units="0.5",
+        employee_id = emp4
+    )
+
+    TimeLog.objects.create(
+        description = "me quiero morir",
+        workDate = "2017-02-12 15:30+00:00",
+        duration = 400,
+        task_id = task3,
+        produced_units="8",
+        employee_id = emp3
+    )
+    ge1=GoalEvolution.objects.create(
+        task_id=task3,
+        
+        actor_id = emp8,
+        production_goal=9.0,
+        goal_description="kgs"
+        )
+    
+    ge2=GoalEvolution.objects.create(
+        task_id=task3,
+        
+        actor_id = emp8,
+        production_goal=4.0,
+        goal_description="kgs"
+        )
+    #as registryDate is an autofield_now and updates on save(), we must set the registrydate with update()
+    #if we want to force a date in registryDate
+    GoalEvolution.objects.filter(pk=ge1.id).update(registryDate = "2017-02-11 15:30+00:00")
+    GoalEvolution.objects.filter(pk=ge2.id).update(registryDate = "2017-02-13 15:30+00:00")
+    
 def create_user(nombre,company2):
     User.objects.create_user(
         username=nombre,
