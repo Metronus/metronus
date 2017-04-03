@@ -1,14 +1,15 @@
-from metronus_app.model.role import Role
-from metronus_app.model.company import Company
-from metronus_app.model.employee import Employee
-from metronus_app.model.project import Project
-from metronus_app.model.department import Department
-from django.contrib.auth.models import User
-from metronus_app.model.administrator import Administrator
-from metronus_app.model.task import Task
-from metronus_app.model.projectDepartment import ProjectDepartment
+from metronus_app.model.role                          import Role
+from metronus_app.model.company                       import Company
+from metronus_app.model.employee                      import Employee
+from metronus_app.model.project                       import Project
+from metronus_app.model.department                    import Department
+from django.contrib.auth.models                       import User
+from metronus_app.model.administrator                 import Administrator
+from metronus_app.model.task                          import Task
+from metronus_app.model.timeLog                       import TimeLog
+from metronus_app.model.projectDepartment             import ProjectDepartment
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
-from django.db import transaction
+from django.db                                        import transaction
 
 @transaction.atomic
 def basicLoad():
@@ -159,20 +160,21 @@ def basicLoad():
         role_id=emp_role )
 
 
-    Task.objects.create(
+    task1 = Task.objects.create(
         name  ="Hacer cosas",
         description  = "meda",
         actor_id = emp4,
         projectDepartment_id = pd1
     )
 
-    Task.objects.create(
+    task2 = Task.objects.create(
         name  ="Hacer cosas de back",
         description  = "hola",
         actor_id = emp5,
         projectDepartment_id = pd1
     )
-    Task.objects.create(
+
+    task3 = Task.objects.create(
         name  ="Hacer cosas de front",
         description  = "nada",
         actor_id = emp8,
@@ -180,13 +182,40 @@ def basicLoad():
         production_goal="2.0",
         goal_description="kgs"
     )
-    Task.objects.create(
+
+    task4 = Task.objects.create(
         name  ="Hacer cosas de cua",
         description  = "nada",
         actor_id = emp8,
         projectDepartment_id = pd1,
         active=False
     )
+
+    TimeLog.objects.create(
+        description = "he currado mucho",
+        workDate = "2017-01-02 10:00+00:00",
+        duration = 240,
+        task_id = task1,
+        employee_id = emp4
+    )
+
+    TimeLog.objects.create(
+        description = "he currado poco",
+        workDate = "2017-03-20 13:37+00:00",
+        duration = 60,
+        task_id = task1,
+        employee_id = emp3
+    )
+
+    TimeLog.objects.create(
+        description = "me quiero morir",
+        workDate = "2017-02-12 15:30+00:00",
+        duration = 400,
+        task_id = task1,
+        employee_id = emp3
+    )
+
+
 def create_user(nombre,company2):
     User.objects.create_user(
         username=nombre,
