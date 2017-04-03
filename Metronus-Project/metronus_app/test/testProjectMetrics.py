@@ -1,15 +1,16 @@
-from metronus_app.model.project                 import Project
-from metronus_app.model.company                 import Company
-from metronus_app.controllers.projectController import *
-from metronus_app.model.role                    import Role
-from django.contrib.auth.models                 import User
-from django.test                                import TestCase, Client
-from metronus_app.model.employee                import Employee
-from django.core.exceptions                     import ObjectDoesNotExist, PermissionDenied
-from metronus_app.model.projectDepartment       import ProjectDepartment
+from metronus_app.model.project                       import Project
+from metronus_app.model.company                       import Company
+from metronus_app.controllers.projectController       import *
+from metronus_app.model.role                          import Role
+from django.contrib.auth.models                       import User
+from django.test                                      import TestCase, Client
+from metronus_app.model.employee                      import Employee
+from django.core.exceptions                           import ObjectDoesNotExist, PermissionDenied
+from metronus_app.model.projectDepartment             import ProjectDepartment
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
-from django.core.exceptions                     import ObjectDoesNotExist
-
+from django.core.exceptions                           import ObjectDoesNotExist
+from metronus_app.model.task                          import Task
+        
 import string, random
 
 def ranstr():
@@ -20,7 +21,7 @@ class ProjectMetricsTestCase(TestCase):
 
     def setUp(self):
 
-        company1 = Company.objects.create(
+        company1 = Company.objects.create(          
             cif="123",
             company_name="company1",
             short_name="mplp",
@@ -171,7 +172,7 @@ class ProjectMetricsTestCase(TestCase):
 
         response = c.get("/project/ajaxEmployeesPerDpmt")
         self.assertEquals(response.status_code, 400)
-
+    
     def test_random_data_empperdmtp(self):
 
         def createEmployeeInProjDept(project, department):
@@ -209,12 +210,12 @@ class ProjectMetricsTestCase(TestCase):
         # Do the random test 10 times
         for k in range(10):
             ProjectDepartmentEmployeeRole.objects.all().delete()
-            employees_per_project = [random.choice(range(11)) for _ in range(len(departments))]
+            employees_per_dpmt = [random.choice(range(11)) for _ in range(len(departments))]
             true_data = {}
 
             for i in range(len(departments)):
                 dpmt = departments[i]
-                employee_count = employees_per_project[i]
+                employee_count = employees_per_dpmt[i]
 
                 true_data[str(dpmt.id)] = {
                                         'name': dpmt.name,
@@ -227,5 +228,85 @@ class ProjectMetricsTestCase(TestCase):
             # Check that the data returned by the AJAX query matches the generated data
 
             response = c.get("/project/ajaxEmployeesPerDpmt?project_id=%d" % project.id)
+            self.assertEquals(response.status_code, 200)
+            self.assertJSONEqual(str(response.content, encoding='utf8'), true_data)
+
+    def test_access_denied_not_logged_tasksperdmtp(self):
+        c = Client()
+
+        response = c.get("/project/ajaxTasksPerDpmt?project_id=%d" % Project.objects.get(name="pro1").id)
+        self.assertEquals(response.status_code, 403)
+
+    def test_access_denied_low_role_tasksperdmtp(self):
+        c = Client()
+        c.login(username="emp1", password="123456")
+
+        response = c.get("/project/ajaxTasksPerDpmt?project_id=%d" % Project.objects.get(name="pro1").id)
+        self.assertEquals(response.status_code, 403)
+
+    def test_access_ok_executive_tasksperdmtp(self):
+        c = Client()
+        c.login(username="emp2", password="123456")
+
+        response = c.get("/project/ajaxTasksPerDpmt?project_id=%d" % Project.objects.get(name="pro1").id)
+        self.assertEquals(response.status_code, 200)
+
+    def test_access_other_company_executive_tasksperdmtp(self):
+        c = Client()
+        c.login(username="emp2", password="123456")
+
+        response = c.get("/project/ajaxTasksPerDpmt?project_id=%d" % Project.objects.get(name="pro2").id)
+        self.assertEquals(response.status_code, 403)
+
+    def test_bad_request_tasksperdmtp(self):
+        c = Client()
+        c.login(username="emp2", password="123456")
+
+        response = c.get("/project/ajaxTasksPerDpmt")
+        self.assertEquals(response.status_code, 400)
+
+    def test_random_data_tasksperdmtp(self):
+
+        def createTaskInProjDept(project, department):
+
+            try:
+                pd = ProjectDepartment.objects.get(project_id=project, department_id=department)
+            except ObjectDoesNotExist:
+                pd = ProjectDepartment.objects.create(project_id=project, department_id=department)
+
+            Task.objects.create(
+                name = ranstr(),
+                description = ranstr(),
+                actor_id = Administrator.objects.get(identifier="adm01"),
+                projectDepartment_id = pd
+            )
+
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        departments = Department.objects.filter(company_id__company_name="company1")
+        project = Project.objects.get(name="pro_random")
+
+        # Do the random test 10 times
+        for k in range(10):
+            Task.objects.all().delete()
+            tasks_per_dpmt = [random.choice(range(11)) for _ in range(len(departments))]
+            true_data = {}
+
+            for i in range(len(departments)):
+                dpmt = departments[i]
+                task_count = tasks_per_dpmt[i]
+
+                true_data[str(dpmt.id)] = {
+                                        'name': dpmt.name,
+                                        'tasks': task_count
+                                     }
+
+                for _ in range(task_count):
+                    createTaskInProjDept(project, dpmt)
+
+            # Check that the data returned by the AJAX query matches the generated data
+
+            response = c.get("/project/ajaxTasksPerDpmt?project_id=%d" % project.id)
             self.assertEquals(response.status_code, 200)
             self.assertJSONEqual(str(response.content, encoding='utf8'), true_data)

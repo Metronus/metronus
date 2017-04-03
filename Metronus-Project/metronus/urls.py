@@ -65,6 +65,7 @@ urlpatterns += [#i18n_patterns(
     url(r'^project/create$', projectController.create, name='project_create'),
     url(r'^project/createAsync$', projectController.createAsync, name='project_create_async'),
     url(r'^project/ajaxEmployeesPerDpmt$', projectController.ajax_employees_per_department, name='project_employees_per_department'),
+    url(r'^project/ajaxTasksPerDpmt$', projectController.ajax_tasks_per_department, name='project_tasks_per_department'),
 
     url(r'^projectdepartment/create$', projectDepartmentController.create, name='projectdepartment_create'),
     url(r'^projectdepartment/list$', projectDepartmentController.list, name='projectdepartment_list'),

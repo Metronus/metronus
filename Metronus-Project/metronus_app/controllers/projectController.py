@@ -1,20 +1,20 @@
-from django.shortcuts import render,redirect
-from metronus_app.forms.projectForm import ProjectForm
-from metronus_app.model.project import Project,Company
-from django.shortcuts import render_to_response, get_object_or_404
-from metronus_app.common_utils import get_current_admin_or_403
-from django.http import HttpResponseRedirect
-from metronus_app.model.administrator import Administrator
-from populate_database import basicLoad
-from django.core.exceptions             import ObjectDoesNotExist, PermissionDenied
-from django.http                        import HttpResponseForbidden, HttpResponseBadRequest
-from django.contrib.auth import authenticate,login
-from metronus_app.model.employee import Employee
-from django.http import JsonResponse
-from metronus_app.model.task import Task
-from metronus_app.model.department import Department
-from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
-from metronus_app.model.actor import Actor
+from django.shortcuts                                   import render,redirect
+from metronus_app.forms.projectForm                     import ProjectForm
+from metronus_app.model.project                         import Project,Company
+from django.shortcuts                                   import render_to_response, get_object_or_404
+from metronus_app.common_utils                          import get_current_admin_or_403
+from django.http                                        import HttpResponseRedirect
+from metronus_app.model.administrator                   import Administrator
+from populate_database                                  import basicLoad
+from django.core.exceptions                             import ObjectDoesNotExist, PermissionDenied
+from django.http                                        import HttpResponseForbidden, HttpResponseBadRequest
+from django.contrib.auth                                import authenticate,login
+from metronus_app.model.employee                        import Employee
+from django.http                                        import JsonResponse
+from metronus_app.model.task                            import Task
+from metronus_app.model.department                      import Department
+from metronus_app.model.projectDepartmentEmployeeRole   import ProjectDepartmentEmployeeRole
+from metronus_app.model.actor                           import Actor
 
 
 def create(request):
@@ -212,6 +212,32 @@ def ajax_employees_per_department(request):
         data[dpmt.id] = {
                             'name': dpmt.name,
                             'employees': ProjectDepartmentEmployeeRole.objects.filter(projectDepartment_id__project_id=project, projectDepartment_id__department_id=dpmt).count()
+                        }
+
+    return JsonResponse(data)
+
+def ajax_tasks_per_department(request):
+    # Devuelve un objeto cuyas claves son las ID de los departamentos y sus valores un objeto {'name': ..., 'tasks': X}
+
+
+    if "project_id" not in request.GET:
+        return HttpResponseBadRequest()
+
+    project_id = request.GET["project_id"]
+    check_metrics_authorized_for_project(request.user, project_id)
+
+    logged = request.user.actor
+    company_departments = Department.objects.filter(active=True, company_id=logged.company_id)
+
+    # The first method checks that the project is fine
+    project = Project.objects.get(id=project_id)
+
+    data = {}
+
+    for dpmt in company_departments:
+        data[dpmt.id] = {
+                            'name': dpmt.name,
+                            'tasks': Task.objects.filter(projectDepartment_id__project_id=project, projectDepartment_id__department_id=dpmt).count()
                         }
 
     return JsonResponse(data)
