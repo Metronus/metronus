@@ -80,7 +80,7 @@ def ajax_employees_per_project(request):
     for project in company_projects:
         data[project.id] = {
             'name': project.name,
-            'employees': list(Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__project_id = project).values('id','user__username'))
+            'employees': list(Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__project_id = project).values('id','identifier','user__username','registryDate'))
         }
     return JsonResponse(data)
 
@@ -93,5 +93,17 @@ def ajax_departments_per_project(request):
         data[project.id] = {
             'name': project.name,
             'departments': list(Department.objects.filter(projectdepartment__project_id=project).values('id','name'))
+        }
+    return JsonResponse(data)
+
+def ajax_tasks_per_project(request):
+    get_current_admin_or_403(request)
+    logged = request.user.actor
+    company_projects = Project.objects.filter(deleted=False, company_id=logged.company_id)
+    data = {}
+    for project in company_projects:
+        data[project.id] = {
+            'name': project.name,
+            'tasks': list(Task.objects.filter(projectDepartment_id__project_id=project).values('id', 'name', 'description'))
         }
     return JsonResponse(data)
