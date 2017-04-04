@@ -54,7 +54,7 @@
 
 
 <script>
-    function fromData(backendData) {
+    function fromData(names, data) {
         return {
             title: {
                 text: 'Line Graph',
@@ -66,7 +66,7 @@
             legend: {
                 x: 220,
                 y: 40,
-                data: backendData.names
+                data: names
             },
             toolbox: {
                 show: true,
@@ -101,7 +101,7 @@
                 type: 'value'
             }],
             series: [{
-                name: backendData.names[0],
+                name: names[0],
                 type: 'line',
                 smooth: true,
                 itemStyle: {
@@ -111,9 +111,9 @@
                         }
                     }
                 },
-                data: backendData.productivity
+                data: data.productivity
             }, {
-                name: backendData.names[1],
+                name: names[1],
                 type: 'line',
                 smooth: true,
                 itemStyle: {
@@ -123,26 +123,17 @@
                         }
                     }
                 },
-                data: backendData.goal_evolution
+                data: data.goal_evolution
             }]
         };
     }
 
     $(document).ready(function() {
-        var defaultBackendData = { 'names': ['Intent', 'Pre-order'],
-            'productivity': [30, 182, 434, 791, 390, 30, 10], 'goal_evolution': [0, 1132, 601, 234, 120, 90, 20] };
+        names = ['Intent', 'Pre-order'];
+        data = {'productivity': [30, 182, 434, 791, 390, 30, 10], 'goal_evolution': [0, 1132, 601, 234, 120, 90, 20] };
 
         echartLine = echarts.init(document.getElementById('task'), theme);
-        echartLine.setOption( fromData( defaultBackendData ) );
-
-        $.get({
-            url: "{% url 'productivity_per_task' %}",
-            data: {department_id: 0},
-            success: function ( backendData )  {
-                defaultBackendData = backendData
-                echartLine.setOption( fromData( backendData ) );
-            }
-        });
+        echartLine.setOption( fromData( names, data ) );
 
         defaultRange = moment().startOf('month').format('MM/DD/YYYY') +' - '+ moment().endOf('month').format('MM/DD/YYYY')
         $('input[name="task_chart"]').val(defaultRange)
@@ -165,14 +156,14 @@
                     end_date: picker.endDate.format('YYYY-MM-DD')
                 },
                 success: function ( backendData )  {
-                    echartLine.setOption( fromData( backendData ) );
+                    echartLine.setOption( fromData( names, backendData ) );
                 }
             });
         });
 
         $('input[name="task_chart"]').on('cancel.daterangepicker', function(ev, picker) {
             $(this).val(defaultRange);
-            echartLine.setOption( fromData(  ) );
+            echartLine.setOption( fromData( names, data ) );
         });
     });
 </script>
