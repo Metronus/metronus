@@ -26,7 +26,12 @@ def show_field(field, required = True):
 def converto_to_hours(amount):
     hours = amount//60
     minutes = amount%60
-    return str(hours)+":"+str(minutes) if amount !=0 else ""
+    minutos = ""
+    if(minutes<10):
+        minutos = "0"+str(minutes)
+    else:
+        minutos = str(minutes)
+    return str(hours)+":"+minutos if amount !=0 else ""
 
 @register.simple_tag
 def is_weekend(day,month,year):

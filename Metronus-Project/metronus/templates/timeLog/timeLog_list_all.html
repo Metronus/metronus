@@ -58,12 +58,12 @@
 
                                         {% for duration in my_task.durations %}
                                             <td class="{% is_weekend forloop.counter currentMonth currentYear %}">
-                                                <a {% if duration != 0 %}
-                                                        data-href="{% url 'timeLog_delete' my_task.id %}"
+                                                <a {% if duration.0 != 0 %}
+                                                        data-href="{% url 'timeLog_delete' duration.1 %}"
                                                         data-toggle="modal" data-target="#confirm-delete"
                                                     {% endif %}>
 
-                                                    {% converto_to_hours duration %}
+                                                    {% converto_to_hours duration.0 %}
                                                 </a>
                                             </td>
                                         {% endfor %}

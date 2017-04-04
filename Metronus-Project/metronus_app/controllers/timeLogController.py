@@ -170,7 +170,7 @@ def list_all(request):
 
     month = [x for x in range(1,calendar.monthrange(currentYear,currentMonth)[1]+1)]
     month.append("Total")
-    total = [sum([x.durations[i] for x in my_tasks]) for i in range(0,calendar.monthrange(currentYear,currentMonth)[1]) ]
+    total = [sum([x.durations[i][0] for x in my_tasks]) for i in range(0,calendar.monthrange(currentYear,currentMonth)[1]) ]
     monthTotal = sum(total)
     total.append(monthTotal)
 
@@ -235,8 +235,8 @@ def createTimeLog(form, employee):
         raise PermissionDenied
     fduration = form.cleaned_data['duration']
     funits=form.cleaned_data['produced_units']
-    timeLog = findTimeLogByDescriptionAndDate(fdescription,fworkDate)
     task = findTask(form.cleaned_data['task_id'])
+    timeLog = findTimeLogByDateAndTask(fworkDate,task)
     if(timeLog is not None):
         timeLog.duration += fduration
         timeLog.produced_units+=funits
@@ -297,24 +297,25 @@ class myTask():
     durations = []
 
     def __init__(self, task, month, year):
+        totalDuration = 0
         self.id = task.id
         today = datetime.today()
         self.name = task.name
-        self.durations = [0 for x in range(0,calendar.monthrange(year,month)[1])]
+        self.durations = [(0,0) for x in range(0,calendar.monthrange(year,month)[1])]
         timeLogs = TimeLog.objects.filter(workDate__year__gte=year,workDate__month__gte=month,
                                      workDate__year__lte=year, workDate__month__lte=month,task_id=task.id)
 
         for tl in timeLogs:
             index = int(tl.workDate.day)-1
-            self.durations[index] += tl.duration
-        totalDuration = sum(self.durations)
-        self.durations.append(totalDuration)
+            self.durations[index] = (tl.duration,tl.id)
+            totalDuration += tl.duration
+        self.durations.append((totalDuration,0))
 
-def findTimeLogByDescriptionAndDate(tDescription,tDate):
+def findTimeLogByDateAndTask(tDate,task):
     #Vaya churro para comprobar que el dia, el mes y el año sean iguales
-    timeLog = TimeLog.objects.filter(description=tDescription,workDate__year__gte=tDate.date().year,workDate__month__gte=tDate.date().month,workDate__day__gte=tDate.date().day,
+    timeLog = TimeLog.objects.filter(workDate__year__gte=tDate.date().year,workDate__month__gte=tDate.date().month,workDate__day__gte=tDate.date().day,
                                      workDate__year__lte=tDate.date().year, workDate__month__lte=tDate.date().month,
-                                     workDate__day__lte=tDate.date().day).first()
+                                     workDate__day__lte=tDate.date().day,task_id=task).first()
     return timeLog
 
 def checkTimeLogOvertime(timeLog):
