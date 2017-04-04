@@ -271,8 +271,8 @@ class DepartmentMetricsTestCase(TestCase):
         department = Department.objects.get(name="Dep_rand")
         projects = Project.objects.filter(company_id__company_name="company1")
 
-        # Make the test run 3 times (this one's slow af)
-        for _ in range(3):
+        # Make the test run 1 time (this one's slow af)
+        for _ in range(1):
 
             TimeLog.objects.all().delete()
             Task.objects.all().delete()
@@ -344,8 +344,8 @@ class DepartmentMetricsTestCase(TestCase):
         department = Department.objects.get(name="Dep_rand")
         projects = Project.objects.filter(company_id__company_name="company1")
 
-        # Make the test run 10 times
-        for _ in range(10):
+        # Make the test run 5 times
+        for _ in range(5):
 
             TimeLog.objects.all().delete()
             Task.objects.all().delete()

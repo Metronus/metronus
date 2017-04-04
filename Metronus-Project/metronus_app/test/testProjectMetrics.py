@@ -226,8 +226,8 @@ class ProjectMetricsTestCase(TestCase):
         project = Project.objects.get(name="pro_random")
 
 
-        # Do the random test 10 times
-        for k in range(10):
+        # Do the random test 5 times
+        for k in range(5):
             ProjectDepartmentEmployeeRole.objects.all().delete()
             employees_per_dpmt = [random.choice(range(11)) for _ in range(len(departments))]
             true_data = {'names': [], 'values': []}
@@ -304,8 +304,8 @@ class ProjectMetricsTestCase(TestCase):
         departments = Department.objects.filter(company_id__company_name="company1")
         project = Project.objects.get(name="pro_random")
 
-        # Do the random test 10 times
-        for k in range(10):
+        # Do the random test 5 times
+        for k in range(5):
             Task.objects.all().delete()
             tasks_per_dpmt = [random.choice(range(11)) for _ in range(len(departments))]
             true_data = {'names': [], 'values': []}
@@ -392,9 +392,9 @@ class ProjectMetricsTestCase(TestCase):
         departments = Department.objects.filter(company_id__company_name="company1")
         project = Project.objects.get(name="pro_random")
 
-        # Do the random test 20 times
+        # Do the random test 5 times
 
-        for k in range(20):
+        for k in range(5):
 
             # Remove all tasks and time logs
             TimeLog.objects.all().delete()
