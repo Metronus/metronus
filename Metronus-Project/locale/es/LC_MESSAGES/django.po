@@ -277,6 +277,20 @@ msgstr "Seleccione departamento"
 msgid "departmentNotNull"
 msgstr "El departamento no puede ser nulo"
 
+#: Department's charts
+msgid "datePicker"
+msgstr "Filtrar por rango de fechas"
+msgid "depTaskChartTitle"
+msgstr "Horas por tarea"
+msgid "depTaskChartSubtitle"
+msgstr "Dentro del intervalo especificado"
+msgid "investedTime"
+msgstr "Tiempo invertido"
+msgid "default"
+msgstr "Por defecto"
+msgid "apply"
+msgstr "Aplicar"
+
 #: Employee
 msgid "registryDate"
 msgstr "Fecha de registro"
