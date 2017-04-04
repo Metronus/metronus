@@ -20,7 +20,7 @@ from django.contrib.auth import authenticate,login
 from django.http import JsonResponse
 from django.core import serializers
 from django.http import HttpResponse
-from django.db.models import Sum
+from django.db.models import F, FloatField
 
 from datetime import date, timedelta
 import re
@@ -276,7 +276,7 @@ def productivity_task_metric(task_id):
 
     # Get and parse the dates and the offset
     start_date = str(date.today())
-    end_date = str(date.today() - timedelta(days=30)) # Puesto a 3 meses vista
+    end_date = str(date.today() - timedelta(days=120)) # Puesto a 3 meses vista
     date_regex = re.compile("^\d{4}-\d{2}-\d{2}$")
 
     if date_regex.match(start_date) is None or date_regex.match(end_date) is None:
@@ -293,12 +293,19 @@ def productivity_task_metric(task_id):
     end_date += " 00:00" + offset
 
     # --------------------------------------------------------------------------
+    print(start_date)
+    print(end_date)
 
+    prod = []
+    production = TimeLog.objects.filter(task_id_id=task_id)\
+        .extra(select={'result': 'produced_units / duration'})\
+        .values_list('result', flat=True)
 
-    production = TimeLog.objects.filter(task_id=task_id, workDate__range=[start_date,end_date])\
-                                .aggregate(production=Sum('duration', field="produced_units/duration"))['production']
+    for i in production:
+        prod.append(i)
+    print(prod)
 
-    return production
+    return prod
 
 
 #Auxiliar methods, containing the operation logic

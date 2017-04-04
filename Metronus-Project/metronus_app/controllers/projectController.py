@@ -196,7 +196,7 @@ def delete(request,project_id):
 ############################################################################
 
 def ajax_employees_per_department(request):
-    # Devuelve un objeto cuyas claves son las ID de los departamentos y sus valores un objeto {'name': ..., 'employees': X}
+    # Devuelve un objeto {'names': [dpto1, dpto2...], 'values': [empleados1, empleados2...]}
 
     # Parámetros obligatorios:
     # project_id - ID del proyecto
@@ -213,18 +213,16 @@ def ajax_employees_per_department(request):
     # The first method checks that the project is fine
     project = Project.objects.get(id=project_id)
 
-    data = {}
+    data = {'names': [], 'values': []}
 
     for dpmt in company_departments:
-        data[dpmt.id] = {
-                            'name': dpmt.name,
-                            'employees': ProjectDepartmentEmployeeRole.objects.filter(projectDepartment_id__project_id=project, projectDepartment_id__department_id=dpmt).count()
-                        }
+        data['names'].append(dpmt.name)
+        data['values'].append(ProjectDepartmentEmployeeRole.objects.filter(projectDepartment_id__project_id=project, projectDepartment_id__department_id=dpmt).count())
 
     return JsonResponse(data)
 
 def ajax_tasks_per_department(request):
-    # Devuelve un objeto cuyas claves son las ID de los departamentos y sus valores un objeto {'name': ..., 'tasks': X}
+    # Devuelve un objeto {'names': [dpto1, dpto2...], 'values': [tareas1, tareas2...]}
 
     # Parámetros obligatorios:
     # project_id - ID del proyecto
@@ -241,18 +239,16 @@ def ajax_tasks_per_department(request):
     # The first method checks that the project is fine
     project = Project.objects.get(id=project_id)
 
-    data = {}
+    data = {'names': [], 'values': []}
 
     for dpmt in company_departments:
-        data[dpmt.id] = {
-                            'name': dpmt.name,
-                            'tasks': Task.objects.filter(projectDepartment_id__project_id=project, projectDepartment_id__department_id=dpmt).count()
-                        }
+        data['names'].append(dpmt.name)
+        data['values'].append(Task.objects.filter(projectDepartment_id__project_id=project, projectDepartment_id__department_id=dpmt).count())
 
     return JsonResponse(data)
 
 def ajax_time_per_department(request):
-    # Devuelve un objeto cuyas claves son las ID de los departamentos y sus valores un objeto {'name': ..., 'time': X} (X en minutos)
+    # Devuelve un objeto {'names': [dpto1, dpto2...], 'values': [tiempo1, tiempo2...]}
 
     # Parámetros obligatorios:
     # project_id - ID del proyecto
@@ -295,7 +291,7 @@ def ajax_time_per_department(request):
     # The first method checks that the project is fine
     project = Project.objects.get(id=project_id)
 
-    data = {}
+    data = {'names': [], 'values': []}
 
     for dpmt in company_departments:
         time_total = TimeLog.objects.filter(task_id__projectDepartment_id__project_id=project, task_id__projectDepartment_id__department_id=dpmt,
@@ -303,10 +299,8 @@ def ajax_time_per_department(request):
         if time_total is None: 
             time_total = 0
 
-        data[dpmt.id] = {
-                            'name': dpmt.name,
-                            'time': time_total
-                        }
+        data['names'].append(dpmt.name)
+        data['values'].append(time_total)
 
     return JsonResponse(data)
 

@@ -55,6 +55,7 @@ def create(request,
                     'admin': administrator,
                     'company': company.short_name,
                     'protocol': 'https' if use_https else 'http',
+                    'html': True
                 }
 
                 send_mail('Metronus Info.', email_template_name,

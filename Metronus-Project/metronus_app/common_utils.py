@@ -6,6 +6,7 @@ from metronus.settings                           import DEFAULT_FROM_EMAIL
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 from django.template import loader
 from django.core.mail import EmailMultiAlternatives
+from django.contrib.auth.models                  import User
 
 from PIL import Image
 
@@ -61,6 +62,14 @@ def get_or_none(model, *args, **kwargs):
         return None
 
 
+def check_user_email(email):
+    try:
+        User.objects.get(email=email)
+        return True
+    except User.DoesNotExist:
+        return False
+
+
 def check_company_contains_actor(company, username):
     ret = False
     actor_set = company.actor_set.all()
@@ -98,7 +107,6 @@ def send_mail(subject, email_template_name, recipients, html_email_template_name
     else:
         body = email_template_name
 
-    print(recipients)
     email_message = EmailMultiAlternatives(subject, body, email_from, recipients)
     if html_email_template_name is not None:
         html_email = loader.render_to_string(html_email_template_name, context)

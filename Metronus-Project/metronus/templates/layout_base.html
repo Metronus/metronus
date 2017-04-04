@@ -51,7 +51,11 @@
             <!-- menu profile quick info -->
             <div class="profile clearfix">
               <div class="profile_pic">
-                <img src="{{ MEDIA_URL }}{{user.actor.picture}}" alt="{{user.get_username}}" class="img-circle profile_img">
+                  {% if user.actor.picture == "/static/avatar.png" %}
+                      <img src="{{user.actor.picture}}" alt="{{user.get_username}}" class="img-circle profile_img">
+                  {% else %}
+                      <img src="{{ MEDIA_URL }}{{user.actor.picture}}" alt="{{user.get_username}}" class="img-circle profile_img">
+                  {% endif %}
               </div>
               <div class="profile_info">
                 <span>{% trans 'dashWelcome' %}, </span>
@@ -123,7 +127,12 @@
 
                 <li class="">
                   <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <img src="{{ MEDIA_URL }}{{user.actor.picture}}" alt="">{{user.first_name}} {{user.last_name}}
+                    {% if user.actor.picture == "/static/avatar.png" %}
+                      <img src="{{user.actor.picture}}" alt="{{user.get_username}}">
+                  {% else %}
+                      <img src="{{ MEDIA_URL }}{{user.actor.picture}}" alt="{{user.get_username}}">
+                  {% endif %}
+                      {{user.first_name}} {{user.last_name}}
                     <span class=" fa fa-angle-down"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-usermenu pull-right">
@@ -168,7 +177,6 @@
 		<script src="/static/js/bootstrap-progressbar.min.js"></script>
 		<script src="/static/js/icheck.min.js"></script>
 		<script src="/static/js/skycons.js"></script>
-		<script src="/static/js/custom.min.js"></script>
 		<script src="/static/js/validator.js"></script>
 		<script src="/static/js/bootstrap-datetimepicker.min.js"></script>
         <script src="/static/js/echarts.min.js"></script>
@@ -179,6 +187,7 @@
     {% block javascript %}
 
     {% endblock %}
+    <script src="/static/js/custom.min.js"></script>
 
     <!-- js -->
     {% compress js %}    
