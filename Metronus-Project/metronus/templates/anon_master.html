@@ -4,29 +4,36 @@
 
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <!-- Meta, title, CSS, favicons, etc. -->
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <meta name="description" content="Metronus, a productivity and profit driven project, where time is the most important variable and the variable which leads you towards success">
-
     <title>Metronus | {% block title %}{% endblock %}</title>
+    <meta name="description" content="Metronus, a productivity and profit driven project, where time is the most important variable and the variable which leads you towards success">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+		<!-- css -->
+    {% compress css %}
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/static/css/nprogress.css" rel="stylesheet">
+    <link href="/static/css/animate.min.css" rel="stylesheet">
+    <link href="/static/css/custom.min.css" rel="stylesheet">
+    {% endcompress %}
+
+		<!-- Favicon content -->
+		<link rel="apple-touch-icon" sizes="180x180" href="/static/landing/img/favicon/apple-icon-180x180.png">
+		<link rel="icon" type="image/png" sizes="192x192"  href="/static/landing/img/favicon/android-icon-192x192.png">
+
+		<!-- OpenGraph content -->
+		<meta property="og:title" content="Metronus" />
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://metronus.es" />
+		<meta property="og:image" content="/static/landing/img/favicon/android-icon-192x192.png" />
   </head>
 
   <body>
     {% block content %}{% endblock %}
   </body>
-
-  <!-- css-->
-  {% compress css %}
-  <link href="/static/css/bootstrap.min.css" rel="stylesheet">
-  <link href="/static/css/font-awesome.min.css" rel="stylesheet">
-  <link href="/static/css/nprogress.css" rel="stylesheet">
-  <link href="/static/css/animate.min.css" rel="stylesheet">
-  <link href="/static/css/custom.min.css" rel="stylesheet">
-  {% endcompress %}
 </html>
