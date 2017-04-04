@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.conf.urls               import url, include
 from django.contrib                 import admin
-from django.contrib.auth.views      import password_reset, password_reset_complete, password_reset_confirm, password_reset_done
+from django.contrib.auth.views      import password_reset_complete, password_reset_confirm, password_reset_done
 from metronus_app.admin             import admin_site
 from django.conf.urls.i18n          import i18n_patterns
 from metronus_app                   import views
@@ -130,7 +130,7 @@ urlpatterns += [#i18n_patterns(
     ])),
 
     # Pass recovery
-    url(r'^lost-password/$', password_reset, {'template_name': 'auth/password_reset.html',
+    url(r'^lost-password/$', appController.password_reset, {'template_name': 'auth/password_reset.html',
         'post_reset_redirect': '/reset-password/', 'from_email': DEFAULT_FROM_EMAIL,
         'email_template_name': 'auth/password_reset_email.html',
         'subject_template_name': 'auth/password_reset_subject.txt',

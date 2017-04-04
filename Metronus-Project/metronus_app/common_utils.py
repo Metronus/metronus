@@ -6,6 +6,7 @@ from metronus.settings                           import DEFAULT_FROM_EMAIL
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 from django.template import loader
 from django.core.mail import EmailMultiAlternatives
+from django.contrib.auth.models                  import User
 
 from PIL import Image
 
@@ -59,6 +60,14 @@ def get_or_none(model, *args, **kwargs):
         return model.objects.get(*args, **kwargs)
     except model.DoesNotExist:
         return None
+
+
+def check_user_email(email):
+    try:
+        User.objects.get(email=email)
+        return True
+    except User.DoesNotExist:
+        return False
 
 
 def check_company_contains_actor(company, username):
