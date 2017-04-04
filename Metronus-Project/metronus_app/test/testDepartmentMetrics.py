@@ -13,13 +13,30 @@ from metronus_app.model.role                          import Role
 from metronus_app.model.administrator                 import Administrator
 from metronus_app.model.department                    import Department
 
-import string, random
+import string, random, json
 
 def ranstr():
     # Returns a 10-character random string
     return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
 
 ### Son herramientas sorpresa que nos ayudarán más tarde
+
+def checkJsonMetricsAreEqual(self, response_string, data):
+    response = json.loads(response_string)
+
+    self.assertTrue('names' in response)
+    self.assertTrue('values' in response)
+
+    self.assertEquals(len(response['names']), len(data['names']))
+    self.assertEquals(len(response['values']), len(data['values']))
+
+    for (name, val) in zip(data['names'], data['values']):
+        self.assertTrue(name in response['names'])
+        self.assertTrue(val in response['values'])
+
+        ind = response['names'].index(name)
+
+        self.assertEquals(val, response['values'][ind])
 
 def createEmployeeInProjDept(project, department):
 
@@ -260,7 +277,7 @@ class DepartmentMetricsTestCase(TestCase):
             TimeLog.objects.all().delete()
             Task.objects.all().delete()
 
-            true_data = {}
+            true_data = {'names': [], 'values': []}
 
             for project in projects:
 
@@ -271,7 +288,8 @@ class DepartmentMetricsTestCase(TestCase):
                 for task in Task.objects.filter(projectDepartment_id__department_id = department, projectDepartment_id__project_id = project):
                     # Create between 2 and 20 employees, that will assign time to that task
                     num_employees = random.randint(2,20)
-                    true_data[str(task.id)] = {'name': task.name, 'employees': num_employees}
+                    true_data['names'].append(task.name)
+                    true_data['values'].append(num_employees)
 
                     for _ in range(num_employees):
                         employee = createEmployeeInProjDept(project, department)
@@ -282,7 +300,7 @@ class DepartmentMetricsTestCase(TestCase):
 
         response = c.get("/department/ajaxEmployeesPerTask?department_id=%d" % Department.objects.get(name="Dep_rand").id)
         self.assertEquals(response.status_code, 200)
-        self.assertJSONEqual(str(response.content, encoding='utf8'), true_data)
+        checkJsonMetricsAreEqual(self, str(response.content, encoding='utf8'), true_data)
     
     def test_access_denied_not_logged_timepertask(self):
         c = Client()
@@ -332,7 +350,7 @@ class DepartmentMetricsTestCase(TestCase):
             TimeLog.objects.all().delete()
             Task.objects.all().delete()
 
-            true_data = {}
+            true_data = {'names': [], 'values': []}
 
             for project in projects:
 
@@ -343,7 +361,7 @@ class DepartmentMetricsTestCase(TestCase):
                 for task in Task.objects.filter(projectDepartment_id__department_id = department, projectDepartment_id__project_id = project):
                     # Create between 2 and 10 employees, that will assign time to that task
                     num_employees = random.randint(2,10)
-                    true_data[str(task.id)] = {'name': task.name, 'time': 0}
+                    used_time = 0
 
                     for _ in range(num_employees):
                         employee = createEmployeeInProjDept(project, department)
@@ -357,8 +375,11 @@ class DepartmentMetricsTestCase(TestCase):
                             createTimelogInTask(task, time_worked, date_worked, employee)
 
                             if count:
-                                true_data[str(task.id)]['time'] += time_worked
+                                used_time += time_worked
+
+                    true_data['names'].append(task.name)
+                    true_data['values'].append(used_time)
 
         response = c.get("/department/ajaxTimePerTask?department_id=%d&start_date=2016-01-01&end_date=2016-12-31" % Department.objects.get(name="Dep_rand").id)
         self.assertEquals(response.status_code, 200)
-        self.assertJSONEqual(str(response.content, encoding='utf8'), true_data)
+        checkJsonMetricsAreEqual(self, str(response.content, encoding='utf8'), true_data)

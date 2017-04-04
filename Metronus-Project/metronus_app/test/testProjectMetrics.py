@@ -13,7 +13,24 @@ from metronus_app.model.role                          import Role
 from metronus_app.model.administrator                 import Administrator
 from metronus_app.model.department                    import Department
         
-import string, random
+import string, random, json
+
+def checkJsonMetricsAreEqual(self, response_string, data):
+    response = json.loads(response_string)
+
+    self.assertTrue('names' in response)
+    self.assertTrue('values' in response)
+
+    self.assertEquals(len(response['names']), len(data['names']))
+    self.assertEquals(len(response['values']), len(data['values']))
+
+    for (name, val) in zip(data['names'], data['values']):
+        self.assertTrue(name in response['names'])
+        self.assertTrue(val in response['values'])
+
+        ind = response['names'].index(name)
+
+        self.assertEquals(val, response['values'][ind])
 
 def ranstr():
     # Returns a 10-character random string
@@ -213,16 +230,14 @@ class ProjectMetricsTestCase(TestCase):
         for k in range(10):
             ProjectDepartmentEmployeeRole.objects.all().delete()
             employees_per_dpmt = [random.choice(range(11)) for _ in range(len(departments))]
-            true_data = {}
+            true_data = {'names': [], 'values': []}
 
             for i in range(len(departments)):
                 dpmt = departments[i]
                 employee_count = employees_per_dpmt[i]
 
-                true_data[str(dpmt.id)] = {
-                                        'name': dpmt.name,
-                                        'employees': employee_count
-                                     }
+                true_data['names'].append(dpmt.name)
+                true_data['values'].append(employee_count)
 
                 for _ in range(employee_count):
                     createEmployeeInProjDept(project, dpmt)
@@ -231,7 +246,7 @@ class ProjectMetricsTestCase(TestCase):
 
             response = c.get("/project/ajaxEmployeesPerDpmt?project_id=%d" % project.id)
             self.assertEquals(response.status_code, 200)
-            self.assertJSONEqual(str(response.content, encoding='utf8'), true_data)
+            checkJsonMetricsAreEqual(self, str(response.content, encoding='utf8'), true_data)
 
     def test_access_denied_not_logged_tasksperdmtp(self):
         c = Client()
@@ -293,16 +308,14 @@ class ProjectMetricsTestCase(TestCase):
         for k in range(10):
             Task.objects.all().delete()
             tasks_per_dpmt = [random.choice(range(11)) for _ in range(len(departments))]
-            true_data = {}
+            true_data = {'names': [], 'values': []}
 
             for i in range(len(departments)):
                 dpmt = departments[i]
                 task_count = tasks_per_dpmt[i]
 
-                true_data[str(dpmt.id)] = {
-                                        'name': dpmt.name,
-                                        'tasks': task_count
-                                     }
+                true_data['names'].append(dpmt.name)
+                true_data['values'].append(task_count)
 
                 for _ in range(task_count):
                     createTaskInProjDept(project, dpmt)
@@ -311,7 +324,7 @@ class ProjectMetricsTestCase(TestCase):
 
             response = c.get("/project/ajaxTasksPerDpmt?project_id=%d" % project.id)
             self.assertEquals(response.status_code, 200)
-            self.assertJSONEqual(str(response.content, encoding='utf8'), true_data)
+            checkJsonMetricsAreEqual(self, str(response.content, encoding='utf8'), true_data)
 
     def test_access_denied_not_logged_timeperdpmt(self):
         c = Client()
@@ -387,7 +400,7 @@ class ProjectMetricsTestCase(TestCase):
             TimeLog.objects.all().delete()
             Task.objects.all().delete()
 
-            true_data = {}
+            true_data = {'names': [], 'values': []}
 
             for i in range(len(departments)):
                 dpmt = departments[i]
@@ -397,7 +410,7 @@ class ProjectMetricsTestCase(TestCase):
                     createTaskInProjDept(project, dpmt)
 
                 # Initialize the true data for this department
-                true_data[str(dpmt.id)] = {'name': dpmt.name, 'time': 0}
+                used_time = 0
 
                 # Create between 1 and 20 timelogs for each department
                 for _ in range(random.randint(1,20)):
@@ -409,11 +422,14 @@ class ProjectMetricsTestCase(TestCase):
                     createTimelogInTask(task, duration, date)
 
                     if measure:
-                        true_data[str(dpmt.id)]["time"] += duration
+                        used_time += duration
+
+                true_data['names'].append(dpmt.name)
+                true_data['values'].append(used_time)
 
             # Check that the data returned by the AJAX query matches the generated data
 
             response = c.get("/project/ajaxTimePerDpmt?project_id=%d&start_date=2016-01-01&end_date=2017-01-01" % project.id)
             self.assertEquals(response.status_code, 200)
-            self.assertJSONEqual(str(response.content, encoding='utf8'), true_data)
+            checkJsonMetricsAreEqual(self, str(response.content, encoding='utf8'), true_data)
 
