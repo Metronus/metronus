@@ -37,7 +37,6 @@
             <td>{{task.registryDate}}</td>
 
             <td>
-              <a href="{% url 'timeLog_list' task.id %}" type="button" class="btn btn-success">{% trans 'timeLog' %}</a>
               <a href="{% url 'task_edit' task.id %}" type="button" class="btn btn-dark">{% trans 'edit' %}</a>
            
            <a href="#" class="btn btn-default" data-href="/task/delete/{{task.id}}/" data-toggle="modal" data-target="#confirm-delete">{% trans 'delete' %}</a>

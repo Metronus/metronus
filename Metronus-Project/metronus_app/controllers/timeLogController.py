@@ -22,76 +22,6 @@ import calendar
 from django.core import serializers
 
 
-def create_all(request):
-    valid_production_units=True
-    employee = get_current_employee_or_403(request)
-
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        form = TimeLog2Form(request, request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:
-            task = form.cleaned_data['task_id']
-            valid_production_units=checkProducedUnits(form)
-            if valid_production_units:
-                if task is not None:
-                    if task.active:
-                        createTimeLog(form,employee)
-                        return redirect('timeLog_list_all')
-
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        form = TimeLog2Form(request,initial={"timeLog_id":0, "workDate":datetime.now()})
-
-
-    return render(request, 'timeLog/timeLog_form.html', {'form': form,'valid_production_units':valid_production_units})
-
-def create_by_task(request,task_id):
-    """
-    valid_production_units: devuelve si se especificó production units y es necesario,
-    o si no se especificó y no era necesario
-    """
-    valid_production_units=True
-    employee = get_current_employee_or_403(request)
-    task = findTask(task_id)
-    checkPermissionForTask(employee,task)
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        form = TimeLogForm(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:
-            valid_production_units=checkProducedUnits(form)
-            if valid_production_units:
-                if task is not None:
-                    if task.active:
-                        createTimeLog(form, employee)
-                        return redirect('timeLog_list', task_id)
-
-
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        form = TimeLogForm(initial={"timeLog_id":0, "task_id":task_id, "workDate":datetime.now()})
-
-
-    return render(request, 'timeLog/timeLog_form.html', {'form': form,'valid_production_units':valid_production_units})
-
-
-def list(request, task_id):
-    employee = get_current_employee_or_403(request)
-    task = findTask(task_id)
-    checkPermissionForTask(employee, task)
-    if(checkRoleForTask(employee,task)):
-        lista = TimeLog.objects.filter(task_id=task_id) #Mando superior: Puede ver las imputaciones de cualquiera en esa tarea
-    else:
-        lista = TimeLog.objects.filter(task_id=task_id, employee_id=employee.id) #Empleado normal: Solo puede ver sus imputaciones en esa tarea
-    return render(request, "timeLog/timeLog_list.html", {"timeLogs": lista,"task":task})
-
 def list_all(request):
     """
     valid_production_units: devuelve si se especificó production units y es necesario,
@@ -126,13 +56,10 @@ def list_all(request):
         if project=='':
             return
         else:
-            print (project)
-            print (department)
             if department is None:
-                print (project)
                 departments = Department.objects.filter(company_id=actor.company_id,
                                                 projectdepartment__project_id=project,
-                                                projectdepartment__projectdepartmentemployeerole__employee_id=employee)
+                                                projectdepartment__projectdepartmentemployeerole__employee_id=employee).distinct()
 
                 data = serializers.serialize('json', departments, fields=('id','name',))
 
@@ -142,7 +69,7 @@ def list_all(request):
             else:
                 print (department)
                 tasks = Task.objects.filter(projectDepartment_id__department_id=department,
-                                            projectDepartment_id__project_id=project,active=True)
+                                            projectDepartment_id__project_id=project,active=True).distinct()
                 data = serializers.serialize('json', tasks, fields=('id', 'name',))
 
                 return HttpResponse(data)
@@ -179,33 +106,6 @@ def list_all(request):
     return render(request, "timeLog/timeLog_list_all.html", {"my_tasks": my_tasks, "month":month,"total":total, "currentMonth":currentMonth, "currentYear":currentYear, 
         "form":form,"valid_production_units":valid_production_units,"over_day_limit":over_day_limit})
 
-
-def edit(request, timeLog_id):
-    """
-    valid_production_units: devuelve si se especificó production units y es necesario, 
-    o si no se especificó y no era necesario
-    """
-    valid_production_units=True
-    
-    employee = get_current_employee_or_403(request)
-    timeLog = findTimeLog(timeLog_id)
-
-    if(employee.id==timeLog.employee_id.id):
-        if request.method == 'POST':
-            form = TimeLogForm(request.POST)
-            if form.is_valid():
-                valid_production_units=checkProducedUnits(form)
-                if valid_production_units:
-                    log = get_object_or_404(TimeLog,pk=form.cleaned_data['timeLog_id'])
-                    updateTimeLog(log,form)
-                    return redirect('timeLog_list',timeLog.task_id.id)
-        else:
-            log = get_object_or_404(TimeLog, pk=timeLog.id)
-            form = TimeLogForm(initial={"description":log.description,"duration":log.duration,
-                                        "workDate":log.workDate,"timeLog_id":log.id,"task_id":log.task_id.id})
-    else:
-        raise PermissionDenied
-    return render (request, 'timeLog/timeLog_form.html', {'form': form,'valid_production_units':valid_production_units})
 
 #Método para eliminar un registro siempre que la fecha del registro sea la misma que cuando se llama al método
 def delete(request, timeLog_id):
@@ -280,16 +180,6 @@ def checkRoleForTask(employee, task):
 def findTimeLog(timeLog_id):
     timeLog = get_object_or_404(TimeLog,pk=timeLog_id)
     return timeLog
-
-def updateTimeLog(timeLog,form):
-    if(timeLog.registryDate.date() < date.today()):
-        raise PermissionDenied
-    else:
-        timeLog.description = form.cleaned_data['description']
-        timeLog.workDate = form.cleaned_data['workDate']
-        timeLog.duration = form.cleaned_data['duration']
-        timeLog.produced_units=form.cleaned_data['produced_units']
-        timeLog.save()
 
 class myTask():
     id = 0
