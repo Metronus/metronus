@@ -43,7 +43,6 @@ def contact(request):
 
             copy_to_user = form.cleaned_data['copy_to_user']
 
-            print(form.cleaned_data['copy_to_user'])
             context = {
                 "html": False
             }

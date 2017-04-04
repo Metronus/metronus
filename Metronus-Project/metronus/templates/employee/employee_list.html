@@ -30,7 +30,15 @@
           <tr data-href="/employee/view/{{employee.user}}" style="cursor: pointer;">
             <th scope="row">{{forloop.counter}}</th>
 
-            <td><img src="{{ MEDIA_URL }}{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
+            <td>
+                {% if user.actor.picture == "/static/avatar.png" %}
+                    <img src="{{user.actor.picture}}" alt="{{user.get_username}}" class="avatar" alt="IMG">
+                {% else %}
+                    <img src="{{ MEDIA_URL }}{{user.actor.picture}}" alt="{{user.get_username}}" class="avatar" alt="IMG">
+                {% endif %}
+
+                {{employee.user}}
+            </td>
 
             <td>{{employee.identifier}}</td>
 
