@@ -20,10 +20,12 @@ from django.contrib.auth import authenticate,login
 from django.http import JsonResponse
 from django.core import serializers
 from django.http import HttpResponse
-from django.db.models import F, FloatField
 
 from datetime import date, timedelta
+from django.utils.dateparse import parse_datetime
+
 import re
+import calendar
 
 
 def create(request):
@@ -190,11 +192,8 @@ def view(request,task_id):
     task = get_object_or_404(Task, pk=task_id)
     checkTask(task, request)
     goal_evolution = GoalEvolution.objects.filter(task_id=task.id)
-
-    # Se obtienen todos los logs correspondientes a la tarea en un rango de un mes
-    productivity = productivity_task_metric(task.id)
   
-    return render(request, "task_view.html", {"task": task, "goal_evolution": goal_evolution, "productivity": productivity})
+    return render(request, "task_view.html", {"task": task, "goal_evolution": goal_evolution})
 
 def edit(request,task_id):
     """
@@ -298,19 +297,26 @@ def ajax_productivity_per_task(request):
     end_date += " 00:00" + offset
 
     # --------------------------------------------------------------------------
-    print(start_date)
-    print(end_date)
-
     data = {
-        'production': []
+        'production': [],
+        'goal_evolution': [],
+        'days':[]
     }
-    production = TimeLog.objects.filter(task_id_id=task_id)\
-        .extra(select={'result': 'produced_units / duration'})\
-        .values_list('result', flat=True)
+    production = TimeLog.objects.filter(task_id_id=task_id, workDate__range=[start_date, end_date])
 
-    for i in production:
-        data['production'].append(i)
-    print(data['production'])
+    z = 0
+    start_date_parse = parse_datetime(start_date)
+    for i in range(0, 31):
+        if len(production) > z and (production[z].workDate-start_date_parse).days == i:
+            data['production'].append(production[z].produced_units / production[z].duration)
+            z += 1
+        else:
+            data['production'].append(0)
+
+        data['goal_evolution'].append(production[0].task_id.production_goal)
+
+        prod_day = start_date_parse + timedelta(days=i)
+        data['days'].append(str(prod_day.day)+", "+str(calendar.month_name[prod_day.month]))
 
     return JsonResponse(data)
 

@@ -109,30 +109,6 @@
                     }
                 },
                 data: [10, 12, 21, 54, 260, 830, 710]
-            }, {
-                name: 'Pre-order',
-                type: 'line',
-                smooth: true,
-                itemStyle: {
-                    normal: {
-                        areaStyle: {
-                            type: 'default'
-                        }
-                    }
-                },
-                data: [30, 182, 434, 791, 390, 30, 10]
-            }, {
-                name: 'Intent',
-                type: 'line',
-                smooth: true,
-                itemStyle: {
-                    normal: {
-                        areaStyle: {
-                            type: 'default'
-                        }
-                    }
-                },
-                data: [0, 1132, 601, 234, 120, 90, 20]
             }]
         };
     }
@@ -155,7 +131,7 @@
         $('input[name="task_chart"]').on('apply.daterangepicker', function(ev, picker) {
             $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
             $.get({
-                url: "/department/ajaxTimePerTask",
+                url: "/task/ajaxTimePerTask",
                 data: {
                     department_id: 0,
                     start_date: picker.startDate.format('YYYY-MM-DD'),
