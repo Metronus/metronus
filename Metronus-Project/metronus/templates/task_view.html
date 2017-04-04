@@ -63,7 +63,7 @@
             legend: {
                 x: 220,
                 y: 40,
-                data: ['Intent', 'Pre-order', 'Deal']
+                data: ['Intent', 'Pre-order', 'Productivity']
             },
             toolbox: {
                 show: true,
@@ -139,6 +139,7 @@
 
     $(document).ready(function() {
         echartLine = echarts.init(document.getElementById('task'), theme);
+        echartLine.setOption( fromData(  ) );
 
         defaultRange = moment().startOf('month').format('MM/DD/YYYY') +' - '+ moment().endOf('month').format('MM/DD/YYYY')
         $('input[name="task_chart"]').val(defaultRange)
