@@ -291,6 +291,10 @@ msgid "default"
 msgstr "Default"
 msgid "apply"
 msgstr "Apply"
+msgid "empTaskChartTitle"
+msgstr "Employees per task"
+msgid "empTaskChartSubtitle"
+msgstr "For this department"
 
 #: Employee
 msgid "registryDate"

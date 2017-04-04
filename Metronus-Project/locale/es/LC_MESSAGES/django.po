@@ -290,6 +290,10 @@ msgid "default"
 msgstr "Por defecto"
 msgid "apply"
 msgstr "Aplicar"
+msgid "empTaskChartTitle"
+msgstr "Número de empleados por tarea"
+msgid "empTaskChartSubtitle"
+msgstr "De este departamento"
 
 #: Employee
 msgid "registryDate"
