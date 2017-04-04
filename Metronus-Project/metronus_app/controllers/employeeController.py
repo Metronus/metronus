@@ -22,7 +22,7 @@ from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEm
 
 from metronus_app.common_utils                   import get_current_admin_or_403, checkImage, get_current_employee_or_403, send_mail
 
-from datetime                                           import date, timedelta
+from datetime                                           import date, timedelta,datetime
 
 import re
 
@@ -134,7 +134,9 @@ def view(request, username):
 
     employee_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee)
 
-    return render(request, 'employee/employee_view.html', {'employee': employee, 'employee_roles': employee_roles})
+    #Find tasks related with the employee
+    tasks = Task.objects.filter(active=True,projectDepartment_id__projectdepartmentemployeerole__employee_id=employee,production_goal__isnull=False).distinct()
+    return render(request, 'employee/employee_view.html', {'employee': employee, 'employee_roles': employee_roles,'tasks':tasks})
 
 def edit(request, username):
     """
@@ -329,7 +331,7 @@ def ajax_productivity_per_task_and_date(request,username):
     # Si se proporcionan pero no tienen el formato correcto se lanzará un error HTTP 400 Bad Request
 
     #Ejemplo
-    #/employee/ajax_productivity_per_task_and_date/JoseGavilan?start_date=2015-01-01&end_date=2018-01-01
+    #/employee/ajax_productivity_per_task_and_date/JoseGavilan?start_date=2017-01-01&end_date=2017-06-01
     
     #devuelve lo siguiente
     #{"3": 
@@ -368,41 +370,57 @@ def ajax_productivity_per_task_and_date(request,username):
     if employee.company_id != logged.company_id:
         raise PermissionDenied
 
+    task_id=request.GET.get("task_id")
+    #Find task with id requested
+    task = Task.objects.filter(pk=task_id,active=True,projectDepartment_id__projectdepartmentemployeerole__employee_id=employee,production_goal__isnull=False).distinct().first()
+    if task is None:
+        return HttpResponseBadRequest("The task could not be found")
+
+    #Get all dates between start and end
+    dates=[]
+    strDates=[]
+    d1 = datetime.strptime(start_date[0:19]+start_date[20:22], '%Y-%m-%d %H:%M%z')
+    d2 = datetime.strptime(end_date[0:19]+end_date[20:22], '%Y-%m-%d %H:%M%z')
+    delta = d2 - d1         # timedelta
+
+    for i in range(delta.days + 1):
+        strDates.append((d1 + timedelta(days=i)).date().strftime("%Y-%m-%d"))
+        dates.append(d1 + timedelta(days=i))
+    print (len(dates))
+
+    data = {'dates':strDates,'task':{'task_id':task.id,'name': task.name,'real_productivity':[],'expected_productivity':[]}}
     
-    #Find tasks with timelog in date range and annotate the sum of the production and time
-    tasks = Task.objects.filter(active=True,timelog__employee_id=employee,production_goal__isnull=False,
-        timelog__workDate__range=[start_date,end_date]).values("timelog__workDate","id","registryDate","production_goal","name","timelog__produced_units","timelog__duration")
-    #print(tasks)
 
-    data = {}
-    #Save productivity for each task
-    for task in tasks:
+    #Save productivity for each  date
+    #for each date, we will find the asociated timelog
+    for logDate in dates:
+        log=TimeLog.objects.filter(task_id=task.id,workDate__year=logDate.year,workDate__month=logDate.month
+            ,workDate__day=logDate.day,employee_id=employee).first()
         
-        total_produced_units= task["timelog__produced_units"]
-        total_duration= task["timelog__duration"]
-        if total_duration is None or total_produced_units is None or total_duration==0: 
-            total_productivity = 0
+        if log is None:
+            #he did not work that day
+            total_productivity=0
         else:
-            #duration is in minutes, so we multiply by 60 (duration is in the denominator)
-            total_productivity = 60*total_produced_units/total_duration
+            total_produced_units= log.produced_units
+            total_duration= log.duration
+            if  total_duration==0: 
+                total_productivity = 0
+            else:
+                #duration is in minutes, so we multiply by 60 (duration is in the denominator)
+                total_productivity = 60*total_produced_units/total_duration
         
-        #find the registry date of production goal evolution which is closest to the workDate
-        expected_productivity=GoalEvolution.objects.filter(task_id_id=task["id"],
-            registryDate__lte=task["timelog__workDate"]).last()
+        #find the registry date of production goal evolution which is closest to the date
+        expected_productivity=GoalEvolution.objects.filter(task_id_id=task.id,
+            registryDate__gte=logDate).first()
 
-        #if we do not find the goal or if the workDate is after the last task update, it may be the current task goal
-        if expected_productivity is None or task["registryDate"]<=task["timelog__workDate"]:
-            expected_productivity=task["production_goal"]
+        #if we do not find the goal or if the date is after the last task update, it may be the current task goal
+        if expected_productivity is None or task.registryDate<=logDate:
+            expected_productivity=task.production_goal
         else:
             expected_productivity=expected_productivity.production_goal
 
-        if data.get(task["id"]) is None:
-            data[task["id"]]={'name': task["name"]}
-        data[task["id"]][task["timelog__workDate"].date().strftime("%Y-%m-%d")] = {
-                            'expected_productivity':expected_productivity,
-                            'workDate':task["timelog__workDate"],
-                            'total_productivity': total_productivity
-                        }
+        data["task"]["real_productivity"].append(total_productivity)
+        data["task"]["expected_productivity"].append(expected_productivity)
 
     return JsonResponse(data)
 

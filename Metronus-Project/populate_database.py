@@ -261,7 +261,7 @@ def basicLoad():
     #if we want to force a date in registryDate
     GoalEvolution.objects.filter(pk=ge1.id).update(registryDate = "2017-02-11 15:30+00:00")
     GoalEvolution.objects.filter(pk=ge2.id).update(registryDate = "2017-02-13 15:30+00:00")
-    
+    Task.objects.filter(pk=task3.id).update(registryDate = "2017-02-13 16:30+00:00")
 def create_user(nombre,company2):
     User.objects.create_user(
         username=nombre,

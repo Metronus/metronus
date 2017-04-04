@@ -330,6 +330,12 @@ msgid "changepw_mail_body"
 msgstr "Tu contraseña ha sido cambiada por un administrador. Por favor, contacta a tus superiores para obtener información sobre este cambio."
 msgid "changepw_mail_subject"
 msgstr "Tu contraseña ha cambiado"
+msgid "productivityGraphic"
+msgstr "Gráfico de productividad"
+msgid "realProductivity"
+msgstr "Productividad real"
+msgid "expectedProductivity"
+msgstr "Productividad esperada"
 
 
 #: Project

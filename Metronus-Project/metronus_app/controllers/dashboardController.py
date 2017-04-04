@@ -1,5 +1,5 @@
 from metronus_app.common_utils import get_current_admin_or_403,get_current_employee_or_403
-
+from django.shortcuts import render
 from django.core.exceptions                             import ObjectDoesNotExist, PermissionDenied
 from django.http                                        import HttpResponseForbidden, HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
 from django.contrib.auth                                import authenticate,login
@@ -21,7 +21,8 @@ from django.core import serializers
 from metronus_app.model.projectDepartment             import ProjectDepartment
 
 import re
-
+def view(request):
+    return render(request, 'dashboard.html')
 
 def ajax_time_per_project(request):
     # Devuelve un objeto cuyas claves son las ID de los proyectos y sus valores un objeto {'name': ..., 'time': X} (X en minutos)

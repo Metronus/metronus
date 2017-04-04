@@ -329,7 +329,12 @@ msgid "changepw_mail_body"
 msgstr "Your password has been changed by an administrator. Please contact your superiors to acquire information on this change."
 msgid "changepw_mail_subject"
 msgstr "Your password has been changed"
-
+msgid "productivityGraphic"
+msgstr "Productivity graphic"
+msgid "realProductivity"
+msgstr "Real productivity"
+msgid "expectedProductivity"
+msgstr "Expected productivity"
 
 #: Project
 msgid "project"
