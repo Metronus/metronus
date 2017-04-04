@@ -1,5 +1,4 @@
 from django.shortcuts import render,redirect
-from metronus_app.forms.timeLogForm import TimeLogForm
 from metronus_app.forms.timeLog2Form import TimeLog2Form
 from metronus_app.model.task import Task
 from django.shortcuts import render_to_response, get_object_or_404
