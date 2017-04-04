@@ -192,7 +192,7 @@ def view(request,task_id):
     goal_evolution = GoalEvolution.objects.filter(task_id=task.id)
 
     # Se obtienen todos los logs correspondientes a la tarea en un rango de un mes
-    productivity = productivity_task_metric(task.id)
+    productivity = [x for x in range(1,15)]#productivity_task_metric(task.id)
   
     return render(request, "task_view.html", {"task": task, "goal_evolution": goal_evolution, "productivity": productivity})
 
