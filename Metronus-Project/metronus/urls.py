@@ -64,6 +64,7 @@ urlpatterns += [#i18n_patterns(
     url(r'^task/edit/(?P<task_id>\w{0,50})/$', taskController.edit, name='task_edit'),
     url(r'^task/delete/(?P<task_id>\w{0,50})/$', taskController.delete, name='task_delete'),
     url(r'^task/getdepartments$', taskController.form_departments),
+    url(r'^task/ajaxProdPerTask', taskController.ajax_productivity_per_task, name='productivity_per_task'),
 
     #Project
     url(r'^project/list$', projectController.list, name='project_list'),

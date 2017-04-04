@@ -270,19 +270,24 @@ def delete(request,task_id):
 
 #Métodos para métricas
 
-def productivity_task_metric(task_id):
+def ajax_productivity_per_task(request):
 
     # ------------------------- Cortesía de Agu ------------------------------
 
+    if "task_id" not in request.GET:
+        return HttpResponseBadRequest()
+
+    task_id = request.GET["task_id"]
+
     # Get and parse the dates and the offset
-    start_date = str(date.today())
-    end_date = str(date.today() - timedelta(days=120)) # Puesto a 3 meses vista
+    start_date = request.GET.get("start_date", str(date.today()))
+    end_date = request.GET.get("end_date", str(date.today() - timedelta(days=30)))
     date_regex = re.compile("^\d{4}-\d{2}-\d{2}$")
 
     if date_regex.match(start_date) is None or date_regex.match(end_date) is None:
         return HttpResponseBadRequest("Start/end date are not valid")
 
-    offset = "+00:00"
+    offset = request.GET.get("offset", "+00:00")
     offset_regex = re.compile("^(\+|-)\d{2}:\d{2}$")
 
     if offset_regex.match(offset) is None:
@@ -296,16 +301,18 @@ def productivity_task_metric(task_id):
     print(start_date)
     print(end_date)
 
-    prod = []
+    data = {
+        'production': []
+    }
     production = TimeLog.objects.filter(task_id_id=task_id)\
         .extra(select={'result': 'produced_units / duration'})\
         .values_list('result', flat=True)
 
     for i in production:
-        prod.append(i)
-    print(prod)
+        data['production'].append(i)
+    print(data['production'])
 
-    return prod
+    return JsonResponse(data)
 
 
 #Auxiliar methods, containing the operation logic
