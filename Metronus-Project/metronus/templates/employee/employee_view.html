@@ -134,14 +134,13 @@
 
 </div>
 <h3> {% trans 'Productivity' %}</h3>
- <div class="task_space">
-      {% for task in tasks %}
-       <input type="button" class="btn btn-success submit-button" value="{{task.name}}" onclick="ajax_productivity({{task.id}});" />
-             
-      {% endfor %}
+ <div id="task_space">
+  {#   here go the tasks, with their total productivities, loads on document ready with an ajax call#}
 
  </div>
+
   <div class="x_content row">
+   {#  by clicking on the tasks above, a graphic is displayed with the diary productivities #}
     <div id="task" style="height:350px;"></div>
   </div>
 {% endblock %}
@@ -151,6 +150,7 @@
 $('#confirm-delete').on('show.bs.modal', function(e) {
     $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
 });
+//the theme is for the graphic style
     var theme = {
         color: [
             '#26B99A', '#34495E', '#BDC3C7', '#3498DB',
@@ -447,6 +447,7 @@ $('#confirm-delete').on('show.bs.modal', function(e) {
 
 }
 function ajax_productivity(id) {
+  //loads diary productivities for the specified tasj
       $.get({
         url: '/employee/ajax_productivity_per_task_and_date/{{employee.user.username}}',
         data:{task_id:id,
@@ -461,6 +462,29 @@ function ajax_productivity(id) {
           // Error
       })
     }
+$(document).ready(function() {
+    //loads all tasks for the employee, with total producitivity
+      $.get({
+        url: "/employee/ajax_productivity_per_task/{{employee.user.username}}",
+        
+        success: function ( backendData )  {
+          space=document.getElementById('task_space')
+          all=""
+          
+          for (var task in backendData ){
+              all+="<div>";
+              all+="<input type='button' class='btn btn-success submit-button' value='" + 
+              backendData[task]["name"] + "' onclick='ajax_productivity("+task+");' />";
+              all+="Expected:"+backendData[task]["expected_productivity"]+";Total:"+
+              backendData[task]["total_productivity"]+"";
+              all+="</div>";
+           }
+            space.innerHTML =all     
+        }
+      })
+  });
     </script>
+
+
 {% endblock %}
 

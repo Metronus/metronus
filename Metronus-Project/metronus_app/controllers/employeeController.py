@@ -2,7 +2,7 @@ from django.contrib.auth.models                  import User
 from django.shortcuts                            import render
 from django.shortcuts                            import render_to_response, get_object_or_404
 from django.core.urlresolvers                    import reverse
-from django.http                                 import HttpResponseRedirect, JsonResponse
+from django.http                                 import HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
 from django.template.context                     import RequestContext
 from django.core.exceptions                      import ObjectDoesNotExist, PermissionDenied
 from django.utils.translation                    import ugettext_lazy
@@ -15,9 +15,9 @@ from metronus_app.forms.employeePasswordForm     import EmployeePasswordForm
 from metronus_app.model.employee                 import Employee
 from metronus_app.model.employeeLog              import EmployeeLog
 from metronus_app.model.administrator            import Administrator
-from metronus_app.model.task                            import Task
-from metronus_app.model.goalEvolution                            import GoalEvolution
-from metronus_app.model.timeLog                         import TimeLog
+from metronus_app.model.task                     import Task
+from metronus_app.model.goalEvolution            import GoalEvolution
+from metronus_app.model.timeLog                  import TimeLog
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 
 from metronus_app.common_utils                   import get_current_admin_or_403, checkImage, get_current_employee_or_403, send_mail
@@ -134,9 +134,7 @@ def view(request, username):
 
     employee_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee)
 
-    #Find tasks related with the employee
-    tasks = Task.objects.filter(active=True,projectDepartment_id__projectdepartmentemployeerole__employee_id=employee,production_goal__isnull=False).distinct()
-    return render(request, 'employee/employee_view.html', {'employee': employee, 'employee_roles': employee_roles,'tasks':tasks})
+    return render(request, 'employee/employee_view.html', {'employee': employee, 'employee_roles': employee_roles})
 
 def edit(request, username):
     """
@@ -295,8 +293,9 @@ def ajax_productivity_per_task(request,username):
         raise PermissionDenied
 
     #Find tasks with timelog in date range and annotate the sum of the production and time
-    tasks = Task.objects.filter(active=True,timelog__employee_id=employee,production_goal__isnull=False
-        ).annotate(total_produced_units=Sum("timelog__produced_units"),total_duration=Sum("timelog__duration"))
+    tasks = Task.objects.filter(active=True,projectDepartment_id__projectdepartmentemployeerole__employee_id=employee,
+            production_goal__isnull=False).distinct().annotate(
+            total_produced_units=Sum("timelog__produced_units"),total_duration=Sum("timelog__duration"))
 
     data = {}
     #Save productivity for each task
@@ -320,8 +319,11 @@ def ajax_productivity_per_task(request,username):
 
 def ajax_productivity_per_task_and_date(request,username):
     # url = employee/ajax_productivity_per_task/<username>
-    # Devuelve un objeto cuyas claves son las ID de los proyectos y sus valores un objeto 
+    # Devuelve un objeto con las fechas y las productividades de la tarea real y esperada
     #{'name': ..., 'total_productivity': X,'expected_productivity':Y} (X en unidades goal_description/hora)
+
+    # Parámetro obligatorio:
+    # task_id: el id de la tarea en cuestión
 
     # Parámetros opcionales: 
     # start_date - fecha en formato YYYY-MM-DD que indica el inicio de la medición. Por defecto, 30 días antes de la fecha actual.
@@ -331,16 +333,16 @@ def ajax_productivity_per_task_and_date(request,username):
     # Si se proporcionan pero no tienen el formato correcto se lanzará un error HTTP 400 Bad Request
 
     #Ejemplo
-    #/employee/ajax_productivity_per_task_and_date/JoseGavilan?start_date=2017-01-01&end_date=2017-06-01
+    #/employee/ajax_productivity_per_task_and_date/JoseGavilan?task_id=3&start_date=2017-02-05&end_date=2017-02-16
     
     #devuelve lo siguiente
-    #{"3": 
-    #   {"2017-02-12": 
-    #       {"workDate": "2017-02-12T15:30:00Z", "total_productivity": 1.2, "expected_productivity": 9.0}, 
-    #   "name": "Hacer cosas de front", 
-    #   "2017-02-14": 
-    #       {"workDate": "2017-02-14T15:30:00Z", "total_productivity": 0.225, "expected_productivity": 4.0}}}
-
+    #{"dates": 
+    #   ["2017-02-05", "2017-02-06", "2017-02-07", "2017-02-08", "2017-02-09", "2017-02-10", "2017-02-11", "2017-02-12", "2017-02-13", "2017-02-14", "2017-02-15", "2017-02-16"], 
+    #"task": {"name": "Hacer cosas de front", 
+    #   "real_productivity": [0, 0, 0, 0, 0, 0, 0, 1.2, 0, 0.225, 0, 0], 
+    #   "task_id": 3, 
+    #   "expected_productivity": [9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 4.0, 4.0, 2.0, 2.0, 2.0]}}
+    
     # Get and parse the dates
     start_date = request.GET.get("start_date", str(date.today()))
     end_date = request.GET.get("end_date", str(date.today() - timedelta(days=30)))
