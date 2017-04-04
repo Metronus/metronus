@@ -283,7 +283,10 @@ def ajax_time_per_task(request):
     logged = request.user.actor
     dpmt_tasks = Task.objects.filter(active = True, projectDepartment_id__department_id__id = department_id)
 
-    data = {}
+    data = {
+        'names' : [],
+        'times' : []
+    }
 
     for task in dpmt_tasks:
         time_total = TimeLog.objects.filter(task_id = task, workDate__range = [start_date, end_date]).aggregate(Sum('duration'))["duration__sum"]
@@ -291,10 +294,8 @@ def ajax_time_per_task(request):
         if time_total is None: 
             time_total = 0
 
-        data[task.id] = {
-                            'name': task.name,
-                            'time': time_total
-                        }
+        data['names'].append(task.name)
+        data['times'].append(time_total)
 
     return JsonResponse(data)
 
