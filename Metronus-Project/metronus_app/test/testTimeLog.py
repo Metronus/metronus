@@ -88,11 +88,11 @@ class TimeLogTestCase(TestCase):
 
         log = TimeLog.objects.all().last()
         self.assertEquals(log.description, "algno")
-        self.assertEquals(log.duration,2.0)
-        self.assertEquals(log.produced_units,0.5)
+        self.assertEquals(log.duration,4.0)
+        self.assertEquals(log.produced_units,3.0)
         logs_after = TimeLog.objects.all().count()
 
-        self.assertEquals(logs_before + 2, logs_after)
+        self.assertEquals(logs_before + 1, logs_after)
 
         
 
@@ -144,7 +144,7 @@ class TimeLogTestCase(TestCase):
         log = TimeLog.objects.all().last()
         self.assertEquals(log.description, "alguno")
         self.assertEquals(log.duration,4.0)
-        self.assertEquals(log.produced_units,2.5)
+        self.assertEquals(log.produced_units,3.0)
         logs_after = TimeLog.objects.all().count()
 
         self.assertEquals(logs_before + 1, logs_after)

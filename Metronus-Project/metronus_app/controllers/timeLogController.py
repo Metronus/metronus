@@ -140,6 +140,8 @@ def createTimeLog(form, employee):
     if(timeLog is not None):
         timeLog.duration += fduration
         timeLog.produced_units+=funits
+        timeLog.description = fdescription
+        timeLog.produced_units += funits
         timeLog.save()
     else:
         TimeLog.objects.create(description=fdescription,workDate=fworkDate,duration=fduration,task_id=task,employee_id=employee,produced_units=funits)
