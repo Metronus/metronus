@@ -54,6 +54,28 @@
             </div>
         </div>
 
+          <!-- MISILES -->
+
+<!--        
+        <div class="">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                <canvas class="canvasDoughnutD" height="200" width="200"></canvas>
+            </div>
+        </div>
+        </div>
+     -->
+
+    
+        <div class="x_panel">
+            <div class="x_content">
+                <div id="echart_donutD" style="height:350px;"></div>
+            </div>
+        </div>
+
+
+        <!-- FIN MISILES -->
+
         <div class="clearfix"></div>
 
         <div class="">
@@ -106,7 +128,6 @@
                 </div>
             </div>
         </div>
-
         <div class="">
             <div class="col-xs-12">
                 <div class="x_panel">
@@ -148,5 +169,167 @@
 {% block javascript %}
 <script>
     $("[data-href]").click( function () { window.location.href = this.dataset.href })
+</script>
+
+
+<script>
+
+$(document).ready(function() {
+      var echartDonut = echarts.init(document.getElementById('echart_donutD'), theme);
+              
+      var defaultBackendData = { 'names': [''], 'values': [0] };
+      $.get({
+        url: "/project/ajaxEmployeesPerDpmt",
+        data: {project_id: {{project.id}}},
+        success: function ( backendData )  {
+          defaultBackendData = backendData
+          echartDonut.setOption(fromData(backendData));
+        }
+      })
+    });
+
+function fromData (backendData) {
+             var opts = {
+                  title : {
+                  text: '{% trans 'deparmentsInfo' %}',
+                  subtext: '{% trans 'employeesByDepartment' %}',
+                  x: 'left'
+                },
+                tooltip: {
+                  trigger: 'item',
+                  formatter: "{a} <br/>{b} : {c} ({d}%)"
+                },
+                calculable: true,
+                legend: {
+                  x: 'left',
+                  y: 'center',
+                  orient:'vertical',
+                  data: (function () {
+                          var res = [];
+                          for (var i in backendData.names) {
+                              res.push(backendData.names[i]);
+                          };
+                          return res;
+                      })()
+                },
+                toolbox: {
+                  show: true,
+                  feature: {
+                    magicType: {
+                      show: true,
+                      type: ['pie', 'funnel'],
+                      option: {
+                        funnel: {
+                          x: '25%',
+                          width: '50%',
+                          funnelAlign: 'center',
+                          max: 1548
+                        }
+                      }
+                    },
+                    restore: {
+                      show: true,
+                      title: "Restore"
+                    },
+                    saveAsImage: {
+                      show: true,
+                      title: "Save Image"
+                    }
+                  }
+                },
+                series: [{
+                  name: 'Information',
+                  type: 'pie',
+                  radius: ['35%', '55%'],
+                  itemStyle: {
+                    normal: {
+                      label: {
+                        show: true
+                      },
+                      labelLine: {
+                        show: true
+                      }
+                    },
+                    emphasis: {
+                      label: {
+                        show: true,
+                        position: 'center',
+                        textStyle: {
+                          fontSize: '14',
+                          fontWeight: 'normal'
+                        }
+                      }
+                    }
+                  },
+                  data: (function () {
+                          var res = [];
+                          for (var n in backendData.values) {
+                              var obj = {
+                                  name: backendData.names[n],
+                                  value: backendData.values[n]
+                              };
+                                res.push(obj);
+
+                            }
+                          return res;
+                      })()
+                }]
+              }
+              return opts;
+          }
+
+
+</script>
+
+
+<script>
+/*    var chart_doughnut_settings = {
+                type: 'doughnut',
+                tooltipFillColor: "rgba(51, 51, 51, 0.55)",
+                data: {
+                    labels: [
+                        "Diseño",
+                        "Programación",
+                        "Arte"
+                    ],
+                    datasets: [{
+                        data: [1, 2, 1],
+                        backgroundColor: [
+                            "#BDC3C7",
+                            "#9B59B6",
+                            "#E74C3C",
+                            "#26B99A",
+                            "#3498DB"
+                        ],
+                        hoverBackgroundColor: [
+                            "#CFD4D8",
+                            "#B370CF",
+                            "#E95E4F",
+                            "#36CAAB",
+                            "#49A9EA"
+                        ]
+                    }]
+                },
+                options: { 
+                    legend: {
+                        display: true,
+                        fullWidth: true,
+                        position: 'left'
+
+                    },
+                    responsive: false 
+                   
+                },
+                
+            };
+        
+            $('.canvasDoughnutD').each(function(){
+                
+                var chart_element = $(this);
+                var chart_doughnut = new Chart( chart_element, chart_doughnut_settings);
+                
+            });*/
+
+
 </script>
 {% endblock %}

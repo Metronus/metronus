@@ -16,22 +16,25 @@
         <div class="">
             <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="x_panel">
-
-
-                    <div class="x_title"  style="display:flex; justify-content: center;">
-                        <form class="form-horizontal">
-                            <label>{% trans 'datePicker' %}</label>
-                            <fieldset>
-                                <div class="control-group">
-                                    <div class="controls">
-                                        <div class="input-prepend input-group">
-                                            <span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
-                                            <input type="text" style="width: 200px" name="task_chart" id="task_chart" class="form-control" value="" />
+                    <div class="row x_title">
+                        <div class="col-md-6">
+                            <h2>{% trans 'datePicker' %}</h2>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="pull-right">
+                                <fieldset>
+                                    <div class="control-group">
+                                        <div class="controls">
+                                            <div class="input-prepend input-group">
+                                                <span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
+                                                <input type="text" style="width: 200px" name="task_chart" id="task_chart" class="form-control" value="" />
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </fieldset>
-                        </form>
+                                </fieldset>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
                     </div>
 
                     <div class="clearfix"></div>
@@ -51,7 +54,7 @@
 
 
 <script>
-    function fromData() {
+    function fromData(names, data) {
         return {
             title: {
                 text: 'Line Graph',
@@ -63,7 +66,7 @@
             legend: {
                 x: 220,
                 y: 40,
-                data: ['Intent', 'Pre-order', 'Productivity']
+                data: names
             },
             toolbox: {
                 show: true,
@@ -98,7 +101,7 @@
                 type: 'value'
             }],
             series: [{
-                name: 'Productivity',
+                name: names[0],
                 type: 'line',
                 smooth: true,
                 itemStyle: {
@@ -108,14 +111,30 @@
                         }
                     }
                 },
-                data: [10, 12, 21, 54, 260, 830, 710]
+
+                data: data.productivity
+            }, {
+                name: names[1],
+                type: 'line',
+                smooth: true,
+                itemStyle: {
+                    normal: {
+                        areaStyle: {
+                            type: 'default'
+                        }
+                    }
+                },
+                data: data.goal_evolution
             }]
         };
     }
 
     $(document).ready(function() {
+        names = ['Intent', 'Pre-order'];
+        data = {'productivity': [30, 182, 434, 791, 390, 30, 10], 'goal_evolution': [0, 1132, 601, 234, 120, 90, 20] };
+
         echartLine = echarts.init(document.getElementById('task'), theme);
-        echartLine.setOption( fromData(  ) );
+        echartLine.setOption( fromData( names, data ) );
 
         defaultRange = moment().startOf('month').format('MM/DD/YYYY') +' - '+ moment().endOf('month').format('MM/DD/YYYY')
         $('input[name="task_chart"]').val(defaultRange)
@@ -131,21 +150,21 @@
         $('input[name="task_chart"]').on('apply.daterangepicker', function(ev, picker) {
             $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
             $.get({
-                url: "/task/ajaxTimePerTask",
+                url: "{% url 'productivity_per_task' %}",
                 data: {
-                    department_id: 0,
+                    task_id: {{ task.id }},
                     start_date: picker.startDate.format('YYYY-MM-DD'),
                     end_date: picker.endDate.format('YYYY-MM-DD')
                 },
                 success: function ( backendData )  {
-                    echartLine.setOption( fromData( backendData ) );
+                    echartLine.setOption( fromData( names, backendData ) );
                 }
             });
         });
 
         $('input[name="task_chart"]').on('cancel.daterangepicker', function(ev, picker) {
             $(this).val(defaultRange);
-            echartLine.setOption( fromData(  ) );
+            echartLine.setOption( fromData( names, data ) );
         });
     });
 </script>
