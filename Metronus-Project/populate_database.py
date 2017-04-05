@@ -294,5 +294,5 @@ def populate_roles():
 #############################################################################
 
 def populate_database():
-#    basicLoad()
-    randomLoad()
+    basicLoad()
+#    randomLoad()
