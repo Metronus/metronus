@@ -163,7 +163,7 @@ def randomLoad():
     for i in range(len(departments)-1):
         dpmt = departments[i]
         for j in range(len(projects)-1):
-            project=projects[i]
+            project=projects[j]
             # Create between 1 and 7 employees for each department and project
             for _ in range(random.randint(2,7)):
                 createEmployeeInProjDept(project, dpmt,company)
