@@ -89,9 +89,9 @@
 		              {% if  editing == True %}
                             {% for dep in roles %}
                             {% if form.role_id.value == dep.id %} 
-                            <option value="{{ dep.id }}"selected>{{ dep.name }}</option>
+                            <option value="{{ dep.id }}"selected>{% trans dep.name %}</option>
                             {% else %}
-                            <option value="{{ dep.id }}">{{ dep.name }}</option>
+                            <option value="{{ dep.id }}">{% trans dep.name %}</option>
                             {% endif %}
                             {% endfor %}
                         {% endif %}
@@ -233,11 +233,42 @@ function ajaxRole(){
     function(returnedData){
          $.each(returnedData, function(i, obj){
                     if("{{form.role_id.value}}"==obj.id){
-                        $('#id_{{ form.role_id.name }}').append("<option value='"+obj.id+"' selected>{% trans '"+obj.name+"' %}</option>");
+                        if(obj.name=='EMPLOYEE'){
+                            $('#id_{{ form.role_id.name }}').append("<option value='"+obj.id+"'selected>{% trans 'EMPLOYEE' %}</option>");
+                        }
+                        else if(obj.name=='COORDINATOR'){
+                            $('#id_{{ form.role_id.name }}').append("<option value='"+obj.id+"'selected>{% trans 'COORDINATOR' %}</option>");
+                        }
+                        else if(obj.name=='PROJECT_MANAGER'){
+                            $('#id_{{ form.role_id.name }}').append("<option value='"+obj.id+"'selected>{% trans 'PROJECT_MANAGER' %}</option>");
+                        }
+                        else if(obj.name=='TEAM_MANAGER'){
+                            $('#id_{{ form.role_id.name }}').append("<option value='"+obj.id+"'selected>{% trans 'TEAM_MANAGER' %}</option>");
+                        }
+                        else if(obj.name=='EXECUTIVE'){
+                            $('#id_{{ form.role_id.name }}').append("<option value='"+obj.id+"'selected>{% trans 'EXECUTIVE' %}</option>");
+                        }
                     }
                     else{
+                        if(obj.name=='EMPLOYEE'){
+                            $('#id_{{ form.role_id.name }}').append("<option value='"+obj.id+"'>{% trans 'EMPLOYEE' %}</option>");
+                        }
+                        else if(obj.name=='COORDINATOR'){
+                            $('#id_{{ form.role_id.name }}').append("<option value='"+obj.id+"'>{% trans 'COORDINATOR' %}</option>");
+                        }
+                        else if(obj.name=='PROJECT_MANAGER'){
+                            $('#id_{{ form.role_id.name }}').append("<option value='"+obj.id+"'>{% trans 'PROJECT_MANAGER' %}</option>");
+                        }
+                        else if(obj.name=='TEAM_MANAGER'){
+                            $('#id_{{ form.role_id.name }}').append("<option value='"+obj.id+"'>{% trans 'TEAM_MANAGER' %}</option>");
+                        }
+                        else if(obj.name=='EXECUTIVE'){
+                            $('#id_{{ form.role_id.name }}').append("<option value='"+obj.id+"'>{% trans 'EXECUTIVE' %}</option>");
+                        }
+                        else{
                         $('#id_{{ form.role_id.name }}').append("<option value='"+obj.id+"'>{% trans '"+obj.name+"' %}</option>");
                         console.log("<option value='"+obj.id+"'>{% trans '"+obj.name+"' %}</option>");
+                        }
                     }
                     
             });

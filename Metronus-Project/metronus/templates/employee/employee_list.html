@@ -20,14 +20,15 @@
             <th>#</th>
             <th>{% trans 'username' %}</th>
             <th>{% trans 'identifier' %}</th>
-            <th>{% trans 'phone' %}</th>
+            <th>{% trans 'phone' %}</th>            
             <th class="hidden-xs">{% trans 'registryDate' %}</th>
+            <th></th>
             <th class="hidden-xs">{% trans 'actions' %}</th>
           </tr>
         </thead>
         <tbody>
           {% for employee in employees %}
-          <tr data-href="/employee/view/{{employee.user}}" style="cursor: pointer;">
+          <tr>
             <th scope="row">{{forloop.counter}}</th>
 
             <td>
@@ -45,6 +46,8 @@
             <td>{{employee.phone}}</td>
 
             <td class="hidden-xs">{{employee.registryDate}}</td>
+            
+            <td><a href="/employee/view/{{employee.user}}" type="button" class="btn btn-success">{% trans 'details' %}</a></td>
 
             <td class="hidden-xs">
               <a href="/employee/edit/{{employee.user}}" type="button" class="btn btn-success">{% trans 'edit' %}</a>
