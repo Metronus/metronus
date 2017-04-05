@@ -36,7 +36,7 @@ class ProjectDepartmentTestCase(TestCase):
         admin_user2 = User.objects.create_user(
             username="admin2",
             password="4321",
-            email="admin@metronus.es",
+            email="admin2@metronus.es",
             first_name="Nimad",
             last_name="Rotartis")
 
