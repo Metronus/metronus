@@ -212,15 +212,15 @@ function fromData (backendData, type) {
                   title : {
                       text: (function () {
                                 if(type == 1)
-                                    return "{% trans 'employeeByDepartment' %}";
+                                    return "{% trans 'employeesPerDepartment' %}";
                                 else
-                                    return "{% trans 'taskByDepartment' %}"
+                                    return "{% trans 'tasksPerDepartment' %}"
                           })(),
                       subtext: (function () {
                                 if(type == 1)
-                                    return "{% trans 'employeeByDepartmentDesc' %}";
+                                    return "{% trans 'employeesPerDepartmentDesc' %}";
                                 else
-                                    return "{% trans 'taskByDepartmentDesc' %}"
+                                    return "{% trans 'tasksPerDepartmentDesc' %}"
                           })(),
                       x: 'left',
                       textStyle:{fontSize:16},
