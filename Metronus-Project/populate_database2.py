@@ -73,7 +73,7 @@ def createTaskInProjDept(project, department,admin,rDate):
     measure = random.choice([True, True, True, False]) # Make the task have a 25% chance of not having a production goal
 
     if measure:
-        pgoal=random.uniform(1,100)
+        pgoal=random.uniform(50,100)
         pdescription=ranstr()
     else:
         pgoal=None
@@ -90,9 +90,9 @@ def createTaskInProjDept(project, department,admin,rDate):
     
     #Generate random number of previous goals
     if measure:
-        for _ in range(random.randint(1,7)):
+        for _ in range(random.randint(3,7)):
             createGoalEvolution(task,admin,rDate)
-
+    return task.id
 def createGoalEvolution(task,actor,rDate):
     """
     rDate is the task registryDate, so we will create a date before that
@@ -100,8 +100,8 @@ def createGoalEvolution(task,actor,rDate):
     ge1=GoalEvolution.objects.create(
         task_id=task,
         actor_id = actor,
-        production_goal=random.uniform(1,100),
-        goal_description=ranstr()
+        production_goal=random.uniform(40,100),
+        goal_description=task.goal_description
         )
     #get a date before the last task update
     date = rDate - timedelta(days=random.randint(2,30))
@@ -110,7 +110,7 @@ def createGoalEvolution(task,actor,rDate):
     
 def createTimelogInTask(task, duration, date, employee):
     if task.production_goal is not None and task.production_goal !="":
-        punits=random.uniform(1,1000)
+        punits=random.uniform(0.8,2)*duration/60*task.production_goal
     else:
         punits=None
     TimeLog.objects.create(
@@ -164,25 +164,22 @@ def randomLoad():
         dpmt = departments[i]
         for j in range(len(projects)-1):
             project=projects[j]
-            # Create between 1 and 7 employees for each department and project
+            # Create between 2 and 7 employees for each department and project
             for _ in range(random.randint(2,7)):
                 createEmployeeInProjDept(project, dpmt,company)
-            # Create between 1 and 4 tasks for each department
-            for _ in range(random.randint(1,4)):
-
-                createTaskInProjDept(project, dpmt,admin,random.choice(dates))
-
-
-            # Create between 1 and 20 timelogs for each task
-            for _ in range(random.randint(1,20)):
-                duration = random.randint(1,100)
-                task = random.choice(Task.objects.filter(projectDepartment_id__project_id = project, projectDepartment_id__department_id = dpmt))
-                
-                date = random.choice(dates)
-                employee=random.choice(Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__project_id=project,
-                        projectdepartmentemployeerole__projectDepartment_id__department_id=dpmt))
-                if employee is not None:
-                    createTimelogInTask(task, duration, date,employee)
+            # Create between 2 and 4 tasks for each department
+            for _ in range(random.randint(2,4)):
+                task_id=createTaskInProjDept(project, dpmt,admin,random.choice(dates))
+                task=Task.objects.get(pk=task_id)
+                employees=list(Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__project_id=project,
+                            projectdepartmentemployeerole__projectDepartment_id__department_id=dpmt))
+                # Create between 10 and 25 timelogs for each task and employee
+                for employee in employees:
+                    for _ in range(random.randint(10,25)):
+                        duration = random.randint(40,480)
+                        
+                        date = random.choice(dates)
+                        createTimelogInTask(task, duration, date,employee)
 
 
 

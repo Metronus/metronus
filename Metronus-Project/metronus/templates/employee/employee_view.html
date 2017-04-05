@@ -134,6 +134,27 @@
 
 </div>
 <h3> {% trans 'Productivity' %}</h3>
+{#here goes the date picker#}
+     <div class="row x_title">
+                        <div class="col-md-6">
+                            <h2>{% trans 'datePicker' %}</h2>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="pull-right">
+                                <fieldset>
+                                    <div class="control-group">
+                                        <div class="controls">
+                                            <div class="input-prepend input-group">
+                                                <span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
+                                                <input type="text" style="width: 200px" name="task_chart" id="task_chart" class="form-control" value="" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
  <div id="task_space">
   {#   here go the tasks, with their total productivities, loads on document ready with an ajax call#}
 
@@ -446,22 +467,41 @@ $('#confirm-delete').on('show.bs.modal', function(e) {
     }
 
 }
+//here we save the current task id for reloading purposes
+var t_id=0
 function ajax_productivity(id) {
-  //loads diary productivities for the specified tasj
-      $.get({
-        url: '/employee/ajax_productivity_per_task_and_date/{{employee.user.username}}',
-        data:{task_id:id,
-          start_date:'2017-01-01',
-          end_date:'2017-04-01'},
-        success: function ( backendData )  {
-         // console.log(JSON.stringify( backendData ))
-          var echartLine = echarts.init(document.getElementById('task'), theme);
-          echartLine.setOption( fromData( backendData ) );
+  //loads diary productivities for the specified task
+  //find the date picker
+  picker=$('input[name="task_chart"]').data('daterangepicker');
+   // $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+  
+  $.get({
+    url: '/employee/ajax_productivity_per_task_and_date/{{employee.user.username}}',
+    data:{
+        task_id:id,
+        start_date:picker.startDate.format('YYYY-MM-DD'),
+        end_date:picker.endDate.format('YYYY-MM-DD')
+     },
+    success: function ( backendData )  {
+     // console.log(JSON.stringify( backendData ))
+      var echartLine = echarts.init(document.getElementById('task'), theme);
+      echartLine.setOption( fromData( backendData ) );
+      t_id=id;
+
+    /**
+     * Esto se encarga de hacer responsivo (más o menos) el chart
+     * */
+    $(window).on('resize', function(){
+        if(echartLine != null && echartLine != undefined){
+            echartLine.resize();
         }
-      }).fail(function () {
-          // Error
-      })
+    });
     }
+  }).fail(function () {
+      // Error
+  })
+
+}    
 $(document).ready(function() {
     //loads all tasks for the employee, with total producitivity
       $.get({
@@ -479,10 +519,55 @@ $(document).ready(function() {
               backendData[task]["total_productivity"]+"";
               all+="</div>";
            }
-            space.innerHTML =all     
+            space.innerHTML =all 
+
+
+        defaultRange = moment().startOf('month').format('MM/DD/YYYY') +' - '+ moment().endOf('month').format('MM/DD/YYYY')
+        $('input[name="task_chart"]').val(defaultRange)
+
+        $('input[name="task_chart"]').daterangepicker({
+            autoUpdateInput: false,
+            locale: {
+                cancelLabel: '{% trans 'default' %}',
+                applyLabel: '{% trans 'apply' %}'
+            }
+        });
+  $('input[name="task_chart"]').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+      
+      $.get({
+        url: '/employee/ajax_productivity_per_task_and_date/{{employee.user.username}}',
+        data:{
+            task_id:t_id,
+            start_date:picker.startDate.format('YYYY-MM-DD'),
+            end_date:picker.endDate.format('YYYY-MM-DD')
+         },
+        success: function ( backendData )  {
+         // console.log(JSON.stringify( backendData ))
+          var echartLine = echarts.init(document.getElementById('task'), theme);
+          echartLine.setOption( fromData( backendData ) );
+
+        /**
+         * Esto se encarga de hacer responsivo (más o menos) el chart
+         * */
+        $(window).on('resize', function(){
+            if(echartLine != null && echartLine != undefined){
+                echartLine.resize();
+            }
+        });
         }
+      }).fail(function () {
+          // Error
+      });  
+        $('input[name="task_chart"]').on('cancel.daterangepicker', function(ev, picker) {
+            $(this).val(defaultRange);
+        });    
+        
       })
-  });
+    }
+});
+});
+
     </script>
 
 
