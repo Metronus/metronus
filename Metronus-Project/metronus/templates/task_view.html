@@ -57,8 +57,8 @@
     function fromData(names, data) {
         return {
             title: {
-                text: 'Line Graph',
-                subtext: 'Subtitle'
+                text: '{% trans 'taskChartTitle' %}',
+                subtext: '{% trans 'taskChartSubtitle' %}'
             },
             tooltip: {
                 trigger: 'axis'
@@ -74,20 +74,20 @@
                     magicType: {
                         show: true,
                         title: {
-                            line: 'Line',
-                            bar: 'Bar',
-                            stack: 'Stack',
-                            tiled: 'Tiled'
+                            line: '{% trans 'line' %}',
+                            bar: '{% trans 'bar' %}',
+                            stack: '{% trans  'stack' %}',
+                            tiled: '{% trans 'tiled' %}'
                         },
                         type: ['line', 'bar', 'stack', 'tiled']
                     },
                     restore: {
                         show: true,
-                        title: "Restore"
+                        title: '{% trans 'restore' %}'
                     },
                     saveAsImage: {
                         show: true,
-                        title: "Save Image"
+                        title: '{% trans 'saveImage' %}'
                     }
                 }
             },
@@ -95,7 +95,7 @@
             xAxis: [{
                 type: 'category',
                 boundaryGap: false,
-                data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                data: data.days
             }],
             yAxis: [{
                 type: 'value'
@@ -112,7 +112,7 @@
                     }
                 },
 
-                data: data.productivity
+                data: data.production
             }, {
                 name: names[1],
                 type: 'line',
@@ -130,11 +130,23 @@
     }
 
     $(document).ready(function() {
-        names = ['Intent', 'Pre-order'];
-        data = {'productivity': [30, 182, 434, 791, 390, 30, 10], 'goal_evolution': [0, 1132, 601, 234, 120, 90, 20] };
+        names = ["{% trans 'production' %}", "{% trans 'goal_evolution' %}"];
+        /*
+        data = {'productivity': [30, 182, 434, 791, 390, 30, 10], 'goal_evolution': [0, 1132, 601, 234, 120, 90, 20],
+            'days': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] };
+        */
 
         echartLine = echarts.init(document.getElementById('task'), theme);
-        echartLine.setOption( fromData( names, data ) );
+        //echartLine.setOption( fromData( names, data ) );
+
+        $.get({
+            url: "{% url 'productivity_per_task' %}",
+            data: {task_id: {{ task.id }}},
+            success: function ( backendData )  {
+                data = backendData
+                echartLine.setOption( fromData( names, backendData ) );
+            }
+        });
 
         defaultRange = moment().startOf('month').format('MM/DD/YYYY') +' - '+ moment().endOf('month').format('MM/DD/YYYY')
         $('input[name="task_chart"]').val(defaultRange)
@@ -157,6 +169,7 @@
                     end_date: picker.endDate.format('YYYY-MM-DD')
                 },
                 success: function ( backendData )  {
+                    console.log(backendData)
                     echartLine.setOption( fromData( names, backendData ) );
                 }
             });

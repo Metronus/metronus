@@ -277,23 +277,52 @@ msgstr "Seleccione departamento"
 msgid "departmentNotNull"
 msgstr "El departamento no puede ser nulo"
 
-#: Department's charts
+
+
+#: Charts
 msgid "datePicker"
 msgstr "Filtrar por rango de fechas"
+msgid "default"
+msgstr "Por defecto"
+msgid "apply"
+msgstr "Aplicar"
+msgid "line"
+msgstr "Línea"
+msgid "bar"
+msgstr "Barra"
+msgid "stack"
+msgstr "Capas"
+msgid "tiled"
+msgstr "Porciones"
+msgid "restore"
+msgstr "Restaurar"
+msgid "saveImage"
+msgstr "Guardar Imagen"
+
+
+#: Department's charts
 msgid "depTaskChartTitle"
 msgstr "Horas por tarea"
 msgid "depTaskChartSubtitle"
 msgstr "Dentro del intervalo especificado"
 msgid "investedTime"
 msgstr "Tiempo invertido"
-msgid "default"
-msgstr "Por defecto"
-msgid "apply"
-msgstr "Aplicar"
 msgid "empTaskChartTitle"
 msgstr "Número de empleados por tarea"
 msgid "empTaskChartSubtitle"
 msgstr "De este departamento"
+
+
+#: Task's charts
+msgid "taskChartTitle"
+msgstr "Detalles de producción"
+msgid "taskChartSubtitle"
+msgstr "Relación entre el tiempo invertido y la producción"
+msgid "production"
+msgstr "Producción"
+msgid "goal_evolution"
+msgstr "Evolución del Objetivo"
+
 
 #: Employee
 msgid "registryDate"
