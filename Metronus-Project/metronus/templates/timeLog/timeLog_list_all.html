@@ -189,7 +189,7 @@
     $(document).ready(function() {
         select = document.getElementById('id_department_id');
          /**
-        clear all options before repopulating
+        clear all department options before repopulating, otherwise other departments could appear (due to queryset cannot be none but it is not known until now)
         */
         for(i = select.options.length - 1 ; i >= 1 ; i--)
             {
@@ -199,7 +199,7 @@
             }
         select = document.getElementById('id_task_id');
          /**
-        clear all options before repopulating
+        clear all task options before repopulating,otherwise other tasks could appear (due to queryset cannot be none but it is not known until now)
         */
         for(i = select.options.length - 1 ; i >= 1 ; i--)
             {

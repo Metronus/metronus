@@ -133,7 +133,6 @@ def createTimeLog(form, employee):
     funits=form.cleaned_data['produced_units']
     task = findTask(form.cleaned_data['task_id'])
     timeLog = findTimeLogByDateAndTask(fworkDate,task,employee)
-    print(timeLog)
     if(timeLog is not None):
         timeLog.duration += fduration
         timeLog.description = fdescription

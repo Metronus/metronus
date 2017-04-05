@@ -228,18 +228,43 @@ class TaskMetricsTestCase(TestCase):
             role_id=role_ex,
             employee_id=employee2
         )
+        task1 = Task.objects.create(
+            name  ="Hacer cosas",
+            description  = "meda",
+            actor_id = employee1,
+            projectDepartment_id = pd
+        )
 
+        task2 = Task.objects.create(
+            name  ="Hacer cosas de back",
+            description  = "hola",
+            actor_id = employee1,
+            projectDepartment_id = pd
+        )
+
+        task3 = Task.objects.create(
+            name  ="Hacer cosas de front",
+            description  = "nada",
+            actor_id = employee2,
+            projectDepartment_id = pd2,
+            production_goal="2.0",
+            goal_description="kgs"
+        )
+
+     
     def test_access_denied_not_logged_prod_task(self):
         c = Client()
 
-        response = c.get("/task/ajaxProdPerTask?task_id=%d" % Task.objects.all()[0].id)
-        self.assertEquals(response.status_code, 403)
-
+        response = c.get("/task/ajaxProdPerTask?task_id=%d" % Task.objects.all().first().id)
+        
+        #redirected to login
+        self.assertEquals(response.status_code, 302)
+        
     def test_access_ok_logged_prod_task(self):
         c = Client()
         c.login(username="emp2", password="123456")
 
-        response = c.get("/task/ajaxProdPerTask?task_id=%d" % Task.objects.all()[0].id)
+        response = c.get("/task/ajaxProdPerTask?task_id=%d" % Task.objects.all().first().id)
         self.assertEquals(response.status_code, 200)
 
     def test_bad_request_prod_per_task(self):

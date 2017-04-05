@@ -275,6 +275,13 @@ def ajax_productivity_per_task(request):
 
     # ------------------------- Cortesía de Agu ------------------------------
 
+    if not request.user.is_authenticated():
+        raise PermissionDenied
+    try:
+        actor= Actor.objects.get(user=request.user)
+    except ObjectDoesNotExist:
+        raise PermissionDenied
+        
     if "task_id" not in request.GET:
         return HttpResponseBadRequest()
 
