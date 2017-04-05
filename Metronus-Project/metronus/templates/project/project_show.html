@@ -56,20 +56,25 @@
 
           <!-- MISILES -->
 
-<!--        
+<div class="clearfix"></div>
+
         <div class="">
             <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="x_panel">
-                <canvas class="canvasDoughnutD" height="200" width="200"></canvas>
-            </div>
-        </div>
-        </div>
-     -->
+                    <div class="x_title">{% trans 'departmentGraphs' %}</div>
 
-    
-        <div class="x_panel">
-            <div class="x_content">
-                <div id="echart_donutD" style="height:350px;"></div>
+                    <div class="clearfix"></div>
+                    <div class="col-md-6">
+                        <div class="x_content">
+                            <div id="donut_department" style="height:200px;"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="x_content">
+                            <div id="donut_task" style="height:200px;"></div>
+                        </div>
+                    </div>
+            </div>
             </div>
         </div>
 
@@ -175,7 +180,7 @@
 <script>
 
 $(document).ready(function() {
-      var echartDonut = echarts.init(document.getElementById('echart_donutD'), theme);
+      var echartDonut = echarts.init(document.getElementById('donut_department'), theme);
               
       var defaultBackendData = { 'names': [''], 'values': [0] };
       $.get({
@@ -183,35 +188,49 @@ $(document).ready(function() {
         data: {project_id: {{project.id}}},
         success: function ( backendData )  {
           defaultBackendData = backendData
-          echartDonut.setOption(fromData(backendData));
+          echartDonut.setOption(fromData(backendData, 1));
+        }
+      })
+
+    
+    var echartDonut2 = echarts.init(document.getElementById('donut_task'), theme);
+              
+      var defaultBackendData = { 'names': [''], 'values': [0] };
+      $.get({
+        url: "/project/ajaxTasksPerDpmt",
+        data: {project_id: {{project.id}}},
+        success: function ( backendData )  {
+          defaultBackendData = backendData
+          echartDonut2.setOption(fromData(backendData, 0));
         }
       })
     });
 
-function fromData (backendData) {
+
+function fromData (backendData, type) {
              var opts = {
                   title : {
-                  text: '{% trans 'deparmentsInfo' %}',
-                  subtext: '{% trans 'employeesByDepartment' %}',
-                  x: 'left'
-                },
+                      text: (function () {
+                                if(type == 1)
+                                    return "{% trans 'employeeByDepartment' %}";
+                                else
+                                    return "{% trans 'taskByDepartment' %}"
+                          })(),
+                      subtext: (function () {
+                                if(type == 1)
+                                    return "{% trans 'employeeByDepartmentDesc' %}";
+                                else
+                                    return "{% trans 'taskByDepartmentDesc' %}"
+                          })(),
+                      x: 'left',
+                      textStyle:{fontSize:16},
+                      subtextStyle:{fontSize:12}
+                 },
                 tooltip: {
                   trigger: 'item',
                   formatter: "{a} <br/>{b} : {c} ({d}%)"
                 },
                 calculable: true,
-                legend: {
-                  x: 'left',
-                  y: 'center',
-                  orient:'vertical',
-                  data: (function () {
-                          var res = [];
-                          for (var i in backendData.names) {
-                              res.push(backendData.names[i]);
-                          };
-                          return res;
-                      })()
-                },
                 toolbox: {
                   show: true,
                   feature: {
@@ -238,7 +257,7 @@ function fromData (backendData) {
                   }
                 },
                 series: [{
-                  name: 'Information',
+                  name: '{{project.name}}',
                   type: 'pie',
                   radius: ['35%', '55%'],
                   itemStyle: {
@@ -268,7 +287,9 @@ function fromData (backendData) {
                                   name: backendData.names[n],
                                   value: backendData.values[n]
                               };
+                            if(backendData.values[n] != 0){
                                 res.push(obj);
+                            }
 
                             }
                           return res;
