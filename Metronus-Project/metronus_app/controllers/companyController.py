@@ -12,7 +12,8 @@ from django.contrib.auth.decorators import login_required
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
-from metronus_app.common_utils import get_current_admin_or_403, get_or_none, checkImage, send_mail
+from metronus_app.common_utils import (get_current_admin_or_403, checkImage, send_mail, is_email_unique
+, get_or_none, is_username_unique)
 from django.core.exceptions import PermissionDenied
 
 
@@ -34,8 +35,26 @@ def create(request,
         # create a form instance and populate it with data from the request:
         form = RegistrationForm(request.POST, request.FILES)
         # check whether it's valid:
-        if form.is_valid() and checkPasswords(form):
-            if checkImage(form, 'logo'):
+        if form.is_valid():
+            errors = []
+
+            # Check that the passwords match
+            if not checkPasswords(form):
+                errors.append('companyRegister_passwordsDontMatch')
+
+            # Check that the username is unique
+            if not is_username_unique(form.cleaned_data["username"]):
+                errors.append('companyRegister_usernameNotUnique')
+
+            # Check that the admin email is unique
+            if not is_email_unique(form.cleaned_data["admin_email"]):
+                errors.append('companyRegister_adminEmailNotUnique')
+
+            # Check that the image is OK
+            if not checkImage(form, 'photo'):
+                errors.append('companyRegister_imageNotValid')
+
+            if not errors:
                 # process the data in form.cleaned_data as required
                 # ...
                 # redirect to a new URL:
@@ -63,7 +82,7 @@ def create(request,
 
                 return HttpResponseRedirect('/' + company.short_name + '/login/')
             else:
-                return render(request, 'company/company_register.html', {'form': form, 'errors': ['error.imageNotValid']})
+                return render(request, 'company/company_register.html', {'form': form, 'errors': errors})
 
     # if a GET (or any other method) we'll create a blank form
     else:
