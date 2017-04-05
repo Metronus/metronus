@@ -40,7 +40,9 @@
                     <div class="clearfix"></div>
 
                     <div class="x_content row">
-                        <div id="task" style="height:350px;"></div>
+                        <div class="col-xs-12">
+                            <div id="task" style="width: 100%; min-height: 400px"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -64,8 +66,7 @@
                 trigger: 'axis'
             },
             legend: {
-                x: 220,
-                y: 40,
+                left: 'center',
                 data: names
             },
             toolbox: {
@@ -129,6 +130,7 @@
         };
     }
 
+
     $(document).ready(function() {
         names = ["{% trans 'production' %}", "{% trans 'goal_evolution' %}"];
         /*
@@ -145,6 +147,15 @@
             success: function ( backendData )  {
                 data = backendData
                 echartLine.setOption( fromData( names, backendData ) );
+            }
+        });
+
+        /**
+         * Esto se encarga de hacer responsivo (más o menos) el chart
+         * */
+        $(window).on('resize', function(){
+            if(echartLine != null && echartLine != undefined){
+                echartLine.resize();
             }
         });
 
