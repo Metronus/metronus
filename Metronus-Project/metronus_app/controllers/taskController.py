@@ -289,7 +289,7 @@ def ajax_productivity_per_task(request):
 
     # Get and parse the dates and the offset
     start_date = request.GET.get("start_date", str(date.today()))
-    end_date = request.GET.get("end_date", str(date.today() - timedelta(days=30)))
+    end_date = request.GET.get("end_date", str(date.today() + timedelta(days=30)))
     date_regex = re.compile("^\d{4}-\d{2}-\d{2}$")
 
     if date_regex.match(start_date) is None or date_regex.match(end_date) is None:
@@ -311,13 +311,16 @@ def ajax_productivity_per_task(request):
         'goal_evolution': [],
         'days':[]
     }
-    production = TimeLog.objects.filter(task_id_id=task_id, workDate__range=[start_date, end_date])
+    print(start_date)
+    print(end_date)
+    production = TimeLog.objects.filter(task_id_id=task_id, workDate__range=[start_date, end_date]).order_by('workDate')
+    print(production)
     task = get_object_or_404(Task, pk=task_id, active=True)
-
     z = 0
     start_date_parse = parse_datetime(start_date)
     for i in range(0, 31):
-        if production is not None and len(production) > z and (production[z].workDate-start_date_parse).days == i:
+        if production is not None and len(production) > z and abs((production[z].workDate-start_date_parse).days) == i:
+            print('patata')
             data['production'].append(production[z].produced_units / (production[z].duration/60))
             z += 1
         else:
@@ -327,7 +330,7 @@ def ajax_productivity_per_task(request):
 
         prod_day = start_date_parse + timedelta(days=i)
         data['days'].append(str(prod_day.day)+", "+str(calendar.month_name[prod_day.month]))
-
+    print(data['production'])
     return JsonResponse(data)
 
 
