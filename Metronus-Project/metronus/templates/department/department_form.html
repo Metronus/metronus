@@ -8,7 +8,7 @@
 {% trans 'editDepartment' %}
 {% endif %}
 {% endblock %}
-
+{% load custom_tags %}
 {% block javascript %}
 
 
@@ -80,10 +80,7 @@ function ajax(){
     </div>
     <div class="x_content">
 
-    <div id="successDiv" class="alert alert-success" hidden='true'>
-            </div>
-        <div id="errorDiv" class="alert alert-danger"  hidden='true'>
-            </div>
+    {% show_ajax_errors  %}
         {% if  repeated_name == True %}
             <div id="error2Div" class="alert alert-danger">
                 <strong>{% trans 'fail' %} | </strong>{% trans 'departmentName' %}
