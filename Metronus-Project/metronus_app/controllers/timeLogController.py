@@ -6,6 +6,7 @@ from metronus_app.common_utils import get_current_admin_or_403,get_current_emplo
 from django.http import HttpResponseRedirect
 from metronus_app.model.administrator import Administrator
 from metronus_app.model.timeLog import TimeLog
+from metronus_app.forms.timeLog2Form import TimeLog2Form
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.department import Department
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
@@ -19,16 +20,18 @@ import json
 from django.http import HttpResponse
 import calendar
 from django.core import serializers
-
+from django.db.models import Sum
 
 def list_all(request):
     """
     valid_production_units: devuelve si se especificó production units y es necesario,
     o si no se especificó y no era necesario
     over_day_limit:True si se paso del límite de 1440 horas al día
+    hasPermissions:True si estas imputando una tarea que es tuya, False si no estas autorizado
     """
     valid_production_units=True
     over_day_limit=False
+    has_permissions=True
     today = datetime.today()
     employee = get_current_employee_or_403(request)
     if(request.GET.get('currentMonth')):
@@ -41,13 +44,6 @@ def list_all(request):
     else:
         currentYear = today.year
 
-    #pa que quieres esto si ya se comprueba como empleado
-    try:
-        actor = Actor.objects.get(user=request.user)
-    except ObjectDoesNotExist:
-        raise PermissionDenied
-
-
     if request.method == 'POST' and request.is_ajax():
         project = request.POST.get("project")
         department = request.POST.get("department")
@@ -56,9 +52,9 @@ def list_all(request):
             return
         else:
             if department is None:
-                departments = Department.objects.filter(company_id=actor.company_id,
+                departments = Department.objects.filter(company_id=employee.company_id,
                                                 projectdepartment__project_id=project,
-                                                projectdepartment__projectdepartmentemployeerole__employee_id=employee).distinct()
+                                                projectdepartment__projectdepartmentemployeerole__employee_id=employee,active=True).distinct()
 
                 data = serializers.serialize('json', departments, fields=('id','name',))
 
@@ -69,30 +65,31 @@ def list_all(request):
                 print (department)
                 tasks = Task.objects.filter(projectDepartment_id__department_id=department,
                                             projectDepartment_id__project_id=project,active=True).distinct()
-                data = serializers.serialize('json', tasks, fields=('id', 'name',))
-
+                data = serializers.serialize('json', tasks, fields=('id', 'name','goal_description'))
                 return HttpResponse(data)
 
     if request.method == 'POST':
-        form = TimeLogForm(request.POST)
+        form = TimeLog2Form(request,request.POST)
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
+            #extra validations for error messages
+            has_permissions=checkPermissionForTask(employee, findTask(form.cleaned_data['task_id']))
             valid_production_units = checkProducedUnits(form)
             over_day_limit=checkDayLimit(form,employee)
-            if valid_production_units and not over_day_limit:
+            if has_permissions and valid_production_units and not over_day_limit:
                 createTimeLog(form, employee)
                 return redirect('timeLog_list_all')
+    else:
+        form = TimeLog2Form(request, initial={"timeLog_id": 0, "workDate": today})
 
-    today = datetime.today()
 
-
-    tareas=Task.objects.filter(actor_id__company_id=actor.company_id,
-                                   projectDepartment_id__projectdepartmentemployeerole__employee_id=actor,
+    tareas=Task.objects.filter(actor_id__company_id=employee.company_id,
+                                   projectDepartment_id__projectdepartmentemployeerole__employee_id=employee,
                                    active=True).distinct()
-    my_tasks = [myTask(x,currentMonth,currentYear) for x in tareas]
+    my_tasks = [myTask(x,currentMonth,currentYear,employee) for x in tareas]
 
     month = [x for x in range(1,calendar.monthrange(currentYear,currentMonth)[1]+1)]
     month.append("Total")
@@ -100,10 +97,10 @@ def list_all(request):
     monthTotal = sum(total)
     total.append(monthTotal)
 
-    form = TimeLog2Form(request, initial={"timeLog_id": 0, "workDate": datetime.now()})
+    
 
     return render(request, "timeLog/timeLog_list_all.html", {"my_tasks": my_tasks, "month":month,"total":total, "currentMonth":currentMonth, "currentYear":currentYear, 
-        "form":form,"valid_production_units":valid_production_units,"over_day_limit":over_day_limit})
+        "form":form,"valid_production_units":valid_production_units,"over_day_limit":over_day_limit,'has_permissions':has_permissions})
 
 
 #Método para eliminar un registro siempre que la fecha del registro sea la misma que cuando se llama al método
@@ -123,7 +120,7 @@ def delete(request, timeLog_id):
 
 #Método auxiliar para encontrar una tarea
 def findTask(task_id):
-    task = get_object_or_404(Task,pk=task_id)
+    task = get_object_or_404(Task,pk=task_id.id)
     return task
 
 #Método auxiliar para la creación de registros
@@ -135,12 +132,16 @@ def createTimeLog(form, employee):
     fduration = form.cleaned_data['duration']
     funits=form.cleaned_data['produced_units']
     task = findTask(form.cleaned_data['task_id'])
-    timeLog = findTimeLogByDateAndTask(fworkDate,task)
+    timeLog = findTimeLogByDateAndTask(fworkDate,task,employee)
+    print(timeLog)
     if(timeLog is not None):
         timeLog.duration += fduration
-        timeLog.produced_units+=funits
         timeLog.description = fdescription
-        timeLog.produced_units += funits
+
+        if timeLog.produced_units is None or timeLog.produced_units=="":
+            timeLog.produced_units = funits
+        else:
+            timeLog.produced_units += funits
         timeLog.save()
     else:
         TimeLog.objects.create(description=fdescription,workDate=fworkDate,duration=fduration,task_id=task,employee_id=employee,produced_units=funits)
@@ -152,18 +153,16 @@ def checkProducedUnits(form):
     """
     task = findTask(form.cleaned_data['task_id'])
     prod_units=form.cleaned_data['produced_units']
-    return (prod_units and task.production_goal) or (not prod_units and not task.production_goal)
+    # both null or empty OR both not null or empty
+    return (prod_units is not None and prod_units!="" and task.production_goal is not None and task.production_goal!="" ) or ((prod_units is None or prod_units=="") and (task.production_goal is None or task.production_goal==""))
 
 #Comprobación para saber si el empleado puede imputar horas
 def checkPermissionForTask(employee, task):
     if employee is not None and task is not None:
         res = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee, projectDepartment_id=task.projectDepartment_id)
-        if res.count()>0:
-            return res
-        else:
-            raise PermissionDenied
-    else:
-        raise PermissionDenied
+        return res.count()>0
+    return False
+    
 
 #Comprobacion para saber si el empleado es un mando superior y tiene acceso a todas las imputaciones de una tarea
 def checkRoleForTask(employee, task):
@@ -187,14 +186,14 @@ class myTask():
     name = ""
     durations = []
 
-    def __init__(self, task, month, year):
+    def __init__(self, task, month, year,employee):
         totalDuration = 0
         self.id = task.id
         today = datetime.today()
         self.name = task.name
         self.durations = [(0,0) for x in range(0,calendar.monthrange(year,month)[1])]
         timeLogs = TimeLog.objects.filter(workDate__year__gte=year,workDate__month__gte=month,
-                                     workDate__year__lte=year, workDate__month__lte=month,task_id=task.id)
+                                     workDate__year__lte=year, workDate__month__lte=month,task_id=task.id,employee_id=employee)
 
         for tl in timeLogs:
             index = int(tl.workDate.day)-1
@@ -202,11 +201,11 @@ class myTask():
             totalDuration += tl.duration
         self.durations.append((totalDuration,0))
 
-def findTimeLogByDateAndTask(tDate,task):
+def findTimeLogByDateAndTask(tDate,task,employee):
     #Vaya churro para comprobar que el dia, el mes y el año sean iguales
-    timeLog = TimeLog.objects.filter(workDate__year__gte=tDate.date().year,workDate__month__gte=tDate.date().month,workDate__day__gte=tDate.date().day,
-                                     workDate__year__lte=tDate.date().year, workDate__month__lte=tDate.date().month,
-                                     workDate__day__lte=tDate.date().day,task_id=task).first()
+    timeLog = TimeLog.objects.filter(workDate__year=tDate.date().year,
+                                     workDate__month=tDate.date().month,
+                                     workDate__day=tDate.date().day,task_id=task,employee_id=employee).first()
     return timeLog
 
 def checkTimeLogOvertime(timeLog):
@@ -216,7 +215,7 @@ def checkTimeLogOvertime(timeLog):
         result = True
     return result
 
-from django.db.models import Sum
+
 def checkDayLimit(form,employee):
     """
     checks the employee cannot work more than 1440 minutes a day (one day in minutes)
@@ -228,4 +227,4 @@ def checkDayLimit(form,employee):
         workDate__month=tDate.date().month,
         workDate__day=tDate.date().day).aggregate(current_sum=Sum("duration"))
     current_sum=time_sum["current_sum"] if time_sum["current_sum"] is not None else 0
-    return form.cleaned_data["duration"]+current_sum>1440
+    return form.cleaned_data["duration"]+current_sum>1440 or form.cleaned_data["duration"]+current_sum<=0

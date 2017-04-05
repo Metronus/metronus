@@ -92,6 +92,23 @@
         <div id="successDiv" class="alert alert-success" hidden='true'></div>
         <div id="errorDiv" class="alert alert-danger"  hidden='true'></div>
 
+        {% if  valid_production_units == False %}
+
+            <div id="error2Div" class="alert alert-danger">
+                <strong>{% trans 'fail' %} | </strong>{% trans 'produced_units_not_valid' %}
+            </div>
+        {% endif %}
+        {% if  has_permissions == False %}
+
+            <div id="error2Div" class="alert alert-danger">
+                <strong>{% trans 'fail' %} | </strong>{% trans 'no_task_permissions' %}
+            </div>
+        {% endif %}
+        {% if  over_day_limit == True %}
+            <div id="error2Div" class="alert alert-danger">
+                <strong>{% trans 'fail' %} | </strong>{% trans 'over_day_limit' %}
+            </div>
+        {% endif %}
         <div class="col-xs-12">
             <div class="x_panel">
                 <div class="x_title">
@@ -170,6 +187,27 @@
     });
 
     $(document).ready(function() {
+        select = document.getElementById('id_department_id');
+         /**
+        clear all options before repopulating
+        */
+        for(i = select.options.length - 1 ; i >= 1 ; i--)
+            {
+                if(select.selectedIndex!=i){
+                select.remove(i);
+                 }
+            }
+        select = document.getElementById('id_task_id');
+         /**
+        clear all options before repopulating
+        */
+        for(i = select.options.length - 1 ; i >= 1 ; i--)
+            {
+                if(select.selectedIndex!=i){
+                    select.remove(i);
+                }
+            }
+
         $("#id_project_id").change(function(){
             $.ajax({
                 type: 'POST',
@@ -219,7 +257,14 @@
                             select.remove(i);
                         }
                     $.each($.parseJSON(resp), function(key,value){
-                        select.options.add(new Option(value.fields['name'],value.pk));
+                        taskname=value.fields['name']
+                        if(value.fields['goal_description'] != null && value.fields['goal_description'] != ""){
+                            taskname+="("+value.fields['goal_description']+")"
+                        }
+                        else{
+                            taskname+="("+'{% trans 'no_goal' %}'+")"
+                        }
+                        select.options.add(new Option(taskname,value.pk));
                     });
                 }
             });
