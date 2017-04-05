@@ -11,7 +11,7 @@ from metronus_app.model.projectDepartment             import ProjectDepartment
 from metronus_app.model.goalEvolution             import GoalEvolution
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 from django.db                                        import transaction
-
+from populate_database2 import randomLoad
 @transaction.atomic
 def basicLoad():
     company=Company.objects.create(cif="A00000001", company_name="company1", short_name="company1", email="company1@gmail.com", phone="123456789")
@@ -294,4 +294,5 @@ def populate_roles():
 #############################################################################
 
 def populate_database():
-    basicLoad()
+#    basicLoad()
+    randomLoad()
