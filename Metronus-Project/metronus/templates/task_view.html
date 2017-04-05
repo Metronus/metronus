@@ -57,8 +57,8 @@
     function fromData(names, data) {
         return {
             title: {
-                text: 'Line Graph',
-                subtext: 'Subtitle'
+                text: '{% trans 'taskChartTitle' %}',
+                subtext: '{% trans 'taskChartSubtitle' %}'
             },
             tooltip: {
                 trigger: 'axis'
@@ -74,20 +74,20 @@
                     magicType: {
                         show: true,
                         title: {
-                            line: 'Line',
-                            bar: 'Bar',
-                            stack: 'Stack',
-                            tiled: 'Tiled'
+                            line: '{% trans 'line' %}',
+                            bar: '{% trans 'bar' %}',
+                            stack: '{% trans  'stack' %}',
+                            tiled: '{% trans 'tiled' %}'
                         },
                         type: ['line', 'bar', 'stack', 'tiled']
                     },
                     restore: {
                         show: true,
-                        title: "Restore"
+                        title: '{% trans 'restore' %}'
                     },
                     saveAsImage: {
                         show: true,
-                        title: "Save Image"
+                        title: '{% trans 'saveImage' %}'
                     }
                 }
             },

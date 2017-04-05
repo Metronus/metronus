@@ -278,23 +278,47 @@ msgstr "Department can't be null"
 msgid "register_mail_subject"
 msgstr "Welcome to Metronus"
 
-#: Department's charts
+
+#: Charts
 msgid "datePicker"
 msgstr "Filter by date range"
+msgid "default"
+msgstr "Default"
+msgid "apply"
+msgstr "Apply"
+msgid "line"
+msgstr "Line"
+msgid "bar"
+msgstr "Bar"
+msgid "stack"
+msgstr "Stack"
+msgid "tiled"
+msgstr "Tiled"
+msgid "restore"
+msgstr "Restore"
+msgid "saveImage"
+msgstr "Save Image"
+
+
+#: Department's charts
 msgid "depTaskChartTitle"
 msgstr "Hours per tasks"
 msgid "depTaskChartSubtitle"
 msgstr "Within the given date range"
 msgid "investedTime"
 msgstr "Time spent"
-msgid "default"
-msgstr "Default"
-msgid "apply"
-msgstr "Apply"
 msgid "empTaskChartTitle"
 msgstr "Employees per task"
 msgid "empTaskChartSubtitle"
 msgstr "For this department"
+
+
+#: Task's charts
+msgid "taskChartTitle"
+msgstr "Production details"
+msgid "taskChartSubtitle"
+msgstr "Relationship between time invested and production"
+
 
 #: Employee
 msgid "registryDate"
