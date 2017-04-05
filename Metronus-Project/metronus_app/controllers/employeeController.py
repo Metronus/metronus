@@ -20,8 +20,8 @@ from metronus_app.model.goalEvolution            import GoalEvolution
 from metronus_app.model.timeLog                  import TimeLog
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 
-from metronus_app.common_utils                   import get_current_admin_or_403, checkImage, get_current_employee_or_403, send_mail
-
+from metronus_app.common_utils                   import (get_current_admin_or_403, checkImage, get_current_employee_or_403, send_mail
+                                                        , is_email_unique, is_username_unique)
 from datetime                                           import date, timedelta,datetime
 
 import re
@@ -67,6 +67,10 @@ def create(request):
             # Check that the username is unique
             if not is_username_unique(form.cleaned_data["username"]):
                 errors.append('employeeCreation_usernameNotUnique')
+
+            # Check that the email is unique
+            if not is_email_unique(form.cleaned_data["email"]):
+                errors.append('employeeCreation_emailNotUnique')
 
             # Check that the image is OK
             if not checkImage(form, 'photo'):
@@ -460,6 +464,3 @@ def notify_password_change(email, name):
 def send_register_email(email, name):
     send_mail(ugettext_lazy("register_mail_subject"), "employee/employee_register_email.html", [email], "employee/employee_register_email.html",
               {'html': True, 'employee_name': name})
-
-def is_username_unique(username):
-    return User.objects.filter(username=username).count() == 0

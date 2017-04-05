@@ -4,6 +4,7 @@ from metronus_app.model.company import Company
 
 import os
 from django.conf import settings
+User._meta.get_field('email')._unique = True
 
 
 class Actor(models.Model):

@@ -15,6 +15,7 @@ from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEm
 from populate_database import basicLoad
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.http import HttpResponseForbidden,HttpResponseBadRequest
+from django.contrib.auth.decorators import login_required
 
 from django.contrib.auth import authenticate,login
 from django.http import JsonResponse
@@ -192,9 +193,6 @@ def view(request,task_id):
     task = get_object_or_404(Task, pk=task_id)
     checkTask(task, request)
     goal_evolution = GoalEvolution.objects.filter(task_id=task.id)
-
-    # Se obtienen todos los logs correspondientes a la tarea en un rango de un mes
-    productivity = [x for x in range(1,15)]#productivity_task_metric(task.id)
   
     return render(request, "task_view.html", {"task": task, "goal_evolution": goal_evolution})
 
@@ -272,6 +270,7 @@ def delete(request,task_id):
 
 #Métodos para métricas
 
+@login_required
 def ajax_productivity_per_task(request):
 
     # ------------------------- Cortesía de Agu ------------------------------
@@ -306,17 +305,18 @@ def ajax_productivity_per_task(request):
         'days':[]
     }
     production = TimeLog.objects.filter(task_id_id=task_id, workDate__range=[start_date, end_date])
+    task = get_object_or_404(Task, pk=task_id, active=True)
 
     z = 0
     start_date_parse = parse_datetime(start_date)
     for i in range(0, 31):
-        if len(production) > z and (production[z].workDate-start_date_parse).days == i:
-            data['production'].append(production[z].produced_units / production[z].duration)
+        if production is not None and len(production) > z and (production[z].workDate-start_date_parse).days == i:
+            data['production'].append(production[z].produced_units / (production[z].duration/60))
             z += 1
         else:
             data['production'].append(0)
 
-        data['goal_evolution'].append(production[0].task_id.production_goal)
+        data['goal_evolution'].append(task.production_goal)
 
         prod_day = start_date_parse + timedelta(days=i)
         data['days'].append(str(prod_day.day)+", "+str(calendar.month_name[prod_day.month]))

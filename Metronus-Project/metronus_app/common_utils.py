@@ -113,3 +113,11 @@ def send_mail(subject, email_template_name, recipients, html_email_template_name
         email_message.attach_alternative(html_email, 'text/html')
 
     email_message.send(fail_silently=False)
+
+
+def is_username_unique(username):
+    return User.objects.filter(username=username).count() == 0
+
+
+def is_email_unique(email):
+    return User.objects.filter(email=email).count() == 0
