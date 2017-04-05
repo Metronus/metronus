@@ -318,6 +318,10 @@ msgid "taskChartTitle"
 msgstr "Production details"
 msgid "taskChartSubtitle"
 msgstr "Relationship between time invested and production"
+msgid "production"
+msgstr "Production"
+msgid "goal_evolution"
+msgstr "Goal's Evolution"
 
 
 #: Employee
