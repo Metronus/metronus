@@ -58,7 +58,7 @@
             <th>{% trans 'projectDeparment' %}</th>
             <th>{% trans 'creationDate' %}</th>
             <th>{% trans 'creator' %}</th>
-            <th>{% trans 'timeLog' %}</th>
+            <th>{% trans 'details' %}</th>
           </tr>
         </thead>
         <tbody>
@@ -74,9 +74,7 @@
             <td>{{task.registryDate}}</td>
 
             <td>
-              <a href="{% url 'timeLog_list' task.id %}" type="button" class="btn btn-success">{% trans 'timeLog' %}</a>
-    
-
+            <a href="{% url 'task_view' task.id %}" type="button" class="btn btn-success">{% trans 'details' %}</a>
             </td>
           </tr>
           {% endfor %}
