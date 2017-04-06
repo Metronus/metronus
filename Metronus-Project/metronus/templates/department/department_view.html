@@ -1,0 +1,295 @@
+{% extends "layout_base.html" %}
+{% load i18n %}
+{% load l10n %}
+{% block title %}{% trans 'departmentList' %}{% endblock %}
+
+{% block content %}
+<h1><strong>{% trans 'department' %}: </strong>{{department.name}}</h1>
+<h2><strong>{% trans 'coordinator' %}: </strong>{{coordinator.user.first_name}} {{coordinator.user.last_name}}</h2> 
+
+<div class="row">
+  <div class="col-md-12 col-sm-12 col-xs-12">
+    <div class="x_panel">
+      <div class="x_content">
+
+        <div id="welp2" style="height:350px;"></div>
+        <br/>
+        <br/>
+        <br/>
+
+        <div id="welp" style="height:350px;"></div>
+
+        <div style="display:flex; justify-content: center;">
+          <form class="form-horizontal">
+            <label for"datepickerlabel">{% trans 'datePicker' %}</label>
+            <fieldset>
+              <div class="control-group">
+                <div class="controls">
+                  <div class="input-prepend input-group">
+                    <span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
+                    <input type="text" style="width: 200px" name="department_chart" id="department_chart" class="form-control" value=""/>
+                  </div>
+                </div>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+        <br/>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-12 col-sm-12 col-xs-12">
+  <div class="x_panel">
+    <div class="x_title">
+
+      <h2>{% trans 'taskList' %}</h2>
+      <ul class="nav navbar-right panel_toolbox">
+                    
+                    <li><a class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                  </ul>
+      <div class="clearfix"></div>
+      </div>
+      <table class="table table-striped table-hover">
+        <thead>
+          <tr>
+            <th>{% trans 'task' %}</th>
+            <th>{% trans 'projectDeparment' %}</th>
+            <th>{% trans 'creationDate' %}</th>
+            <th>{% trans 'creator' %}</th>
+            <th>{% trans 'timeLog' %}</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          {% for task in tasks %}
+          <tr>
+            <td>{{task.name}}</td>
+
+            <td>{{task.projectDepartment_id}}</td>
+
+            <td>{{task.actor_id}}</td>
+
+            <td>{{task.registryDate}}</td>
+
+            <td>
+              <a href="{% url 'timeLog_list' task.id %}" type="button" class="btn btn-success">{% trans 'timeLog' %}</a>
+    
+
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      </div>
+
+
+<div class="x_panel">
+    <div class="x_title">
+
+      <h2>{% trans 'employeeList' %}</h2>
+      <ul class="nav navbar-right panel_toolbox">
+                    
+                    <li><a class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                  </ul>
+      <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
+
+      
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>{% trans 'username' %}</th>
+                                    <th>{% trans 'identifier' %}</th>
+                                    <th>{% trans 'phone' %}</th>
+                                    <th class="hidden-xs">{% trans 'registryDate' %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for employee in employees %}
+                                    <tr data-href="{% url 'employee_view' employee.user %}" style="cursor: pointer;">
+                                        <td><img src="{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
+                                        <td>{{employee.identifier}}</td>
+                                        <td>{{employee.phone}}</td>
+                                        <td class="hidden-xs">{{employee.registryDate}}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    
+
+</div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+
+<script>
+    function fromData (backendData) {
+      return {
+        title : {
+          text: '{% trans 'depTaskChartTitle' %}',
+          subtext: '{% trans 'depTaskChartSubtitle' %}',
+          x: 'left'
+        },
+        tooltip : {
+          trigger: 'axis'
+        },
+        legend: {
+          data:['{% trans 'investedTime' %}'],
+          x : 'center',
+        },
+        toolbox: {
+          show : true,
+          feature : {
+            saveAsImage : {show: true}
+          }
+        },
+        calculable : true,
+        xAxis : [
+        {
+          type : 'category',
+          show : false,
+          data : backendData.names
+        }
+        ],
+        yAxis : [
+        {
+          type : 'value'
+        }
+        ],
+        series : [
+        {
+          name:'{% trans 'investedTime' %}',
+          type:'bar',
+          data: backendData.values,
+          markPoint : {
+            data : [
+            {type : 'max', name: '{% trans 'max' %}'},
+            {type : 'min', name: '{% trans 'min' %}'}
+            ]
+          },
+          markLine : {
+            data : [
+            {type : 'average', name: '{% trans 'avg' %}'}
+            ]
+          }
+        }
+        ]
+      }
+    }
+
+    $(document).ready(function() {
+      var echartLine = echarts.init(document.getElementById('welp'), theme);
+      var defaultBackendData = { 'names': [''], 'values': [0] };
+      $.get({
+        url: "/department/ajaxTimePerTask",
+        data: {department_id: {{department.id}}},
+        success: function ( backendData )  {
+          defaultBackendData = backendData
+          echartLine.setOption( fromData( backendData ) );
+        }
+      })
+
+      defaultRange = moment().startOf('month').format('MM/DD/YYYY') +' - '+ moment().endOf('month').format('MM/DD/YYYY')
+      $('input[name="department_chart"]').val(defaultRange)
+
+      $('input[name="department_chart"]').daterangepicker({
+        autoUpdateInput: false,
+        locale: {
+          cancelLabel: '{% trans 'default' %}',
+          applyLabel: '{% trans 'apply' %}'
+        }
+      });
+
+      $('input[name="department_chart"]').on('apply.daterangepicker', function(ev, picker) {
+        $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+        $.get({
+          url: "/department/ajaxTimePerTask",
+          data: {
+            department_id: {{department.id}},
+            start_date: picker.startDate.format('YYYY-MM-DD'),
+            end_date: picker.endDate.format('YYYY-MM-DD')
+          },
+          success: function ( backendData )  {
+            echartLine.setOption( fromData( backendData ) );
+          }
+        })
+      });
+
+      $('input[name="department_chart"]').on('cancel.daterangepicker', function(ev, picker) {
+        $(this).val(defaultRange);
+        echartLine.setOption( fromData( defaultBackendData ) );
+      });
+
+
+      ////////////////////////////////////////////
+
+
+      function reformatForPieChart(backendData) {
+        var res = []
+        for( i=0; i<backendData.names.length; i++) {
+          res.push({
+            name: backendData.names[i],
+            value: backendData.values[i]
+          })
+        }
+        return res
+      }
+
+      // Gráfico 2
+      function pieFromData(backendData) {
+        return {
+            title : {
+                text: '{% trans 'empTaskChartTitle' %}',
+                subtext: '{% trans 'empTaskChartSubtitle' %}',
+                x:'left'
+            },
+            tooltip : {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            toolbox: {
+                show : true,
+                feature : {
+                    saveAsImage : {show: true}
+                }
+            },
+            calculable : true,
+            series : [
+                {
+                    name:'{% trans 'empTaskChartTitle' %}',
+                    type:'pie',
+                    radius : '55%',
+                    center: ['50%', '60%'],
+                    data: reformatForPieChart(backendData)
+                }
+            ]
+        }
+      }
+
+
+      var echartLine2 = echarts.init(document.getElementById('welp2'), theme);
+
+      $.get({
+        url: "/department/ajaxEmployeesPerTask",
+        data: {department_id: {{department.id}}},
+        success: function ( backendData )  {
+          echartLine2.setOption( pieFromData(backendData) );
+        }
+      })
+        
+
+
+
+    })
+
+</script>
+{% endblock %}

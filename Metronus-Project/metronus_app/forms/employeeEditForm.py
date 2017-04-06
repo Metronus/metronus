@@ -5,8 +5,6 @@ from django.forms import Form
 class EmployeeEditForm(Form):
 
     # User (Account data)
-    password1 = forms.CharField(label="password1", widget=forms.PasswordInput, required=False)
-    password2 = forms.CharField(label="password2", widget=forms.PasswordInput, required=False)
     first_name = forms.CharField(max_length=50)
     last_name = forms.CharField(max_length=50)
     email = forms.EmailField()

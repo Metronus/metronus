@@ -1,15 +1,17 @@
-from metronus_app.model.role import Role
-from metronus_app.model.company import Company
-from metronus_app.model.employee import Employee
-from metronus_app.model.project import Project
-from metronus_app.model.department import Department
-from django.contrib.auth.models import User
-from metronus_app.model.administrator import Administrator
-from metronus_app.model.task import Task
-from metronus_app.model.projectDepartment import ProjectDepartment
+from metronus_app.model.role                          import Role
+from metronus_app.model.company                       import Company
+from metronus_app.model.employee                      import Employee
+from metronus_app.model.project                       import Project
+from metronus_app.model.department                    import Department
+from django.contrib.auth.models                       import User
+from metronus_app.model.administrator                 import Administrator
+from metronus_app.model.task                          import Task
+from metronus_app.model.timeLog                       import TimeLog
+from metronus_app.model.projectDepartment             import ProjectDepartment
+from metronus_app.model.goalEvolution             import GoalEvolution
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
-from django.db import transaction
-
+from django.db                                        import transaction
+from populate_database2 import randomLoad
 @transaction.atomic
 def basicLoad():
     company=Company.objects.create(cif="A00000001", company_name="company1", short_name="company1", email="company1@gmail.com", phone="123456789")
@@ -102,10 +104,10 @@ def basicLoad():
 
     populate_roles()
 
-    emp_role=Role.objects.get(name="Employee")
-    coor_role=Role.objects.get(name="Coordinator")
-    pm_role=Role.objects.get(name="Project manager")
-    team_role=Role.objects.get(name="Team manager")
+    emp_role=Role.objects.get(name="EMPLOYEE")
+    coor_role=Role.objects.get(name="COORDINATOR")
+    pm_role=Role.objects.get(name="PROJECT_MANAGER")
+    team_role=Role.objects.get(name="TEAM_MANAGER")
 
     ProjectDepartmentEmployeeRole.objects.create(
         projectDepartment_id=pd1,
@@ -159,32 +161,107 @@ def basicLoad():
         role_id=emp_role )
 
 
-    Task.objects.create(
+    task1 = Task.objects.create(
         name  ="Hacer cosas",
         description  = "meda",
         actor_id = emp4,
         projectDepartment_id = pd1
     )
 
-    Task.objects.create(
+    task2 = Task.objects.create(
         name  ="Hacer cosas de back",
         description  = "hola",
         actor_id = emp5,
         projectDepartment_id = pd1
     )
-    Task.objects.create(
+
+    task3 = Task.objects.create(
         name  ="Hacer cosas de front",
         description  = "nada",
         actor_id = emp8,
-        projectDepartment_id = pd2
+        projectDepartment_id = pd2,
+        production_goal="2.0",
+        goal_description="kgs"
     )
-    Task.objects.create(
+
+    task4 = Task.objects.create(
         name  ="Hacer cosas de cua",
         description  = "nada",
         actor_id = emp8,
         projectDepartment_id = pd1,
         active=False
     )
+
+    TimeLog.objects.create(
+        description = "he currado mucho",
+        workDate = "2017-01-02 10:00+00:00",
+        duration = 240,
+        task_id = task1,
+        employee_id = emp4
+    )
+
+    TimeLog.objects.create(
+        description = "he currado poco",
+        workDate = "2017-03-20 13:37+00:00",
+        duration = 60,
+        task_id = task1,
+        employee_id = emp3
+    )
+
+    TimeLog.objects.create(
+        description = "me quiero morir",
+        workDate = "2017-02-12 15:30+00:00",
+        duration = 400,
+        task_id = task1,
+        employee_id = emp3
+    )
+
+    TimeLog.objects.create(
+        description = "me quiero morir mas que nunca",
+        workDate = "2017-02-14 15:30+00:00",
+        duration = 400,
+        task_id = task3,
+        produced_units="1.5",
+        employee_id = emp3
+    )
+
+    TimeLog.objects.create(
+        description = "me quiero morir algunos dias",
+        workDate = "2017-04-01 15:30+00:00",
+        duration = 300,
+        task_id = task3,
+        produced_units="0.5",
+        employee_id = emp4
+    )
+
+    TimeLog.objects.create(
+        description = "me quiero morir",
+        workDate = "2017-02-12 15:30+00:00",
+        duration = 400,
+        task_id = task3,
+        produced_units="8",
+        employee_id = emp3
+    )
+    ge1=GoalEvolution.objects.create(
+        task_id=task3,
+        
+        actor_id = emp8,
+        production_goal=9.0,
+        goal_description="kgs"
+        )
+    
+    ge2=GoalEvolution.objects.create(
+        task_id=task3,
+        
+        actor_id = emp8,
+        production_goal=4.0,
+        goal_description="kgs"
+        )
+    #as registryDate is an autofield_now and updates on save(), we must set the registrydate with update()
+    #if we want to force a date in registryDate
+    GoalEvolution.objects.filter(pk=ge1.id).update(registryDate = "2017-02-11 15:30+00:00")
+    GoalEvolution.objects.filter(pk=ge2.id).update(registryDate = "2017-02-13 15:30+00:00")
+    Task.objects.filter(pk=task3.id).update(registryDate = "2017-02-13 16:30+00:00")
 def create_user(nombre,company2):
     User.objects.create_user(
         username=nombre,
@@ -201,10 +278,16 @@ def create_user(nombre,company2):
         company_id=company2)
 
 def populate_roles():
-    Role.objects.create(name="Project manager")
-    Role.objects.create(name="Coordinator")
-    Role.objects.create(name="Team manager")
-    Role.objects.create(name="Employee")
+    # El gerente
+    Role.objects.create(name="EXECUTIVE", tier=50)
+    # El jefe de proyecto
+    Role.objects.create(name="PROJECT_MANAGER", tier=40)
+    # El jefe de equipo 
+    Role.objects.create(name="TEAM_MANAGER", tier=30)
+    # El coordinador del departamento
+    Role.objects.create(name="COORDINATOR", tier=20)
+    # El empleado
+    Role.objects.create(name="EMPLOYEE", tier=10)
 
 #############################################################################
 #############################################################################
@@ -212,3 +295,4 @@ def populate_roles():
 
 def populate_database():
     basicLoad()
+#    randomLoad()

@@ -1,5 +1,7 @@
 {% load i18n %}
 {% load l10n %}
+{% load compress %}
+{% load custom_tags %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -8,6 +10,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
 
 		<title> {% block title %}{% endblock %} </title>
 
@@ -18,15 +21,29 @@
 		<link href="/static/css/jqvmap.min.css" rel="stylesheet">
 		<link href="/static/css/daterangepicker.css" rel="stylesheet">
 		<link href="/static/css/custom.min.css" rel="stylesheet">
+		<link href="/static/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
   </head>
 
   <body class="nav-md">
+
+  {% isAdmin user.actor as _is_admin %}
+  {% isEmployee user.actor as _is_employee %}
+
+
     <div class="container body">
       <div class="main_container">
         <div class="col-md-3 left_col">
           <div class="left_col scroll-view">
             <div class="navbar nav_title" style="border: 0;">
-              <a href="index.html" class="site_title"><i class="fa fa-paw"></i> <span>{{user.actor.company_id.company_name}}</span></a>
+              <a href="index.html" class="site_title">
+                {% if user.actor.company_id.logo == "" %}
+                  <img src="/static/landing/img/favicon/android-icon-192x192.png" class="img-circle" width="40" height="40">
+                {% else %}
+                  <img src="{{ MEDIA_URL }}{{user.actor.company_id.logo}}" class="img-circle" width="40" height="40">
+                {% endif %}
+
+
+              <span>{{user.actor.company_id.company_name}}</span></a>
             </div>
 
             <div class="clearfix"></div>
@@ -34,7 +51,11 @@
             <!-- menu profile quick info -->
             <div class="profile clearfix">
               <div class="profile_pic">
-                <img src="{{user.actor.picture}}" alt="{{user.get_username}}" class="img-circle profile_img">
+                  {% if user.actor.picture == "/static/avatar.png" %}
+                      <img src="{{user.actor.picture}}" alt="{{user.get_username}}" class="img-circle profile_img">
+                  {% else %}
+                      <img src="{{ MEDIA_URL }}{{user.actor.picture}}" alt="{{user.get_username}}" class="img-circle profile_img">
+                  {% endif %}
               </div>
               <div class="profile_info">
                 <span>{% trans 'dashWelcome' %}, </span>
@@ -52,7 +73,8 @@
                 <ul class="nav side-menu">
                   <li><a><i class="fa fa-home"></i>{% trans 'dashIndex' %}</span></a>
                   </li>
-                  <li><a><i class="fa fa-desktop"></i>{% trans 'dashProjects' %}<span class="fa fa-chevron-down"></span></a>
+                  <li>
+                  <a><i class="fa fa-desktop"></i>{% trans 'dashProjects' %}<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/project/list">{% trans 'dashProjectsList' %}</a></li>
                       <li><a href="/project/create">{% trans 'dashProjectCreate' %}</a></li>
@@ -79,7 +101,6 @@
                   <li><a><i class="fa fa-calendar"></i>{% trans 'dashTimeControl' %}<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/timeLog/list_all">{% trans 'dashTimeControlList' %}</a></li>
-                      <li><a href="/timeLog/create_all">{% trans 'dashTimeControlCreate' %}</a></li>
                     </ul>
                   </li>
                 </ul>
@@ -97,10 +118,20 @@
                 <a id="menu_toggle"><i class="fa fa-bars"></i></a>
               </div>
 
+
               <ul class="nav navbar-nav navbar-right">
+
+                <li><a href="#"><img id="flag_es" alt="Spanish" class="img-responsive" src="/static/landing/img/flag_es.png" height="40" width="40"></a></li>
+                <li><a href="#"><img id="flag_en" alt="Spanish" class="img-responsive" src="/static/landing/img/flag_en.png" height="40" width="40"></a></li>
+
                 <li class="">
                   <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <img src="{{user.actor.picture}}" alt="">{{user.first_name}} {{user.last_name}}
+                    {% if user.actor.picture == "/static/avatar.png" %}
+                      <img src="{{user.actor.picture}}" alt="{{user.get_username}}">
+                  {% else %}
+                      <img src="{{ MEDIA_URL }}{{user.actor.picture}}" alt="{{user.get_username}}">
+                  {% endif %}
+                      {{user.first_name}} {{user.last_name}}
                     <span class=" fa fa-angle-down"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-usermenu pull-right">
@@ -145,12 +176,265 @@
 		<script src="/static/js/bootstrap-progressbar.min.js"></script>
 		<script src="/static/js/icheck.min.js"></script>
 		<script src="/static/js/skycons.js"></script>
-		<script src="/static/js/custom.min.js"></script>
 		<script src="/static/js/validator.js"></script>
+		<script src="/static/js/bootstrap-datetimepicker.min.js"></script>
+        <script src="/static/js/echarts.min.js"></script>
 		<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/css/bootstrapvalidator.min.css"/>
 		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/js/bootstrapvalidator.min.js"></script>
 		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/4.3.8/js/fileinput.min.js"></script>
 
-    {% block javascript %}{% endblock %}
+        <!-- bootstrap-daterangepicker -->
+        <script src="/static/js/moment.min.js"></script>
+        <script src="/static/js/daterangepicker.js"></script>
+
+  <script>
+      var theme = {
+        color: [
+            '#26B99A', '#34495E', '#BDC3C7', '#3498DB',
+            '#9B59B6', '#8abb6f', '#759c6a', '#bfd3b7'
+        ],
+
+        title: {
+            itemGap: 8,
+            textStyle: {
+                fontWeight: 'normal',
+                color: '#408829'
+            }
+        },
+
+        dataRange: {
+            color: ['#1f610a', '#97b58d']
+        },
+
+        toolbox: {
+            color: ['#408829', '#408829', '#408829', '#408829']
+        },
+
+        tooltip: {
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            axisPointer: {
+                type: 'line',
+                lineStyle: {
+                    color: '#408829',
+                    type: 'dashed'
+                },
+                crossStyle: {
+                    color: '#408829'
+                },
+                shadowStyle: {
+                    color: 'rgba(200,200,200,0.3)'
+                }
+            }
+        },
+
+        dataZoom: {
+            dataBackgroundColor: '#eee',
+            fillerColor: 'rgba(64,136,41,0.2)',
+            handleColor: '#408829'
+        },
+        grid: {
+            borderWidth: 0
+        },
+
+        categoryAxis: {
+            axisLine: {
+                lineStyle: {
+                    color: '#408829'
+                }
+            },
+            splitLine: {
+                lineStyle: {
+                    color: ['#eee']
+                }
+            }
+        },
+
+        valueAxis: {
+            axisLine: {
+                lineStyle: {
+                    color: '#408829'
+                }
+            },
+            splitArea: {
+                show: true,
+                areaStyle: {
+                    color: ['rgba(250,250,250,0.1)', 'rgba(200,200,200,0.1)']
+                }
+            },
+            splitLine: {
+                lineStyle: {
+                    color: ['#eee']
+                }
+            }
+        },
+        timeline: {
+            lineStyle: {
+                color: '#408829'
+            },
+            controlStyle: {
+                normal: {
+                    color: '#408829'
+                },
+                emphasis: {
+                    color: '#408829'
+                }
+            }
+        },
+
+        k: {
+            itemStyle: {
+                normal: {
+                    color: '#68a54a',
+                    color0: '#a9cba2',
+                    lineStyle: {
+                        width: 1,
+                        color: '#408829',
+                        color0: '#86b379'
+                    }
+                }
+            }
+        },
+        map: {
+            itemStyle: {
+                normal: {
+                    areaStyle: {
+                        color: '#ddd'
+                    },
+                    label: {
+                        textStyle: {
+                            color: '#c12e34'
+                        }
+                    }
+                },
+                emphasis: {
+                    areaStyle: {
+                        color: '#99d2dd'
+                    },
+                    label: {
+                        textStyle: {
+                            color: '#c12e34'
+                        }
+                    }
+                }
+            }
+        },
+        force: {
+            itemStyle: {
+                normal: {
+                    linkStyle: {
+                        strokeColor: '#408829'
+                    }
+                }
+            }
+        },
+        chord: {
+            padding: 4,
+            itemStyle: {
+                normal: {
+                    lineStyle: {
+                        width: 1,
+                        color: 'rgba(128, 128, 128, 0.5)'
+                    },
+                    chordStyle: {
+                        lineStyle: {
+                            width: 1,
+                            color: 'rgba(128, 128, 128, 0.5)'
+                        }
+                    }
+                },
+                emphasis: {
+                    lineStyle: {
+                        width: 1,
+                        color: 'rgba(128, 128, 128, 0.5)'
+                    },
+                    chordStyle: {
+                        lineStyle: {
+                            width: 1,
+                            color: 'rgba(128, 128, 128, 0.5)'
+                        }
+                    }
+                }
+            }
+        },
+        gauge: {
+            startAngle: 225,
+            endAngle: -45,
+            axisLine: {
+                show: true,
+                lineStyle: {
+                    color: [
+                        [0.2, '#86b379'],
+                        [0.8, '#68a54a'],
+                        [1, '#408829']
+                    ],
+                    width: 8
+                }
+            },
+            axisTick: {
+                splitNumber: 10,
+                length: 12,
+                lineStyle: {
+                    color: 'auto'
+                }
+            },
+            axisLabel: {
+                textStyle: {
+                    color: 'auto'
+                }
+            },
+            splitLine: {
+                length: 18,
+                lineStyle: {
+                    color: 'auto'
+                }
+            },
+            pointer: {
+                length: '90%',
+                color: 'auto'
+            },
+            title: {
+                textStyle: {
+                    color: '#333'
+                }
+            },
+            detail: {
+                textStyle: {
+                    color: 'auto'
+                }
+            }
+        },
+        textStyle: {
+            fontFamily: 'Arial, Verdana, sans-serif'
+        }
+    };
+  </script>
+    {% block javascript %}
+
+    {% endblock %}
+    <script src="/static/js/custom.min.js"></script>
+
+    <!-- js -->
+    {% compress js %}    
+    <script src="/static/landing/js/cookies.min.js"></script>
+    <script src="/static/landing/js/wow.min.js"></script>
+    {% endcompress %}
+
+    <script>
+      $( document ).ready(function() {
+        new WOW().init();
+
+        $("#flag_es").click(function() {
+          console.log("joll");
+          Cookies.set('lang', 'es-es');
+          location.reload(true);
+        });
+
+        $("#flag_en").click(function() {
+          Cookies.set('lang', 'en-us');
+          location.reload(true);
+        });
+      });
+    </script>
+
   </body>
 </html>

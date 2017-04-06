@@ -1,0 +1,56 @@
+{% extends "anon_master.html" %}
+{% load i18n %}
+{% load l10n %}
+
+
+{% block title %}{% trans 'contact_form' %}{% endblock %}
+
+
+{% block content %}
+
+<body class="login">
+    <div class="login_wrapper">
+      <section class="login_content">
+
+          <h3 class="text-center">{% trans 'contact_form' %}</h3>
+          <form id="contact_form" method="POST" action="" accept-charset="utf-8">
+            {% csrf_token %}
+              <div class="separator">
+              </div>
+           
+              <input type="text" for="id_{{ form.name.name }}" class="form-control" placeholder="{% trans 'name' %}" required="" name="{{ form.name.name }}"  id="id_{{ form.name.name }}"/>
+         
+              <input type="email" for="id_{{ form.email.name }}" class="form-control" placeholder="{% trans 'email' %}" required="" name="{{ form.email.name }}" id="id_{{ form.email.name }}"/>
+           
+              <input type="text" for="id_{{ form.subject.name }}" class="form-control" placeholder="{% trans 'email_subject' %}" required="" name="{{ form.subject.name }}" id="id_{{ form.subject.name }}"/>
+            
+              <textarea class="form-control" name="{{ form.body.name }}" id="id_{{ form.body.name }}" rows="5" placeholder="{% trans 'email_body' %}" style="resize:none"></textarea>
+
+              <div class="checkbox">
+                <label>
+                
+                  <input type="checkbox" data-toggle="toggle" name="{{ form.copy_to_user.name }}" id="id_{{ form.copy_to_user.name }}">
+                  {% trans 'copy_to_user' %}
+                  
+                </label>
+              </div>
+
+            <div class="separator">
+              <button type="submit" class="btn btn-success submit">{% trans 'send' %}</button>
+              <button type="button" class="btn btn-info submit" onclick="window.location.href='/'">{% trans 'return_to_landingpage' %}</button>
+            </div>
+
+          </form>
+          </section>
+          {% if form.errors %}
+        <p>{{ form.errors }}</p>
+{% endif %}
+ 
+{% if errors %}
+    {% for err in errors%}
+        <p>{% trans err %}</p>
+    {% endfor %}
+{% endif %}
+    </div>
+</body>
+{% endblock %}

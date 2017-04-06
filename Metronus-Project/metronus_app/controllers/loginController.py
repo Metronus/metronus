@@ -23,6 +23,7 @@ from django.contrib.auth.views import deprecate_current_app
 from metronus_app.model.company import Company
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
+from django.shortcuts import render
 from metronus_app.common_utils import check_company_contains_actor
 
 

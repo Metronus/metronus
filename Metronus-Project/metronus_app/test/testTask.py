@@ -7,8 +7,10 @@ from django.test import TestCase, Client
 from metronus_app.model.employee         import Employee
 from metronus_app.model.project import Project
 from metronus_app.model.department import Department
+from metronus_app.model.goalEvolution import GoalEvolution
 from django.core.exceptions                      import ObjectDoesNotExist, PermissionDenied
 from populate_database import populate_database
+from metronus_app.model.goalEvolution import GoalEvolution
 class TaskTestCase(TestCase):
 
     def setUpTestData():
@@ -149,18 +151,15 @@ class TaskTestCase(TestCase):
         form = response.context["task"]
 
         self.assertEquals(form.id, dep_id)
+        self.assertEquals(response.context["goal_evolution"]==None,False)
 
-
-    def test_view_task_positive_2(self):
+    def test_view_task_negative_2(self):
         c = Client()
         c.login(username="anddonram", password="123456")
         response = c.get("/task/list")
         dep_id=response.context["tasks"][0].id
         response = c.get("/task/view/"+str(dep_id)+"/")
-        self.assertEquals(response.status_code, 200)
-        form = response.context["task"]
-
-        self.assertEquals(form.id, dep_id)
+        self.assertEquals(response.status_code, 403)
 
     def test_view_task_negative(self):
         c = Client()
@@ -197,20 +196,80 @@ class TaskTestCase(TestCase):
         c.login(username="metronus", password="metronus")
 
         pro_id=Project.objects.get(name="Metronus").id,
-
         dep_id=Department.objects.get(name="Frontend").id
-        response = c.get("/task/list")
-        task_id=response.context["tasks"][0].id
+        task_id=Task.objects.filter(name="Hacer cosas de cua").first().id
+
+        logs_before = GoalEvolution.objects.all().count()
 
         response = c.post("/task/edit/"+str(task_id)+"/", {
             "task_id": task_id,
             "name": "Hacer memes",
             "description":"alguno",
             "project_id":pro_id,
-            "department_id":dep_id
+            "department_id":dep_id,
+            "production_goal":"3.0",
+            "goal_description":"kgs"
               })
 
         self.assertEquals(response.status_code, 302)
+        logs_after = GoalEvolution.objects.all().count()
+
+        self.assertEquals(logs_before + 1, logs_after)
+
+    def test_edit_task_positive_2(self):
+        # Logged in as an administrator, try to edit a task
+        # no new entry is created
+        c = Client()
+        c.login(username="metronus", password="metronus")
+
+        pro_id=Project.objects.get(name="Metronus").id,
+
+        dep_id=Department.objects.get(name="Frontend").id
+
+      
+        task_id=Task.objects.filter(name="Hacer cosas de front").first().id
+
+        logs_before = GoalEvolution.objects.all().count()
+
+        response = c.post("/task/edit/"+str(task_id)+"/", {
+            "task_id": task_id,
+            "name": "Hacer memes",
+            "description":"alguno",
+            "project_id":pro_id,
+            "department_id":dep_id,
+            "production_goal":"2.0",
+            "goal_description":"kgs"
+              })
+
+        self.assertEquals(response.status_code, 302)
+        logs_after = GoalEvolution.objects.all().count()
+
+        self.assertEquals(logs_before, logs_after)
+
+    def test_edit_task_invalid_goal(self):
+        # Logged in as an administrator, try to edit a task
+        c = Client()
+        c.login(username="metronus", password="metronus")
+
+        pro_id=Project.objects.get(name="Metronus").id,
+
+        dep_id=Department.objects.get(name="Frontend").id
+        response = c.get("/task/list")
+        task_id=response.context["tasks"][0].id
+
+
+        response = c.post("/task/edit/"+str(task_id)+"/", {
+            "task_id": task_id,
+            "name": "Hacer memes",
+            "description":"alguno",
+            "project_id":pro_id,
+            "department_id":dep_id,
+            "production_goal":"2.0",
+            "goal_description":""
+              })
+
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response.context["valid_goal"],False)
 
     def test_edit_task_duplicate(self):
         # Logged in as an employee, try to edit a task

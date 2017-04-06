@@ -11,6 +11,9 @@ class Task(models.Model):
     actor_id = models.ForeignKey(Actor)
     projectDepartment_id = models.ForeignKey(ProjectDepartment)
 
+    production_goal=models.FloatField(null=True,blank=True)
+    goal_description=models.CharField(blank=True,max_length=100,default="")
+
     def __unicode__(self):
         return self.name
 

@@ -12,70 +12,68 @@ from django.shortcuts                                 import render
 from django.shortcuts                                 import render_to_response, get_object_or_404
 from django.http                                      import HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
  
-from metronus_app.common_utils                        import get_current_admin_or_403
+from metronus_app.common_utils                        import get_authorized_or_403
 
 
 def manage(request):
     """
-    parameters/returns:
-
-    employee_id: id del empleado (si el formulario es nuevo)
-    role_id: id del rol a editar (si se edita uno ya existente)
+    parameters:
+        employee_id: id del empleado (si el formulario es nuevo)
+        role_id: id del rol a editar (si se edita uno ya existente)
+        Se devuelve error 403 si no se proporciona al menos uno de los dos
 
     returns:
-    departments: lista de departamentos de la empresa del admin logueado
-    projects: lista de proyectos de la empresa del admin logueado
-    roles: lista de roles del sistema
-    form: formulario RoleManagementForm con los valores iniciales adecuados
+        employee: datos del empleado que se está editando
+        departments: lista de departamentos que puede usar el usuario/admin logueado
+        projects: lista de proyectos que puede user el usuario/admin logueado
+        roles: lista de roles del sistema (sólo se aceptarán si están por debajo para el dpto/proyecto)
+        form: formulario RoleManagementForm con los valores iniciales adecuados
+
+        errors: array de códigos de error si los hay
     
     template:
-    rol_form.html
+        rol_form.html
+
+    códigos de error (todos empiezan por roleCreation_):
+        formNotValid - el formulario enviado no es válido
+        employeeDoesNotExist - el empleado indicado no existe en la compañía o no está activo
+        departmentDoesNotExist - el departamento indicado no existe en la compañía o no está activo
+        projectDoesNotExist - el proyecto indicado no existe en la compañía o no está activo
+        roleDoesNotExist - el rol indicado no existe
+        employeeRoleDoesNotExist - el ID de rol de empleado indicado no existe
+        notAuthorizedProjectDepartment - el usuario no está autorizado para crear roles en ese departamento y proyecto
+        notAuthorizedRole - el usuario está autorizado a crear roles pero el que intenta crear es igual o superior al suyo
+        alreadyExists - ya existe un rol para ese usuario, departamento y proyecto (sólo aparece al crear roles, no al editar)
+        editingHigherRole - el usuario está intentando editar un rol de otro usuario que está por encima de él
     """
 
-    admin = get_current_admin_or_403(request)
-    company = admin.company_id
+    logged = get_authorized_or_403(request)
 
-    # Return all departments and roles for the logged admin
     if request.method == "GET":
-        # Check that the GET request contains at least employee_id or role_id as parameters
+        # Check that at least 'employee_id' or 'role_id' are provided as GET params, raise 400 otherwise
         if "employee_id" not in request.GET and "role_id" not in request.GET:
             return HttpResponseBadRequest()
 
-        return return_get_form(request, admin)
+        # Return the initial form
+        return get_form(request, logged)
 
     elif request.method == "POST":
 
-        # Process the received form
         form = RoleManagementForm(request.POST)
         if form.is_valid():
-            check_form_permissions(form, admin)
-
-            if form.cleaned_data['employeeRole_id'] == 0:
-                # ID = 0, crear un nuevo rol
-                create_new_role(form)
+            
+            result = process_post_form(logged, form)
+            if result["ok"]:
+                return HttpResponseRedirect('/employee/view/' + Employee.objects.get(id=form.cleaned_data["employee_id"]).user.username + '/')
             else:
-                existing_role = get_object_or_404(ProjectDepartmentEmployeeRole, id=form.cleaned_data['employeeRole_id'])
-                if existing_role.employee_id.id != form.cleaned_data['employee_id'] or existing_role.projectDepartment_id.project_id.id != form.cleaned_data['project_id'] or existing_role.projectDepartment_id.department_id.id != form.cleaned_data['department_id']:
-
-                    create_new_role(form) # Treat it like a new role if the employee, the project or the department have changed from the original
-
-                else:
-                    # Update the current role
-                    existing_role.role_id = get_object_or_404(Role, id=form.cleaned_data['role_id'])
-                    existing_role.save()
-
-            return HttpResponseRedirect('/employee/view/' + Employee.objects.get(id=form.cleaned_data["employee_id"]).user.username + '/')
+                return return_invalid_form(request, form, logged, result["errors"])
 
         else:
-            # Form is not valid
-            return render(request, 'rol_form.html', {'departments': Department.objects.filter(company_id=company, active=True), 
-                                                     'projects': Project.objects.filter(company_id=company, deleted=False), 
-                                                     'roles': Role.objects.all(), 
-                                                     'form': form})
-    else:
-        raise PermissionDenied
-    
+            # The form is not valid
+            return return_invalid_form(request, form, logged, ['roleCreation_formNotValid'])
 
+    else: # Other request method, not supported
+        raise PermissionDenied
 
 def manageAsync(request):
     """
@@ -83,58 +81,76 @@ def manageAsync(request):
     form: el formulario con los datos del departamento
 
     returns:
-    data: JSON con un mensaje de respuesta. Es un dict que contiene lo siguiente
-    success:true si hubo exito, false si no
+
+    JSON con un mensaje de respuesta. Es un dict que contiene lo siguiente
+    success: true si hubo exito, false si no
+    errors: array de códigos de error (vacío si success == true)
     """
 
-    def false():
-        return JsonResponse({'success': False})
+    logged = get_authorized_or_403(request)
 
-    def true():
-        return JsonResponse({'success': True})
-
-    ################## 
-
-    admin = get_current_admin_or_403(request)
-    company = admin.company_id
-
-    # Process an AJAX request
     if request.method == 'POST':
-
+        
         form = RoleManagementForm(request.POST)
         if form.is_valid():
-            check_form_permissions(form, admin)
-
-            # Try to create a new role if the employee_role id is 0
-            if form.cleaned_data['employeeRole_id'] == 0:
-                try:
-                    create_new_role(form)
-                    return true()
-                except:
-                    return false()
-
-            else:
-                try:
-                    existing_role = get_object_or_404(ProjectDepartmentEmployeeRole, id=form.cleaned_data['employeeRole_id'])
-                    if existing_role.employee_id.id != form.cleaned_data['employee_id'] or existing_role.projectDepartment_id.project_id.id != form.cleaned_data['project_id'] or existing_role.projectDepartment_id.department_id.id != form.cleaned_data['department_id']:
-                        create_new_role(form) # Treat it like a new role if the employee, the project or the department have changed from the original
-                    else:
-                        # Update the current role
-                        existing_role.role_id = get_object_or_404(Role, id=form.cleaned_data['role_id'])
-                        existing_role.save()
-                    return true()
-
-                except:
-                    return false()
-
+            result = process_post_form(logged, form)
+            return JsonResponse({'success': result["ok"], 'errors': result['errors']})
         else:
-            return false()
-            
+            JsonResponse({'success': False, 'errors': ['roleCreation_formNotValid']})
 
+def ajax_departments_from_projects(request):
+    """
+    parameters:
+    project_id: ID del proyecto seleccionado
+
+    returns:
+    lista de objetos {id, nombre} de los departamentos seleccionables
+    """
+
+    logged = get_authorized_or_403(request)
+    if "project_id" not in request.GET:
+        return HttpResponseBadRequest()
+
+    if logged.user_type == "E":
+        ids = ProjectDepartmentEmployeeRole.objects.values_list('projectDepartment_id__department_id', flat=True).filter(employee_id=logged, role_id__tier__gt=10, projectDepartment_id__department_id__active=True, projectDepartment_id__project_id__id=request.GET["project_id"])
+        dpts = Department.objects.filter(id__in=ids)
     else:
-        # What are you doing
-        raise PermissionDenied
+        dpts = Department.objects.filter(active=True, company_id=logged.company_id)
 
+    data = []
+    for d in dpts:
+        data.append({'id': d.id, 'name': d.name})
+
+    return JsonResponse(data, safe=False)
+
+def ajax_roles_from_tuple(request):
+    """
+    parameters:
+    project_id: ID del proyecto seleccionado
+    department_id: ID del proyecto seleccionado
+
+    returns:
+    lista de objetos {id, nombre} de los roles seleccionables
+    """
+
+    logged = get_authorized_or_403(request)
+    if "project_id" not in request.GET or "department_id" not in request.GET:
+        return HttpResponseBadRequest()
+
+    if logged.user_type == "E":
+        try:
+            myrole = ProjectDepartmentEmployeeRole.objects.get(employee_id=logged, projectDepartment_id__project_id__id=request.GET["project_id"], projectDepartment_id__department_id__id=request.GET["department_id"])
+            roles = Role.objects.filter(tier__lt=myrole.role_id.tier)
+        except:
+            raise PermissionDenied
+    else:
+        roles = Role.objects.all()
+
+    data = []
+    for r in roles:
+        data.append({'id': r.id, 'name': r.name})
+
+    return JsonResponse(data, safe=False)
 
 def delete(request, role_id):
     """
@@ -144,13 +160,23 @@ def delete(request, role_id):
     role_id: id del rol a borrar
 
     returns: redirecciona a la vista del empleado en cuestión o devuelve 404 (si no existe) / 403 (si no está autorizado)
+
+    El botón de borrar sólo se debería mostrar si el usuario en cuestión está autorizado a borrar el rol, por lo que no se devuelven códigos de error.
     """
 
-    admin = get_current_admin_or_403(request)
+    logged = get_authorized_or_403(request)
     role = get_object_or_404(ProjectDepartmentEmployeeRole, id=role_id)
 
-    if(role.employee_id.company_id != admin.company_id):
-        raise PermissionDenied
+    check_companies_match(logged, role.employee_id)
+
+    if logged.user_type == 'E':
+        try:
+            logged_role = ProjectDepartmentEmployeeRole.objects.get(employee_id=logged, projectDepartment_id=role.projectDepartment_id)
+            if role.role_id.tier >= logged_role.role_id.tier:
+                raise PermissionDenied
+
+        except ObjectDoesNotExist:
+            raise PermissionDenied    
 
     employee_username = role.employee_id.user.username
     role.delete()
@@ -158,30 +184,76 @@ def delete(request, role_id):
     return HttpResponseRedirect('/employee/view/' + employee_username)
 
 
-########################################################################################################################################
-########################################################################################################################################
-########################################################################################################################################
+###########################################################################################
 
-def create_new_role(form):
-    # Permissions and objects are already checked
-    dpmt_id = form.cleaned_data['department_id']
-    project_id = form.cleaned_data['project_id']
-    employee_id = form.cleaned_data['employee_id']
-    role_id = form.cleaned_data['role_id']
+def process_post_form(logged, form):
+    res = {'errors': [], 'ok': False}
 
-    department = Department.objects.get(id=dpmt_id)
-    project = Project.objects.get(id=project_id)
-    employee = Employee.objects.get(id=employee_id)
-    role = Role.objects.get(id=role_id)
+    employee_id = form.cleaned_data["employee_id"]
+    department_id = form.cleaned_data["department_id"]
+    project_id = form.cleaned_data["project_id"]
+    role_id = form.cleaned_data["role_id"]
+    employeeRole_id = form.cleaned_data["employeeRole_id"]
 
-    # Check if there is an existing role for that combination and overwrites if so
+    company = logged.company_id
+
+    # Check that everything exists and is within the logged user's company
     try:
-        existing = ProjectDepartmentEmployeeRole.objects.get(employee_id=employee, projectDepartment_id__project_id=project, projectDepartment_id__department_id=department)
-        existing.role_id = role
-        existing.save()
+        employee = Employee.objects.get(id=employee_id, user__is_active=True, company_id=company)
     except ObjectDoesNotExist:
-        # If the employee role doesn't exist, create a new one, 
-        # taking care of also creating a new projectdepartment for the desired combination if it doesn't yet exist
+        res["errors"].append('roleCreation_employeeDoesNotExist')
+
+    try:
+        department = Department.objects.get(id=department_id, active=True, company_id=company)
+    except ObjectDoesNotExist:
+        res["errors"].append('roleCreation_departmentDoesNotExist')
+
+    try:
+        project = Project.objects.get(id=project_id, deleted=False, company_id=company)
+    except ObjectDoesNotExist:
+        res["errors"].append('roleCreation_projectDoesNotExist')
+
+    try:
+        role = Role.objects.get(id=role_id)
+    except ObjectDoesNotExist:
+        res["errors"].append('roleCreation_roleDoesNotExist')
+
+
+    if employeeRole_id: # employeeRole_id != 0
+        try:
+            employeeRole = ProjectDepartmentEmployeeRole.objects.get(id=employeeRole_id)
+        except ObjectDoesNotExist:
+            res["errors"].append('roleCreation_employeeRoleDoesNotExist')
+
+    # Return now if there are errors
+    if res["errors"]: return res
+
+    if logged.user_type == 'E': # Admins have all privileges
+
+        # Check that the logged user has a ProjDpmtEmplRole for that tuple
+        try:
+            loggedRole = ProjectDepartmentEmployeeRole.objects.get(employee_id=logged, projectDepartment_id__department_id=department, projectDepartment_id__project_id=project)
+        except ObjectDoesNotExist:
+            res["errors"].append('roleCreation_notAuthorizedProjectDepartment')
+
+        # Return now if there are errors
+        if res["errors"]: return res
+
+        # Check that the role that the logged user is trying to assign is below his current role
+        if loggedRole.role_id.tier <= role.tier:
+            res["errors"].append('roleCreation_notAuthorizedRole')
+
+        # Return now if there are errors
+        if res["errors"]: return res
+
+
+    if employeeRole_id == 0:
+        # We are creating a new role, check that it doesn't yet exist
+        if ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee, projectDepartment_id__department_id=department, projectDepartment_id__project_id=project).count() > 0:
+            res["errors"].append('roleCreation_alreadyExists')
+            return res
+
+        # Everything is okay now, create the role
         try:
             pd = ProjectDepartment.objects.get(department_id=department, project_id=project)
         except ObjectDoesNotExist:
@@ -189,51 +261,82 @@ def create_new_role(form):
 
         ProjectDepartmentEmployeeRole.objects.create(projectDepartment_id=pd, employee_id=employee, role_id=role)
 
+    else:
+        # We are editing an existing role
+        if logged.user_type == 'E' and loggedRole.role_id.tier <= employeeRole.role_id.tier:
+            res["errors"].append('roleCreation_editingHigherRole')
+            return res
 
-def return_get_form(request, admin):
-    company = admin.company_id
+        employeeRole.role_id = role
+        employeeRole.save()
 
-    departments = Department.objects.filter(company_id=company, active=True)
-    projects = Project.objects.filter(company_id=company, deleted=False)
+    res["ok"] = True
+    return res
+
+def return_invalid_form(request, form, logged, errors=None):
+    employee = get_object_or_404(Employee, id=form.cleaned_data.get('employee_id', 0), user__is_active=True)
+    return render(request, 'role/rol_form.html', {'departments': get_allowed_departments(logged), 
+                                             'projects': get_allowed_projects(logged), 
+                                             'roles': Role.objects.all(), 
+                                             'form': form,
+                                             'employee': employee,
+                                             'errors': errors,
+                                             'editing': form.cleaned_data["employeeRole_id"] != 0
+                                             })
+
+def get_form(request, logged):
+
+    departments = get_allowed_departments(logged)
+    projects = get_allowed_projects(logged)
     roles = Role.objects.all()
 
     if "employee_id" in request.GET:
-        # New form
-        employee = get_object_or_404(Employee, id=request.GET['employee_id'])
-        if employee.company_id != company:
-            raise PermissionDenied
+        employee_id_get = request.GET["employee_id"]
+
+        # Return 404 if no employee with such id exists
+        employee = get_object_or_404(Employee, id=employee_id_get, user__is_active=True, company_id=logged.company_id)
 
         form = RoleManagementForm(initial = {'employee_id': employee.id, 'employeeRole_id': 0})
+
     else:
-        # Edit existing role
+        # Editing an existing role
         role = get_object_or_404(ProjectDepartmentEmployeeRole, id=request.GET['role_id'])
-        
-        # Check that the role belongs to the current admin's company
-        if role.employee_id.company_id != admin.company_id:
-            raise PermissionDenied
+        employee = role.employee_id
+
+        check_companies_match(employee, logged)
 
         form = RoleManagementForm(initial = {
-            'employee_id': role.employee_id.id,
+            'employee_id': employee.id,
             'department_id': role.projectDepartment_id.department_id.id,
             'project_id': role.projectDepartment_id.project_id.id,
             'role_id': role.role_id.id,
             'employeeRole_id': role.id,
         })
 
-    return render(request, 'rol_form.html', {'departments': departments, 'projects': projects, 'roles': roles, 'form': form})
+    # Pass a boolean parameter to the frontent that indicates whether we are editing o creating a role
+    # This was a direct request from the frontend team
 
-def check_form_permissions(form, admin):
+    editing = 'role_id' in request.GET
 
-    employee = get_object_or_404(Employee, id=form.cleaned_data['employee_id'], user__is_active=True)
-    if employee.company_id != admin.company_id:
+    return render(request, 'role/rol_form.html', {'employee': employee, 'departments': departments, 'projects': projects, 'roles': roles, 'form': form, 'editing': editing})
+
+
+def check_companies_match(act1, act2):
+    if act1.company_id != act2.company_id:
         raise PermissionDenied
 
-    project = get_object_or_404(Project, id=form.cleaned_data['project_id'], deleted=False)
-    if project.company_id != admin.company_id:
-        raise PermissionDenied
+def get_allowed_departments(logged):
+    if logged.user_type == 'A':
+        return Department.objects.filter(company_id=logged.company_id, active=True)
+    else:
+        # Return the departments in which the user has a role higher than Employee
+        ids = ProjectDepartmentEmployeeRole.objects.values_list('projectDepartment_id__department_id', flat=True).filter(employee_id=logged, role_id__tier__gt=10, projectDepartment_id__department_id__active=True)
+        return Department.objects.filter(id__in=ids)
 
-    dpmt = get_object_or_404(Department, id=form.cleaned_data['department_id'], active=True)
-    if dpmt.company_id != admin.company_id:
-        raise PermissionDenied
-
-    get_object_or_404(Role, id=form.cleaned_data['role_id'])
+def get_allowed_projects(logged):
+    if logged.user_type == 'A':
+        return Project.objects.filter(company_id=logged.company_id, deleted=False)
+    else:
+        # Return the departments in which the user has a role higher than Employee
+        ids = ProjectDepartmentEmployeeRole.objects.values_list('projectDepartment_id__project_id', flat=True).filter(employee_id=logged, role_id__tier__gt=10, projectDepartment_id__project_id__deleted=False)
+        return Project.objects.filter(id__in=ids)

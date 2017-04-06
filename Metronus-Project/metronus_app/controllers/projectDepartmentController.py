@@ -28,7 +28,7 @@ def create(request):
 
         if form.is_valid():
             createProjectDepartment(form, admin)
-            return render_to_response('projectdepartment_create.html', {'form': ProjectDepartmentForm(user=admin), 'success': True})
+            return render(request, 'projectdepartment_create.html', {'form': ProjectDepartmentForm(user=admin), 'success': True})
 
     #GET -> Create an empty form
     else:

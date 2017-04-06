@@ -1,6 +1,7 @@
 {% extends "anon_master.html" %}
 {% load i18n %}
 {% load l10n %}
+{% load compress %}
 {% load custom_tags %}
 
 {% block title %}{% trans 'registerCompany' %}{% endblock %}
@@ -67,29 +68,39 @@
                     <div class="help-block with-errors"></div>
                   </div>
                 </div>
-
               </div>
+               <div class="separator">
+               <button type="button" class="btn btn-info submit" onclick="window.location.href='/'">{% trans 'return_to_landingpage' %}</button>
+                </div>
             </form>
               <!-- End SmartWizard Content -->
             </div>
           </div>
         </div>
       </div>
+
     </div>
   </div>
 </div>
+
 <body>
 
+  <!-- js -->
+{% compress js %}
 <script src="/static/js/jquery.min.js"></script>
 <script src="/static/js/bootstrap.min.js"></script>
 <script src="/static/js/fastclick.js"></script>
 <script src="/static/js/nprogress.js"></script>
 <script src="/static/js/jquery.smartWizard.js"></script>
 <script src="/static/js/custom.min.js"></script>
+{% endcompress %}
 
 <script type="text/javascript">
   $(document).ready(function(){
       $('#wizard').smartWizard();
+      $(".buttonNext").text("{% trans 'next' %}");
+      $(".buttonPrevious").text("{% trans 'previous' %}");
+      $(".buttonFinish").text("{% trans 'finish' %}");
   });
 </script>
 {% endblock %}

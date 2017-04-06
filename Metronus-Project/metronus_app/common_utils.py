@@ -1,9 +1,16 @@
 from django.core.exceptions                      import PermissionDenied
 from metronus_app.model.administrator            import Administrator
-from metronus_app.model.employee            import Employee
+from metronus_app.model.employee                 import Employee
 from django.core.exceptions                      import ObjectDoesNotExist
+from metronus.settings                           import DEFAULT_FROM_EMAIL
+from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
+from django.template import loader
+from django.core.mail import EmailMultiAlternatives
+from django.contrib.auth.models                  import User
 
 from PIL import Image
+
+import sys
 
 
 # Image limit parameters
@@ -31,12 +38,36 @@ def get_current_employee_or_403(request):
     except ObjectDoesNotExist:
         raise PermissionDenied
 
+def get_authorized_or_403(request):
+    # Returns the current administrator, or the logged user if they have at least a role higher than Employee on any department/project
+
+    if not request.user.is_authenticated():
+        raise PermissionDenied
+
+    try:
+        return get_current_admin_or_403(request)
+    except PermissionDenied:
+        # The user is authenticated and it's not an admin
+        cur_user = Employee.objects.get(user=request.user)
+        if ProjectDepartmentEmployeeRole.objects.filter(employee_id=cur_user, role_id__tier__gt=10).count() > 0:
+            return cur_user
+        else:
+            raise PermissionDenied
+
 
 def get_or_none(model, *args, **kwargs):
     try:
         return model.objects.get(*args, **kwargs)
     except model.DoesNotExist:
         return None
+
+
+def check_user_email(email):
+    try:
+        User.objects.get(email=email)
+        return True
+    except User.DoesNotExist:
+        return False
 
 
 def check_company_contains_actor(company, username):
@@ -64,3 +95,29 @@ def checkImage(form, param):
         return xsize <= WIDTH and ysize <= HEIGHT and ext
     else:
         return True
+
+
+def send_mail(subject, email_template_name, recipients, html_email_template_name,
+              context, email_from=DEFAULT_FROM_EMAIL, **kwargs):
+
+    if 'test' in sys.argv: return # Don't send mails if we are testing to prevent spam
+
+    if context['html']:
+        body = loader.render_to_string(email_template_name, context)
+    else:
+        body = email_template_name
+
+    email_message = EmailMultiAlternatives(subject, body, email_from, recipients)
+    if html_email_template_name is not None:
+        html_email = loader.render_to_string(html_email_template_name, context)
+        email_message.attach_alternative(html_email, 'text/html')
+
+    email_message.send(fail_silently=False)
+
+
+def is_username_unique(username):
+    return User.objects.filter(username=username).count() == 0
+
+
+def is_email_unique(email):
+    return User.objects.filter(email=email).count() == 0

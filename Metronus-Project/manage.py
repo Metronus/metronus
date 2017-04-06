@@ -29,5 +29,10 @@ if __name__ == "__main__":
         #Load the data into the database
         from populate_database import populate_database
         populate_database()
+    elif argv=='populaternd':
+        #Load the data into the database
+        from populate_database2 import randomLoad
+        randomLoad()
+
     else:
         execute_from_command_line(sys.argv)

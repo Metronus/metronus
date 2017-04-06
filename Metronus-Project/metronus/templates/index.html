@@ -1,19 +1,19 @@
 {% load i18n %}
 {% load l10n %}
+{% load compress %}
 
 <!DOCTYPE html>
-<html>
+<html lang="es">
 	<head>
 		<title>Metronus</title>
-
-		<!-- meta -->
+		<meta name="description" content="Metronus, a productivity and profit driven project, where time is the most important variable and the variable which leads you towards success">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<meta charset="UTF-8">
-	  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-		<!--Let browser know website is optimized for mobile-->
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-	    <!-- css -->
+		<!-- css -->
+		{% compress css %}
 		<link rel="stylesheet" href="/static/landing/css/bootstrap.min.css">
 		<link rel="stylesheet" href="/static/landing/css/ionicons.min.css">
 		<link rel="stylesheet" href="/static/landing/css/font-awesome.min.css">
@@ -22,14 +22,17 @@
 		<link rel="stylesheet" href="/static/landing/css/owl.transitions.css">
 		<link rel="stylesheet" href="/static/landing/css/animate.css">
 		<link rel="stylesheet" href="/static/landing/css/custom.css">
+		{% endcompress %}
 
-		<!-- js -->
-		<script src="/static/landing/js/jquery.min.js"></script>
-		<script src="/static/landing/js/bootstrap.min.js"></script>
-		<script src="/static/landing/js/owl.carousel.min.js"></script>
-		<script src="/static/landing/js/script.js"></script>
-		<script src="/static/landing/js/wow.min.js"></script>
-		<script src="/static/landing/js/jquery.actual.min.js"></script>
+		<!-- Favicon content -->
+		<link rel="apple-touch-icon" sizes="180x180" href="/static/landing/img/favicon/apple-icon-180x180.png">
+		<link rel="icon" type="image/png" sizes="192x192"  href="/static/landing/img/favicon/android-icon-192x192.png">
+
+		<!-- OpenGraph content -->
+		<meta property="og:title" content="Metronus" />
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://metronus.es" />
+		<meta property="og:image" content="/static/landing/img/favicon/android-icon-192x192.png" />
 	</head>
 
 	<body>
@@ -51,6 +54,8 @@
 		        					<li><a href="#price_table">{% trans 'landingPricing' %}</a></li>
 		        					<li><a href="/register">{% trans 'landingRegister' %}</a></li>
 		        					<li><a href="/login">{% trans 'landingLogin' %}</a></li>
+											<li><a href="#"><img id="flag_es" alt="Spanish" class="img-responsive" src="/static/landing/img/flag_es.png"></a></li>
+											<li><a href="#"><img id="flag_en" alt="Spanish" class="img-responsive" src="/static/landing/img/flag_en.png"></a></li>
 							    </ul>
 	    					</div>	<!-- collapse navbar-collapse -->
 	  					</div>	<!-- container-fluid -->
@@ -59,7 +64,8 @@
 				<section id="starting">
 					<div class="text-center starting-text">
 						<h1 class="rene">METRONUS</h1>
-						<h2>{% trans 'landingLeitmotiv' %}</h2>
+						<h2><i>{% trans 'landingLeitmotiv' %}</i></h2>
+						<h2>{% trans 'landingLeitmotivAuthor' %}</h2>
 					</div>
 				</section>
 				<div id="bottom" class="bottom text-center">
@@ -71,14 +77,14 @@
 		<!-- Our service -->
 		<section id="service">
 			<div class="container">
-				<div class="row text-center" id= "heading">
-	        		<div class="col-md-6 col-md-offset-3 wow animated zoomInDown" id= "heading-text">
-	        			<h3>{% trans 'landingService' %}</h3>
-	                	<p>{% trans 'landingServiceSub' %}</p>
-	                	<hr class= "full">
-	                	<br/>
-	        		</div>
-		        </div>
+				<div class="row text-center">
+        		<div class="col-md-6 col-md-offset-3 wow animated zoomInDown" id= "heading-text-services">
+        			<h3>{% trans 'landingService' %}</h3>
+                	<p>{% trans 'landingServiceSub' %}</p>
+                	<hr class= "full">
+                	<br/>
+        		</div>
+	        </div>
 			    <div class="main_content">
 				    <div class="services">
 			        	<div class="row">
@@ -125,8 +131,8 @@
 	    <section id="team">
 	    	<div class="container">
 		    	<div class="team-members">
-		    		<div class="row text-center" id="heading">
-		    			<div class="col-md-6 col-md-offset-3 wow animated zoomInDown" id="heading-text">
+		    		<div class="row text-center">
+		    			<div class="col-md-6 col-md-offset-3 wow animated zoomInDown" id="heading-text-team">
 		        			<h3>{% trans 'landingTeam' %}</h3>
 		                	<p>{% trans 'landingTeamDesc' %}</p>
 		                	<hr class="full">
@@ -140,16 +146,8 @@
 				    				<img class="img-circle img-responsive center-block" src="/static/landing/img/team/davsanboi.png" alt="David de los Santos">
 				    			</div>
 				    		</div>
-				        	<h4 class="wow animated fadeInUp" data-wow-delay= "0.2s">David de los Santos</h4>
-				        	<p class= "member-title wow animated fadeIn" data-wow-delay= "0.3s">{% trans 'landingTeamProjectManager' %}</p>
-				        	<p class= "team-member-description wow animated fadeIn" data-wow-delay= "0.4s">{% trans 'landing_davsanboi' %}</p>
-				        	<div class= "row text-center wow animated fadeInDown" data-wow-delay= "0.5s">
-				        		<div class= "team-member-contact">
-				        			<a href="#" data-toggle="tooltip" title="Contact with Google-plus"class= "team-google-plus">
-				        				<i class="fa fa-linkedin"></i>
-				        			</a>
-				        		</div>
-				        	</div>
+			        	<h4 class="wow animated fadeInUp" data-wow-delay= "0.2s">David de los Santos</h4>
+			        	<p class= "member-title wow animated fadeIn" data-wow-delay= "0.3s">{% trans 'landingTeamProjectManager' %}</p>
 				    	</div>	<!-- col-md-4 -->
 
 							<div class="col-md-4 col-sm-6 text-center">
@@ -158,16 +156,8 @@
 				    				<img class="img-circle img-responsive center-block" src="/static/landing/img/team/agubordia.png" alt="Agustín Borrego">
 				    			</div>
 				    		</div>
-				        	<h4 class="wow animated fadeInUp" data-wow-delay= "0.2s">Agustín Borrego</h4>
-				        	<p class= "member-title wow animated fadeIn" data-wow-delay= "0.3s">{% trans 'landingTeamCoordBackend' %}</p>
-				        	<p class= "team-member-description wow animated fadeIn" data-wow-delay= "0.4s">{% trans 'landing_agubordia' %}</p>
-				        	<div class= "row text-center wow animated fadeInDown" data-wow-delay= "0.5s">
-				        		<div class= "team-member-contact">
-				        			<a href="#" data-toggle="tooltip" title="Contact with Google-plus"class= "team-google-plus">
-				        				<i class="fa fa-linkedin"></i>
-				        			</a>
-				        		</div>
-				        	</div>
+			        	<h4 class="wow animated fadeInUp" data-wow-delay= "0.2s">Agustín Borrego</h4>
+			        	<p class= "member-title wow animated fadeIn" data-wow-delay= "0.3s">{% trans 'landingTeamCoordBackend' %}</p>
 				    	</div>	<!-- col-md-4 -->
 
 							<div class="col-md-4 col-sm-6 text-center">
@@ -176,16 +166,8 @@
 				    				<img class="img-circle img-responsive center-block" src="/static/landing/img/team/josrenram.png" alt="José Renato Ramos">
 				    			</div>
 				    		</div>
-				        	<h4 class="wow animated fadeInUp" data-wow-delay= "0.2s">José Renato Ramos</h4>
-				        	<p class= "member-title wow animated fadeIn" data-wow-delay= "0.3s">{% trans 'landingTeamCoordFrontend' %}</p>
-				        	<p class= "team-member-description wow animated fadeIn" data-wow-delay= "0.4s">{% trans 'landing_josrenram' %}</p>
-				        	<div class= "row text-center wow animated fadeInDown" data-wow-delay= "0.5s">
-				        		<div class= "team-member-contact">
-				        			<a href="#" data-toggle="tooltip" title="Contact with Google-plus"class= "team-google-plus">
-				        				<i class="fa fa-linkedin"></i>
-				        			</a>
-				        		</div>
-				        	</div>
+			        	<h4 class="wow animated fadeInUp" data-wow-delay= "0.2s">José Renato Ramos</h4>
+			        	<p class= "member-title wow animated fadeIn" data-wow-delay= "0.3s">{% trans 'landingTeamCoordFrontend' %}</p>
 				    	</div>	<!-- col-md-4 -->
 
 							<div class="col-md-4 col-sm-6 text-center">
@@ -194,16 +176,8 @@
 				    				<img class="img-circle img-responsive center-block" src="/static/landing/img/team/anddonram.png" alt="Andrés Doncel">
 				    			</div>
 				    		</div>
-				        	<h4 class="wow animated fadeInUp" data-wow-delay= "0.2s">Andrés Doncel</h4>
-				        	<p class= "member-title wow animated fadeIn" data-wow-delay= "0.3s">{% trans 'landingTeamDevBackend' %}</p>
-				        	<p class= "team-member-description wow animated fadeIn" data-wow-delay= "0.4s">{% trans 'landing_anddonram' %}</p>
-				        	<div class= "row text-center wow animated fadeInDown" data-wow-delay= "0.5s">
-				        		<div class= "team-member-contact">
-				        			<a href="#" data-toggle="tooltip" title="Contact with Google-plus"class= "team-google-plus">
-				        				<i class="fa fa-linkedin"></i>
-				        			</a>
-				        		</div>
-				        	</div>
+			        	<h4 class="wow animated fadeInUp" data-wow-delay= "0.2s">Andrés Doncel</h4>
+			        	<p class= "member-title wow animated fadeIn" data-wow-delay= "0.3s">{% trans 'landingTeamDevBackend' %}</p>
 				    	</div>	<!-- col-md-4 -->
 
 							<div class="col-md-4 col-sm-6 text-center">
@@ -212,16 +186,8 @@
 				    				<img class="img-circle img-responsive center-block" src="/static/landing/img/team/josgavrui.png" alt="José Gavilán">
 				    			</div>
 				    		</div>
-				        	<h4 class="wow animated fadeInUp" data-wow-delay= "0.2s">José Gavilán</h4>
-				        	<p class= "member-title wow animated fadeIn" data-wow-delay= "0.3s">{% trans 'landingTeamDevFrontend' %}</p>
-				        	<p class= "team-member-description wow animated fadeIn" data-wow-delay= "0.4s">{% trans 'landing_josgavrui' %}</p>
-				        	<div class= "row text-center wow animated fadeInDown" data-wow-delay= "0.5s">
-				        		<div class= "team-member-contact">
-				        			<a href="#" data-toggle="tooltip" title="Contact with Google-plus"class= "team-google-plus">
-				        				<i class="fa fa-linkedin"></i>
-				        			</a>
-				        		</div>
-				        	</div>
+			        	<h4 class="wow animated fadeInUp" data-wow-delay= "0.2s">José Gavilán</h4>
+			        	<p class= "member-title wow animated fadeIn" data-wow-delay= "0.3s">{% trans 'landingTeamDevFrontend' %}</p>
 				    	</div>	<!-- col-md-4 -->
 
 							<div class="col-md-4 col-sm-6 text-center">
@@ -230,16 +196,8 @@
 				    				<img class="img-circle img-responsive center-block" src="/static/landing/img/team/alvgonsie.png" alt="Álvaro González">
 				    			</div>
 				    		</div>
-				        	<h4 class="wow animated fadeInUp" data-wow-delay= "0.2s">Álvaro González</h4>
-				        	<p class= "member-title wow animated fadeIn" data-wow-delay= "0.3s">{% trans 'landingTeamDevBackend' %}</p>
-				        	<p class= "team-member-description wow animated fadeIn" data-wow-delay= "0.4s">{% trans 'landing_alvgonsie' %}</p>
-				        	<div class= "row text-center wow animated fadeInDown" data-wow-delay= "0.5s">
-				        		<div class= "team-member-contact">
-				        			<a href="#" data-toggle="tooltip" title="Contact with Google-plus"class= "team-google-plus">
-				        				<i class="fa fa-linkedin"></i>
-				        			</a>
-				        		</div>
-				        	</div>
+			        	<h4 class="wow animated fadeInUp" data-wow-delay= "0.2s">Álvaro González</h4>
+			        	<p class= "member-title wow animated fadeIn" data-wow-delay= "0.3s">{% trans 'landingTeamDevBackend' %}</p>
 				    	</div>	<!-- col-md-4 -->
 
 							<div class="col-md-4 col-sm-6 text-center">
@@ -248,16 +206,8 @@
 				    				<img class="img-circle img-responsive center-block" src="/static/landing/img/team/josjimjim.png" alt="José María Jiménez">
 				    			</div>
 				    		</div>
-				        	<h4 class="wow animated fadeInUp" data-wow-delay= "0.2s">José María Jiménez</h4>
-				        	<p class= "member-title wow animated fadeIn" data-wow-delay= "0.3s">{% trans 'landingTeamDevBackend' %}</p>
-				        	<p class= "team-member-description wow animated fadeIn" data-wow-delay= "0.4s">{% trans 'landing_josjimjim' %}</p>
-				        	<div class= "row text-center wow animated fadeInDown" data-wow-delay= "0.5s">
-				        		<div class= "team-member-contact">
-				        			<a href="#" data-toggle="tooltip" title="Contact with Google-plus"class= "team-google-plus">
-				        				<i class="fa fa-linkedin"></i>
-				        			</a>
-				        		</div>
-				        	</div>
+			        	<h4 class="wow animated fadeInUp" data-wow-delay= "0.2s">José María Jiménez</h4>
+			        	<p class= "member-title wow animated fadeIn" data-wow-delay= "0.3s">{% trans 'landingTeamDevBackend' %}</p>
 				    	</div>	<!-- col-md-4 -->
 
 							<div class="col-md-4 col-sm-6 text-center">
@@ -266,16 +216,8 @@
 				    				<img class="img-circle img-responsive center-block" src="/static/landing/img/team/andjimrio.png" alt="Andrés Jiménez">
 				    			</div>
 				    		</div>
-				        	<h4 class="wow animated fadeInUp" data-wow-delay= "0.2s">Andrés Jiménez</h4>
-				        	<p class= "member-title wow animated fadeIn" data-wow-delay= "0.3s">{% trans 'landingTeamDevFrontend' %}</p>
-				        	<p class= "team-member-description wow animated fadeIn" data-wow-delay= "0.4s">{% trans 'landing_andjimrio' %}</p>
-				        	<div class= "row text-center wow animated fadeInDown" data-wow-delay= "0.5s">
-				        		<div class= "team-member-contact">
-				        			<a href="#" data-toggle="tooltip" title="Contact with Google-plus"class= "team-google-plus">
-				        				<i class="fa fa-linkedin"></i>
-				        			</a>
-				        		</div>
-				        	</div>
+			        	<h4 class="wow animated fadeInUp" data-wow-delay= "0.2s">Andrés Jiménez</h4>
+			        	<p class= "member-title wow animated fadeIn" data-wow-delay= "0.3s">{% trans 'landingTeamDevFrontend' %}</p>
 				    	</div>	<!-- col-md-4 -->
 
 							<div class="col-md-4 col-sm-6 text-center">
@@ -284,16 +226,8 @@
 				    				<img class="img-circle img-responsive center-block" src="/static/landing/img/team/jualiefer.png" alt="Juan Carlos Liébana">
 				    			</div>
 				    		</div>
-				        	<h4 class="wow animated fadeInUp" data-wow-delay= "0.2s">Juan Carlos Liébana</h4>
-				        	<p class= "member-title wow animated fadeIn" data-wow-delay= "0.3s">{% trans 'landingTeamDevFrontend' %}</p>
-				        	<p class= "team-member-description wow animated fadeIn" data-wow-delay= "0.4s">{% trans 'landing_jualiefer' %}</p>
-				        	<div class= "row text-center wow animated fadeInDown" data-wow-delay= "0.5s">
-				        		<div class= "team-member-contact">
-				        			<a href="#" data-toggle="tooltip" title="Contact with Google-plus"class= "team-google-plus">
-				        				<i class="fa fa-linkedin"></i>
-				        			</a>
-				        		</div>
-				        	</div>
+			        	<h4 class="wow animated fadeInUp" data-wow-delay= "0.2s">Juan Carlos Liébana</h4>
+			        	<p class= "member-title wow animated fadeIn" data-wow-delay= "0.3s">{% trans 'landingTeamDevFrontend' %}</p>
 				    	</div>	<!-- col-md-4 -->
 
 							<div class="col-md-4 col-sm-6 text-center">
@@ -302,16 +236,8 @@
 				    				<img class="img-circle img-responsive center-block" src="/static/landing/img/team/josrojvid.png" alt="José Antonio Rojo">
 				    			</div>
 				    		</div>
-				        	<h4 class="wow animated fadeInUp" data-wow-delay= "0.2s">José Antonio Rojo</h4>
-				        	<p class= "member-title wow animated fadeIn" data-wow-delay= "0.3s">{% trans 'landingTeamDevBackend' %}</p>
-				        	<p class= "team-member-description wow animated fadeIn" data-wow-delay= "0.4s">{% trans 'landing_josrojvid' %}</p>
-				        	<div class= "row text-center wow animated fadeInDown" data-wow-delay= "0.5s">
-				        		<div class= "team-member-contact">
-				        			<a href="#" data-toggle="tooltip" title="Contact with Google-plus"class= "team-google-plus">
-				        				<i class="fa fa-linkedin"></i>
-				        			</a>
-				        		</div>
-				        	</div>
+			        	<h4 class="wow animated fadeInUp" data-wow-delay= "0.2s">José Antonio Rojo</h4>
+			        	<p class= "member-title wow animated fadeIn" data-wow-delay= "0.3s">{% trans 'landingTeamDevBackend' %}</p>
 				    	</div>	<!-- col-md-4 -->
 			    	</div> <!-- row main_content -->
 			    </div>	<!-- team-members -->
@@ -321,8 +247,8 @@
 		<!-- Price-Table -->
 	    <section id="price_table">
 	    	<div class="container">
-	    		<div class="row text-center" id="heading">
-	    			<div class="col-md-6 col-md-offset-3 wow animated zoomInDown" id="heading-text">
+	    		<div class="row text-center">
+	    			<div class="col-md-6 col-md-offset-3 wow animated zoomInDown" id="heading-text-pricing">
 	        			<h3>{% trans 'landingPriceTable' %}</h3>
 	                	<p>{% trans 'landingPriceTableDesc' %}</p>
 	                	<hr class="full">
@@ -356,8 +282,32 @@
 	    		</div>	<!-- row main_content -->
 	    	</div>	<!-- container -->
 	    </section>	<!-- price_table -->
+
+		<!-- js -->
+		{% compress js %}
+		<script src="/static/landing/js/jquery.min.js"></script>
+		<script src="/static/landing/js/bootstrap.min.js"></script>
+		<script src="/static/landing/js/owl.carousel.min.js"></script>
+		<script src="/static/landing/js/script.js"></script>
+		<script src="/static/landing/js/cookies.min.js"></script>
+		<script src="/static/landing/js/wow.min.js"></script>
+		<script src="/static/landing/js/jquery.actual.min.js"></script>
+		{% endcompress %}
+
 		<script>
- 			new WOW().init();
+			$( document ).ready(function() {
+				new WOW().init();
+
+				$("#flag_es").click(function() {
+					Cookies.set('lang', 'es-es');
+					location.reload(true);
+				});
+
+				$("#flag_en").click(function() {
+					Cookies.set('lang', 'en-us');
+					location.reload(true);
+				});
+			});
 		</script>
 	</body>
 </html>

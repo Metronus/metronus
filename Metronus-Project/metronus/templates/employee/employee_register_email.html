@@ -1,0 +1,12 @@
+{% extends "email_master.html" %}
+
+{% load i18n %}
+{% load l10n %}
+
+{% block content %}
+    <p>{% trans 'register_mail_greeting1' %} {{ employee_name}}, {% trans 'register_mail_greeting2' %}<p>
+    <br/>
+    <p>{% trans 'register_mail_body' %}</p>
+    <br/>
+    <p>{% trans 'register_mail_farewell' %}</p>
+{% endblock %}

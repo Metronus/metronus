@@ -96,7 +96,18 @@
             }
         }
     })
+
+
+   $('button[type="submit"]').click(function (e) {
+        var b = $('[data-bv-validator="callback"]')[0]
+        if (b.style.display!='none') {
+            e.preventDefault();
+        }
+   })
+
   });
+
+
 </script>
 {% endblock %}
 
@@ -183,6 +194,13 @@
           <label class="control-label col-sm-4" for="id_{{ form.identifier.name }}">{% trans 'identifier' %}</label>
             <div class="col-sm-6">
             <input type="text" class="form-control col-md-6" name="{{ form.identifier.name }}" id="id_{{ form.identifier.label }}" required>
+            </div>
+        </div>
+
+        <div class="form-group required form-class">
+          <label class="control-label col-sm-4" for="id_{{ form.photo.name }}">{% trans 'photo' %}</label>
+            <div class="col-sm-6">
+            <input type="file" accept="image/*" class="form-control col-md-6" name="{{ form.photo.name }}" id="id_{{ form.photo.label }}" required>
             </div>
         </div>
 

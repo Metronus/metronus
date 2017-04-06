@@ -1,0 +1,289 @@
+{% extends "layout_base.html" %}
+{% load i18n %}
+{% load l10n %}
+{% load static }
+{% block title %}
+{% if  editing == False %}
+{% trans 'addRole' %}
+{% else %}
+{% trans 'editRole' %}
+{% endif %}
+{% endblock %}
+
+
+
+{% block content %}
+
+<div class="row">
+
+<div class="col-md-12 col-sm-12 col-xs-12">
+  <div class="x_panel">
+    <div class="x_title">
+      {% if  editing == False %}
+		  <h2 > {% trans 'addRole' %}  : {{employee.user.first_name}} {{employee.user.last_name}}</h2>
+	  {% else %}
+		  <h2 > {% trans 'editRole' %} : {{employee.user.first_name}} {{employee.user.last_name}}</h2>
+	  {% endif %}
+      <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
+
+    
+   <form id="register_form" method="POST" action="" class="form-horizontal">
+
+    {% csrf_token %}
+    <div id="successDiv" class="alert alert-success" hidden='true'>
+    <a class="close" data-dismiss="alert">x</a>
+            </div>
+        <div id="errorDiv" class="alert alert-error alert-dismissible" role="alert"  hidden='true'>
+        <a class="close" data-dismiss="alert">x</a>
+            </div>
+    {% if  errors %}
+        <div id="errorDiv2" class="alert alert-error alert-dismissible" role="alert">
+        <a class="close" data-dismiss="alert">x</a>
+        {% for error in errors %}
+          {% trans error %}
+        {% endfor %}
+        </div>
+    {% endif %}
+
+	    <div class="col-md-6 col-md-offset-2 collapse in" >
+
+	    <div class="form-group required form-class">
+          
+          <label class="control-label col-md-4 col-sm-4 col-xs-12" for="id_{{ form.project_id.name }}">{% trans 'project' %}</label>
+            <div class="col-sm-6">
+              <select class="form-control col-sm-6 col-md-6" name="{{ form.project_id.name }}" id="id_{{ form.project_id.name }}"{% if  editing == True %} disabled="true" {% endif %} required onchange="ajaxDepartment();">
+
+	              		<option value="" selected>{% trans 'selectProject' %}</option>
+	              		{% for dep in projects %}
+	    				<option value="{{ dep.id }}"{% if form.project_id.value == dep.id %} selected{% endif %}>{{ dep.name }}</option>
+						{% endfor %}
+              		</select>
+            </div>
+        </div>
+
+        <div class="form-group required form-class">
+          
+          <label class="control-label col-md-4 col-sm-4 col-xs-12" for="id_{{ form.department_id.name }}">{% trans 'department' %}</label>
+            <div class="col-sm-6">
+              <select class="form-control col-sm-6 col-md-6" name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}" required disabled="true"  onchange="ajaxRole();">
+	              		<option value="" selected>{% trans 'selectDepartment' %}</option>
+                        {% if  editing == True %}
+                            {% for dep in departments %}
+                            {% if form.department_id.value == dep.id %} 
+                            <option value="{{ dep.id }}"selected>{{ dep.name }}</option>
+                            {% endif %}
+                            {% endfor %}
+                        {% endif %}
+	              		
+              		</select>
+            </div>
+        </div>
+
+        <div class="form-group required form-class">
+          <label class="control-label col-sm-4" for="id_{{ form.role_id.name }}">{% trans 'rol' %}</label>
+            <div class="col-sm-6">
+              <select class="form-control col-sm-6 col-md-6" required name="{{ form.role_id.name }}" id="id_{{ form.role_id.name }}"  {% if  editing == False %}disabled="true" {% endif %} >
+		              <option value="" selected>{% trans 'selectRole' %}</option>
+		              {% if  editing == True %}
+                            {% for dep in roles %}
+                            {% if form.role_id.value == dep.id %} 
+                            <option value="{{ dep.id }}"selected>{% trans dep.name %}</option>
+                            {% else %}
+                            <option value="{{ dep.id }}">{% trans dep.name %}</option>
+                            {% endif %}
+                            {% endfor %}
+                        {% endif %}
+	              </select>
+            </div>
+        </div>
+
+        <input type="text" hidden="true" name="{{ form.employee_id.name }}" id="id_{{ form.employee_id.name }}" value="{{ form.employee_id.value}}" />
+        <input type="text" hidden="true" name="{{ form.employeeRole_id.name }}" id="id_{{ form.employeeRole_id.name }}" value="{{ form.employeeRole_id.value}}" />
+
+
+        <div class="form-group control-buttons">
+            <div class="col-sm-offset-4 col-sm-10">
+
+            <input type="submit" class="btn btn-success submit-button" value="{% trans 'confirm' %}" />
+	    	{% if  editing == False %}
+		    	<input type="button" class="btn btn-success submit-button" value="{% trans 'roleAdd' %}" onclick="ajax();" />
+		    {% endif %}
+
+            </div>
+          
+        </div>
+        </div>
+
+    </form>
+    
+ </div>
+ </div>
+ </div>
+ </div>
+
+
+{% endblock %}
+
+{% block javascript %}
+
+
+<script>
+//Esto es para validar en cliente de forma bonita con bootstrap :)
+$(document).ready(function() {
+    $('#register_form').bootstrapValidator({
+        feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+            department_id: {
+                validators: {
+                    notEmpty: {
+                        message: "{% trans 'departmentNameNotNull' %}"
+                    },
+                }
+            },
+            project_id: {
+                validators: {
+                    notEmpty: {
+                        message: "{% trans 'projectNotNull' %}"
+                    },
+                }
+            },
+            role_id: {
+                validators: {
+                    notEmpty: {
+                        message: "{% trans 'roleNotNull' %}"
+                    },
+                }
+            },
+
+        },
+    });
+});
+</script>
+
+<script type="text/javascript">
+    
+function ajax(){
+    $.post('/roles/manageAsync', $('#register_form').serialize(), function(data, status){
+        document.getElementById('register_form').reset();
+        $('#id_{{ form.department_id.name }}').attr('disabled', true);
+        $('#id_{{ form.role_id.name }}').attr('disabled', true);
+        $('#id_{{ form.department_id.name }}')
+        .find('option')
+        .remove()
+        .end()
+        .append("<option value='' selected>{% trans 'selectProject' %}</option>");
+        $('#id_{{ form.role_id.name }}')
+        .find('option')
+        .remove()
+        .end()
+        .append("<option value='' selected>{% trans 'selectProject' %}</option>");
+        $("#register_form").data('bootstrapValidator').resetForm();
+        console.log(data)
+        if(JSON.stringify(data['success'])=="true"){
+            $('#errorDiv').attr('hidden', true);
+            $('#errorDiv2').attr('hidden', true);
+            $('#successDiv').attr('hidden', false).html("<strong>{% trans 'success' %} | </strong>{% trans 'roleSaved' %}");
+        }else{
+            $('#successDiv').attr('hidden', true);
+            $('#errorDiv').attr('hidden', false).html("<strong>{% trans 'fail' %} | </strong>{% trans 'roleError' %}"); 
+            $('#errorDiv2').attr('hidden', true);
+        }
+        
+    });
+};
+</script>
+
+<script type="text/javascript">
+
+function ajaxDepartment(){
+    console.log($("#id_{{ form.project_id.name }}").val()); 
+    $('#id_{{ form.department_id.name }}')
+        .find('option')
+        .remove()
+        .end()
+        .append("<option value='' selected>{% trans 'selectProject' %}</option>");
+    $.get('/roles/availableDepartments', { project_id : $("#id_{{ form.project_id.name }}").val()}, 
+    function(returnedData){
+         $.each(returnedData, function(i, obj){
+                    if("{{form.department_id.value}}"==obj.id){
+                        $('#id_{{ form.department_id.name }}').append($('<option>').text(obj.name).attr('value', obj.id)).attr('selected', true);
+                    }
+                    else{
+                        $('#id_{{ form.department_id.name }}').append($('<option>').text(obj.name).attr('value', obj.id));
+                    }
+                    
+            });
+         $('#id_{{ form.department_id.name }}').attr('disabled', false);    
+    });
+};
+function ajaxRole(){
+    console.log($("#id_{{ form.project_id.name }}").val()); 
+    $('#id_{{ form.role_id.name }}')
+        .find('option')
+        .remove()
+        .end()
+        .append("<option value='' selected>{% trans 'selectProject' %}</option>");
+    $.get('/roles/availableRoles', { project_id : $("#id_{{ form.project_id.name }}").val(), department_id : $("#id_{{ form.department_id.name }}").val()}, 
+    function(returnedData){
+         $.each(returnedData, function(i, obj){
+                    if("{{form.role_id.value}}"==obj.id){
+                        if(obj.name=='EMPLOYEE'){
+                            $('#id_{{ form.role_id.name }}').append("<option value='"+obj.id+"'selected>{% trans 'EMPLOYEE' %}</option>");
+                        }
+                        else if(obj.name=='COORDINATOR'){
+                            $('#id_{{ form.role_id.name }}').append("<option value='"+obj.id+"'selected>{% trans 'COORDINATOR' %}</option>");
+                        }
+                        else if(obj.name=='PROJECT_MANAGER'){
+                            $('#id_{{ form.role_id.name }}').append("<option value='"+obj.id+"'selected>{% trans 'PROJECT_MANAGER' %}</option>");
+                        }
+                        else if(obj.name=='TEAM_MANAGER'){
+                            $('#id_{{ form.role_id.name }}').append("<option value='"+obj.id+"'selected>{% trans 'TEAM_MANAGER' %}</option>");
+                        }
+                        else if(obj.name=='EXECUTIVE'){
+                            $('#id_{{ form.role_id.name }}').append("<option value='"+obj.id+"'selected>{% trans 'EXECUTIVE' %}</option>");
+                        }
+                    }
+                    else{
+                        if(obj.name=='EMPLOYEE'){
+                            $('#id_{{ form.role_id.name }}').append("<option value='"+obj.id+"'>{% trans 'EMPLOYEE' %}</option>");
+                        }
+                        else if(obj.name=='COORDINATOR'){
+                            $('#id_{{ form.role_id.name }}').append("<option value='"+obj.id+"'>{% trans 'COORDINATOR' %}</option>");
+                        }
+                        else if(obj.name=='PROJECT_MANAGER'){
+                            $('#id_{{ form.role_id.name }}').append("<option value='"+obj.id+"'>{% trans 'PROJECT_MANAGER' %}</option>");
+                        }
+                        else if(obj.name=='TEAM_MANAGER'){
+                            $('#id_{{ form.role_id.name }}').append("<option value='"+obj.id+"'>{% trans 'TEAM_MANAGER' %}</option>");
+                        }
+                        else if(obj.name=='EXECUTIVE'){
+                            $('#id_{{ form.role_id.name }}').append("<option value='"+obj.id+"'>{% trans 'EXECUTIVE' %}</option>");
+                        }
+                        else{
+                        $('#id_{{ form.role_id.name }}').append("<option value='"+obj.id+"'>{% trans '"+obj.name+"' %}</option>");
+                        console.log("<option value='"+obj.id+"'>{% trans '"+obj.name+"' %}</option>");
+                        }
+                    }
+                    
+            });
+         $('#id_{{ form.role_id.name }}').attr('disabled', false);    
+    });
+};
+
+function removeOptions(selectbox)
+{
+    var i;
+    for(i = selectbox.options.length - 1 ; i >= 0 ; i--)
+    {
+        selectbox.remove(i);
+    }
+}    
+</script>
+
+{% endblock %}

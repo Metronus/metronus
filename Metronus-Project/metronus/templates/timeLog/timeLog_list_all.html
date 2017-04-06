@@ -2,43 +2,297 @@
 
 {% load i18n %}
 {% load l10n %}
+{% load custom_tags %}
 
 {% block title %}{% trans 'timeLogList' %}{% endblock %}
 
 {% block content %}
-    <h1>{% trans 'timeLogList' %}</h1>
-
-    <br>
-    <div id="alert_placeholder"></div>
-    <br>
-
-    <div class="table-responsive">
-        <table class="table table-striped">
-            <thead class="thead-inverse">
-                <tr>
-                    <th>#</th>
-                    {% for day in month %}
-                        <th>{{ day }}</th>
-                    {% endfor %}
-                </tr>
-            </thead>
-            <tbody>
-                {% for my_task in my_tasks %}
-                    <tr>
-                        <th scope="row">{{ my_task.name }}</th>
-                        {% for day in my_task.durations %}
-                            <td>{{ day }}</td>
-                        {% endfor %}
-                    </tr>
-                {% endfor %}
-                <tr class="success">
-                    <th scope="row">Total</th>
-                    {% for day in total %}
-                        <td>{{ day }}</td>
-                    {% endfor %}
-                </tr>
-            </tbody>
-        </table>
+<div class="">
+    <div class="page-title">
+        <div class="title_left">
+            <h3>{% trans 'timeLogList' %}</h3>
+        </div>
     </div>
 
+    <div class="clearfix"></div><br>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="x_panel">
+                <div class="row x_title">
+                    <div class="col-md-6">
+                        <h2>{% trans 'dashTimeControlList' %}</h2>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="pull-right">
+                            <fieldset>
+                                <div class="control-group">
+                                    <div class="controls">
+                                        <div class="col-xs-12 xdisplay_inputx form-group has-feedback">
+                                            <input type="text" class="form-control has-feedback-left" name="date_field" value="" />
+                                            <span class="fa fa-calendar-o form-control-feedback left" aria-hidden="true"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+
+
+                    <div class="clearfix"></div>
+                </div>
+
+                 <div class="clearfix"></div>
+
+                <div class="x_content">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                             <thead class="thead-inverse">
+                                <tr>
+                                    <th>#</th>
+                                    {% for day in month %}
+                                        <th class="{% is_weekend day currentMonth currentYear %}">
+                                            {{ day }}
+                                        </th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for my_task in my_tasks %}
+                                    <tr>
+                                        <th scope="row">{{ my_task.name }}</th>
+
+                                        {% for duration in my_task.durations %}
+                                            <td class="{% is_weekend forloop.counter currentMonth currentYear %}">
+                                                <a {% if duration.0 != 0 %}
+                                                        data-href="{% url 'timeLog_delete' duration.1 %}"
+                                                        data-toggle="modal" data-target="#confirm-delete"
+                                                    {% endif %}>
+
+                                                    {% converto_to_hours duration.0 %}
+                                                </a>
+                                            </td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                                <tr class="success">
+                                    <th scope="row">Total</th>
+                                    {% for duration in total %}
+                                        <td>{% converto_to_hours duration %}</td>
+                                    {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="clearfix"></div>
+        <div id="successDiv" class="alert alert-success" hidden='true'></div>
+        <div id="errorDiv" class="alert alert-danger"  hidden='true'></div>
+
+        {% if  valid_production_units == False %}
+
+            <div id="error2Div" class="alert alert-danger">
+                <strong>{% trans 'fail' %} | </strong>{% trans 'produced_units_not_valid' %}
+            </div>
+        {% endif %}
+        {% if  has_permissions == False %}
+
+            <div id="error2Div" class="alert alert-danger">
+                <strong>{% trans 'fail' %} | </strong>{% trans 'no_task_permissions' %}
+            </div>
+        {% endif %}
+        {% if  over_day_limit == True %}
+            <div id="error2Div" class="alert alert-danger">
+                <strong>{% trans 'fail' %} | </strong>{% trans 'over_day_limit' %}
+            </div>
+        {% endif %}
+        <div class="col-xs-12">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2>{% trans 'dashTimeControlCreate' %}</h2>
+                    <div class="clearfix"></div>
+                </div>
+
+                 <div class="clearfix"></div>
+
+                <div class="x_content">
+                    <form id="form" class="form-horizontal form-label-left"
+                          novalidate method="POST" action="{% url 'timeLog_list_all' %}">{% csrf_token %}
+                        {% for field in form.visible_fields %}
+                            <div class="{{ field.name }} form-group">
+                                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="{{ form.name.auto_id }}">
+                                    {{ field.label }} *
+                                </label>
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    {{ field }}
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                        {% for field in form.hidden_fields %}{{ field }}{% endfor %}
+                        <div class="ln_solid"></div>
+
+                        <div class="form-group">
+                            <div class="col-md-12 text-center">
+                                <a class="btn btn-danger" href="{% url 'timeLog_list_all' %}">{% trans 'cancel' %}</a>
+                                <button type="submit" class="btn btn-success">{% trans 'confirm' %}</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="clearfix"></div>
+
+    </div>
+</div>
+
+<div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">{% trans 'delete' %}</div>
+            <div class="modal-body">{% trans 'projectConfirm' %}</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'cancel' %}</button>
+                <a class="btn btn-danger btn-ok">{% trans 'delete' %}</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+<script>
+
+    $(document).ready(function() {
+        $('input[name="date_field"]').daterangepicker({
+            singleDatePicker: true,
+            showDropdowns: true,
+            startDate: '{{ currentMonth }}/1/{{ currentYear }}'
+        },
+        function(start, end, label) {
+            window.location.href = '?currentMonth='+(start.month()+1)+'&currentYear='+start.year();
+        });
+    });
+
+    $("#id_workDate").datetimepicker({format: 'yyyy-mm-dd hh:ii'});
+
+    $('#confirm-delete').on('show.bs.modal', function(e) {
+        $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+    });
+
+    $(document).ready(function() {
+        select = document.getElementById('id_department_id');
+         /**
+        clear all department options before repopulating, otherwise other departments could appear (due to queryset cannot be none but it is not known until now)
+        */
+        for(i = select.options.length - 1 ; i >= 1 ; i--)
+            {
+                if(select.selectedIndex!=i){
+                select.remove(i);
+                 }
+            }
+        select = document.getElementById('id_task_id');
+         /**
+        clear all task options before repopulating,otherwise other tasks could appear (due to queryset cannot be none but it is not known until now)
+        */
+        for(i = select.options.length - 1 ; i >= 1 ; i--)
+            {
+                if(select.selectedIndex!=i){
+                    select.remove(i);
+                }
+            }
+
+        $("#id_project_id").change(function(){
+            $.ajax({
+                type: 'POST',
+                data:  {
+                    project:$('#id_project_id option:selected').val(),
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+
+                success: function(resp){
+                    var name, select, option;
+                    console.log(resp);
+                    select = document.getElementById('id_department_id');
+                     /**
+                    clear all options before repopulating
+                    */
+                    for(i = select.options.length - 1 ; i >= 1 ; i--)
+                        {
+                            select.remove(i);
+                        }
+                    $.each($.parseJSON(resp), function(key,value){
+                        select.options.add(new Option(value.fields['name'],value.pk));
+                    });
+                }
+            });
+        });
+    });
+
+    $(document).ready(function() {
+        $("#id_department_id").change(function(){
+            $.ajax({
+                type: 'POST',
+                data:  {
+                    project:$('#id_project_id option:selected').val(),
+                    department:$('#id_department_id option:selected').val(),
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+
+                success: function(resp){
+                    var name, select, option;
+                    console.log(resp);
+                    select = document.getElementById('id_task_id');
+                    /**
+                    clear all options before repopulating
+                    */
+                    for(i = select.options.length - 1 ; i >= 1 ; i--)
+                        {
+                            select.remove(i);
+                        }
+                    $.each($.parseJSON(resp), function(key,value){
+                        taskname=value.fields['name']
+                        if(value.fields['goal_description'] != null && value.fields['goal_description'] != ""){
+                            taskname+="("+value.fields['goal_description']+")"
+                        }
+                        else{
+                            taskname+="("+'{% trans 'no_goal' %}'+")"
+                        }
+                        select.options.add(new Option(taskname,value.pk));
+                    });
+                }
+            });
+        });
+    });
+
+    /**
+     * Validación en cliente del formulario
+     * */
+    $(document).ready(function() {
+        $('#form').bootstrapValidator({
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                name: {
+                    validators: {
+                        notEmpty: {
+                            message: "{% trans 'projectNameNotNull' %}"
+                        },
+                    }
+                },
+
+
+            },
+        });
+    });
+</script>
 {% endblock %}

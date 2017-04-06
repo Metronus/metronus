@@ -1,0 +1,575 @@
+{% extends "layout_base.html" %}
+{% load i18n %}
+{% load l10n %}
+{% block title %}
+{{employee.user}}
+{% endblock %}
+
+{% block content %}
+<h1>{% trans 'profile' %}</h1>
+
+<div class="row" style="display: flex;">
+  <div class="col-md-3 col-xs-12 widget widget_tally_box">
+    <div class="x_panel">
+      <div class="x_content">
+
+        <div class="flex">
+          <ul class="list-inline widget_profile_box">
+            <li>
+              <a>
+                <i class="fa fa-linkedin"></i>
+              </a>
+            </li>
+            <li>
+              <img src="/static/avatar.png" class="img-circle profile_img" alt="IMG">
+            </li>
+            <li>
+              <a>
+                <i class="fa fa-github"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="name">
+          <h3 class="name_title">{{employee.user}}</h3>
+          <p>{{employee.identifier}}</p>
+        </div>
+
+        <div class="divider"></div>
+
+        <p>
+          Some random self description or about section.
+        </p>
+
+        <div class="divider"></div>
+      </div>
+
+      <div>
+        <ul class="list-inline widget_tally">
+        <li>
+          <b>{% trans 'name' %}</b> <span class="pull-right">{{employee.user.first_name}}</span>
+        </li>
+        <li>
+          <b>{% trans 'surname' %}</b> <span class="pull-right">{{employee.user.last_name}}</span>
+        </li>
+        <li>
+          <b>{% trans 'email' %}</b> <span class="pull-right">{{employee.user.email}}</span>
+        </li>
+        <li>
+          <b>{% trans 'phone' %}</b> <span class="pull-right">{{employee.phone}}</span>
+        </li>
+        <li>
+          <b>{% trans 'roles' %}</b> <span class="pull-right">0</span>
+        </li>
+        <li>
+          <b>{% trans 'projects' %}</b> <span class="pull-right">0</span>
+        </li>
+        <li>
+          <b>{% trans 'departments' %}</b> <span class="pull-right">0</span>
+        </li>
+        <li style="text-align: center">
+          <span>{{employee.registryDate}}</span>
+        </li>
+        </div>
+        </ul>
+    </div>
+  </div>
+
+
+  <div style="flex: 1">
+
+
+    <div class="x_panel">
+
+      <div>
+        <h2 align="center">{% trans 'roles' %}</h2>
+        {% if employee_roles %}
+        <table align="center" class="table table-striped">
+          <thead>
+            <tr>
+              <th class="col-xs-3">{% trans 'project' %}</th>
+              <th class="col-xs-3">{% trans 'department' %}</th>
+              <th class="col-xs-3">{% trans 'rol' %}</th>
+              <th class="col-xs-3"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for rol in employee_roles %}
+            <tr>
+              <td>{{rol.projectDepartment_id.project_id.name}}</td>
+              <td>{{rol.projectDepartment_id.department_id.name}}</td>
+              <td>{% trans rol.role_id.name %}</td>
+              <td><div align="right"><a align="right" class="btn btn-primary" href="/roles/manage?role_id={{rol.id}}">{% trans 'update' %}</a>
+                <a href="#" align="right" class="btn btn-danger" data-href="/roles/delete/{{rol.id}}" data-toggle="modal" data-target="#confirm-delete">{% trans 'delete' %}</a>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          {% trans 'noRoles' %}
+          {% endif %}
+        </div>
+      </br>
+      <a align="center" class="btn btn-primary" href="/roles/manage?employee_id={{employee.id}}">{% trans 'addRole' %}</a>
+
+      <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              {% trans 'delete' %}
+            </div>
+            <div class="modal-body">
+              {% trans 'roleConfirm' %}
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'cancel' %}</button>
+              <a class="btn btn-danger btn-ok">{% trans 'delete' %}</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<h3> {% trans 'Productivity' %}</h3>
+{#here goes the date picker#}
+     <div class="row x_title">
+                        <div class="col-md-6">
+                            <h2>{% trans 'datePicker' %}</h2>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="pull-right">
+                                <fieldset>
+                                    <div class="control-group">
+                                        <div class="controls">
+                                            <div class="input-prepend input-group">
+                                                <span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
+                                                <input type="text" style="width: 200px" name="task_chart" id="task_chart" class="form-control" value="" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+ <div id="task_space">
+  {#   here go the tasks, with their total productivities, loads on document ready with an ajax call#}
+
+ </div>
+
+  <div class="x_content row">
+   {#  by clicking on the tasks above, a graphic is displayed with the diary productivities #}
+    <div id="task" style="height:350px;"></div>
+  </div>
+{% endblock %}
+{% block javascript %}
+
+<script>
+$('#confirm-delete').on('show.bs.modal', function(e) {
+    $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+});
+//the theme is for the graphic style
+    var theme = {
+        color: [
+            '#26B99A', '#34495E', '#BDC3C7', '#3498DB',
+            '#9B59B6', '#8abb6f', '#759c6a', '#bfd3b7'
+        ],
+
+        title: {
+            itemGap: 8,
+            textStyle: {
+                fontWeight: 'normal',
+                color: '#408829'
+            }
+        },
+
+        dataRange: {
+            color: ['#1f610a', '#97b58d']
+        },
+
+        toolbox: {
+            color: ['#408829', '#408829', '#408829', '#408829']
+        },
+
+        tooltip: {
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            axisPointer: {
+                type: 'line',
+                lineStyle: {
+                    color: '#408829',
+                    type: 'dashed'
+                },
+                crossStyle: {
+                    color: '#408829'
+                },
+                shadowStyle: {
+                    color: 'rgba(200,200,200,0.3)'
+                }
+            }
+        },
+
+        dataZoom: {
+            dataBackgroundColor: '#eee',
+            fillerColor: 'rgba(64,136,41,0.2)',
+            handleColor: '#408829'
+        },
+        grid: {
+            borderWidth: 0
+        },
+
+        categoryAxis: {
+            axisLine: {
+                lineStyle: {
+                    color: '#408829'
+                }
+            },
+            splitLine: {
+                lineStyle: {
+                    color: ['#eee']
+                }
+            }
+        },
+
+        valueAxis: {
+            axisLine: {
+                lineStyle: {
+                    color: '#408829'
+                }
+            },
+            splitArea: {
+                show: true,
+                areaStyle: {
+                    color: ['rgba(250,250,250,0.1)', 'rgba(200,200,200,0.1)']
+                }
+            },
+            splitLine: {
+                lineStyle: {
+                    color: ['#eee']
+                }
+            }
+        },
+        timeline: {
+            lineStyle: {
+                color: '#408829'
+            },
+            controlStyle: {
+                normal: {
+                    color: '#408829'
+                },
+                emphasis: {
+                    color: '#408829'
+                }
+            }
+        },
+
+        k: {
+            itemStyle: {
+                normal: {
+                    color: '#68a54a',
+                    color0: '#a9cba2',
+                    lineStyle: {
+                        width: 1,
+                        color: '#408829',
+                        color0: '#86b379'
+                    }
+                }
+            }
+        },
+        map: {
+            itemStyle: {
+                normal: {
+                    areaStyle: {
+                        color: '#ddd'
+                    },
+                    label: {
+                        textStyle: {
+                            color: '#c12e34'
+                        }
+                    }
+                },
+                emphasis: {
+                    areaStyle: {
+                        color: '#99d2dd'
+                    },
+                    label: {
+                        textStyle: {
+                            color: '#c12e34'
+                        }
+                    }
+                }
+            }
+        },
+        force: {
+            itemStyle: {
+                normal: {
+                    linkStyle: {
+                        strokeColor: '#408829'
+                    }
+                }
+            }
+        },
+        chord: {
+            padding: 4,
+            itemStyle: {
+                normal: {
+                    lineStyle: {
+                        width: 1,
+                        color: 'rgba(128, 128, 128, 0.5)'
+                    },
+                    chordStyle: {
+                        lineStyle: {
+                            width: 1,
+                            color: 'rgba(128, 128, 128, 0.5)'
+                        }
+                    }
+                },
+                emphasis: {
+                    lineStyle: {
+                        width: 1,
+                        color: 'rgba(128, 128, 128, 0.5)'
+                    },
+                    chordStyle: {
+                        lineStyle: {
+                            width: 1,
+                            color: 'rgba(128, 128, 128, 0.5)'
+                        }
+                    }
+                }
+            }
+        },
+        gauge: {
+            startAngle: 225,
+            endAngle: -45,
+            axisLine: {
+                show: true,
+                lineStyle: {
+                    color: [
+                        [0.2, '#86b379'],
+                        [0.8, '#68a54a'],
+                        [1, '#408829']
+                    ],
+                    width: 8
+                }
+            },
+            axisTick: {
+                splitNumber: 10,
+                length: 12,
+                lineStyle: {
+                    color: 'auto'
+                }
+            },
+            axisLabel: {
+                textStyle: {
+                    color: 'auto'
+                }
+            },
+            splitLine: {
+                length: 18,
+                lineStyle: {
+                    color: 'auto'
+                }
+            },
+            pointer: {
+                length: '90%',
+                color: 'auto'
+            },
+            title: {
+                textStyle: {
+                    color: '#333'
+                }
+            },
+            detail: {
+                textStyle: {
+                    color: 'auto'
+                }
+            }
+        },
+        textStyle: {
+            fontFamily: 'Arial, Verdana, sans-serif'
+        }
+    };
+
+       
+ function fromData (backendData) {
+  dates=backendData["dates"];
+  task=backendData["task"]
+  //en xAxis data pones lo que va en el eje X (en este caso las fechas)
+  //cada dato necesita una serie
+  //expected y real productivity, dos series, cada una con un campo data
+
+    return {
+        title : {
+            text: '{% trans 'productivityGraphic' %}',
+            subtext: task["name"]
+        },
+        tooltip : {
+            trigger: 'axis'
+        },
+        legend: {
+            data:['Invested time']
+        },
+        toolbox: {
+            show : true,
+            feature : {
+                saveAsImage : {show: true}
+            }
+        },
+        calculable : true,
+        xAxis : [
+            {
+                type : 'category',
+                show : false,
+                data : dates
+            }
+        ],
+        yAxis : [
+            {
+                type : 'value'
+            }
+        ],
+        series : [
+            {
+                name:'{% trans 'expectedProductivity' %}',
+                type:'bar',
+                data: task["expected_productivity"],
+                markPoint : {
+                    data : [
+                        {type : 'max', name: 'Max'},
+                        {type : 'min', name: 'Min'}
+                    ]
+                },
+                markLine : {
+                    data : [
+                        {type : 'average', name: 'Avg'}
+                    ]
+                }
+            },
+            {
+                name:'{% trans 'realProductivity' %}',
+                type:'bar',
+                data: task["real_productivity"],
+                markPoint : {
+                    data : [
+                        {type : 'max', name: 'Max'},
+                        {type : 'min', name: 'Min'}
+                    ]
+                },
+                markLine : {
+                    data : [
+                        {type : 'average', name: 'Avg'}
+                    ]
+                }
+            }
+        ]
+    }
+
+}
+//here we save the current task id for reloading purposes
+var t_id=0
+function ajax_productivity(id) {
+  //loads diary productivities for the specified task
+  //find the date picker
+  picker=$('input[name="task_chart"]').data('daterangepicker');
+   // $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+  
+  $.get({
+    url: '/employee/ajax_productivity_per_task_and_date/{{employee.user.username}}',
+    data:{
+        task_id:id,
+        start_date:picker.startDate.format('YYYY-MM-DD'),
+        end_date:picker.endDate.format('YYYY-MM-DD')
+     },
+    success: function ( backendData )  {
+     // console.log(JSON.stringify( backendData ))
+      var echartLine = echarts.init(document.getElementById('task'), theme);
+      echartLine.setOption( fromData( backendData ) );
+      t_id=id;
+
+    /**
+     * Esto se encarga de hacer responsivo (más o menos) el chart
+     * */
+    $(window).on('resize', function(){
+        if(echartLine != null && echartLine != undefined){
+            echartLine.resize();
+        }
+    });
+    }
+  }).fail(function () {
+      // Error
+  })
+
+}    
+$(document).ready(function() {
+    //loads all tasks for the employee, with total producitivity
+      $.get({
+        url: "/employee/ajax_productivity_per_task/{{employee.user.username}}",
+        
+        success: function ( backendData )  {
+          space=document.getElementById('task_space')
+          all=""
+          
+          for (var task in backendData ){
+              all+="<div>";
+              all+="<input type='button' class='btn btn-success submit-button' value='" + 
+              backendData[task]["name"] + "' onclick='ajax_productivity("+task+");' />";
+              all+="Expected:"+backendData[task]["expected_productivity"]+";Total:"+
+              backendData[task]["total_productivity"]+"";
+              all+="</div>";
+           }
+            space.innerHTML =all 
+
+
+        defaultRange = moment().startOf('month').format('MM/DD/YYYY') +' - '+ moment().endOf('month').format('MM/DD/YYYY')
+        $('input[name="task_chart"]').val(defaultRange)
+
+        $('input[name="task_chart"]').daterangepicker({
+            autoUpdateInput: false,
+            locale: {
+                cancelLabel: '{% trans 'default' %}',
+                applyLabel: '{% trans 'apply' %}'
+            }
+        });
+  $('input[name="task_chart"]').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+      
+      $.get({
+        url: '/employee/ajax_productivity_per_task_and_date/{{employee.user.username}}',
+        data:{
+            task_id:t_id,
+            start_date:picker.startDate.format('YYYY-MM-DD'),
+            end_date:picker.endDate.format('YYYY-MM-DD')
+         },
+        success: function ( backendData )  {
+         // console.log(JSON.stringify( backendData ))
+          var echartLine = echarts.init(document.getElementById('task'), theme);
+          echartLine.setOption( fromData( backendData ) );
+
+        /**
+         * Esto se encarga de hacer responsivo (más o menos) el chart
+         * */
+        $(window).on('resize', function(){
+            if(echartLine != null && echartLine != undefined){
+                echartLine.resize();
+            }
+        });
+        }
+      }).fail(function () {
+          // Error
+      });  
+        $('input[name="task_chart"]').on('cancel.daterangepicker', function(ev, picker) {
+            $(this).val(defaultRange);
+        });    
+        
+      })
+    }
+});
+});
+
+    </script>
+
+
+{% endblock %}
+

@@ -6,19 +6,20 @@ from metronus_app.model.administrator import Administrator
 from django.contrib.auth.models import User
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.contrib.sites.shortcuts import get_current_site
 
 from django.contrib.auth.decorators import login_required
 
-from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
-from django.shortcuts import render_to_response, get_object_or_404
-from metronus_app.common_utils import get_current_admin_or_403, get_or_none, checkImage
+from django.shortcuts import get_object_or_404
+from metronus_app.common_utils import (get_current_admin_or_403, checkImage, send_mail, is_email_unique
+, get_or_none, is_username_unique)
 from django.core.exceptions import PermissionDenied
 
-from django.core.mail import send_mail
 
-
-def create(request):
+def create(request,
+           email_template_name='company/company_register_email.html',
+           html_email_template_name='company/company_register_email.html'):
     """
     parameters/returns:
     form: el formulario con los datos de la compañía y el administrador de la compañía
@@ -34,8 +35,26 @@ def create(request):
         # create a form instance and populate it with data from the request:
         form = RegistrationForm(request.POST, request.FILES)
         # check whether it's valid:
-        if form.is_valid() and checkPasswords(form):
-            if checkImage(form, 'logo'):
+        if form.is_valid():
+            errors = []
+
+            # Check that the passwords match
+            if not checkPasswords(form):
+                errors.append('companyRegister_passwordsDontMatch')
+
+            # Check that the username is unique
+            if not is_username_unique(form.cleaned_data["username"]):
+                errors.append('companyRegister_usernameNotUnique')
+
+            # Check that the admin email is unique
+            if not is_email_unique(form.cleaned_data["admin_email"]):
+                errors.append('companyRegister_adminEmailNotUnique')
+
+            # Check that the image is OK
+            if not checkImage(form, 'photo'):
+                errors.append('companyRegister_imageNotValid')
+
+            if not errors:
                 # process the data in form.cleaned_data as required
                 # ...
                 # redirect to a new URL:
@@ -44,12 +63,26 @@ def create(request):
 
                 # This sends an information email to the company and to the admin
 
-                #send_mail('Metronus Info.', 'Registrado :)', 'info@metronus.es',
-                #          [company.email, administrator.user.email], fail_silently=False,)
+                current_site = get_current_site(request)
+                site_name = current_site.name
+                domain = current_site.domain
+
+                use_https = True
+                context = {
+                    'domain': domain,
+                    'site_name': site_name,
+                    'admin': administrator,
+                    'company': company.short_name,
+                    'protocol': 'https' if use_https else 'http',
+                    'html': True
+                }
+
+                send_mail('Metronus Info.', email_template_name,
+                          [company.email, administrator.user.email], html_email_template_name, context)
 
                 return HttpResponseRedirect('/' + company.short_name + '/login/')
             else:
-                return render(request, 'company/company_register.html', {'form': form, 'errors': ['error.imageNotValid']})
+                return render(request, 'company/company_register.html', {'form': form, 'errors': errors})
 
     # if a GET (or any other method) we'll create a blank form
     else:

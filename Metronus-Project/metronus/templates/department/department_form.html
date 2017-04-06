@@ -8,7 +8,7 @@
 {% trans 'editDepartment' %}
 {% endif %}
 {% endblock %}
-
+{% load custom_tags %}
 {% block javascript %}
 
 
@@ -41,10 +41,9 @@ $(document).ready(function() {
 	
 function ajax(){
     $.post('/department/createAsync', $('#register_form').serialize(), function(data, status){
-    	document.getElementById('register_form').reset();
         $("#register_form").data('bootstrapValidator').resetForm();
-    	console.log(data)
     	if(JSON.stringify(data['success'])=="true"){
+            $('#id_{{ form.name.name }}').val('');
     		$('#errorDiv').attr('hidden', true);
     		$('#error2Div').attr('hidden', true);
     		$('#successDiv').attr('hidden', false).html("<strong>{% trans 'success' %} | </strong>{% trans 'departmentSaved' %}");
@@ -66,36 +65,64 @@ function ajax(){
 
 
 {% block content %}
-		{% if  request.path == '/department/create'%}
-			<h1 align="center"> {% trans 'createDepartment' %} </h1></br>
-		{% else %}
-			<h1 align="center"> {% trans 'editDepartment' %} </h1></br>
-		{% endif %}
-		<div id="successDiv" class="alert alert-success" hidden='true'>
-	    	</div>
-	    <div id="errorDiv" class="alert alert-danger"  hidden='true'>
-	    	</div>
-		{% if  repeated_name == True %}
-	    	<div id="error2Div" class="alert alert-danger">
-	    		<strong>{% trans 'fail' %} | </strong>{% trans 'departmentName' %}
-	    	</div>
-	    {% endif %}
-    <form id="register_form" method="POST" action="" class="form-horizontal">{% csrf_token %}
 
-	    <div class="form-group company_class form-class">
+<div class="row">
+
+<div class="col-md-12 col-sm-12 col-xs-12">
+  <div class="x_panel">
+    <div class="x_title">
+        {% if  request.path == '/department/create'%}
+            <h1 align="center"> {% trans 'createDepartment' %} </h1></br>
+        {% else %}
+            <h1 align="center"> {% trans 'editDepartment' %} </h1></br>
+        {% endif %}
+      <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
+
+    {% show_ajax_errors  %}
+        {% if  repeated_name == True %}
+            <div id="error2Div" class="alert alert-danger">
+                <strong>{% trans 'fail' %} | </strong>{% trans 'departmentName' %}
+            </div>
+        {% endif %}
+
+    
+   <form id="register_form" method="POST" action="" class="form-horizontal">{% csrf_token %}
+
+    {% csrf_token %}
+
+        <div class="col-md-6 col-md-offset-2 collapse in" >
+
+        <div class="form-group required form-class">
+          
           <label class="control-label col-sm-4" for="id_{{ form.name.name }}">{{ form.name.label }}</label>
             <div class="col-sm-6">
               <input type="text" class="form-control col-md-6" name="{{ form.name.name }}" id="id_{{ form.name.name }}" value="{{ form.name.value }}" required />
             </div>
-            <input type="text" hidden="true" name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}" value="{{ form.department_id.value}}" />
         </div>
-	    </br>
-	    <div align="center" >
-		    <button type="submit" class="btn btn-success submit-button" >{% trans 'confirm' %}</button>
-		    {% if  request.path == '/department/create'%}
-		    	<input type="button" class="btn btn-success submit-button" value="{% trans 'departmentAdd' %}" onclick="ajax();" />
-		    {% endif %}
-		</div>
-    </form>
 
+        <input type="text" hidden="true" name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}" value="{{ form.department_id.value}}" />
+
+        
+        <div class="form-group control-buttons">
+            <div class="col-sm-offset-4 col-sm-10">
+
+            <button type="submit" class="btn btn-success submit-button" >{% trans 'confirm' %}</button>
+            {% if  request.path == '/department/create'%}
+                <input type="button" class="btn btn-success submit-button" value="{% trans 'departmentAdd' %}" onclick="ajax();" />
+            {% endif %}
+
+            </div>
+          
+        </div>
+        </div>
+
+    </form>
+ </div>
+ </div>
+ </div>
+ </div>
+
+	
 {% endblock %}

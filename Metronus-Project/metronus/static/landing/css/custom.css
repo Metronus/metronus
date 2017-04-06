@@ -1,12 +1,46 @@
-@import url(omnes-pro.css);
-@import url(http://fonts.googleapis.com/css?family=Coda);
-@import url(http://fonts.googleapis.com/css?family=Roboto);
-@import url(http://fonts.googleapis.com/css?family=Raleway);
-@import url(http://fonts.googleapis.com/css?family=Dosis:200,300,400,500,600);
-
 /*======================================================================================================
                             Global
 =======================================================================================================*/
+
+@font-face {
+  font-family: 'Coda';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Coda'), local('Coda-Regular'), url('/static/landing/fonts/coda.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Roboto'), local('Roboto-Regular'), url('/static/landing/fonts/roboto.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+
+@font-face {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Raleway'), local('Raleway-Regular'), url('/static/landing/fonts/raleway.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+
+@font-face {
+  font-family: 'Dosis';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Dosis Regular'), local('Dosis-Regular'), url('/static/landing/fonts/dosis.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+
+
+#flag_es, #flag_en{
+  max-width: 40px;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
 
 * {
     outline: none !important;
@@ -106,24 +140,24 @@ li a
 {
     text-decoration: none;
 }
-#heading-text 
+#heading-text-services h3, #heading-text-team h3, #heading-text-pricing h3
 {
     padding-top: 10px;
 }
-#heading-text h3 {
+#heading-text-services h3, #heading-text-team h3, #heading-text-pricing h3 {
     font-size: 49px;
     font-family: 'Roboto', sans-serif;
     padding-top: 58px;
     text-transform: uppercase;
 }
 
-#heading-text p {
+#heading-text-services p, #heading-text-team p, #heading-text-pricing p {
     font-size: 18px;
     font-family: 'Roboto', sans-serif;
     padding: 5px 0px
 }
 
-.main_content 
+.main_content
 {
     padding: 50px 0px;
 }
@@ -166,14 +200,14 @@ iframe
 }
 .navbar-default .navbar-brand {
     color: #fff;
-    font-family: "Coda";  
-    padding: 5px 15px;  
-    font-size: 26px;  
-    line-height: 100%;  
+    font-family: "Coda";
+    padding: 5px 15px;
+    font-size: 26px;
+    line-height: 100%;
     height: auto;
 }
 
-.nav-wrap 
+.nav-wrap
 {
     position: fixed;
     top: 0;
@@ -203,17 +237,17 @@ iframe
 .rene {
     font-size: 120px;
     color: white;
-    font-family: "omnes-pro", "Helvetica", sans-serif;
+    font-family: 'Coda', "Helvetica", sans-serif;
     font-weight: 300;
     margin-top: 75px;
 }
 
 .starting-text h2 {
-    font-family: "omnes-pro", "Helvetica", sans-serif;
+    font-family: 'Coda', "Helvetica", sans-serif;
     color: #fff;
 }
 
-.bottom 
+.bottom
 {
     width: 100%;
     position: absolute;
@@ -223,7 +257,7 @@ iframe
 {
     color: rgba(192, 192, 192, 0.5);
 }
-h5 
+h5
 {
     padding-top: 22px;
     font-size: 18px;
@@ -259,7 +293,7 @@ Our service
     overflow: hidden;
     position: relative;
 }
-.about-service 
+.about-service
 {
     font-size: 16px;
     padding: 5px 10px 0px 10px;
@@ -269,7 +303,7 @@ Our service
     font-size: 33px;
 }
 
-.service-icon i 
+.service-icon i
 {
     padding: 20px 0px;
     font-size: 5em;
@@ -320,7 +354,7 @@ hr
 {
     font-size: 7em;
 }
-.service:hover .about-service h3 
+.service:hover .about-service h3
 {
     color: rgb(175, 104, 77)
 }
@@ -357,7 +391,7 @@ hr
     font-family: 'Raleway', sans-serif;
     font-size: 15px;
 }
-.team-member-description 
+.team-member-description
 {
     line-height: 25px;
 }
@@ -370,18 +404,18 @@ hr
 {
     text-decoration: none;
 }
-#team .fa 
+#team .fa
 {
     font-size: 21px;
 }
-#team ul 
+#team ul
 {
     padding-top: 20px;
 }
-.team-facebook, .team-twitter, .team-google-plus 
+.team-facebook, .team-twitter, .team-google-plus
 {
     color: rgb(32, 178, 170);
-} 
+}
 .team-facebook:hover
 {
     color: #46629E;
@@ -416,20 +450,20 @@ hr
 /*------------------------------------------------------------------------------------------------------
                                 price-table
 --------------------------------------------------------------------------------------------------------*/
-.price-column 
+.price-column
 {
     position: relative;
     z-index: 999;
     margin-bottom: 15px;
 }
-.price-column .price-heading 
+.price-column .price-heading
 {
     background-color: cadetblue;
     position: relative;
     padding: 17px 15px 15px;
     box-shadow: 0 2px 2px #494946;
 }
-.price-column .price-heading h4 
+.price-column .price-heading h4
 {
     font-size: 18px;
     font-weight: bold;
@@ -438,22 +472,22 @@ hr
     margin-bottom: 0;
     margin-top: 0;
 }
-.price-column .price-heading .subtitle 
+.price-column .price-heading .subtitle
 {
     color: #ffffff;
     font-weight: bold;
     font-style: italic;
     text-shadow: 0 1px 1px #41413e;
 }
-.price-column .price-heading .price 
+.price-column .price-heading .price
 {
     position: absolute;
     top: 12px;
     right: 10px;
 }
-.price-column .price-heading .price .currency 
+.price-column .price-heading .price .currency
 {
-    color: white; 
+    color: white;
     font: bold 16px Roboto Condensed,Helvetica,Geneva,sans-serif;
     font-size: 22px;
 }
@@ -464,7 +498,7 @@ hr
     margin-right: 18px;
     font-size: 35px;
 }
-.price-column .price-heading .price .cents 
+.price-column .price-heading .price .cents
 {
     color: white;
     font: bold 16px Roboto Condensed,Helvetica,Geneva,sans-serif;
@@ -473,7 +507,7 @@ hr
     top: 27px;
     right: 0;
 }
-.price-content 
+.price-content
 {
     background-color: rgba(47, 79, 79, 0.71);
 }
@@ -482,7 +516,7 @@ hr
     margin: 0px 0px;
     padding: 0px 0px;
 }
-.price-content ul li:first-child 
+.price-content ul li:first-child
 {
     border-top-width: initial;
     border-top-style: none;
@@ -501,23 +535,23 @@ hr
     transition: all 0.5s;
 }
 
-.price-column.highlight 
+.price-column.highlight
 {
     margin-top: 0;
     box-shadow: 0 1px 8px #4d4d4d;
     position: relative;
     z-index: 999;
 }
-.price-column.hightligh .price-heading 
+.price-column.hightligh .price-heading
 {
     background: #f85140;
 }
-.price-column.hightligh .price-heading h4, .price-column.hightligh .price-heading .subtitle 
+.price-column.hightligh .price-heading h4, .price-column.hightligh .price-heading .subtitle
 {
     color: #ffffff;
     text-shadow: 0 1px 1px #d61b08;
 }
-.price-column .price-heading .price 
+.price-column .price-heading .price
 {
     position: absolute;
     top: 12px;
@@ -532,34 +566,34 @@ hr
                                 Blog
 -------------------------------------------------------------------------------------------------------*/
 
-#blog 
+#blog
 {
     margin-top: 10px;
     margin-bottom: 20px;
     width: 100%;
     font-family: 'Lora', serif;
 }
-.post 
+.post
 {
     width: 90%;
     margin-bottom: 15px;
 }
-.row-fluid 
+.row-fluid
 {
     overflow: hidden;
     padding: 25px 0px;
     width: 100%;
 }
-#blog .post .post-thumbnail 
+#blog .post .post-thumbnail
 {
     overflow: visible !important;
 }
-#blog .post .post-thumbnail .frame, #blog .post .post-thumbnail .frame img 
+#blog .post .post-thumbnail .frame, #blog .post .post-thumbnail .frame img
 {
     border-radius: 3px;
     margin-bottom: 0;
 }
-#blog .post .post-thumbnail .frame 
+#blog .post .post-thumbnail .frame
 {
     padding: 8px;
     background: #b9b9bb;
@@ -567,7 +601,7 @@ hr
     margin-left: 20px;
     margin-top: 20px;
 }
-#blog .post .post-thumbnail .post-format 
+#blog .post .post-thumbnail .post-format
 {
     display: block;
     width: 60px;
@@ -583,24 +617,24 @@ hr
     background-color: #d9dad9;
     z-index: 9999;
 }
-#blog .post .post-thumbnail .post-format span 
+#blog .post .post-thumbnail .post-format span
 {
     font-size: 33px;
     position: relative;
     top: 2px;
     color: rgb(32, 178, 170);
 }
-a 
+a
 {
     outline: none;
     text-decoration: none;
 }
-#blog .post .post-thumbnail .post-shadow 
+#blog .post .post-thumbnail .post-shadow
 {
     margin: 0;
     padding: 0 0 0 18px;
 }
-#blog .post-excerpt 
+#blog .post-excerpt
 {
     margin-top: 18px;
     padding-left: 70px;
@@ -612,18 +646,18 @@ a
     text-shadow: 0 1px 1px #f7f7f6;
     font-family: 'Dosis', sans-serif;
 }
-#blog .post h2.title 
+#blog .post h2.title
 {
     margin-bottom: 0;
     padding-bottom: 0;
     margin-top: 0;
     font-size: 20px;
 }
-.title 
+.title
 {
     position: relative;
 }
-.line-dotted 
+.line-dotted
 {
     border-bottom: 1px dashed #a4a4a4;
     box-shadow: 0 1px 1px #ffffff;
@@ -633,12 +667,12 @@ a
     margin-bottom: 23px;
 }
 
-.post-share a 
+.post-share a
 {
     padding: 0px 10px;
     font-size: 18px;
 }
- #blog .post .post-share p 
+ #blog .post .post-share p
 {
     font-weight: bold;
     float: left;
@@ -652,7 +686,7 @@ a
     font-style: italic;
     font-size: 18px;
 }
-.client-comment 
+.client-comment
 {
     padding: 40px 0px 25px 0px;
 }
@@ -675,22 +709,22 @@ a
  {
     padding-bottom: 80px;
  }
-.socials-icons 
+.socials-icons
 {
     margin: 0 auto;
     position: relative;
     width: 100%;
     padding-top: 60px;
 
-}   
-.socials-icons li 
+}
+.socials-icons li
 {
     padding-left: 20px;
     padding-bottom: 10px;
     display: inline-block;
     list-style: none;
 }
-.socials-icons li a 
+.socials-icons li a
 {
     display: block;
     position: relative;
@@ -705,13 +739,13 @@ a
     transition: all .3s ease-in-out;
     opacity: 0.8;
 }
-.socials-icons li a i.fa 
+.socials-icons li a i.fa
 {
     color: #fff;
     line-height: 50px;
     font-size: 21px;
 }
-.socials-icons li a:hover 
+.socials-icons li a:hover
 {
     opacity: 1;
 }
@@ -783,7 +817,7 @@ form
 }
 .copyright
 {
-    margin-top: 10px; 
+    margin-top: 10px;
     font-size: 16px;
     color: #f3f3f3;
 }
@@ -814,7 +848,7 @@ form
     }
 }
 @media (max-width: 405px){
-    #heading-text h3
+    #heading-text-services, #heading-text-team, #heading-text-pricing h3
     {
         font-size: 45px;
     }
@@ -829,7 +863,7 @@ form
         font-size: 35px;
     }
 }
-/* 
+/*
 
 .shadow-team
 {
@@ -921,7 +955,7 @@ form
         width: 100%;
     }
 
-    .navbar-fixed-top, 
+    .navbar-fixed-top,
     .navbar-fixed-bottom {
         position: static;
     }
@@ -930,13 +964,13 @@ form
         margin-bottom: 10px;
     }
 }
-    
+
     #price_table ul {
         display:table;
         margin: 0 auto;
         width:100%;
         max-width:1100px;
-    
+
         padding: 0;
 }
     #price_table li {
@@ -947,20 +981,20 @@ form
         position:relative;
         z-index:0;
         border:1px solid #BBB;
-    
+
         background-color: #fff;
 }
-    
+
     #price_table li:first-child {
         position:relative;
-        right:-1px; 
+        right:-1px;
     }
     #price_table li:last-child {
         position:relative;
-        left:-1px;  
+        left:-1px;
     }
 
-    
+
     #price_table li:hover {
         box-shadow: 0 13px 48px rgba(0, 0, 0, 0.2);
         z-index:1;
@@ -971,19 +1005,19 @@ form
         -moz-transform:scale(1.05);
         transform: scale(1.05);
     }
-    
+
     #price_table li * {
         transition: 0 !important;
         text-decoration: none;
 }
-    
+
     #price_table li:hover * {
         color: #fff !important;
         border-color:rgba(255, 255, 255, 0.27) !important;
     }
-    
-    
-    
+
+
+
     #price_table li strong {
         font-size:19px;
         text-transform:uppercase;
@@ -996,7 +1030,7 @@ form
         display: block;
         text-align: center;
 }
-    
+
     #price_table ul .price_table-description {
         display:block;
         font-size:19px;
@@ -1004,7 +1038,7 @@ form
         text-align: center;
         color: #6C6C6C;
 }
-    
+
     #price_table .price_table-price {
         font-size:84px;
         letter-spacing:2px;
@@ -1032,8 +1066,8 @@ form
     #price_table li:hover .price_table-button {
         transition: 0;
     }
-    
-    
+
+
     #price_table ul a:hover {
         color:#E85700;
     }

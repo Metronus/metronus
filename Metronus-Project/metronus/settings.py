@@ -17,6 +17,8 @@ from django.utils.translation import ugettext_lazy as _
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_PATH = os.path.dirname(os.path.realpath(__file__))
 
+production = "METRONUS_PRODUCTION" in os.environ
+heroku = os.environ["METRONUS_DB_NAME"] == 'dnuusjkalf041'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
@@ -25,7 +27,7 @@ PROJECT_PATH = os.path.dirname(os.path.realpath(__file__))
 SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = "METRONUS_PRODUCTION" not in os.environ
+DEBUG = not production
 
 ALLOWED_HOSTS = [".metronus.es", "metronus.herokuapp.com", "localhost", "127.0.0.1"]
 
@@ -48,10 +50,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'metronus_app',
+    'compressor',
 ]
 
 MIDDLEWARE = [
-
     'django.middleware.security.SecurityMiddleware',
     #estas tres siguientes tienen que ir en este orden, para que la localización furule
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -61,34 +63,70 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.http.ConditionalGetMiddleware',
 ]
 
 ROOT_URLCONF = 'metronus.urls'
 
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(PROJECT_PATH,'templates'),],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.i18n',
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
+# Solo carga en producción la caché, que si no...
+if production or heroku:
+    TEMPLATES = [
+        {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [os.path.join(PROJECT_PATH,'templates'),],
+            #'APP_DIRS': True,
+            'OPTIONS': {
+                'context_processors': [
+                    'django.template.context_processors.i18n',
+                    'django.template.context_processors.debug',
+                    'django.template.context_processors.request',
+                    'django.contrib.auth.context_processors.auth',
+                    'django.contrib.messages.context_processors.messages',
+                    'django.template.context_processors.media',
+                ],
+                'loaders': [
+                    ('django.template.loaders.cached.Loader', [
+                        'django.template.loaders.filesystem.Loader',
+                        'django.template.loaders.app_directories.Loader',
+                    ]),
+                ],
+            },
         },
-    },
-]
+    ]
+
+    COMPRESS_ENABLED = True
+    STATICFILES_FINDERS = (
+        'django.contrib.staticfiles.finders.FileSystemFinder',
+        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+        # other finders..
+        'compressor.finders.CompressorFinder',
+    )
+else:
+    TEMPLATES = [
+        {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [os.path.join(PROJECT_PATH,'templates'),],
+            #'APP_DIRS': True,
+            'OPTIONS': {
+                'context_processors': [
+                    'django.template.context_processors.i18n',
+                    'django.template.context_processors.debug',
+                    'django.template.context_processors.request',
+                    'django.contrib.auth.context_processors.auth',
+                    'django.contrib.messages.context_processors.messages',
+                    'django.template.context_processors.media',
+                ],
+            },
+        },
+    ]
+
+
 
 WSGI_APPLICATION = 'metronus.wsgi.application'
 
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
-
-heroku = os.environ["METRONUS_DB_NAME"] == 'dnuusjkalf041'
 
 DATABASES = {
 	    'default': {
@@ -124,13 +162,10 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
+LANGUAGE_COOKIE_NAME = 'lang'
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
 
@@ -149,7 +184,7 @@ LOGIN_URL = '/login'
 LOGOUT_URL = '/'
 
 # File storage
-
+MEDIA_URL = '/media/'
 MEDIA_ROOT = (
     os.path.join(BASE_DIR, 'media')
 )
@@ -158,3 +193,12 @@ MEDIA_ROOT = (
 # https://warehouse.python.org/project/whitenoise/
 
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
+
+# Mail configuration
+EMAIL_HOST = os.environ["METRONUS_MAIL_HOST"]
+EMAIL_PORT = os.environ["METRONUS_MAIL_PORT"]
+EMAIL_HOST_USER = os.environ["METRONUS_MAIL_USER"]
+EMAIL_HOST_PASSWORD = os.environ["METRONUS_MAIL_PASSWORD"]
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = os.environ["METRONUS_MAIL_DEFAULTFROM"]
