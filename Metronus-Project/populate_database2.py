@@ -22,24 +22,24 @@ from django.utils import timezone
 
 def ranstr():
     # Returns a 10-character random string
-    return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
+    return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8))
 
 ### Métodos para crear objetos
 def createDepartments(company):
      Department.objects.create(
-        name=ranstr(),
+        name="department"+ranstr(),
         active=True,
         company_id=company
     )
 def createProjects(company):
-     Project.objects.create(name=ranstr(), deleted=False, company_id=company)
+     Project.objects.create(name="project"+ranstr(), deleted=False, company_id=company)
 
 def createEmployeeInProjDept(project, department,company):
     """
     creates an employee and assigns him/her a new role
     """
     user = User.objects.create_user(
-        username=ranstr(),
+        username="employee"+ranstr(),
         password="metronus",
         email=ranstr() + "@metronus.es",
         first_name=ranstr(),
@@ -74,12 +74,12 @@ def createTaskInProjDept(project, department,admin,rDate):
 
     if measure:
         pgoal=random.uniform(50,100)
-        pdescription=ranstr()
+        pdescription=random.choice(["kgs", "fresas", "granos de harina", "estrellitas", "cms"])
     else:
         pgoal=None
         pdescription=""
     task=Task.objects.create(
-        name = ranstr(),
+        name = "task"+ranstr(),
         description = ranstr(),
         actor_id = admin,
         production_goal=pgoal,
