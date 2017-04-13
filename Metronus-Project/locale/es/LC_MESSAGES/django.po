@@ -422,6 +422,12 @@ msgid "tasksPerDepartmentDesc"
 msgstr "Número de tareas por departamento"
 msgid "departmentGraphs"
 msgstr "Gráficas de departamentos"
+msgid "timePerDepartment"
+msgstr "Tiempo por departamento"
+msgid "timePerDepartment2"
+msgstr "Tiempo imputado por cada departamento en el rango de fechas seleccionado"
+msgid "imputedTime"
+msgstr "Tiempo imputado"
 
 #: TimeLog
 msgid "timeLog"

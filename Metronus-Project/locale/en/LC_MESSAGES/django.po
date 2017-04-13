@@ -419,6 +419,12 @@ msgid "tasksPerDepartmentDesc"
 msgstr "Number of tasks per department"
 msgid "departmentGraphs"
 msgstr "Department graphs"
+msgid "timePerDepartment"
+msgstr "Time per department"
+msgid "timePerDepartment2"
+msgstr "Time per department considered in the temporal range setted"
+msgid "imputedTime"
+msgstr "Imputed time"
 
 #: TimeLog
 msgid "timeLog"
