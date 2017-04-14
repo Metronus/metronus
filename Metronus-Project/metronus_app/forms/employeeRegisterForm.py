@@ -17,3 +17,4 @@ class EmployeeRegisterForm(Form):
     phone = forms.CharField(label=_("phone"), max_length=15)
     identifier = forms.CharField(label=_("identifier"), max_length=15)
     photo = forms.ImageField(label=_("photo"), required = False)
+    price_per_hour=forms.FloatField(label=_("price_per_hour"),initial="1.0")

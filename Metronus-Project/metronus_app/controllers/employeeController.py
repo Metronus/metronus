@@ -40,6 +40,7 @@ def create(request):
         usernameNotUnique: el nombre de usuario ya existe
         imageNotValid: la imagen no es válida por formato y/o tamaño
         formNotValid: el formulario contiene errores
+        priceNotValid: el precio debe ser mayor que 0
     
     template:
         employee_register.html
@@ -76,11 +77,15 @@ def create(request):
             if not checkImage(form, 'photo'):
                 errors.append('employeeCreation_imageNotValid')
 
+            # Check that the price is OK
+            if form.cleaned_data['price_per_hour']<=0:
+                errors.append('employeeCreation_priceNotValid')
+
             if not errors:
                 # Everything is OK, create the employee
                 employeeUser = createEmployeeUser(form)
                 employee = createEmployee(employeeUser, admin, form)
-                EmployeeLog.objects.create(employee_id=employee, event="A")
+                EmployeeLog.objects.create(employee_id=employee, event="A", price_per_hour=employee.price_per_hour)
                 send_register_email(form.cleaned_data["email"], form.cleaned_data["first_name"])
 
                 if "redirect" in request.GET: # Redirect to the created employee
@@ -168,7 +173,8 @@ def edit(request, username):
             'last_name': employee.user.last_name,
             'email': employee.user.email,
             'identifier': employee.identifier,
-            'phone': employee.phone
+            'phone': employee.phone,
+            'price_per_hour':employee.price_per_hour
         })
 
         return render(request, 'employee/employee_edit.html', {'form': form})
@@ -178,21 +184,35 @@ def edit(request, username):
         
         form = EmployeeEditForm(request.POST)
         if form.is_valid():
-            
-            # Update employee data
-            employee.identifier = form.cleaned_data["identifier"]
-            employee.phone = form.cleaned_data["phone"]
+            errors = []
+            # Check that the price is OK
+            if form.cleaned_data['price_per_hour']<=0:
+                errors.append('employeeCreation_priceNotValid')
+            if not errors:
+                # Update employee data
+                employee.identifier = form.cleaned_data["identifier"]
+                employee.phone = form.cleaned_data["phone"]
+                #New log if the salary has changed
+                newLog=employee.price_per_hour != form.cleaned_data["price_per_hour"];
+                    
+                employee.price_per_hour = form.cleaned_data["price_per_hour"]
 
-            # Update user data
-            user = employee.user
-            user.first_name = form.cleaned_data["first_name"]
-            user.last_name = form.cleaned_data["last_name"]
-            user.email = form.cleaned_data["email"]
+                # Update user data
+                user = employee.user
+                user.first_name = form.cleaned_data["first_name"]
+                user.last_name = form.cleaned_data["last_name"]
+                user.email = form.cleaned_data["email"]
 
-            user.save()
-            employee.save()
-
-            return HttpResponseRedirect('/employee/view/' + username + '/')
+                user.save()
+                employee.save()
+                
+                #New log if the salary has changed
+                if newLog:
+                    EmployeeLog.objects.create(employee_id=employee, event="C", price_per_hour=form.cleaned_data["price_per_hour"])
+                return HttpResponseRedirect('/employee/view/' + username + '/')
+            else:
+                # There are errors
+                return render(request, 'employee/employee_edit.html', {'form': form, 'errors': errors})
 
         else:
             # Form is not valid
@@ -270,7 +290,7 @@ def delete(request, username):
     employee_user.is_active = False
     employee_user.save()
 
-    EmployeeLog.objects.create(employee_id=employee, event="B")
+    EmployeeLog.objects.create(employee_id=employee, event="B", price_per_hour=employee.price_per_hour)
     return HttpResponseRedirect('/employee/list/')
 
 ###AJAX methods
@@ -451,8 +471,8 @@ def createEmployee(employeeUser, admin, form):
     phone = form.cleaned_data['phone']
     company = admin.company_id
     picture = form.cleaned_data['photo']
-
-    return Employee.objects.create(user=user, user_type=user_type, identifier=identifier, phone=phone, company_id=company, picture=picture)
+    price_per_hour=form.cleaned_data['price_per_hour']
+    return Employee.objects.create(user=user, user_type=user_type, identifier=identifier, phone=phone, company_id=company, picture=picture,price_per_hour=price_per_hour)
 
 def checkPasswords(form):
     return form.cleaned_data['password1'] == form.cleaned_data['password2']

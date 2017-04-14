@@ -29,7 +29,8 @@ def basicLoad():
         user_type="E",
         identifier="12345",
         phone="123456789",
-        company_id=company)
+        company_id=company,
+        price_per_hour=2.0)
 
     User.objects.create_user(
         username="admin",
@@ -165,14 +166,16 @@ def basicLoad():
         name  ="Hacer cosas",
         description  = "meda",
         actor_id = emp4,
-        projectDepartment_id = pd1
+        projectDepartment_id = pd1,
+        price_per_hour=1.0
     )
 
     task2 = Task.objects.create(
         name  ="Hacer cosas de back",
         description  = "hola",
         actor_id = emp5,
-        projectDepartment_id = pd1
+        projectDepartment_id = pd1,
+        price_per_hour=7.0
     )
 
     task3 = Task.objects.create(
@@ -181,7 +184,8 @@ def basicLoad():
         actor_id = emp8,
         projectDepartment_id = pd2,
         production_goal="2.0",
-        goal_description="kgs"
+        goal_description="kgs",
+        price_per_unit=7.0
     )
 
     task4 = Task.objects.create(
@@ -189,7 +193,8 @@ def basicLoad():
         description  = "nada",
         actor_id = emp8,
         projectDepartment_id = pd1,
-        active=False
+        active=False,
+        price_per_hour=3.0
     )
 
     TimeLog.objects.create(
@@ -247,7 +252,8 @@ def basicLoad():
         
         actor_id = emp8,
         production_goal=9.0,
-        goal_description="kgs"
+        goal_description="kgs",
+        price_per_unit=3.0
         )
     
     ge2=GoalEvolution.objects.create(
@@ -255,7 +261,8 @@ def basicLoad():
         
         actor_id = emp8,
         production_goal=4.0,
-        goal_description="kgs"
+        goal_description="kgs",
+        price_per_unit=2.0
         )
     #as registryDate is an autofield_now and updates on save(), we must set the registrydate with update()
     #if we want to force a date in registryDate

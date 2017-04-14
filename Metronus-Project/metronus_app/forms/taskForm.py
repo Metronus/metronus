@@ -17,3 +17,6 @@ class TaskForm(forms.Form):
     department_id = forms.ModelChoiceField(queryset=Department.objects.all())
     production_goal = forms.FloatField(label=_("production_goal"),required=False,initial="")
     goal_description = forms.CharField(label=_("goal_description"),max_length=100,required=False,initial="")
+
+    price_per_unit=forms.FloatField(label=_("price_per_unit"),required=False,initial="")
+    price_per_hour=forms.FloatField(label=_("price_per_hour"),required=False,initial="")

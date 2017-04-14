@@ -17,7 +17,7 @@ class TaskTestCase(TestCase):
         populate_database()
 
     def test_create_task_positive(self):
-        # Logged in as an administrator, try to create a task
+        # Logged in as an employee with appropiate role, try to create a task
         c = Client()
         c.login(username="ddlsb", password="123456")
 
@@ -31,7 +31,8 @@ class TaskTestCase(TestCase):
             "name": "dep4",
             "description":"alguno",
             "project_id":pro_id,
-            "department_id":dep_id
+            "department_id":dep_id,
+            "price_per_hour":6.0
               })
 
         self.assertEquals(response.status_code, 302)
@@ -60,7 +61,8 @@ class TaskTestCase(TestCase):
             "name": "hacer memes",
             "description":"alguno",
             "project_id":pro_id,
-            "department_id":dep_id
+            "department_id":dep_id,
+            "price_per_hour":2.0
               })
 
         self.assertEquals(response.status_code, 302)
@@ -73,6 +75,34 @@ class TaskTestCase(TestCase):
         logs_after = Task.objects.all().count()
 
         self.assertEquals(logs_before + 1, logs_after)
+    def test_create_invalid_task_filled_price(self):
+        # Logged in as an employee with appropiate role, try to create a task
+        #both fields filled
+        c = Client()
+        c.login(username="ddlsb", password="123456")
+
+        logs_before = GoalEvolution.objects.all().count()
+        pro_id=Project.objects.get(name="Metronus").id,
+
+        dep_id=Department.objects.get(name="Frontend").id
+
+        response = c.post("/task/create", {
+            "task_id": "0",
+            "name": "dep4",
+            "description":"alguno",
+            "project_id":pro_id,
+            "department_id":dep_id,
+            "price_per_hour":6.0,
+            "price_per_unit":4.0
+              })
+
+        self.assertEquals(response.status_code, 200)
+        logs_after = GoalEvolution.objects.all().count()
+        self.assertEquals(logs_before, logs_after)
+        self.assertEquals(response.context["valid_goal"],True)
+        self.assertEquals(response.context["valid_price"],False)
+
+
 
     def test_create_task_duplicate(self):
         # Logged in as an administrator, try to create an task with the name of an existing company
@@ -84,7 +114,8 @@ class TaskTestCase(TestCase):
             "description":"alguno",
             "name": "Hacer cosas",
             "project_id":str(Project.objects.get(name="Metronus").id),
-            "department_id":str(Department.objects.get(name="Backend").id)
+            "department_id":str(Department.objects.get(name="Backend").id),
+            "price_per_hour":"1.0"
         })
 
         self.assertEquals(response.status_code, 200)
@@ -100,7 +131,8 @@ class TaskTestCase(TestCase):
             "description":"alguno",
             "name": "Hacer cosas",
             "project_id":str(Project.objects.get(name="Proust-Ligeti").id),
-            "department_id":str(Department.objects.get(name="dep3").id)
+            "department_id":str(Department.objects.get(name="dep3").id),
+            "price_per_hour":"3.0"
         })
         self.assertEquals(response.status_code, 200)
         self.assertEquals(response.context["repeated_name"],False)
@@ -208,7 +240,8 @@ class TaskTestCase(TestCase):
             "project_id":pro_id,
             "department_id":dep_id,
             "production_goal":"3.0",
-            "goal_description":"kgs"
+            "goal_description":"kgs",
+            "price_per_unit":"6.0"
               })
 
         self.assertEquals(response.status_code, 302)
@@ -238,13 +271,111 @@ class TaskTestCase(TestCase):
             "project_id":pro_id,
             "department_id":dep_id,
             "production_goal":"2.0",
-            "goal_description":"kgs"
+            "goal_description":"kgs",
+            "price_per_unit":"7.0"
               })
 
         self.assertEquals(response.status_code, 302)
         logs_after = GoalEvolution.objects.all().count()
 
         self.assertEquals(logs_before, logs_after)
+
+    def test_edit_task_positive_3(self):
+        # Logged in as an administrator, try to edit a task
+        # an entry is created with the new price_per_unit
+        c = Client()
+        c.login(username="metronus", password="metronus")
+
+        pro_id=Project.objects.get(name="Metronus").id,
+
+        dep_id=Department.objects.get(name="Frontend").id
+
+      
+        task_id=Task.objects.filter(name="Hacer cosas de front").first().id
+
+        logs_before = GoalEvolution.objects.all().count()
+
+        response = c.post("/task/edit/"+str(task_id)+"/", {
+            "task_id": task_id,
+            "name": "Hacer memes",
+            "description":"alguno",
+            "project_id":pro_id,
+            "department_id":dep_id,
+            "production_goal":"2.0",
+            "goal_description":"kgs",
+            "price_per_unit":"4.0"
+              })
+
+        self.assertEquals(response.status_code, 302)
+        logs_after = GoalEvolution.objects.all().count()
+
+        self.assertEquals(logs_before+1, logs_after)
+
+    def test_edit_task_invalid_price(self):
+        # Logged in as an administrator, try to edit a task with goal and change its price for per hour
+        # no new entry is created
+        c = Client()
+        c.login(username="metronus", password="metronus")
+
+        pro_id=Project.objects.get(name="Metronus").id,
+
+        dep_id=Department.objects.get(name="Frontend").id
+
+      
+        task_id=Task.objects.filter(name="Hacer cosas de front").first().id
+
+        logs_before = GoalEvolution.objects.all().count()
+
+        response = c.post("/task/edit/"+str(task_id)+"/", {
+            "task_id": task_id,
+            "name": "Hacer memes",
+            "description":"alguno",
+            "project_id":pro_id,
+            "department_id":dep_id,
+            "production_goal":"2.0",
+            "goal_description":"kgs",
+            "price_per_hour":"2.75"
+              })
+
+        self.assertEquals(response.status_code, 200)
+        logs_after = GoalEvolution.objects.all().count()
+        self.assertEquals(logs_before, logs_after)
+        self.assertEquals(response.context["valid_goal"],True)
+        self.assertEquals(response.context["valid_price"],False)
+
+    def test_edit_task_invalid_price_all_filled(self):
+        # Logged in as an administrator, try to edit a task with goal with both prices filled
+        # no new entry is created
+        c = Client()
+        c.login(username="metronus", password="metronus")
+
+        pro_id=Project.objects.get(name="Metronus").id,
+
+        dep_id=Department.objects.get(name="Frontend").id
+
+      
+        task_id=Task.objects.filter(name="Hacer cosas de front").first().id
+
+        logs_before = GoalEvolution.objects.all().count()
+
+        response = c.post("/task/edit/"+str(task_id)+"/", {
+            "task_id": task_id,
+            "name": "Hacer memes",
+            "description":"alguno",
+            "project_id":pro_id,
+            "department_id":dep_id,
+            "production_goal":"2.0",
+            "goal_description":"kgs",
+            "price_per_hour":"2.75",
+            "price_per_unit":"2.75"
+              })
+
+        self.assertEquals(response.status_code, 200)
+        logs_after = GoalEvolution.objects.all().count()
+        self.assertEquals(logs_before, logs_after)
+        self.assertEquals(response.context["valid_goal"],True)
+        self.assertEquals(response.context["valid_price"],False)
+
 
     def test_edit_task_invalid_goal(self):
         # Logged in as an administrator, try to edit a task
@@ -286,7 +417,8 @@ class TaskTestCase(TestCase):
             "name": "Hacer cosas de back",
             "description":"alguno",
             "project_id":pro_id,
-            "department_id":dep_id
+            "department_id":dep_id,
+            "price_per_hour":"8.0"
               })
 
         self.assertEquals(response.status_code, 200)

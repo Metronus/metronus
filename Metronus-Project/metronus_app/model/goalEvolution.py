@@ -13,5 +13,8 @@ class GoalEvolution(models.Model):
     production_goal=models.FloatField(blank=True,null=True)
     goal_description=models.CharField(blank=True,max_length=100,default="")
 
+    price_per_unit=models.FloatField(null=True,blank=True)
+    price_per_hour=models.FloatField(null=True,blank=True)
+
     def __unicode__(self):
         return self.production_goal

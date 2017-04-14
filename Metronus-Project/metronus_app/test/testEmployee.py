@@ -89,6 +89,7 @@ class EmployeeTestCase(TestCase):
             "email": "frc@empresa.com",
             "identifier": "frc01",
             "phone": "654321987",
+            "price_per_hour": "1.0"
         })
 
         self.assertEquals(response.status_code, 200)
@@ -125,6 +126,7 @@ class EmployeeTestCase(TestCase):
             "email": "frc2@empresa.com",
             "identifier": "frc02",
             "phone": "654321987",
+            "price_per_hour": "2.0"
         })
 
         self.assertRedirects(response, "/employee/view/employee11343154/", fetch_redirect_response=False)
@@ -160,6 +162,7 @@ class EmployeeTestCase(TestCase):
             "email": "frc@empresa.com",
             "identifier": "frc01",
             "phone": "654321987",
+            "price_per_hour": "2.0",
         })
 
         self.assertEquals(response.status_code, 200)
@@ -169,6 +172,35 @@ class EmployeeTestCase(TestCase):
 
         logs_after = EmployeeLog.objects.all().count()
         self.assertEquals(logs_before, logs_after)
+
+    def test_create_employee_negative_price_negative(self):
+        # Logged in as an administrator, try to create an employee
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        logs_before = EmployeeLog.objects.all().count()
+
+        response = c.post("/employee/create", {
+            "username": "employee_creating",
+            "password1": "dontmatch",
+            "password2": "dontmatch",
+            "first_name": "Francisco",
+            "last_name": "Romualdo",
+            "email": "frc@empresa.com",
+            "identifier": "frc01",
+            "phone": "654321987",
+            "price_per_hour": "-1.0",
+        })
+
+        self.assertEquals(response.status_code, 200)
+        self.assertTrue('employeeCreation_priceNotValid' in response.context["errors"])
+
+        # Check that the employee has not been created
+
+        logs_after = EmployeeLog.objects.all().count()
+        self.assertEquals(logs_before, logs_after)
+
+
 
     def test_create_employee_username_taken_negative(self):
         # Logged in as an administrator, try to create an employee
@@ -186,6 +218,7 @@ class EmployeeTestCase(TestCase):
             "email": "frc@empresa.com",
             "identifier": "frc01",
             "phone": "654321987",
+            "price_per_hour": "2.0",
         })
 
         self.assertEquals(response.status_code, 200)
@@ -283,13 +316,14 @@ class EmployeeTestCase(TestCase):
         c.login(username="admin1", password="123456")
 
         initialpass = User.objects.get(username="emp1").password
-
+        logs_before = EmployeeLog.objects.all().count()
         response = c.post("/employee/edit/emp1/", {
             "first_name": "NuevoNombre",
             "last_name": "NuevoApellido",
             "email": "nuevocorreo@empresa.com",
             "identifier": "nuevoid",
             "phone": "nuevotelefono",
+            "price_per_hour": "4.0",
         })
 
         self.assertRedirects(response, "/employee/view/emp1/", fetch_redirect_response=False)
@@ -301,6 +335,12 @@ class EmployeeTestCase(TestCase):
         self.assertEquals(final.user.last_name, "NuevoApellido")
         self.assertEquals(final.user.email, "nuevocorreo@empresa.com")
         self.assertEquals(final.user.password, initialpass)
+        self.assertEquals(final.price_per_hour, 4.0)
+
+        #Assert a new log was created with the price change
+        logs_after = EmployeeLog.objects.all().count()
+        self.assertEquals(logs_before + 1, logs_after)
+
 
     def test_edit_employee_pass_positive(self):
         c = Client()

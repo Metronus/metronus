@@ -38,7 +38,7 @@ def create(request):
     repeated_name: si el nombre es repetido
     valid_goal:si el objetivo es correcto(no está uno en blanco y otro no)
     project_department_related: si nos están relacionados projectdepartment
-
+    valid_price: si el precio esta puesto acorde al objetivo de producción (y es positivo)
     template:
     task_form.html
     """
@@ -48,6 +48,7 @@ def create(request):
     project_department_related=True
     repeated_name=False
     valid_goal=True
+    valid_price=True
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -57,7 +58,8 @@ def create(request):
         if form.is_valid():
             # process the data in form.cleaned_data as required
             valid_goal = checkGoal(form)
-            if valid_goal:
+            valid_price=checkPrice(form)
+            if valid_goal and valid_price:
                 pname=form.cleaned_data['name']
                 ppro=form.cleaned_data['project_id']
                 pdep=form.cleaned_data['department_id']
@@ -83,8 +85,8 @@ def create(request):
         form = TaskForm()
     coll=find_collections(request)
     return render(request, 'task_form.html', {'form': form,'repeated_name':repeated_name,"valid_goal":valid_goal,
-        'project_department_related':project_department_related
-        ,"departments":coll["departments"],"projects":coll["projects"]})
+        'project_department_related':project_department_related,'valid_price':valid_price,
+        "departments":coll["departments"],"projects":coll["projects"]})
 
 
 def createAsync(request):
@@ -95,6 +97,8 @@ def createAsync(request):
     projects:eso
     repeated_name: si el nombre es repetido
     project_department_related: si nos están relacionados projectdepartment
+    valid_price: si el precio esta puesto acorde al objetivo de producción (y es positivo)
+    valid_goal:si el objetivo es correcto(no está uno en blanco y otro no)
 
     template:
     task_form.html
@@ -105,7 +109,8 @@ def createAsync(request):
         'repeated_name': False,
         'success':True,
         'project_department_related':True,
-        "valid_goal":True
+        'valid_goal':True,
+        'valid_price':True
     }
 
     # if this is a POST request we need to process the form data
@@ -117,7 +122,8 @@ def createAsync(request):
         if form.is_valid():
             # process the data in form.cleaned_data as required
             data['valid_goal'] = checkGoal(form)
-            if data['valid_goal']:
+            data['valid_price']=checkPrice(form)
+            if data['valid_goal'] and data['valid_price']:
                 pname=form.cleaned_data['name']
                 ppro=form.cleaned_data['project_id']
                 pdep=form.cleaned_data['department_id']
@@ -205,6 +211,7 @@ def edit(request,task_id):
     repeated_name: si el nombre es repetido
     valid_goal:si los objetivos son válidos
     project_department_related: si nos están relacionados projectdepartment
+    valid_price: si el precio esta puesto acorde al objetivo de producción (y es positivo)
     
     template:
     task_form.html
@@ -213,6 +220,7 @@ def edit(request,task_id):
     actor=checkTask(None,request)
     repeated_name=False
     valid_goal=True
+    valid_price=True
     
     project_department_related=True
     # if this is a POST request we need to process the form data
@@ -223,7 +231,8 @@ def edit(request,task_id):
         if form.is_valid():
             # process the data in form.cleaned_data as required
             valid_goal = checkGoal(form)
-            if valid_goal:
+            valid_price=checkPrice(form)
+            if valid_goal and valid_price:
                 task=get_object_or_404(Task,pk=form.cleaned_data['task_id'])
                 checkTask(task,request)
                 #find tasks with the same name
@@ -247,8 +256,8 @@ def edit(request,task_id):
     #The project
     coll=find_collections(request)
     return render(request, 'task_form.html', {'form': form,'repeated_name':repeated_name,
-        "valid_goal":valid_goal,'project_department_related':project_department_related
-        ,"departments":coll["departments"],"projects":coll["projects"]})
+        "valid_goal":valid_goal,'project_department_related':project_department_related,'valid_price':valid_price,
+        "departments":coll["departments"],"projects":coll["projects"]})
 
 def delete(request,task_id):
     """
@@ -341,10 +350,13 @@ def createTask(form, project_department,actor):
     fdescription=form.cleaned_data['description']
     fgoal=form.cleaned_data['production_goal']
     fgoaldescription=form.cleaned_data['goal_description']
+    fperunit=form.cleaned_data['price_per_unit']
+    fperhour=form.cleaned_data['price_per_hour']
 
     task=Task.objects.create(name=fname,description=fdescription,
         projectDepartment_id=project_department,actor_id=actor,
-        production_goal=fgoal,goal_description=fgoaldescription)
+        production_goal=fgoal,goal_description=fgoaldescription,
+        price_per_unit=fperunit,price_per_hour=fperhour)
 
 def updateTask(task,form,actor):
     newGoalEntry(task,form,actor)
@@ -352,6 +364,8 @@ def updateTask(task,form,actor):
     task.description = form.cleaned_data['description']
     task.production_goal = form.cleaned_data['production_goal']
     task.goal_description = form.cleaned_data['goal_description']
+    task.price_per_unit=form.cleaned_data['price_per_unit']
+    task.price_per_hour=form.cleaned_data['price_per_hour']
     task.save()
 
 def newGoalEntry(task,form,actor):
@@ -360,11 +374,16 @@ def newGoalEntry(task,form,actor):
     """
     fgoal=form.cleaned_data['production_goal']
     fgoaldescription=form.cleaned_data['goal_description']
-    if fgoal!=task.production_goal or fgoaldescription!=task.goal_description:
+    fperunit=form.cleaned_data['price_per_unit']
+    fperhour=form.cleaned_data['price_per_hour']
+    if fgoal!=task.production_goal or fgoaldescription!=task.goal_description or \
+        fperhour!=task.price_per_hour or fperunit!=task.price_per_unit:
         GoalEvolution.objects.create(task_id  = task,
             actor_id = actor,
             production_goal=task.production_goal,
-            goal_description=task.goal_description)
+            goal_description=task.goal_description,
+            price_per_unit=task.price_per_unit,
+            price_per_hour=task.price_per_hour)
 
 def checkGoal(form):
     """
@@ -373,6 +392,19 @@ def checkGoal(form):
     fgoal=form.cleaned_data['production_goal']
     fgoaldescription=form.cleaned_data['goal_description']
     return (fgoal!="" and fgoaldescription!="") or (not fgoal and not fgoaldescription)
+
+def checkPrice(form):
+    """
+    This returns true if the price field is valid
+    This means only per_unit or per_hour must be filled 
+    and only if there is a valid goal description for the first field, or no goal for the second
+    """
+    fgoal=form.cleaned_data['production_goal']
+    fgoaldescription=form.cleaned_data['goal_description']
+    fperunit=form.cleaned_data['price_per_unit']
+    fperhour=form.cleaned_data['price_per_hour']
+    return (fgoaldescription!="" and not fperhour and fperunit and fperunit>0 ) or  (not fgoaldescription and not fperunit and fperhour and fperhour>0)
+
 
 def deleteTask(task):
     task.active=False

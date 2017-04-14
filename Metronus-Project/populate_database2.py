@@ -51,7 +51,8 @@ def createEmployeeInProjDept(project, department,company):
         user_type="E",
         identifier=ranstr(),
         phone="123123123",
-        company_id=company
+        company_id=company,
+        price_per_hour=random.uniform(4,16)
     )
 
     try:
@@ -75,33 +76,51 @@ def createTaskInProjDept(project, department,admin,rDate):
     if measure:
         pgoal=random.uniform(50,100)
         pdescription=random.choice(["kgs", "fresas", "granos de harina", "estrellitas", "cms"])
+        pprice_units=random.uniform(4,20)
+        pprice_hours=None
     else:
         pgoal=None
         pdescription=""
+        pprice_units=None
+        pprice_hours=random.uniform(4,20)
+
     task=Task.objects.create(
         name = "task"+ranstr(),
         description = ranstr(),
         actor_id = admin,
         production_goal=pgoal,
         goal_description=pdescription,
-        projectDepartment_id = pd
+        projectDepartment_id = pd,
+        price_per_hour=pprice_hours,
+        price_per_unit=pprice_units
     )
     Task.objects.filter(pk=task.id).update(registryDate = rDate.strftime('%Y-%m-%d')+" 10:00+00:00")
     
     #Generate random number of previous goals
-    if measure:
-        for _ in range(random.randint(3,7)):
-            createGoalEvolution(task,admin,rDate)
+    
+    for _ in range(random.randint(3,7)):
+        createGoalEvolution(task,admin,rDate,measure)
     return task.id
-def createGoalEvolution(task,actor,rDate):
+def createGoalEvolution(task,actor,rDate,measure):
     """
     rDate is the task registryDate, so we will create a date before that
     """
+    if measure:
+        pgoal=random.uniform(40,100)
+        pprice_units=random.uniform(4,20)
+        pprice_hours=None
+    else:
+        pgoal=None
+        pprice_units=None
+        pprice_hours=random.uniform(4,20)
+
     ge1=GoalEvolution.objects.create(
         task_id=task,
         actor_id = actor,
-        production_goal=random.uniform(40,100),
-        goal_description=task.goal_description
+        production_goal=pgoal,
+        goal_description=task.goal_description,
+        price_per_hour=pprice_hours,
+        price_per_unit=pprice_units
         )
     #get a date before the last task update
     date = rDate - timedelta(days=random.randint(2,30))
