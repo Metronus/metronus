@@ -26,8 +26,14 @@
 
   <body class="nav-md">
 
-  {% isAdmin user.actor as _is_admin %}
-  {% isEmployee user.actor as _is_employee %}
+  {% isAdmin user.actor as actor_is_admin %}
+  {% isExecutive user.actor as actor_is_executive %}
+  {% isProjectManager user.actor as actor_is_projectManager %}
+  {% isCoordinator user.actor as actor_is_coordinator %}
+  {% isTeamManager user.actor as actor_is_teamManager %}
+  {% isEmployee user.actor as actor_is_employee %}
+  {% hasRole user.actor as actor_has_role %}
+
 
 
     <div class="container body">
@@ -73,36 +79,56 @@
                 <ul class="nav side-menu">
                   <li><a><i class="fa fa-home"></i>{% trans 'dashIndex' %}</span></a>
                   </li>
+                  {% if actor_is_admin or actor_is_executive or actor_is_projectManager %}
                   <li>
                   <a><i class="fa fa-desktop"></i>{% trans 'dashProjects' %}<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/project/list">{% trans 'dashProjectsList' %}</a></li>
+                      {% if actor_is_admin or actor_is_executive %}
                       <li><a href="/project/create">{% trans 'dashProjectCreate' %}</a></li>
+                      {% endif %}
                     </ul>
                   </li>
+                  {% endif %}
+
+                  {% if actor_is_admin or actor_is_executive or actor_is_projectManager or actor_is_coordinator or actor_is_teamManager %}
                   <li><a><i class="fa fa-group"></i>{% trans 'dashDepartments' %}<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/department/list">{% trans 'dashDepartmentsList' %}</a></li>
+                      {% if actor_is_admin or actor_is_executive or actor_is_projectManager %}
                       <li><a href="/department/create">{% trans 'dashDepartmentCreate' %}</a></li>
+                      {% endif %}
                     </ul>
                   </li>
+                  {% endif %}
+
+                  {% if actor_is_admin or actor_is_executive %}
                   <li><a><i class="fa fa-user"></i>{% trans 'dashEmployees' %}<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/employee/list">{% trans 'dashEmployeesList' %}</a></li>
+                      {% if actor_is_admin or actor_is_executive %}
                       <li><a href="/employee/create">{% trans 'dashEmployeesCreate' %}</a></li>
+                      {% endif%}
                     </ul>
                   </li>
+                  {% endif %}
+
+                  {% if actor_is_admin or actor_is_executive or actor_is_projectManager or actor_is_teamManager or actor_is_coordinator %}
                   <li><a><i class="fa fa-tasks"></i>{% trans 'dashTasks' %}<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/task/list">{% trans 'dashTasksList' %}</a></li>
                       <li><a href="/task/create">{% trans 'dashTasksCreate' %}</a></li>
                     </ul>
                   </li>
+                  {% endif %}
+
+                  {% if not actor_is_admin and actor_has_role %}
                   <li><a><i class="fa fa-calendar"></i>{% trans 'dashTimeControl' %}<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/timeLog/list_all">{% trans 'dashTimeControlList' %}</a></li>
                     </ul>
                   </li>
+                  {% endif %}
                 </ul>
               </div>
             </div>

@@ -1,6 +1,7 @@
 from django import template
 from datetime import datetime
 import calendar
+from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 
 register = template.Library()
 
@@ -45,8 +46,75 @@ def is_weekend(day,month,year):
 
 @register.assignment_tag
 def isAdmin(actor):
-    return actor.user_type == 'A'
+    if actor.user_type == 'A':
+        return True
+    else:
+        return False
+
+@register.assignment_tag
+def hasRole(actor):
+    if actor.user_type == 'E' or actor.user_type == 'A':
+        try:
+            role_id = ProjectDepartmentEmployeeRole.objects.get(employee_id = actor.id).role_id
+            return True
+        except:
+            return False
+    else:
+        return False
+
 
 @register.assignment_tag
 def isEmployee(actor):
-    return actor.user_type == 'E'
+    if actor.user_type == 'A' or not hasRole(actor):
+        return False
+
+    role_id = ProjectDepartmentEmployeeRole.objects.get(employee_id = actor.id).role_id
+    if role_id.name == 'EMPLOYEE':
+        return True
+    else:
+        return False
+
+@register.assignment_tag
+def isProjectManager(actor):
+    if actor.user_type == 'A' or not hasRole(actor):
+        return False
+
+    role_id = ProjectDepartmentEmployeeRole.objects.get(employee_id = actor.id).role_id
+    print(role_id.name)
+    if role_id.name == 'PROJECT_MANAGER':
+        return True
+    else:
+        return False
+
+@register.assignment_tag
+def isCoordinator(actor):
+    if actor.user_type == 'A' or not hasRole(actor):
+        return False
+
+    role_id = ProjectDepartmentEmployeeRole.objects.get(employee_id = actor.id).role_id
+    if role_id.name == 'COORDINATOR':
+        return True
+    else:
+        return False
+
+@register.assignment_tag
+def isExecutive(actor):
+    if actor.user_type == 'A' or not hasRole(actor):
+        return False
+
+    role_id = ProjectDepartmentEmployeeRole.objects.get(employee_id = actor.id).role_id
+    if role_id.name == 'EXECUTIVE':
+        return True
+    else:
+        return False
+
+@register.assignment_tag
+def isTeamManager(actor):
+    if actor.user_type == 'A' or not hasRole(actor):
+        return False
+
+    role_id = ProjectDepartmentEmployeeRole.objects.get(employee_id = actor.id).role_id
+    if role_id.name == 'TEAM_MANAGER':
+        return True
+    else:
+        return False
