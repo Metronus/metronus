@@ -46,8 +46,8 @@ def delete(request):
     """
 
     admin = get_current_admin_or_403(request)
-    projectDepartment_id = request.GET.get("projectDepartment_id")
-    projectDepartment = get_object_or_404(ProjectDepartment, id=projectDepartment_id)
+    project_department_id = request.GET.get("projectDepartment_id")
+    projectDepartment = get_object_or_404(ProjectDepartment, id=project_department_id)
 
     deleteProjectDepartment(projectDepartment, admin)
 

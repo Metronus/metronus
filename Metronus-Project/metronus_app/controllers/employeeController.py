@@ -83,8 +83,8 @@ def create(request):
 
             if not errors:
                 # Everything is OK, create the employee
-                employeeUser = createEmployeeUser(form)
-                employee = createEmployee(employeeUser, admin, form)
+                employee_user = createEmployeeUser(form)
+                employee = createEmployee(employee_user, admin, form)
                 EmployeeLog.objects.create(employee_id=employee, event="A", price_per_hour=employee.price_per_hour)
                 send_register_email(form.cleaned_data["email"], form.cleaned_data["first_name"])
 

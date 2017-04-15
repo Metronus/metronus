@@ -16,12 +16,15 @@ from metronus_app.model.department                    import Department
 import string, random, json
 
 def ranstr():
-    # Returns a 10-character random string
+    """Returns a 10-character random string"""
     return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
 
 ### Son herramientas sorpresa que nos ayudarán más tarde
 
 def checkJsonMetricsAreEqual(self, response_string, data):
+    """
+    Checks the data provided by the JSON equals the real data
+    """
     response = json.loads(response_string)
 
     self.assertTrue('names' in response)
@@ -39,35 +42,39 @@ def checkJsonMetricsAreEqual(self, response_string, data):
         self.assertEquals(val, response['values'][ind])
 
 def createEmployeeInProjDept(project, department):
+    """
+    creates an employee and assigns him/her a new role
+    """
+    user = User.objects.create_user(
+        username=ranstr(),
+        password=ranstr(),
+        email=ranstr() + "@metronus.es",
+        first_name=ranstr(),
+        last_name=ranstr()
+    )
 
-        user = User.objects.create_user(
-            username=ranstr(),
-            password=ranstr(),
-            email=ranstr() + "@metronus.es",
-            first_name=ranstr(),
-            last_name=ranstr()
-        )
+    employee = Employee.objects.create(
+        user=user,
+        user_type="E",
+        identifier=ranstr(),
+        phone="123123123",
+        company_id=Company.objects.get(company_name="company1")
+    )
 
-        employee = Employee.objects.create(
-            user=user,
-            user_type="E",
-            identifier=ranstr(),
-            phone="123123123",
-            company_id=Company.objects.get(company_name="company1")
-        )
+    try:
+        pd = ProjectDepartment.objects.get(project_id=project, department_id=department)
+    except ObjectDoesNotExist:
+        pd = ProjectDepartment.objects.create(project_id=project, department_id=department)
 
-        try:
-            pd = ProjectDepartment.objects.get(project_id=project, department_id=department)
-        except ObjectDoesNotExist:
-            pd = ProjectDepartment.objects.create(project_id=project, department_id=department)
+    role = Role.objects.get(tier=random.choice([10, 20, 30, 40, 50]))
+    ProjectDepartmentEmployeeRole.objects.create(projectDepartment_id=pd, role_id=role, employee_id=employee)
 
-        role = Role.objects.get(tier=random.choice([10, 20, 30, 40, 50]))
-        ProjectDepartmentEmployeeRole.objects.create(projectDepartment_id=pd, role_id=role, employee_id=employee)
-
-        return employee
+    return employee
 
 def createTaskInProjDept(project, department):
-
+    """
+    creates a task for a given project and department
+    """
     try:
         pd = ProjectDepartment.objects.get(project_id=project, department_id=department)
     except ObjectDoesNotExist:
@@ -81,7 +88,9 @@ def createTaskInProjDept(project, department):
     )
 
 def createTimelogInTask(task, duration, date, employee = None):
-
+    """
+    creates a timelog for an employee involving a task during a specific date
+    """
     TimeLog.objects.create(
         description = ranstr(),
         workDate = date,
@@ -230,12 +239,18 @@ class DepartmentMetricsTestCase(TestCase):
         )
 
     def test_access_denied_not_logged_emppertask(self):
+        """
+        Without authentication, try getting the emppertask JSON
+        """
         c = Client()
 
         response = c.get("/department/ajaxEmployeesPerTask?department_id=%d" % Department.objects.get(name="Departamento2").id)
         self.assertEquals(response.status_code, 403)
 
     def test_access_denied_low_role_emppertask(self):
+        """
+        Without proper roles, try getting the emppertask JSON
+        """
         c = Client()
         c.login(username="emp1", password="123456")
 
@@ -243,6 +258,9 @@ class DepartmentMetricsTestCase(TestCase):
         self.assertEquals(response.status_code, 403)
 
     def test_access_ok_executive_emppertask(self):
+        """
+        As an executive, try getting the emppertask JSON
+        """
         c = Client()
         c.login(username="emp2", password="123456")
 
@@ -250,6 +268,9 @@ class DepartmentMetricsTestCase(TestCase):
         self.assertEquals(response.status_code, 200)
 
     def test_access_other_company_executive_emppertask(self):
+        """
+        As an executive, try getting the emppertask JSON from other company
+        """
         c = Client()
         c.login(username="emp2", password="123456")
 
@@ -257,6 +278,9 @@ class DepartmentMetricsTestCase(TestCase):
         self.assertEquals(response.status_code, 403)
 
     def test_bad_request_emppertask(self):
+        """
+        Try getting the emppertask JSON without providing a department
+        """
         c = Client()
         c.login(username="emp2", password="123456")
 
@@ -264,7 +288,9 @@ class DepartmentMetricsTestCase(TestCase):
         self.assertEquals(response.status_code, 400)
     
     def test_random_data_emppertask(self):
-
+        """
+        Does a lot of random test and checks the data generate matches the emppertask JSON
+        """
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -303,12 +329,18 @@ class DepartmentMetricsTestCase(TestCase):
         checkJsonMetricsAreEqual(self, str(response.content, encoding='utf8'), true_data)
     
     def test_access_denied_not_logged_timepertask(self):
+        """
+        Try getting the timepertask JSON without authentication
+        """
         c = Client()
 
         response = c.get("/department/ajaxTimePerTask?department_id=%d" % Department.objects.get(name="Departamento2").id)
         self.assertEquals(response.status_code, 403)
 
     def test_access_denied_low_role_timepertask(self):
+        """
+        Try getting the timepertask JSON without proper roles
+        """
         c = Client()
         c.login(username="emp1", password="123456")
 
@@ -316,6 +348,9 @@ class DepartmentMetricsTestCase(TestCase):
         self.assertEquals(response.status_code, 403)
 
     def test_access_ok_executive_timepertask(self):
+        """
+        Try getting the timepertask JSON as an executive
+        """
         c = Client()
         c.login(username="emp2", password="123456")
 
@@ -323,6 +358,9 @@ class DepartmentMetricsTestCase(TestCase):
         self.assertEquals(response.status_code, 200)
 
     def test_access_other_company_executive_timepertask(self):
+        """
+        Try getting the timepertask JSON without as an executive from other company
+        """
         c = Client()
         c.login(username="emp2", password="123456")
 
@@ -330,6 +368,9 @@ class DepartmentMetricsTestCase(TestCase):
         self.assertEquals(response.status_code, 403)
 
     def test_bad_request_timepertask(self):
+        """
+        Try getting the timepertask JSON without providing a department
+        """
         c = Client()
         c.login(username="emp2", password="123456")
 
@@ -337,7 +378,9 @@ class DepartmentMetricsTestCase(TestCase):
         self.assertEquals(response.status_code, 400)
 
     def test_random_data_timepertask(self):
-
+        """
+        Does a lot of test and checks the data matches the timepertask JSON
+        """
         c = Client()
         c.login(username="admin1", password="123456")
 

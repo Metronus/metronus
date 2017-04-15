@@ -424,9 +424,9 @@ def checkRoleForList(request):
 
     if actor.user_type!='A':
         #not an admin
-        isTeamManager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+        is_team_manager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
                     role_id__tier= 30)
-        res=isTeamManager.count()>0
+        res=is_team_manager.count()>0
 
         if res:
             #is manager

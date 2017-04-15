@@ -20,18 +20,24 @@ from datetime                                           import date, timedelta,d
 from django.utils import timezone
 
 def ranstr():
-    # Returns a 10-character random string
+    """ Returns a 10-character random string"""
     return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8))
 
 ### Métodos para crear objetos
 def createDepartments(company):
-     Department.objects.create(
+    """
+    Creates a random department for a given company
+    """
+    Department.objects.create(
         name="department"+ranstr(),
         active=True,
         company_id=company
     )
 def createProjects(company):
-     Project.objects.create(name="project"+ranstr(), deleted=False, company_id=company)
+    """
+    Creates a random project for a given company
+    """
+    Project.objects.create(name="project"+ranstr(), deleted=False, company_id=company)
 
 def createEmployeeInProjDept(project, department,company):
     """
@@ -65,7 +71,9 @@ def createEmployeeInProjDept(project, department,company):
     return employee
 
 def createTaskInProjDept(project, department,admin,rDate):
-
+    """
+    creates a task for a given project and department, either with production goal or not
+    """
     try:
         pd = ProjectDepartment.objects.get(project_id=project, department_id=department)
     except ObjectDoesNotExist:
@@ -102,7 +110,9 @@ def createTaskInProjDept(project, department,admin,rDate):
     return task.id
 def createGoalEvolution(task,actor,rDate,measure):
     """
+    creates a production goal registry for a task in the past
     rDate is the task registryDate, so we will create a date before that
+    measure is true if there was a production goal, otherwise the task was paid per hour
     """
     if measure:
         pgoal=random.uniform(40,100)
@@ -127,6 +137,9 @@ def createGoalEvolution(task,actor,rDate,measure):
     GoalEvolution.objects.filter(pk=ge1.id).update(registryDate = date.strftime('%Y-%m-%d')+" 10:00+00:00")
     
 def createTimelogInTask(task, duration, date, employee):
+    """
+    creates a timelog for an employee involving a task during a specific date
+    """
     if task.production_goal is not None and task.production_goal !="":
         punits=random.uniform(0.8,2)*duration/60*task.production_goal
     else:
@@ -143,6 +156,9 @@ def createTimelogInTask(task, duration, date, employee):
 ################################## Party hard a partir de aquí ##################################
 @transaction.atomic
 def randomLoad():
+    """
+    loads a lot of random data
+    """
     populate_roles()
     #create company
     company=Company.objects.create(cif="A00000002", company_name="metronus", short_name="metronus", email="info@metronus.es", phone="123456789")
@@ -202,6 +218,9 @@ def randomLoad():
 
 
 def populate_roles():
+    """
+    Loads... the available roles!!
+    """
     # El gerente
     Role.objects.create(name="EXECUTIVE", tier=50)
     # El jefe de proyecto

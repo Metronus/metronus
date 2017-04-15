@@ -74,7 +74,7 @@ class EmployeeTestCase(TestCase):
         )
 
     def test_create_employee_positive(self):
-        # Logged in as an administrator, try to create an employee
+        """ Logged in as an administrator, try to create an employee"""
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -111,7 +111,7 @@ class EmployeeTestCase(TestCase):
         self.assertEquals(logs_before + 1, logs_after)
 
     def test_create_employee_with_redirect_positive(self):
-        # Logged in as an administrator, try to create an employee
+        """ Logged in as an administrator, try to create an employee"""
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -147,7 +147,7 @@ class EmployeeTestCase(TestCase):
         self.assertEquals(logs_before + 1, logs_after)
 
     def test_create_employee_password_not_match_negative(self):
-        # Logged in as an administrator, try to create an employee
+        """ Logged in as an administrator, try to create an employee"""
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -174,7 +174,7 @@ class EmployeeTestCase(TestCase):
         self.assertEquals(logs_before, logs_after)
 
     def test_create_employee_negative_price_negative(self):
-        # Logged in as an administrator, try to create an employee
+        """ Logged in as an administrator, try to create an employee"""
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -203,7 +203,7 @@ class EmployeeTestCase(TestCase):
 
 
     def test_create_employee_username_taken_negative(self):
-        # Logged in as an administrator, try to create an employee
+        """ Logged in as an administrator, try to create an employee"""
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -230,7 +230,7 @@ class EmployeeTestCase(TestCase):
         self.assertEquals(logs_before, logs_after)
 
     def test_create_employee_invalid_form_negative(self):
-        # Logged in as an administrator, try to create an employee
+        """ Logged in as an administrator, try to create an employee"""
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -257,6 +257,9 @@ class EmployeeTestCase(TestCase):
 
 
     def test_list_employees_positive(self):
+        """
+        As an admin, list the employees
+        """
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -267,11 +270,17 @@ class EmployeeTestCase(TestCase):
         self.assertEquals(response.context["employees"][0].identifier, "emp01")
 
     def test_list_employees_not_logged(self):
+        """
+        Try listing the employees without authentication
+        """
         c = Client()
         response = c.get("/employee/list")
         self.assertEquals(response.status_code, 403)
 
     def test_view_employee_positive(self):
+        """
+        As an admin, view an employee profile
+        """
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -284,6 +293,9 @@ class EmployeeTestCase(TestCase):
         self.assertEquals(employee.user.first_name, "Álvaro")
 
     def test_view_employee_not_allowed(self):
+        """
+        As an admin, try viewing an employee profile from other company
+        """
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -291,6 +303,9 @@ class EmployeeTestCase(TestCase):
         self.assertEquals(response.status_code, 403)
 
     def test_view_employee_404(self):
+        """
+        Try getting an inexistent employee profile
+        """
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -298,6 +313,9 @@ class EmployeeTestCase(TestCase):
         self.assertEquals(response.status_code, 404)
 
     def test_edit_employee_get(self):
+        """
+        As an admin, get the edit employee form
+        """
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -312,6 +330,9 @@ class EmployeeTestCase(TestCase):
         self.assertEquals(form.initial["phone"], "666555444")
 
     def test_edit_employee_positive_without_pass(self):
+        """
+        As an admin, edit an employee profile
+        """
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -343,6 +364,9 @@ class EmployeeTestCase(TestCase):
 
 
     def test_edit_employee_pass_positive(self):
+        """
+        As an admin, edit an employee password
+        """
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -357,6 +381,9 @@ class EmployeeTestCase(TestCase):
         self.assertTrue(final.user.password != initialpass)
 
     def test_edit_employee_pass_negative(self):
+        """
+        As an admin, try editing an employee password when password repeat do not match
+        """
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -371,18 +398,27 @@ class EmployeeTestCase(TestCase):
         self.assertTrue(final.user.password == initialpass)
 
     def test_edit_employee_not_allowed(self):
+        """
+        Try editing an employee from other company
+        """
         c = Client()
         c.login(username="admin1", password="123456")
         response = c.get("/employee/edit/emp2/")
         self.assertEquals(response.status_code, 403)
 
     def test_edit_employee_404(self):
+        """
+        Try editing an inexistent employee
+        """
         c = Client()
         c.login(username="admin1", password="123456")
         response = c.get("/employee/edit/diana/")
         self.assertEquals(response.status_code, 404)
 
     def test_delete_employee_positive(self):
+        """
+        As an admin, delete an employee from the company and check the log updates
+        """
         c = Client()
         c.login(username="admin1", password="123456")
 

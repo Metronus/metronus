@@ -8,7 +8,6 @@ from metronus_app.model.administrator import Administrator
 from metronus_app.model.task import Task
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
-from metronus_app.controllers.departmentController import *
 from django.test import TestCase, Client
 from django.core.exceptions                      import ObjectDoesNotExist, PermissionDenied
 from populate_database import populate_database
@@ -96,7 +95,7 @@ class DepartmentTestCase(TestCase):
             employee_id=employee1,
             role_id= Role.objects.create(name="Project manager", tier=40))
     def test_create_department_positive(self):
-        # Logged in as an administrator, try to create an department
+        """ Logged in as an administrator, try to create an department"""
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -120,7 +119,7 @@ class DepartmentTestCase(TestCase):
         self.assertEquals(logs_before + 1, logs_after)
 
     def test_create_async_department_positive(self):
-        # Logged in as an administrator, try to create an department
+        """ Logged in as an administrator, try to create an department"""
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -152,7 +151,7 @@ class DepartmentTestCase(TestCase):
 
 
     def test_create_department_duplicate(self):
-        # Logged in as an administrator, try to create an department with the name of an existing company
+        """ Logged in as an administrator, try to create an department with the name of an existing company"""
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -168,17 +167,20 @@ class DepartmentTestCase(TestCase):
 
 
     def test_create_department_not_logged(self):
+        """ Without authentication, try to create an department """
         c = Client()
         response = c.get("/department/create")
         self.assertEquals(response.status_code, 403)
 
     def test_create_department_not_allowed(self):
+        """ Without proper roles, try to create an department """
         c = Client()
         c.login(username="emp2", password="123456")
         response = c.get("/department/create")
         self.assertEquals(response.status_code, 403)
 
     def test_list_departments_positive(self):
+        """As an admin, try to list the departments """
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -190,6 +192,7 @@ class DepartmentTestCase(TestCase):
 
 
     def test_list_departments_positive_2(self):
+        """As an employee with proper roles, try to list the departments """
         c = Client()
         c.login(username="emp1", password="123456")
 
@@ -200,6 +203,7 @@ class DepartmentTestCase(TestCase):
         self.assertEquals(response.context["departments"][0].name, "dep1")
 
     def test_view_department_positive(self):
+        """As an admin, try to view a department """
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -212,6 +216,7 @@ class DepartmentTestCase(TestCase):
         #self.assertEquals(response.context["employees"][0].department.id, dep_id)
         self.assertEquals(response.context["coordinator"],None)
     def test_view_department_not_allowed(self):
+        """Without proper roles, try to view a department """
         c = Client()
         c.login(username="emp2", password="123456")
         dep_id=Department.objects.all().first()
@@ -220,11 +225,13 @@ class DepartmentTestCase(TestCase):
 
 
     def test_list_departments_not_logged(self):
+        """Without authentication, try to list the departments """
         c = Client()
         response = c.get("/department/list")
         self.assertEquals(response.status_code, 403)
 
     def test_list_departments_not_allowed(self):
+        """Without proper roles, try to list the departments """
         c = Client()
         c.login(username="emp2", password="123456")
         response = c.get("/department/list")
@@ -232,6 +239,7 @@ class DepartmentTestCase(TestCase):
 
 
     def test_edit_department_get(self):
+        """As an admin, try to get the edit department form """
         c = Client()
         c.login(username="admin1", password="123456")
         response = c.get("/department/list")
@@ -244,6 +252,7 @@ class DepartmentTestCase(TestCase):
         self.assertEquals(form.initial["department_id"], dep_id)
 
     def test_edit_department_404(self):
+        """As an admin, try to edit an inexistent department"""
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -252,6 +261,7 @@ class DepartmentTestCase(TestCase):
 
 
     def test_delete_department_positive(self):
+        """As an admin, try to delete a department"""
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -264,6 +274,7 @@ class DepartmentTestCase(TestCase):
         self.assertFalse(Department.objects.get(pk=dep_id).active)
 
     def test_delete_department_not_allowed(self):
+        """As an admin, try to delete a department from other company"""
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -275,6 +286,7 @@ class DepartmentTestCase(TestCase):
         self.assertEquals(response.status_code, 403)
 
     def test_delete_department_not_active(self):
+        """As an admin, try to delete an already deleted department """
         c = Client()
         c.login(username="admin1", password="123456")
 

@@ -3,9 +3,8 @@ from django.contrib.auth.models                  import User
 from metronus_app.model.timeLog import TimeLog
 from django.test import TestCase, Client
 from django.core.exceptions                      import ObjectDoesNotExist, PermissionDenied
-from metronus_app.controllers.timeLogController import *
 from populate_database import populate_database
-
+from datetime import date,datetime
 class TimeLogTestCase(TestCase):
     """This class provides a test case for using and managing employee timelogs"""
     @classmethod
@@ -13,7 +12,7 @@ class TimeLogTestCase(TestCase):
         populate_database()
 
     def test_create_timelog_positive(self):
-        # Creates a timelog
+        """ Creates a timelog"""
         c = Client()
         c.login(username="anddonram", password="123456")
         task=Task.objects.filter(name="Hacer cosas de back").first()
@@ -43,7 +42,7 @@ class TimeLogTestCase(TestCase):
 
 
     def test_create_timelog_positive_2(self):
-        # Creates a timelog twice with different description, with production goals
+        """Creates a timelog twice with different description, with production goals"""
         c = Client()
         c.login(username="andjimrio", password="123456")
         task=Task.objects.filter(name="Hacer cosas de front").first()
@@ -98,7 +97,7 @@ class TimeLogTestCase(TestCase):
         
 
     def test_create_timelog_positive_3(self):
-        # Creates a timelog twice with the same description, causing the log to be update
+        """ Creates a timelog twice with the same description, causing the log to be update"""
         c = Client()
         c.login(username="andjimrio", password="123456")
         task=Task.objects.filter(name="Hacer cosas de front").first()
@@ -153,7 +152,7 @@ class TimeLogTestCase(TestCase):
 
 
     def test_create_timelog_negative(self):
-        # Creates a timelog without production goals when the task requires it
+        """Creates a timelog without production goals when the task requires it"""
         c = Client()
         c.login(username="andjimrio", password="123456")
         task=Task.objects.filter(name="Hacer cosas de front").first()
@@ -173,7 +172,7 @@ class TimeLogTestCase(TestCase):
         self.assertEquals(response.context['over_day_limit'], False)
 
     def test_create_timelog_negative_2(self):
-        # Creates a timelog with production goals when the task does not need it
+        """ Creates a timelog with production goals when the task does not need it"""
         c = Client()
         c.login(username="anddonram", password="123456")
         task=Task.objects.filter(name="Hacer cosas de back").first()
@@ -194,7 +193,7 @@ class TimeLogTestCase(TestCase):
         self.assertEquals(response.context['over_day_limit'], False)
 
     def test_create_timelog_overtime(self):
-        # Creates two timelogs whose sum overpasses the limit of 1440 minutes per day
+        """ Creates two timelogs whose sum overpasses the limit of 1440 minutes per day"""
         c = Client()
         c.login(username="andjimrio", password="123456")
         task=Task.objects.filter(name="Hacer cosas de front").first()

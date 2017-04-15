@@ -14,6 +14,9 @@ from django.db                                        import transaction
 from populate_database2 import randomLoad
 @transaction.atomic
 def basicLoad():
+    """
+    Loads a lot of data from scratch
+    """
     company=Company.objects.create(cif="A00000001", company_name="company1", short_name="company1", email="company1@gmail.com", phone="123456789")
     company2=Company.objects.create(cif="A00000002", company_name="metronus", short_name="metronus", email="info@metronus.es", phone="123456789")
     #From first company:company1
@@ -285,6 +288,9 @@ def create_user(nombre,company2):
         company_id=company2)
 
 def populate_roles():
+    """
+    Loads... the available roles!!
+    """
     # El gerente
     Role.objects.create(name="EXECUTIVE", tier=50)
     # El jefe de proyecto
@@ -301,5 +307,7 @@ def populate_roles():
 #############################################################################
 
 def populate_database():
+    """
+    This is called by python3 manage.py populate
+    """
     basicLoad()
-#    randomLoad()

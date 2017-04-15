@@ -16,12 +16,15 @@ from metronus_app.model.department                    import Department
 import string, random, json
 
 def ranstr():
-    # Returns a 10-character random string
+    """ Returns a 10-character random string"""
     return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
 
 ### Son herramientas sorpresa que nos ayudarán más tarde
 
 def checkJsonMetricsAreEqual(self, response_string, data):
+    """
+    Checks the data provided by the JSON equals the real data
+    """
     response = json.loads(response_string)
 
     self.assertTrue('names' in response)
@@ -39,35 +42,39 @@ def checkJsonMetricsAreEqual(self, response_string, data):
         self.assertEquals(val, response['values'][ind])
 
 def createEmployeeInProjDept(project, department):
+    """
+    creates an employee and assigns him/her a new role
+    """
+    user = User.objects.create_user(
+        username=ranstr(),
+        password=ranstr(),
+        email=ranstr() + "@metronus.es",
+        first_name=ranstr(),
+        last_name=ranstr()
+    )
 
-        user = User.objects.create_user(
-            username=ranstr(),
-            password=ranstr(),
-            email=ranstr() + "@metronus.es",
-            first_name=ranstr(),
-            last_name=ranstr()
-        )
+    employee = Employee.objects.create(
+        user=user,
+        user_type="E",
+        identifier=ranstr(),
+        phone="123123123",
+        company_id=Company.objects.get(company_name="company1")
+    )
 
-        employee = Employee.objects.create(
-            user=user,
-            user_type="E",
-            identifier=ranstr(),
-            phone="123123123",
-            company_id=Company.objects.get(company_name="company1")
-        )
+    try:
+        pd = ProjectDepartment.objects.get(project_id=project, department_id=department)
+    except ObjectDoesNotExist:
+        pd = ProjectDepartment.objects.create(project_id=project, department_id=department)
 
-        try:
-            pd = ProjectDepartment.objects.get(project_id=project, department_id=department)
-        except ObjectDoesNotExist:
-            pd = ProjectDepartment.objects.create(project_id=project, department_id=department)
+    role = Role.objects.get(tier=random.choice([10, 20, 30, 40, 50]))
+    ProjectDepartmentEmployeeRole.objects.create(projectDepartment_id=pd, role_id=role, employee_id=employee)
 
-        role = Role.objects.get(tier=random.choice([10, 20, 30, 40, 50]))
-        ProjectDepartmentEmployeeRole.objects.create(projectDepartment_id=pd, role_id=role, employee_id=employee)
-
-        return employee
+    return employee
 
 def createTaskInProjDept(project, department):
-
+    """
+    creates a task for a given project and department, either with production goal or not
+    """
     try:
         pd = ProjectDepartment.objects.get(project_id=project, department_id=department)
     except ObjectDoesNotExist:
@@ -81,7 +88,9 @@ def createTaskInProjDept(project, department):
     )
 
 def createTimelogInTask(task, duration, date, employee = None):
-
+    """
+    creates a timelog for an employee involving a task during a specific date
+    """
     TimeLog.objects.create(
         description = ranstr(),
         workDate = date,
@@ -253,6 +262,9 @@ class TaskMetricsTestCase(TestCase):
 
      
     def test_access_denied_not_logged_prod_task(self):
+        """
+        Without authentication, try getting the prod_per_task JSON
+        """
         c = Client()
 
         response = c.get("/task/ajaxProdPerTask?task_id=%d" % Task.objects.all().first().id)
@@ -261,6 +273,9 @@ class TaskMetricsTestCase(TestCase):
         self.assertEquals(response.status_code, 302)
         
     def test_access_ok_logged_prod_task(self):
+        """
+        With proper roles, get the prod_per_task JSON
+        """
         c = Client()
         c.login(username="emp2", password="123456")
 
@@ -268,6 +283,9 @@ class TaskMetricsTestCase(TestCase):
         self.assertEquals(response.status_code, 200)
 
     def test_bad_request_prod_per_task(self):
+        """
+        Get the prod_per_task JSON without providing a task id
+        """
         c = Client()
         c.login(username="emp2", password="123456")
 

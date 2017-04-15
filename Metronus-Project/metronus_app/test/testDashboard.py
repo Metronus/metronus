@@ -25,9 +25,13 @@ class DashboardTestCase(TestCase):
     def setUpTestData(cls):
         populate_database()
     def test_random_data_timeperproject(self):
-
+        """
+        Does a lot of random test,thus ensuring the dashboard provides the correct data every time
+        """
         def createTimelogInTask(task, duration, date):
-
+            """
+            creates a timelog for an employee involving a task during a specific date
+            """
             TimeLog.objects.create(
                 description = ranstr(),
                 workDate = date,
@@ -37,7 +41,9 @@ class DashboardTestCase(TestCase):
             )
 
         def createTaskInProjDept(project, department):
-
+            """
+            creates a task for a given project and department, either with production goal or not
+            """
             try:
                 pd = ProjectDepartment.objects.get(project_id=project, department_id=department)
             except ObjectDoesNotExist:
