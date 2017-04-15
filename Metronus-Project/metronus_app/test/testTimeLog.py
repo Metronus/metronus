@@ -7,8 +7,8 @@ from metronus_app.controllers.timeLogController import *
 from populate_database import populate_database
 
 class TimeLogTestCase(TestCase):
-#TODO: comprobar que la suma de imputaciones de un día no es mayor que 24 horas
-    def setUpTestData():
+    @classmethod
+    def setUpTestData(cls):
         populate_database()
 
     def test_create_timelog_positive(self):

@@ -6,7 +6,6 @@ from metronus_app.common_utils import get_current_admin_or_403,get_current_emplo
 from django.http import HttpResponseRedirect
 from metronus_app.model.administrator import Administrator
 from metronus_app.model.timeLog import TimeLog
-from metronus_app.forms.timeLog2Form import TimeLog2Form
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.department import Department
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole

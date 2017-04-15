@@ -6,14 +6,13 @@ from django.contrib.auth.models                  import User
 from django.test import TestCase, Client
 from metronus_app.model.employee         import Employee
 from metronus_app.model.project import Project
-from metronus_app.model.department import Department
 from metronus_app.model.goalEvolution import GoalEvolution
 from django.core.exceptions                      import ObjectDoesNotExist, PermissionDenied
 from populate_database import populate_database
 from metronus_app.model.goalEvolution import GoalEvolution
 class TaskTestCase(TestCase):
-
-    def setUpTestData():
+    @classmethod
+    def setUpTestData(cls):
         populate_database()
 
     def test_create_task_positive(self):

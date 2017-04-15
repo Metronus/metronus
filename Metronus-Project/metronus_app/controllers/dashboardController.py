@@ -7,7 +7,6 @@ from django.db.models                                   import Sum
 
 from metronus_app.forms.projectForm                     import ProjectForm
 from metronus_app.model.project                         import Project,Company
-from metronus_app.common_utils                          import get_current_admin_or_403
 from metronus_app.model.administrator                   import Administrator
 from metronus_app.model.employee                        import Employee
 from metronus_app.model.task                            import Task

@@ -15,7 +15,8 @@ from populate_database import populate_database
 import json
 
 class DepartmentTestCase(TestCase):
-    def setUpTestData():
+    @classmethod
+    def setUpTestData(cls):
         company1 = Company.objects.create(
             cif="123",
             company_name = "company1",

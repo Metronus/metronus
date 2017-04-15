@@ -20,7 +20,8 @@ def ranstr():
     return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
 
 class DashboardTestCase(TestCase):
-    def setUpTestData():
+    @classmethod
+    def setUpTestData(cls):
         populate_database()
     def test_random_data_timeperproject(self):
 
