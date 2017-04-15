@@ -3,9 +3,9 @@ from django.utils.translation import ugettext_lazy as _
 from metronus_app.model.projectDepartment import Project, Department
 
 class ProjectDepartmentForm(forms.Form):
-	"""
-	Form for relating a project and a department
-	"""
+    """
+    Form for relating a project and a department
+    """
     projectDepartment_id = forms.IntegerField(widget=forms.HiddenInput())
 
     def __init__(self, user, *args, **kwargs):

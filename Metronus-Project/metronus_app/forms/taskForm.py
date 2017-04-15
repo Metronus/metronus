@@ -10,7 +10,7 @@ from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEm
 
 
 class TaskForm(forms.Form):
-	"""Form for Task model class"""
+    """Form for Task model class"""
     name = forms.CharField(label=_("name"),max_length=30,initial="")
     description = forms.CharField(label=_("description"),max_length=200,initial="")
     task_id=forms.IntegerField(widget=forms.HiddenInput(),initial="0")

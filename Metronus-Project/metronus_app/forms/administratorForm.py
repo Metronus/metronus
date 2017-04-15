@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class AdministratorForm(Form):
-	"""Form for Administrator model class"""
+    """Form for Administrator model class"""
     admin_email = forms.EmailField(label=_("admin_email"))
     password = forms.CharField(label=_("password"), widget=forms.PasswordInput)
     repeatPassword = forms.CharField(label=_("repeatPassword"), widget=forms.PasswordInput)
