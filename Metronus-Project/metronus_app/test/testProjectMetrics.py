@@ -37,7 +37,7 @@ def ranstr():
     return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
 
 class ProjectMetricsTestCase(TestCase):
-"""This class provides a test case for accessing project-related metrics"""
+    """This class provides a test case for accessing project-related metrics"""
     def setUp(self):
 
         company1 = Company.objects.create(          

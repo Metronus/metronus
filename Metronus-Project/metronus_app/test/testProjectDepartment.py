@@ -8,7 +8,7 @@ from django.test import TestCase, Client
 
 
 class ProjectDepartmentTestCase(TestCase):
-"""This class provides a test case for using and managing project-departement relationship"""
+    """This class provides a test case for using and managing project-departement relationship"""
     def setUp(self):
 
         company123 = Company.objects.create(

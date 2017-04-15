@@ -94,7 +94,7 @@ def createTimelogInTask(task, duration, date, employee = None):
 
 
 class TaskMetricsTestCase(TestCase):
-"""This class provides a test case for accessing task-related metrics"""
+    """This class provides a test case for accessing task-related metrics"""
     def setUp(self):
         company1 = Company.objects.create(
             cif="123",
