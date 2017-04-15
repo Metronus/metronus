@@ -227,7 +227,7 @@ def validateCIF(request):
     """
     checks if the company cif already exist
     """
-    cif = request.GET.get('cif', None)
+    cif = request.GET.get('cif')
 
     check = get_or_none(Company, cif=cif)
     if check is not None:
@@ -245,7 +245,7 @@ def validateAdmin(request):
     """
     checks if the company administrator is registered
     """
-    admin = request.GET.get('admin', None)
+    admin = request.GET.get('admin')
 
     check = get_or_none(Administrator, user__username=admin)
     if check is not None:
@@ -262,7 +262,7 @@ def validateShortName(request):
     """
     checks if the company short name already exist
     """
-    short_name = request.GET.get('short_name', None)
+    short_name = request.GET.get('short_name')
 
     check = get_or_none(Company, short_name=short_name)
     if check is not None:

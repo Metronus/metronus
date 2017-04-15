@@ -3,13 +3,12 @@ from metronus_app.model.company import Company
 from metronus_app.model.department import Department
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.administrator import Administrator
-from metronus_app.controllers.projectDepartmentController import *
 from django.contrib.auth.models	import User
 from django.test import TestCase, Client
 
 
 class ProjectDepartmentTestCase(TestCase):
-
+"""This class provides a test case for using and managing project-departement relationship"""
     def setUp(self):
 
         company123 = Company.objects.create(
@@ -103,7 +102,7 @@ class ProjectDepartmentTestCase(TestCase):
 
     #---------------------- CREATE
 
-    def test_create_projectDepartment_positive(self):
+    def test_create_project_department_positive(self):
         """
 		#checks the number of projectDepartments increased
 		"""
@@ -126,7 +125,7 @@ class ProjectDepartmentTestCase(TestCase):
         self.assertEquals(count + 1, count2)
 
 
-    def test_create_projectDepartment_negative_project(self):
+    def test_create_project_department_negative_project(self):
         """
 		#checks the number of projectDepartments didn't increase
 		Admin is trying to create a projectDepartment using a project that's not from his Company
@@ -150,7 +149,7 @@ class ProjectDepartmentTestCase(TestCase):
         self.assertEquals(count, count2)
 
 
-    def test_create_projectDepartment_negative_project2(self):
+    def test_create_project_department_negative_project2(self):
         """
 		#checks the number of projectDepartments didn't increase
 		Admin is trying to create a projectDepartment using a project that's deleted
@@ -174,7 +173,7 @@ class ProjectDepartmentTestCase(TestCase):
         self.assertEquals(count, count2)
 
 
-    def test_create_projectDepartment_negative_department1(self):
+    def test_create_project_department_negative_department1(self):
         """
 		#checks the number of projectDepartments didn't increase
 		Admin is trying to create a projectDepartment using a department that's not from his Company
@@ -198,7 +197,7 @@ class ProjectDepartmentTestCase(TestCase):
         self.assertEquals(count, count2)
 
 
-    def test_create_projectDepartment_negative_department2(self):
+    def test_create_project_department_negative_department2(self):
         """
 		#checks the number of projectDepartments didn't increase
 		Admin is trying to create a projectDepartment using a department that's not active

@@ -14,7 +14,7 @@ from metronus_app.forms.roleManagementForm            import RoleManagementForm
 
 
 class RoleTestCase(TestCase):
-
+"""This class provides a test case for using and managing roles"""
     def setUp(self):
         company1 = Company.objects.create(
             cif="123",
@@ -404,13 +404,13 @@ class RoleTestCase(TestCase):
         projdepts_before = ProjectDepartment.objects.all().count()
         employeeroles_before = ProjectDepartmentEmployeeRole.objects.all().count()
 
-        curRole = ProjectDepartmentEmployeeRole.objects.get(employee_id=employee)
+        cur_role = ProjectDepartmentEmployeeRole.objects.get(employee_id=employee)
 
         response = c.post("/roles/manage", {
             'employee_id': employee.id,
             'department_id': department.id,
             'project_id': project.id,
-            'employeeRole_id': curRole.id,
+            'employeeRole_id': cur_role.id,
             'role_id': role.id,
         })
 
@@ -466,7 +466,7 @@ class RoleTestCase(TestCase):
         department = Department.objects.get(name="departamento 1")
         project = Project.objects.get(name="proyecto 1")
         role = Role.objects.get(name="EMPLOYEE")
-        curRole = ProjectDepartmentEmployeeRole.objects.get(employee_id=employee)
+        cur_role = ProjectDepartmentEmployeeRole.objects.get(employee_id=employee)
 
         errors = ['departmentDoesNotExist', 'projectDoesNotExist', 'employeeRoleDoesNotExist', 'roleDoesNotExist']
 
@@ -475,7 +475,7 @@ class RoleTestCase(TestCase):
                 'employee_id': employee.id,
                 'department_id': department.id if i!=0 else 9999,
                 'project_id': project.id if i!=1 else 9999,
-                'employeeRole_id': curRole.id if i!=2 else 9999,
+                'employeeRole_id': cur_role.id if i!=2 else 9999,
                 'role_id': role.id if i!=3 else 9999,
             })
 

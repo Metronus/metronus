@@ -7,7 +7,7 @@ from django.contrib.auth.models                  import User
 from metronus_app.model.employeeLog              import EmployeeLog
 
 class EmployeeTestCase(TestCase):
-
+"""This class provides a test case for employee management"""
     def setUp(self):
         company1 = Company.objects.create(
             cif="123",

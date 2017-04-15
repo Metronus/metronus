@@ -7,6 +7,7 @@ from metronus_app.controllers.timeLogController import *
 from populate_database import populate_database
 
 class TimeLogTestCase(TestCase):
+    """This class provides a test case for using and managing employee timelogs"""
     @classmethod
     def setUpTestData(cls):
         populate_database()

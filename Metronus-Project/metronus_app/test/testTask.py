@@ -9,8 +9,9 @@ from metronus_app.model.project import Project
 from metronus_app.model.goalEvolution import GoalEvolution
 from django.core.exceptions                      import ObjectDoesNotExist, PermissionDenied
 from populate_database import populate_database
-from metronus_app.model.goalEvolution import GoalEvolution
+
 class TaskTestCase(TestCase):
+    """This class provides a test case for using and managing tasks"""
     @classmethod
     def setUpTestData(cls):
         populate_database()

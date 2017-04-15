@@ -1,9 +1,9 @@
 from metronus_app.common_utils import get_current_admin_or_403,get_current_employee_or_403
-from django.shortcuts import render
 from django.core.exceptions                             import ObjectDoesNotExist, PermissionDenied
 from django.http                                        import HttpResponseForbidden, HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
 from django.contrib.auth                                import authenticate,login
 from django.db.models                                   import Sum
+from django.shortcuts                                   import render_to_response, get_object_or_404, render,redirect
 
 from metronus_app.forms.projectForm                     import ProjectForm
 from metronus_app.model.project                         import Project,Company
@@ -14,7 +14,7 @@ from metronus_app.model.timeLog                         import TimeLog
 from metronus_app.model.department                      import Department
 from metronus_app.model.projectDepartmentEmployeeRole   import ProjectDepartmentEmployeeRole
 from metronus_app.model.actor                           import Actor
-from django.shortcuts                                   import render_to_response, get_object_or_404, render,redirect
+
 from datetime                                           import date, timedelta
 from django.core import serializers
 from metronus_app.model.projectDepartment             import ProjectDepartment

@@ -7,6 +7,7 @@ from metronus_app.model.employee         import Employee
 from django.core.exceptions                      import ObjectDoesNotExist, PermissionDenied
 
 class ProjectTestCase(TestCase):
+	"""This class provides a test case for project management"""
 	def setUp(self):
 		company1 = Company.objects.create(
 			cif="123",

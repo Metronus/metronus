@@ -93,7 +93,7 @@ def createTimelogInTask(task, duration, date, employee = None):
 ################################## Party hard a partir de aquí ##################################
 
 class DepartmentMetricsTestCase(TestCase):
-
+"""This class provides a test case for accessing department-related metrics"""
     def setUp(self):
 
         company1 = Company.objects.create(          

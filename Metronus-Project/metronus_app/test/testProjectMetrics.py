@@ -37,7 +37,7 @@ def ranstr():
     return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
 
 class ProjectMetricsTestCase(TestCase):
-
+"""This class provides a test case for accessing project-related metrics"""
     def setUp(self):
 
         company1 = Company.objects.create(          
@@ -225,14 +225,16 @@ class ProjectMetricsTestCase(TestCase):
         departments = Department.objects.filter(company_id__company_name="company1")
         project = Project.objects.get(name="pro_random")
 
+        n_dep=len(departments)
 
         # Do the random test 5 times
         for k in range(5):
             ProjectDepartmentEmployeeRole.objects.all().delete()
-            employees_per_dpmt = [random.choice(range(11)) for _ in range(len(departments))]
+            
+            employees_per_dpmt = [random.choice(range(11)) for _ in range(n_dep)]
             true_data = {'names': [], 'values': []}
 
-            for i in range(len(departments)):
+            for i in range(n_dep):
                 dpmt = departments[i]
                 employee_count = employees_per_dpmt[i]
 
@@ -304,13 +306,15 @@ class ProjectMetricsTestCase(TestCase):
         departments = Department.objects.filter(company_id__company_name="company1")
         project = Project.objects.get(name="pro_random")
 
+        n_dep=len(departments)
         # Do the random test 5 times
         for k in range(5):
             Task.objects.all().delete()
-            tasks_per_dpmt = [random.choice(range(11)) for _ in range(len(departments))]
+            
+            tasks_per_dpmt = [random.choice(range(11)) for _ in range(n_dep)]
             true_data = {'names': [], 'values': []}
 
-            for i in range(len(departments)):
+            for i in range(n_dep):
                 dpmt = departments[i]
                 task_count = tasks_per_dpmt[i]
 
@@ -391,7 +395,8 @@ class ProjectMetricsTestCase(TestCase):
 
         departments = Department.objects.filter(company_id__company_name="company1")
         project = Project.objects.get(name="pro_random")
-
+        
+        n_dep=len(departments)
         # Do the random test 5 times
 
         for k in range(5):
@@ -401,8 +406,8 @@ class ProjectMetricsTestCase(TestCase):
             Task.objects.all().delete()
 
             true_data = {'names': [], 'values': []}
-
-            for i in range(len(departments)):
+            
+            for i in range(n_dep):
                 dpmt = departments[i]
 
                 # Create between 1 and 4 tasks for each department

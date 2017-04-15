@@ -20,6 +20,7 @@ def ranstr():
     return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
 
 class DashboardTestCase(TestCase):
+    """This class provides a test case for metrics provided by the dashboard to an administrator"""
     @classmethod
     def setUpTestData(cls):
         populate_database()
@@ -55,6 +56,8 @@ class DashboardTestCase(TestCase):
         departments = Department.objects.filter(company_id__company_name="metronus")
         projects = Project.objects.filter(company_id__company_name="metronus")
 
+        n_dep=len(departments)
+        n_pro=len(projects)
         # Do the random test 5 times
 
         for k in range(5):
@@ -64,13 +67,14 @@ class DashboardTestCase(TestCase):
             Task.objects.all().delete()
 
             true_data = {}
-            for i in range(len(projects)):
+
+            for i in range(n_pro):
                 project=projects[i];
 
                 # Initialize the true data for this department
                 true_data[str(project.id)] = {'name': project.name, 'time': 0}
 
-                for i in range(len(departments)):
+                for i in range(n_dep):
                     dpmt = departments[i]
 
                     # Create between 1 and 4 tasks for each department

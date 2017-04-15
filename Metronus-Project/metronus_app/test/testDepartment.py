@@ -15,6 +15,7 @@ from populate_database import populate_database
 import json
 
 class DepartmentTestCase(TestCase):
+    """This class provides a test case for department management"""
     @classmethod
     def setUpTestData(cls):
         company1 = Company.objects.create(

@@ -34,14 +34,14 @@ def list_all(request):
     today = datetime.today()
     employee = get_current_employee_or_403(request)
     if(request.GET.get('currentMonth')):
-        currentMonth = int(request.GET['currentMonth'])
+        current_month = int(request.GET['currentMonth'])
     else:
-        currentMonth = today.month
+        current_month = today.month
 
     if (request.GET.get('currentYear')):
-        currentYear = int(request.GET['currentYear'])
+        current_year = int(request.GET['currentYear'])
     else:
-        currentYear = today.year
+        current_year = today.year
 
     if request.method == 'POST' and request.is_ajax():
         project = request.POST.get("project")
@@ -88,17 +88,17 @@ def list_all(request):
     tareas=Task.objects.filter(actor_id__company_id=employee.company_id,
                                    projectDepartment_id__projectdepartmentemployeerole__employee_id=employee,
                                    active=True).distinct()
-    my_tasks = [myTask(x,currentMonth,currentYear,employee) for x in tareas]
+    my_tasks = [MyTask(x,current_month,current_year,employee) for x in tareas]
 
-    month = [x for x in range(1,calendar.monthrange(currentYear,currentMonth)[1]+1)]
+    month = [x for x in range(1,calendar.monthrange(current_year,current_month)[1]+1)]
     month.append("Total")
-    total = [sum([x.durations[i][0] for x in my_tasks]) for i in range(0,calendar.monthrange(currentYear,currentMonth)[1]) ]
-    monthTotal = sum(total)
-    total.append(monthTotal)
+    total = [sum([x.durations[i][0] for x in my_tasks]) for i in range(0,calendar.monthrange(current_year,current_month)[1]) ]
+    month_total = sum(total)
+    total.append(month_total)
 
     
 
-    return render(request, "timeLog/timeLog_list_all.html", {"my_tasks": my_tasks, "month":month,"total":total, "currentMonth":currentMonth, "currentYear":currentYear, 
+    return render(request, "timeLog/timeLog_list_all.html", {"my_tasks": my_tasks, "month":month,"total":total, "currentMonth":current_month, "currentYear":current_year, 
         "form":form,"valid_production_units":valid_production_units,"over_day_limit":over_day_limit,'has_permissions':has_permissions})
 
 
@@ -125,13 +125,13 @@ def findTask(task_id):
 #Método auxiliar para la creación de registros
 def createTimeLog(form, employee):
     fdescription = form.cleaned_data['description']
-    fworkDate = form.cleaned_data['workDate']
-    if (fworkDate.date() > date.today()):
+    fwork_date = form.cleaned_data['workDate']
+    if (fwork_date.date() > date.today()):
         raise PermissionDenied
     fduration = form.cleaned_data['duration']
     funits=form.cleaned_data['produced_units']
     task = findTask(form.cleaned_data['task_id'])
-    timeLog = findTimeLogByDateAndTask(fworkDate,task,employee)
+    timeLog = findTimeLogByDateAndTask(fwork_date,task,employee)
     if(timeLog is not None):
         timeLog.duration += fduration
         timeLog.description = fdescription
@@ -142,7 +142,7 @@ def createTimeLog(form, employee):
             timeLog.produced_units += funits
         timeLog.save()
     else:
-        TimeLog.objects.create(description=fdescription,workDate=fworkDate,duration=fduration,task_id=task,employee_id=employee,produced_units=funits)
+        TimeLog.objects.create(description=fdescription,workDate=fwork_date,duration=fduration,task_id=task,employee_id=employee,produced_units=funits)
 
 
 def checkProducedUnits(form):
@@ -164,9 +164,9 @@ def checkPermissionForTask(employee, task):
 
 #Comprobacion para saber si el empleado es un mando superior y tiene acceso a todas las imputaciones de una tarea
 def checkRoleForTask(employee, task):
-    isTeamManager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee,
+    is_team_manager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee,
                                                                         role_id__tier=30)
-    res = isTeamManager.count() > 0
+    res = is_team_manager.count() > 0
     if not res:
         roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee,
                                                              projectDepartment_id=task.projectDepartment_id,
@@ -179,13 +179,13 @@ def findTimeLog(timeLog_id):
     timeLog = get_object_or_404(TimeLog,pk=timeLog_id)
     return timeLog
 
-class myTask():
+class MyTask():
     id = 0
     name = ""
     durations = []
 
     def __init__(self, task, month, year,employee):
-        totalDuration = 0
+        total_duration = 0
         self.id = task.id
         today = datetime.today()
         self.name = task.name
@@ -196,8 +196,8 @@ class myTask():
         for tl in timeLogs:
             index = int(tl.workDate.day)-1
             self.durations[index] = (tl.duration,tl.id)
-            totalDuration += tl.duration
-        self.durations.append((totalDuration,0))
+            total_duration += tl.duration
+        self.durations.append((total_duration,0))
 
 def findTimeLogByDateAndTask(tDate,task,employee):
     #Vaya churro para comprobar que el dia, el mes y el año sean iguales
@@ -219,10 +219,10 @@ def checkDayLimit(form,employee):
     checks the employee cannot work more than 1440 minutes a day (one day in minutes)
     True if the limit was passed
     """
-    tDate = form.cleaned_data['workDate']
+    t_date = form.cleaned_data['workDate']
     time_sum=TimeLog.objects.filter(employee_id=employee,
-        workDate__year=tDate.date().year,
-        workDate__month=tDate.date().month,
-        workDate__day=tDate.date().day).aggregate(current_sum=Sum("duration"))
+        workDate__year=t_date.date().year,
+        workDate__month=t_date.date().month,
+        workDate__day=t_date.date().day).aggregate(current_sum=Sum("duration"))
     current_sum=time_sum["current_sum"] if time_sum["current_sum"] is not None else 0
     return form.cleaned_data["duration"]+current_sum>1440 or form.cleaned_data["duration"]+current_sum<=0
