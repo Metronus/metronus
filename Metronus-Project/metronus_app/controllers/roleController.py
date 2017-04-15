@@ -322,10 +322,12 @@ def get_form(request, logged):
 
 
 def check_companies_match(act1, act2):
+    """Checks the roles from both actors match"""
     if act1.company_id != act2.company_id:
         raise PermissionDenied
 
 def get_allowed_departments(logged):
+    """Gets the departments the logged user can create roles for"""
     if logged.user_type == 'A':
         return Department.objects.filter(company_id=logged.company_id, active=True)
     else:
@@ -334,6 +336,7 @@ def get_allowed_departments(logged):
         return Department.objects.filter(id__in=ids)
 
 def get_allowed_projects(logged):
+    """Gets the projects the logged user can create roles for"""
     if logged.user_type == 'A':
         return Project.objects.filter(company_id=logged.company_id, deleted=False)
     else:

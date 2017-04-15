@@ -118,6 +118,7 @@ def edit(request):
 #Auxiliar methods, containing the operation logic
 
 def createProjectDepartment(form, admin):
+    """ Creates a link between a project and a department so that tasks can be created for them"""
     project=form.cleaned_data['project_id']
     department = form.cleaned_data['department_id']
 
@@ -128,8 +129,9 @@ def createProjectDepartment(form, admin):
     return ProjectDepartment.objects.create(project_id = project, department_id = department)
 
 
-#Se permitirán los updates de projectDepartment? -> Nope
+
 def updateProjectDepartment(projectDepartment, form, admin):
+    """Se permitirán los updates de projectDepartment? -> Nope"""
     projectDepartment.project_id = form.cleaned_data['project_id']
     projectDepartment.department_id = form.cleaned_data['department_id']
 
@@ -140,6 +142,7 @@ def updateProjectDepartment(projectDepartment, form, admin):
 
 
 def deleteProjectDepartment(projectDepartment, admin):
+    """Deletes the relationship between a project and a department"""
     if not checkCompanyProjectDepartmentSession(projectDepartment, admin):
         raise PermissionDenied
 

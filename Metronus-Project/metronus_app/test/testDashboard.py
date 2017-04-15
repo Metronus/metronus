@@ -23,6 +23,9 @@ class DashboardTestCase(TestCase):
     """This class provides a test case for metrics provided by the dashboard to an administrator"""
     @classmethod
     def setUpTestData(cls):
+        """
+        Loads the data to the database for tests to be done
+        """
         populate_database()
     def test_random_data_timeperproject(self):
         """

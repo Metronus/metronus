@@ -189,6 +189,9 @@ def delete(request):
 #Auxiliar methods, containing the operation logic
 
 def createCompany(form):
+    """
+    Creates a company, supposing the data provided by the form is OK
+    """
     cif=form.cleaned_data['cif']
     company_name = form.cleaned_data['company_name']
     short_name = form.cleaned_data['short_name']
@@ -201,6 +204,9 @@ def createCompany(form):
 
 
 def registerAdministrator(form, company):
+    """
+    Tegisters an administrator for a company, supposing the data provided by the form is OK
+    """
     username = form.cleaned_data['username']
     password = form.cleaned_data['password']
     first_name = form.cleaned_data['first_name']

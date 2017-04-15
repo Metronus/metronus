@@ -219,11 +219,12 @@ def delete(request,department_id):
 ##################################################################################################################
 
 def ajax_employees_per_task(request):
+    """
     # Devuelve un objeto {'names': [tarea1, tarea2...], 'values': [tareas1, tareas2...]}
 
     # Parámetros obligatorios:
     # department_id - ID del departamento
-
+    """
     if "department_id" not in request.GET:
         return HttpResponseBadRequest()
 
@@ -245,6 +246,7 @@ def ajax_employees_per_task(request):
     return JsonResponse(data)
 
 def ajax_time_per_task(request):
+    """
     # Devuelve un objeto {'names': [tarea1, tarea2...], 'values': [tiempo1, tiempo2...]}
 
     # Parámetros obligatorios:
@@ -256,7 +258,7 @@ def ajax_time_per_task(request):
     # offset - desplazamiento (huso) horario en formato +/-HH:MM - Por defecto +02:00
 
     # Si se proporcionan pero no tienen el formato correcto se lanzará un error HTTP 400 Bad Request
-
+    """
     if "department_id" not in request.GET:
         return HttpResponseBadRequest()
 
@@ -306,7 +308,7 @@ def ajax_time_per_task(request):
 ##################################################################################################################
 
 def check_metrics_authorized_for_department(user, dpmt_id):
-    # Raises 403 if the current actor is not allowed to obtain metrics for the project
+    """Raises 403 if the current actor is not allowed to obtain metrics for the project"""
     if not user.is_authenticated():
         raise PermissionDenied
 
@@ -325,19 +327,22 @@ def check_metrics_authorized_for_department(user, dpmt_id):
             raise PermissionDenied
 
 def findName(dname,admin):
+    """Finds a department with the specified name in the company, as it must be unique"""
     return Department.objects.filter(name=dname,company_id=admin.company_id).first()
 
 def createDepartment(form,admin):
-
+    """Creates a department supposing the data in the form is OK"""
     dname=form.cleaned_data['name']
     company=admin.company_id
     return Department.objects.create(name=dname,active=True,company_id=company)
 
 def editDepartment(department,form):
+    """Edits a department supposing the data in the form is OK"""
     department.name = form.cleaned_data['name']
     department.save()
 
 def deleteDepartment(department):
+    """Deletes a department"""
     department.active=False
     department.save()
 
@@ -398,6 +403,9 @@ def checkCompanyDepartment(department,company_id):
     return res
 
 def getListForRole(request):
+    """
+    Gets the list of departments according to the role tier of the logged user
+    """
     actor=None
     if not request.user.is_authenticated():
         raise PermissionDenied
@@ -428,5 +436,8 @@ def getListForRole(request):
     return departments 
 
 def get_coordinator(department):
+    """
+    Gets the coordinator from a department(the first of them if there is many)
+    """
     return Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__department_id=department,
         projectdepartmentemployeerole__role_id__tier=20).first()

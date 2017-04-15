@@ -281,7 +281,20 @@ def delete(request,task_id):
 
 @login_required
 def ajax_productivity_per_task(request):
+    """
+    # Devuelve un objeto {'names': [dpto1, dpto2...], 'values': [tiempo1, tiempo2...]}
 
+    # Parámetros obligatorios:
+    # task_id - ID del task
+
+    # Parámetros opcionales: 
+    # start_date - fecha en formato YYYY-MM-DD que indica el inicio de la medición. Por defecto, 30 días antes de la fecha actual.
+    # end_date - fecha en formato YYYY-MM-DD que indica el final de la medición. Por defecto, fecha actual.
+    # offset - desplazamiento (huso) horario en formato +/-HH:MM - Por defecto +00:00
+
+    # Si se proporcionan pero no tienen el formato correcto se lanzará un error HTTP 400 Bad Request
+
+    """
     # ------------------------- Cortesía de Agu ------------------------------
 
     if not request.user.is_authenticated():
@@ -346,6 +359,7 @@ def ajax_productivity_per_task(request):
 #Auxiliar methods, containing the operation logic
 
 def createTask(form, project_department,actor):
+    """Creates a task supposing the data in the form is ok"""
     fname=form.cleaned_data['name']
     fdescription=form.cleaned_data['description']
     fgoal=form.cleaned_data['production_goal']
@@ -359,6 +373,7 @@ def createTask(form, project_department,actor):
         price_per_unit=fperunit,price_per_hour=fperhour)
 
 def updateTask(task,form,actor):
+    """Updates a task and saves the data in the log"""
     newGoalEntry(task,form,actor)
     task.name = form.cleaned_data['name']
     task.description = form.cleaned_data['description']
@@ -407,6 +422,7 @@ def checkPrice(form):
 
 
 def deleteTask(task):
+    """Deletes a task"""
     task.active=False
     task.save()
 
@@ -487,6 +503,9 @@ def find_tuple(project_id,department_id,actor):
 
 
 def find_collections(request):
+    """
+    Gets the projects and departments the logged user can create tasks for, depending to their roles
+    """
     actor=None
     if not request.user.is_authenticated():
         raise PermissionDenied
@@ -535,6 +554,9 @@ def find_collections(request):
 
 
 def find_departments(request):
+    """
+    Gets the  departments the logged user can create tasks for a project, depending to their roles
+    """
     project_id=request.GET.get("project_id")
     actor=None
     if not request.user.is_authenticated():
@@ -578,6 +600,9 @@ def find_departments(request):
     return departamentos
 
 def find_projects(request):
+    """
+    Gets the projects and departments the logged user can create tasks for a department, depending to their roles
+    """
     department_id=request.GET.get("department_id")
     actor=None
     if not request.user.is_authenticated():

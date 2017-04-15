@@ -10,10 +10,12 @@ from django.core.exceptions                      import PermissionDenied, Object
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 class MyModelChoiceField(ModelChoiceField):
+    """Custom Dropdown List which shows the name of the object instead of some weird or standard message"""
     def label_from_instance(self, obj):
         return  obj.name
 
 class TimeLog2Form(forms.Form):
+    """Form for TimeLog model class"""
     project_id = MyModelChoiceField(label=_("project"),queryset=None, widget=forms.Select(attrs={'class':'form-control'}))
     department_id = MyModelChoiceField(label=_("department"),queryset=None, widget=forms.Select(attrs={'class':'form-control'}))
     task_id = MyModelChoiceField(label=_("task"),queryset=None, widget=forms.Select(attrs={'class':'form-control'}))

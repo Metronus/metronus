@@ -13,6 +13,9 @@ class TaskTestCase(TestCase):
     """This class provides a test case for using and managing tasks"""
     @classmethod
     def setUpTestData(cls):
+        """
+        Loads the data to the database for tests to be done
+        """
         populate_database()
 
     def test_create_task_positive(self):

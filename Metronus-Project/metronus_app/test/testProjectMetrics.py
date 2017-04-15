@@ -42,7 +42,9 @@ def ranstr():
 class ProjectMetricsTestCase(TestCase):
     """This class provides a test case for accessing project-related metrics"""
     def setUp(self):
-
+        """
+        Loads the data to the database for tests to be done
+        """
         company1 = Company.objects.create(          
             cif="123",
             company_name="company1",

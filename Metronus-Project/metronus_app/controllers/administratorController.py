@@ -104,6 +104,9 @@ def delete(request, username):
 
 
 def checkPasswords(form):
+    """
+    Check the passwords in the form match
+    """
     return form.cleaned_data['password'] == form.cleaned_data['repeatPassword']
 
 

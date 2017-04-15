@@ -10,7 +10,9 @@ from django.test import TestCase, Client
 class ProjectDepartmentTestCase(TestCase):
     """This class provides a test case for using and managing project-departement relationship"""
     def setUp(self):
-
+        """
+        Loads the data to the database for tests to be done
+        """
         company123 = Company.objects.create(
             cif="123",
             company_name="company1",

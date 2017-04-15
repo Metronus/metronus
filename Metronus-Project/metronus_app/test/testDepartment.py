@@ -17,6 +17,9 @@ class DepartmentTestCase(TestCase):
     """This class provides a test case for department management"""
     @classmethod
     def setUpTestData(cls):
+        """
+        Loads the data to the database for tests to be done
+        """
         company1 = Company.objects.create(
             cif="123",
             company_name = "company1",

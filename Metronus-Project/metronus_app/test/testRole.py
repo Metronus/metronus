@@ -16,6 +16,9 @@ from metronus_app.forms.roleManagementForm            import RoleManagementForm
 class RoleTestCase(TestCase):
     """This class provides a test case for using and managing roles"""
     def setUp(self):
+        """
+        Loads the data to the database for tests to be done
+        """
         company1 = Company.objects.create(
             cif="123",
             company_name = "company1",

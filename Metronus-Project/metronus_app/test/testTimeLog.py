@@ -9,6 +9,9 @@ class TimeLogTestCase(TestCase):
     """This class provides a test case for using and managing employee timelogs"""
     @classmethod
     def setUpTestData(cls):
+        """
+        Loads the data to the database for tests to be done
+        """
         populate_database()
 
     def test_create_timelog_positive(self):

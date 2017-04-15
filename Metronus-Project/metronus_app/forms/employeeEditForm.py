@@ -3,7 +3,7 @@ from django.forms import Form
 from django.utils.translation import ugettext_lazy as _
 
 class EmployeeEditForm(Form):
-
+	"""Form for Employee profile editing"""
     # User (Account data)
     first_name = forms.CharField(max_length=50)
     last_name = forms.CharField(max_length=50)

@@ -295,6 +295,7 @@ def delete(request, username):
 
 ###AJAX methods
 def ajax_productivity_per_task(request,username):
+    """
     # url = employee/ajax_productivity_per_task/<username>
     # Devuelve un objeto cuyas claves son las ID de los proyectos y sus valores un objeto 
     #{'name': ..., 'total_productivity': X,'expected_productivity':Y} (X e Y en unidades goal_description/hora)
@@ -304,7 +305,7 @@ def ajax_productivity_per_task(request,username):
     
     #devuelve lo siguiente
     #{"3": {"total_productivity": 0.7125, "expected_productivity": 2.0, "name": "Hacer cosas de front"}}
-    
+    """
     # Check that the user is logged in and it's an administrator or with permissions
     try:
         logged = get_current_admin_or_403(request)
@@ -342,6 +343,7 @@ def ajax_productivity_per_task(request,username):
     return JsonResponse(data)
 
 def ajax_productivity_per_task_and_date(request,username):
+    """
     # url = employee/ajax_productivity_per_task/<username>
     # Devuelve un objeto con las fechas y las productividades de la tarea real y esperada
     #{'name': ..., 'total_productivity': X,'expected_productivity':Y} (X en unidades goal_description/hora)
@@ -366,7 +368,8 @@ def ajax_productivity_per_task_and_date(request,username):
     #   "real_productivity": [0, 0, 0, 0, 0, 0, 0, 1.2, 0, 0.225, 0, 0], 
     #   "task_id": 3, 
     #   "expected_productivity": [9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 4.0, 4.0, 2.0, 2.0, 2.0]}}
-    
+    """
+
     # Get and parse the dates
     start_date = request.GET.get("start_date", str(date.today()))
     end_date = request.GET.get("end_date", str(date.today() - timedelta(days=30)))
@@ -456,6 +459,7 @@ def ajax_productivity_per_task_and_date(request,username):
 ########################################################################################################################################
 
 def createEmployeeUser(form):
+    """Creates an employee user supposing the data in the form is OK"""
     username = form.cleaned_data['username']
     password = form.cleaned_data['password1']
     email = form.cleaned_data['email']
@@ -465,6 +469,7 @@ def createEmployeeUser(form):
     return User.objects.create_user(username=username, password=password, email=email, first_name=first_name, last_name=last_name)
 
 def createEmployee(employeeUser, admin, form):
+    """Creates an employee supposing the data in the form is OK"""
     user = employeeUser
     user_type = 'E'
     identifier = form.cleaned_data['identifier']
@@ -475,12 +480,15 @@ def createEmployee(employeeUser, admin, form):
     return Employee.objects.create(user=user, user_type=user_type, identifier=identifier, phone=phone, company_id=company, picture=picture,price_per_hour=price_per_hour)
 
 def checkPasswords(form):
+    """Checks the password is equal in the password repeat form field"""
     return form.cleaned_data['password1'] == form.cleaned_data['password2']
 
 def notify_password_change(email, name):
+    """Notifies a password change to someone by sending them an email"""
     send_mail(ugettext_lazy("register_changepw_subject"), "employee/employee_changepw_email.html", [email], "employee/employee_changepw_email.html",
               {'html': True, 'employee_name': name})
 
 def send_register_email(email, name):
+    """Emails someone who has been registered from a company"""
     send_mail(ugettext_lazy("register_mail_subject"), "employee/employee_register_email.html", [email], "employee/employee_register_email.html",
               {'html': True, 'employee_name': name})

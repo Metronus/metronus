@@ -21,10 +21,13 @@ from metronus_app.model.projectDepartment             import ProjectDepartment
 
 import re
 def view(request):
+    """
+    Standard view for dashboard, is empty as all data will be requested through AJAX
+    """
     return render(request, 'dashboard.html')
 
 def ajax_time_per_project(request):
-    # Devuelve un objeto cuyas claves son las ID de los proyectos y sus valores un objeto {'name': ..., 'time': X} (X en minutos)
+    """ Devuelve un objeto cuyas claves son las ID de los proyectos y sus valores un objeto {'name': ..., 'time': X} (X en minutos)
 
     # Parámetros opcionales: 
     # start_date - fecha en formato YYYY-MM-DD que indica el inicio de la medición. Por defecto, 30 días antes de la fecha actual.
@@ -32,7 +35,7 @@ def ajax_time_per_project(request):
     # offset - desplazamiento (huso) horario en formato +/-HH:MM - Por defecto +00:00
 
     # Si se proporcionan pero no tienen el formato correcto se lanzará un error HTTP 400 Bad Request
-
+    """
     get_current_admin_or_403(request)
    
     # Get and parse the dates
@@ -73,6 +76,9 @@ def ajax_time_per_project(request):
     return JsonResponse(data)
 
 def ajax_employees_per_project(request):
+    """
+    Gets the number of employees per project
+    """
     get_current_admin_or_403(request)
     logged = request.user.actor
     company_projects = Project.objects.filter(deleted=False, company_id=logged.company_id)
@@ -85,6 +91,9 @@ def ajax_employees_per_project(request):
     return JsonResponse(data)
 
 def ajax_departments_per_project(request):
+    """
+    Gets the number of departments per project
+    """
     get_current_admin_or_403(request)
     logged = request.user.actor
     company_projects = Project.objects.filter(deleted=False, company_id=logged.company_id)
@@ -97,6 +106,9 @@ def ajax_departments_per_project(request):
     return JsonResponse(data)
 
 def ajax_tasks_per_project(request):
+    """
+    Gets the number of tasks per project
+    """
     get_current_admin_or_403(request)
     logged = request.user.actor
     company_projects = Project.objects.filter(deleted=False, company_id=logged.company_id)

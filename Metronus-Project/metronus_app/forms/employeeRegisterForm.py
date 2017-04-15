@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class EmployeeRegisterForm(Form):
-
+    """Form for Employee registering"""
     # User (Account data)
     username = forms.CharField(label=_("username"))
     password1 = forms.CharField(label=_("password"), widget=forms.PasswordInput)

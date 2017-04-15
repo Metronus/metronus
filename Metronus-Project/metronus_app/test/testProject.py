@@ -9,6 +9,9 @@ from metronus_app.controllers.projectController import checkCompanyProject
 class ProjectTestCase(TestCase):
 	"""This class provides a test case for project management"""
 	def setUp(self):
+		"""
+        Loads the data to the database for tests to be done
+        """
 		company1 = Company.objects.create(
 			cif="123",
 			company_name="company1",

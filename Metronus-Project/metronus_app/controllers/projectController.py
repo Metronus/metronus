@@ -196,11 +196,12 @@ def delete(request,project_id):
 ############################################################################
 
 def ajax_employees_per_department(request):
+    """
     # Devuelve un objeto {'names': [dpto1, dpto2...], 'values': [empleados1, empleados2...]}
 
     # Parámetros obligatorios:
     # project_id - ID del proyecto
-
+    """
     if "project_id" not in request.GET:
         return HttpResponseBadRequest()
 
@@ -222,10 +223,12 @@ def ajax_employees_per_department(request):
     return JsonResponse(data)
 
 def ajax_tasks_per_department(request):
+    """
     # Devuelve un objeto {'names': [dpto1, dpto2...], 'values': [tareas1, tareas2...]}
 
     # Parámetros obligatorios:
     # project_id - ID del proyecto
+    """
 
     if "project_id" not in request.GET:
         return HttpResponseBadRequest()
@@ -248,6 +251,7 @@ def ajax_tasks_per_department(request):
     return JsonResponse(data)
 
 def ajax_time_per_department(request):
+    """
     # Devuelve un objeto {'names': [dpto1, dpto2...], 'values': [tiempo1, tiempo2...]}
 
     # Parámetros obligatorios:
@@ -260,7 +264,7 @@ def ajax_time_per_department(request):
 
     # Si se proporcionan pero no tienen el formato correcto se lanzará un error HTTP 400 Bad Request
 
-
+    """
     if "project_id" not in request.GET:
         return HttpResponseBadRequest()
 
@@ -309,7 +313,7 @@ def ajax_time_per_department(request):
 ##################################################################################################################
 
 def check_metrics_authorized_for_project(user, project_id):
-    # Raises 403 if the current actor is not allowed to obtain metrics for the project
+    """ Raises 403 if the current actor is not allowed to obtain metrics for the project"""
     if not user.is_authenticated():
         raise PermissionDenied
 
@@ -328,15 +332,18 @@ def check_metrics_authorized_for_project(user, project_id):
             raise PermissionDenied
 
 def createProject(form, admin):
+    """Creates a new project supposing the data in the form is OK"""
     pname=form.cleaned_data['name']
     company=admin.company_id
     return Project.objects.create(name=pname,deleted=False,company_id=company)
 
 def updateProject(project,form):
+    """Edits a  project supposing the data in the form is OK"""
     project.name = form.cleaned_data['name']
     project.save()
 
 def deleteProject(project):
+    """Deletes a project"""
     project.deleted=True
     project.save()
 
@@ -370,9 +377,11 @@ def checkCompanyProjectId(projectId, companyId):
     return project is not None
 
 def findName(pname,admin):
+    """ Finds a project with the specified name in the company, as it must be unique"""
     return Project.objects.filter(name=pname,company_id=admin.company_id).first()
 
 def getListForRole(request):
+    """Gets the list of projects visible to the logged user, as it depends on their roles"""
     actor=None
     if not request.user.is_authenticated():
         raise PermissionDenied
