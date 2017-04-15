@@ -8,6 +8,7 @@
 {% else %}
 {% trans 'editRole' %}
 {% endif %}
+{% load custom_tags %}
 {% endblock %}
 
 
@@ -32,12 +33,7 @@
    <form id="register_form" method="POST" action="" class="form-horizontal">
 
     {% csrf_token %}
-    <div id="successDiv" class="alert alert-success" hidden='true'>
-    <a class="close" data-dismiss="alert">x</a>
-            </div>
-        <div id="errorDiv" class="alert alert-error alert-dismissible" role="alert"  hidden='true'>
-        <a class="close" data-dismiss="alert">x</a>
-            </div>
+    {% show_ajax_errors %}
     {% if  errors %}
         <div id="errorDiv2" class="alert alert-error alert-dismissible" role="alert">
         <a class="close" data-dismiss="alert">x</a>
@@ -105,10 +101,9 @@
 
         <div class="form-group control-buttons">
             <div class="col-sm-offset-4 col-sm-10">
-
             <input type="submit" class="btn btn-success submit-button" value="{% trans 'confirm' %}" />
 	    	{% if  editing == False %}
-		    	<input type="button" class="btn btn-success submit-button" value="{% trans 'roleAdd' %}" onclick="ajax();" />
+		    	<input type="button" class="btn btn-info submit-button" value="{% trans 'roleAdd' %}" onclick="ajax();" />
 		    {% endif %}
 
             </div>

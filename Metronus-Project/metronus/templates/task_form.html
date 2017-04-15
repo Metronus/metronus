@@ -206,7 +206,7 @@
         <div class="col-sm-6" align="center" >
             {% if  form.task_id.value == '0' %}
             <button type="submit" class="btn btn-success submit-button" >{% trans 'confirm' %}</button>
-                <input type="button" class="btn btn-success submit-button" value="{% trans 'taskAdd' %}" onclick="ajax();" />
+                <input type="button" class="btn btn-info submit-button" value="{% trans 'taskAdd' %}" onclick="ajax();" />
             {% endif %}
             {% if  form.task_id.value != '0' %}
                 <button type="submit" class="btn btn-success submit-button" >{% trans 'edit' %}</button>
