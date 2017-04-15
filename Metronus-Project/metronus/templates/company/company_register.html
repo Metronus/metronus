@@ -83,6 +83,7 @@
   </div>
 </div>
 
+ 
 <body>
 
   <!-- js -->
@@ -91,8 +92,12 @@
 <script src="/static/js/bootstrap.min.js"></script>
 <script src="/static/js/fastclick.js"></script>
 <script src="/static/js/nprogress.js"></script>
+<script src="/static/js/validator.js"></script>
 <script src="/static/js/jquery.smartWizard.js"></script>
 <script src="/static/js/custom.min.js"></script>
+
+ <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/css/bootstrapvalidator.min.css"/>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/js/bootstrapvalidator.min.js"></script>
 {% endcompress %}
 
 <script type="text/javascript">
@@ -101,6 +106,135 @@
       $(".buttonNext").text("{% trans 'next' %}");
       $(".buttonPrevious").text("{% trans 'previous' %}");
       $(".buttonFinish").text("{% trans 'finish' %}");
+
+      document.getElementsByName("logo")[0].className = 'col-md-7 col-xs-12';
+
+      //YIIIIIHA
+
+        $('#register_form').bootstrapValidator({
+        feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+          cif: {
+                validators: {
+                    notEmpty: {
+                        message: '{% trans 'cif_error#1'%}'
+                    },
+                    regexp:{
+                      regexp: /^[a-zA-Z]\d{8}$/ig,
+                      message: '{% trans 'cif_error#2'%}'
+                    },
+                },
+            },
+            company_name: {
+                validators: {
+                    notEmpty: {
+                        message: '{% trans 'company_name_error' %}'
+                    }
+                }
+            },
+            company_email: {
+                validators: {
+                    notEmpty: {
+                        message: '{% trans 'company_email_error#1' %}'
+                    },
+                    emailAddress: {
+                        message: '{% trans 'company_email_error#2' %}'
+                    }
+                }
+            },
+            short_name: {
+                validators: {
+                    notEmpty: {
+                        message: '{% trans 'company_short_name_error' %}'
+                    }
+                }
+            },
+            company_phone: {
+                validators: {
+                    notEmpty: {
+                        message: '{% trans 'company_phone_error#1' %}'
+                    },
+                     regexp:{
+                      regexp: /^\d{9}$/ig,
+                      message: '{% trans 'company_phone_error#2' %}'
+                    },
+                }
+            },          
+            username: {
+                validators: {
+                    notEmpty: {
+                        message: '{% trans 'username_error' %}'
+                    }
+                }
+            },
+            admin_email: {
+                validators: {
+                    notEmpty: {
+                        message: '{% trans 'admin_email_error#1' %}'
+                    },
+                    emailAddress: {
+                        message: '{% trans 'admin_email_error#2' %}'
+                    }
+                }
+            },
+            password: {
+                validators: {
+                    notEmpty: {
+                        message: '{% trans 'password_error' %}'
+                    }
+                }
+            },
+            repeatPassword: {
+                validators: {
+                    notEmpty: {
+                        message: '{% trans 'passwordRepeat_error' %}'
+                    }
+                }
+            },
+            first_name: {
+                validators: {
+                    notEmpty: {
+                        message: '{% trans 'first_name_error' %}'
+                    }
+                }
+            },
+            last_name: {
+                validators: {
+                    notEmpty: {
+                        message: '{% trans 'last_name_error' %}'
+                    }
+                }
+            },
+            admin_identifier: {
+                validators: {
+                    notEmpty: {
+                        message: '{% trans 'admin_identifier_error' %}'
+                    }
+                }
+            },
+            admin_phone: {
+                validators: {
+                    notEmpty: {
+                        message: '{% trans 'admin_phone_error#1' %}'
+                    },
+                    regexp:{
+                      regexp: /^\d{9}$/ig,
+                      message: '{% trans 'admin_phone_error#2' %}'
+                    },
+                }
+            },
+ 
+        },
+    });
+
+
+
+
   });
 </script>
+
 {% endblock %}
