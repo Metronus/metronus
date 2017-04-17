@@ -1,6 +1,7 @@
 from django import template
 from datetime import datetime
 import calendar
+from django.core.exceptions import MultipleObjectsReturned
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 
 register = template.Library()
@@ -57,8 +58,10 @@ def isAdmin(actor):
 def hasRole(actor):
     if actor.user_type == 'E' or actor.user_type == 'A':
         try:
-            role_id = ProjectDepartmentEmployeeRole.objects.get(employee_id = actor.id).role_id
-            return True
+            if ProjectDepartmentEmployeeRole.objects.filter(employee_id = actor.id).count() > 0:
+                return True
+            else:
+                return False
         except:
             return False
     else:
@@ -70,53 +73,55 @@ def isEmployee(actor):
     if actor.user_type == 'A' or not hasRole(actor):
         return False
 
-    role_id = ProjectDepartmentEmployeeRole.objects.get(employee_id = actor.id).role_id
-    if role_id.name == 'EMPLOYEE':
-        return True
-    else:
-        return False
+    for role in ProjectDepartmentEmployeeRole.objects.filter(employee_id = actor.id):
+        if role.role_id.name == 'EMPLOYEE':
+            return True
+        else:
+            return False
+       
+    
 
 @register.assignment_tag
 def isProjectManager(actor):
     if actor.user_type == 'A' or not hasRole(actor):
         return False
 
-    role_id = ProjectDepartmentEmployeeRole.objects.get(employee_id = actor.id).role_id
-    print(role_id.name)
-    if role_id.name == 'PROJECT_MANAGER':
-        return True
-    else:
-        return False
+    for role in ProjectDepartmentEmployeeRole.objects.filter(employee_id = actor.id):
+        if role.role_id.name == 'PROJECT_MANAGER':
+            return True
+        else:
+            return False
 
 @register.assignment_tag
 def isCoordinator(actor):
     if actor.user_type == 'A' or not hasRole(actor):
         return False
 
-    role_id = ProjectDepartmentEmployeeRole.objects.get(employee_id = actor.id).role_id
-    if role_id.name == 'COORDINATOR':
-        return True
-    else:
-        return False
+    for role in ProjectDepartmentEmployeeRole.objects.filter(employee_id = actor.id):
+        if role.role_id.name == 'COORDINATOR':
+            return True
+        else:
+            return False
+
 
 @register.assignment_tag
 def isExecutive(actor):
     if actor.user_type == 'A' or not hasRole(actor):
         return False
 
-    role_id = ProjectDepartmentEmployeeRole.objects.get(employee_id = actor.id).role_id
-    if role_id.name == 'EXECUTIVE':
-        return True
-    else:
-        return False
+    for role in ProjectDepartmentEmployeeRole.objects.filter(employee_id = actor.id):
+        if role.role_id.name == 'EXECUTIVE':
+            return True
+        else:
+            return False
 
 @register.assignment_tag
 def isTeamManager(actor):
     if actor.user_type == 'A' or not hasRole(actor):
         return False
 
-    role_id = ProjectDepartmentEmployeeRole.objects.get(employee_id = actor.id).role_id
-    if role_id.name == 'TEAM_MANAGER':
-        return True
-    else:
-        return False
+    for role in ProjectDepartmentEmployeeRole.objects.filter(employee_id = actor.id):
+        if role.role_id.name == 'TEAM_MANAGER':
+            return True
+        else:
+            return False
