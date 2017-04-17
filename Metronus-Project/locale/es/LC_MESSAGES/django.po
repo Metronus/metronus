@@ -383,6 +383,8 @@ msgid "realProductivity"
 msgstr "Productividad real"
 msgid "expectedProductivity"
 msgstr "Productividad esperada"
+msgid "employeeConfirm"
+msgstr "¿Está seguro de eliminar el empleado? Se eliminará también todo lo relacionado con el mismo"
 
 
 #: Project

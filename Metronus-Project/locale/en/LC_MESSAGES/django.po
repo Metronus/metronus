@@ -381,6 +381,8 @@ msgid "realProductivity"
 msgstr "Real productivity"
 msgid "expectedProductivity"
 msgstr "Expected productivity"
+msgid "employeeConfirm"
+msgstr "Are you sure about deleting this employee? All information related to it will be erased too"
 
 #: Project
 msgid "project"
