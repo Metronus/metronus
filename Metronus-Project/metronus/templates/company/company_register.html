@@ -11,13 +11,11 @@
   <!-- page content -->
   <div class="container body">
   <div class="right_col" role="main">
-    <div class="">
       <div class="clearfix"></div>
 
       <div class="row">
         <div class="col-md-12 col-sm-12 col-xs-12">
           <div class="x_panel">
-            <div class="x_content">
               <!-- Smart Wizard -->
               <form id="register_form" method="POST" class="form-horizontal" data-toggle="validator" role="form" action="" enctype="multipart/form-data">
                 {% csrf_token %}
@@ -44,11 +42,11 @@
                 </ul>
                 <div id="step-1">
                   <div id="form-step-0" role="form" data-toggle="validator">
-                    {% show_field form.cif  %}
-                    {% show_field form.company_name  %}
-                    {% show_field form.short_name  %}
-                    {% show_field form.company_email  %}
-                    {% show_field form.company_phone  %}
+                    {% show_field form.cif False %}
+                    {% show_field form.company_name False  %}
+                    {% show_field form.short_name False %}
+                    {% show_field form.company_email False %}
+                    {% show_field form.company_phone False %}
                     {% show_field form.logo False %}
                   <div class="help-block with-errors"></div>
                   </div>
@@ -57,14 +55,14 @@
                 <div id="step-2">
                   <div id="form-step-0" role="form" data-toggle="validator">
 
-                    {% show_field form.username %}
-                    {% show_field form.admin_email %}
-                    {% show_field form.password %}
-                    {% show_field form.repeatPassword %}
-                    {% show_field form.first_name %}
-                    {% show_field form.last_name  %}
-                    {% show_field form.admin_identifier  %}
-                    {% show_field form.admin_phone  %}
+                    {% show_field form.username False%}
+                    {% show_field form.admin_email False%}
+                    {% show_field form.password False %}
+                    {% show_field form.repeatPassword False %}
+                    {% show_field form.first_name False %}
+                    {% show_field form.last_name  False %}
+                    {% show_field form.admin_identifier False  %}
+                    {% show_field form.admin_phone False %}
                     <div class="help-block with-errors"></div>
                   </div>
                 </div>
@@ -74,12 +72,9 @@
                 </div>
             </form>
               <!-- End SmartWizard Content -->
-            </div>
           </div>
         </div>
       </div>
-
-    </div>
   </div>
 </div>
 
@@ -108,6 +103,7 @@
       $(".buttonFinish").text("{% trans 'finish' %}");
 
       document.getElementsByName("logo")[0].className = 'col-md-7 col-xs-12';
+      
 
       //YIIIIIHA
 
@@ -236,5 +232,6 @@
 
   });
 </script>
+
 
 {% endblock %}
