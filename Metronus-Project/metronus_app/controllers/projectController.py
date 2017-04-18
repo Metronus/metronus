@@ -52,7 +52,7 @@ def create(request):
                     repeated_name=True
             else:
                 project = createProject(form,admin)
-                return redirect('project_show', project_id=project.id)
+                return redirect('project_view', project_id=project.id)
         else:
             error = True
     # if a GET (or any other method) we'll create a blank form
@@ -130,7 +130,7 @@ def show(request,project_id):
     employees = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__project_id=project).distinct()
     tasks=Task.objects.filter(active=True, projectDepartment_id__project_id__id=project_id)
     departments = Department.objects.filter(active=True, projectdepartment__project_id__id=project_id)
-    return render(request, "project/project_show.html", {"project": project, "employees": employees,"tasks":tasks, "departments": departments, "project_manager": project_manager})
+    return render(request, "project/project_view.html", {"project": project, "employees": employees,"tasks":tasks, "departments": departments, "project_manager": project_manager})
 
 
 def edit(request,project_id):

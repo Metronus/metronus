@@ -22,6 +22,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="pull-right">
+                                <!-- DataPicker para cambiar de fecha la gráfica -->
                                 <fieldset>
                                     <div class="control-group">
                                         <div class="controls">
@@ -41,6 +42,7 @@
 
                     <div class="x_content row">
                         <div class="col-xs-12">
+                            <!-- Gráfica: muy importante el Style para que sea responsivo -->
                             <div id="task" style="width: 100%; min-height: 400px"></div>
                         </div>
                     </div>
@@ -56,6 +58,17 @@
 
 
 <script>
+    /**
+     * @fileoverview Funciones de la gráfica de Task
+     * @author andjimrio
+     * */
+
+    /**
+     * Con los datos que devuelve el Backend devuelve un JSON apto para editar la gráfica.
+     * @param {Array} names nombre de las gráficas
+     * @param {Array} data datos que se reciben de Backend
+     * @return {Array} el JSON para la gráfica
+     * */
     function fromData(names, data) {
         return {
             title: {
@@ -66,7 +79,6 @@
                 trigger: 'axis'
             },
             legend: {
-                left: 'center',
                 data: names
             },
             toolbox: {
@@ -83,7 +95,7 @@
                         type: ['line', 'bar', 'stack', 'tiled']
                     },
                     restore: {
-                        show: true,
+                        show: false,
                         title: '{% trans 'restore' %}'
                     },
                     saveAsImage: {
@@ -132,15 +144,13 @@
 
 
     $(document).ready(function() {
+        //Nombres que se utilizarán en toda las gráficas
         names = ["{% trans 'production' %}", "{% trans 'goal_evolution' %}"];
-        /*
-        data = {'productivity': [30, 182, 434, 791, 390, 30, 10], 'goal_evolution': [0, 1132, 601, 234, 120, 90, 20],
-            'days': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] };
-        */
 
+        //Inicialización de la gráfica
         echartLine = echarts.init(document.getElementById('task'), theme);
-        //echartLine.setOption( fromData( names, data ) );
 
+        //Al principio, se piden los datos para una gráfica del mes actual
         $.get({
             url: "{% url 'productivity_per_task' %}",
             data: {task_id: {{ task.id }}},
@@ -150,18 +160,16 @@
             }
         });
 
-        /**
-         * Esto se encarga de hacer responsivo (más o menos) el chart
-         * */
+        //Esto se encarga de hacer responsivo (más o menos) el chart
         $(window).on('resize', function(){
             if(echartLine != null && echartLine != undefined){
                 echartLine.resize();
             }
         });
 
+        //Instanciación del DatePicker con el mes actual.
         defaultRange = moment().startOf('month').format('MM/DD/YYYY') +' - '+ moment().endOf('month').format('MM/DD/YYYY')
         $('input[name="task_chart"]').val(defaultRange)
-
         $('input[name="task_chart"]').daterangepicker({
             autoUpdateInput: false,
             locale: {
@@ -170,6 +178,7 @@
             }
         });
 
+        //Al pulsar el botón aplicar, pide por AJAX la nueva gráfica con dicho rango de fechas.
         $('input[name="task_chart"]').on('apply.daterangepicker', function(ev, picker) {
             $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
             $.get({
@@ -186,6 +195,7 @@
             });
         });
 
+        //Al pulsar el botón cancelar, se ponen valores por defecto.
         $('input[name="task_chart"]').on('cancel.daterangepicker', function(ev, picker) {
             $(this).val(defaultRange);
             echartLine.setOption( fromData( names, data ) );
