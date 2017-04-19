@@ -34,7 +34,7 @@
                                     </div>
 
                                     <div class="right col-xs-5 text-center">
-                                        <img src="{{ project_manager.picture }}" alt="" class="img-circle img-responsive">
+                                        <img src="{{ project_manager.picture }}" alt="" class="img-circle img-responsive" width="150px">
                                     </div>
                                 </div>
 
@@ -144,7 +144,6 @@
                                                 <thead>
                                                     <tr>
                                                       <th>{% trans 'task' %}</th>
-                                                      <th>{% trans 'projectDeparment' %}</th>
                                                       <th>{% trans 'creationDate' %}</th>
                                                       <th>{% trans 'creator' %}</th>
                                                     </tr>
@@ -153,9 +152,8 @@
                                                     {% for task in tasks %}
                                                         <tr data-href="{% url 'task_view' task.id %}">
                                                             <td>{{task.name}}</td>
-                                                            <td>{{task.projectDepartment_id}}</td>
-                                                            <td>{{task.actor_id}}</td>
                                                             <td>{{task.registryDate}}</td>
+                                                            <td>{{task.actor_id.user.get_username}}</td>
                                                         </tr>
                                                     {% endfor %}
                                                 </tbody>
@@ -217,7 +215,7 @@
 
 $(document).ready(function() {
       var echartDonut = echarts.init(document.getElementById('donut_department'), theme);
-              
+
       var defaultBackendData = { 'names': [''], 'values': [0] };
       $.get({
         url: "/project/ajaxEmployeesPerDpmt",
@@ -228,9 +226,9 @@ $(document).ready(function() {
         }
       })
 
-    
+
     var echartDonut2 = echarts.init(document.getElementById('donut_task'), theme);
-              
+
       var defaultBackendData = { 'names': [''], 'values': [0] };
       $.get({
         url: "/project/ajaxTasksPerDpmt",
@@ -293,7 +291,7 @@ $(document).ready(function() {
                     end_date: picker.endDate.format('YYYY-MM-DD')
                 },
                 success: function ( backendData )  {
-                   
+
                     console.log(backendData);
                     echartLine.setOption( fromDataBarChart(backendData ) );
                 }
