@@ -78,7 +78,7 @@
   </div>
 </div>
 
- 
+
 <body>
 
   <!-- js -->
@@ -90,9 +90,7 @@
 <script src="/static/js/validator.js"></script>
 <script src="/static/js/jquery.smartWizard.js"></script>
 <script src="/static/js/custom.min.js"></script>
-
- <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/css/bootstrapvalidator.min.css"/>
-  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/js/bootstrapvalidator.min.js"></script>
+<script type="text/javascript" src="/static/js/bootstrapvalidator.min.js"></script>  
 {% endcompress %}
 
 <script type="text/javascript">
@@ -103,7 +101,7 @@
       $(".buttonFinish").text("{% trans 'finish' %}");
 
       document.getElementsByName("logo")[0].className = 'col-md-7 col-xs-12';
-      
+
 
       //YIIIIIHA
 
@@ -159,7 +157,7 @@
                       message: '{% trans 'company_phone_error#2' %}'
                     },
                 }
-            },          
+            },
             username: {
                 validators: {
                     notEmpty: {
@@ -223,7 +221,7 @@
                     },
                 }
             },
- 
+
         },
     });
 
