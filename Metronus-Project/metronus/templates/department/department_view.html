@@ -4,9 +4,55 @@
 {% block title %}{% trans 'departmentList' %}{% endblock %}
 
 {% block content %}
+<div class="row">
+    <div class="page-title">
+    <div class="title_left">
 <h1><strong>{% trans 'department' %}: </strong>{{department.name}}</h1>
-<h2><strong>{% trans 'coordinator' %}: </strong>{{coordinator.user.first_name}} {{coordinator.user.last_name}}</h2>
+</div>
 
+<div class="clearfix"></div><br>
+{% if coordinator != null %}
+<div class="">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_title">{% trans 'projectManager' %}</div>
+
+                    <div class="clearfix"></div>
+
+                    <div class="x_content">
+                        <div class="profile_details text-center">
+                            <div class="well profile_view">
+                                <div class="col-sm-12">
+                                    <h4 class="brief"><i>{% trans 'projectManager' %}</i></h4>
+                                    <div class="left col-xs-7">
+                                        <h2>{{ coordinator.user.get_username }}</h2>
+                                        <ul class="list-unstyled">
+                                            <li><i class="fa fa-phone"></i> {{ coordinator.phone }}</li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="right col-xs-5 text-center">
+                                        <img src="{{ coordinator.picture }}" alt="" class="img-circle img-responsive" width="150px">
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12 bottom text-center">
+                                    <a type="button" class="btn btn-primary btn-xs" href="{% url 'employee_view' coordinator.user %}">
+                                        <i class="fa fa-user"> </i> {% trans 'profile' %}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endif %}
+<div class="clearfix"></div>
 <div class="row">
   <div class="col-md-12 col-sm-12 col-xs-12">
     <div class="x_panel">
@@ -111,6 +157,8 @@
       </div>
     </div>
   </div>
+</div>
+</div>
 </div>
 {% endblock %}
 
