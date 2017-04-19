@@ -70,9 +70,15 @@ def login(request, template_name='registration/login.html',
 
             #if company is not None:
             #    check_company_contains_actor(company, form.get_user())
+            user = form.get_user()
 
-            auth_login(request, form.get_user())
-            return HttpResponseRedirect("/app/")
+            auth_login(request, user)
+            if user.actor.user_type == 'A':
+                return HttpResponseRedirect("/dashboard/view")
+            elif user.actor.user_type == 'E':
+                return HttpResponseRedirect("/timeLog/list_all")
+            else:
+                return HttpResponseRedirect("/app/")
             #return HttpResponseRedirect(_get_login_redirect_url(request, redirect_to))
     else:
         form = authentication_form(request)
