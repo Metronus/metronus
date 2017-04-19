@@ -8,6 +8,7 @@ from metronus_app.model.administrator import Administrator
 from metronus_app.model.actor import Actor
 from metronus_app.model.project import Project
 from metronus_app.model.timeLog import TimeLog
+from metronus_app.model.employee import Employee
 from metronus_app.model.department import Department
 from metronus_app.model.goalEvolution import GoalEvolution
 from metronus_app.model.projectDepartment import ProjectDepartment
@@ -199,8 +200,9 @@ def view(request,task_id):
     task = get_object_or_404(Task, pk=task_id)
     checkTask(task, request)
     goal_evolution = GoalEvolution.objects.filter(task_id=task.id)
+    employees = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__task=task.id).distinct()
   
-    return render(request, "task_view.html", {"task": task, "goal_evolution": goal_evolution})
+    return render(request, "task_view.html", {"task": task, "goal_evolution": goal_evolution, "employees": employees})
 
 def edit(request,task_id):
     """
