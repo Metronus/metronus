@@ -252,7 +252,9 @@ def edit(request,task_id):
                 "task_id":task.id,
                 "production_goal":task.production_goal,"goal_description":task.goal_description,
                 "project_id":task.projectDepartment_id.project_id,
-                "department_id":task.projectDepartment_id.department_id})
+                "department_id":task.projectDepartment_id.department_id,
+                "price_per_unit":task.price_per_unit if task.price_per_unit is not None else "",
+                "price_per_hour":task.price_per_hour if task.price_per_hour is not None else ""})
     #The project
     coll=find_collections(request)
     return render(request, 'task_form.html', {'form': form,'repeated_name':repeated_name,

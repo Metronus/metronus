@@ -48,7 +48,7 @@
                                     {% trans 'details' %}</a>
                                 </td>
                                 <td class="hidden-xs">
-                                    <a href="{% url 'employee_edit' employee.id %}" type="button" class="btn btn-dark">
+                                    <a href="{% url 'employee_edit' employee.user.username %}" type="button" class="btn btn-dark">
                                         {% trans 'update' %}</a>
                                 </td>
                                 <td class="hidden-xs">

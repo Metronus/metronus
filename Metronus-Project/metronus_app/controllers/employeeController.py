@@ -41,6 +41,7 @@ def create(request):
         imageNotValid: la imagen no es válida por formato y/o tamaño
         formNotValid: el formulario contiene errores
         priceNotValid: el precio debe ser mayor que 0
+        emailNotUnique:si el correo no es úinco
     
     template:
         employee_register.html
