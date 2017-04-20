@@ -246,7 +246,7 @@ class DepartmentMetricsTestCase(TestCase):
         """
         c = Client()
 
-        response = c.get("/department/ajaxEmployeesPerTask?department_id=%d" % Department.objects.get(name="Departamento2").id)
+        response = c.get("/department/ajaxEmployeesPerTask?department_id={0}" .format( Department.objects.get(name="Departamento2").id))
         self.assertEquals(response.status_code, 403)
 
     def test_access_denied_low_role_emppertask(self):
@@ -256,7 +256,7 @@ class DepartmentMetricsTestCase(TestCase):
         c = Client()
         c.login(username="emp1", password="123456")
 
-        response = c.get("/department/ajaxEmployeesPerTask?department_id=%d" % Department.objects.get(name="Departamento2").id)
+        response = c.get("/department/ajaxEmployeesPerTask?department_id={0}" .format( Department.objects.get(name="Departamento2").id))
         self.assertEquals(response.status_code, 403)
 
     def test_access_ok_executive_emppertask(self):
@@ -266,7 +266,7 @@ class DepartmentMetricsTestCase(TestCase):
         c = Client()
         c.login(username="emp2", password="123456")
 
-        response = c.get("/department/ajaxEmployeesPerTask?department_id=%d" % Department.objects.get(name="Departamento2").id)
+        response = c.get("/department/ajaxEmployeesPerTask?department_id={0}" .format( Department.objects.get(name="Departamento2").id))
         self.assertEquals(response.status_code, 200)
 
     def test_access_other_company_executive_emppertask(self):
@@ -276,7 +276,7 @@ class DepartmentMetricsTestCase(TestCase):
         c = Client()
         c.login(username="emp2", password="123456")
 
-        response = c.get("/department/ajaxEmployeesPerTask?department_id=%d" % Department.objects.get(name="Departamento5").id)
+        response = c.get("/department/ajaxEmployeesPerTask?department_id={0}" .format( Department.objects.get(name="Departamento5").id))
         self.assertEquals(response.status_code, 403)
 
     def test_bad_request_emppertask(self):
@@ -326,7 +326,7 @@ class DepartmentMetricsTestCase(TestCase):
                         for _ in range(random.randint(1,3)):
                             createTimelogInTask(task, 100, "2016-01-01 10:00+00:00", employee)
 
-        response = c.get("/department/ajaxEmployeesPerTask?department_id=%d" % Department.objects.get(name="Dep_rand").id)
+        response = c.get("/department/ajaxEmployeesPerTask?department_id={0}" .format( Department.objects.get(name="Dep_rand").id))
         self.assertEquals(response.status_code, 200)
         checkJsonMetricsAreEqual(self, str(response.content, encoding='utf8'), true_data)
     
@@ -336,7 +336,7 @@ class DepartmentMetricsTestCase(TestCase):
         """
         c = Client()
 
-        response = c.get("/department/ajaxTimePerTask?department_id=%d" % Department.objects.get(name="Departamento2").id)
+        response = c.get("/department/ajaxTimePerTask?department_id={0}" .format( Department.objects.get(name="Departamento2").id))
         self.assertEquals(response.status_code, 403)
 
     def test_access_denied_low_role_timepertask(self):
@@ -346,7 +346,7 @@ class DepartmentMetricsTestCase(TestCase):
         c = Client()
         c.login(username="emp1", password="123456")
 
-        response = c.get("/department/ajaxTimePerTask?department_id=%d" % Department.objects.get(name="Departamento2").id)
+        response = c.get("/department/ajaxTimePerTask?department_id={0}" .format( Department.objects.get(name="Departamento2").id))
         self.assertEquals(response.status_code, 403)
 
     def test_access_ok_executive_timepertask(self):
@@ -356,7 +356,7 @@ class DepartmentMetricsTestCase(TestCase):
         c = Client()
         c.login(username="emp2", password="123456")
 
-        response = c.get("/department/ajaxTimePerTask?department_id=%d" % Department.objects.get(name="Departamento2").id)
+        response = c.get("/department/ajaxTimePerTask?department_id={0}" .format( Department.objects.get(name="Departamento2").id))
         self.assertEquals(response.status_code, 200)
 
     def test_access_other_company_executive_timepertask(self):
@@ -366,7 +366,7 @@ class DepartmentMetricsTestCase(TestCase):
         c = Client()
         c.login(username="emp2", password="123456")
 
-        response = c.get("/department/ajaxTimePerTask?department_id=%d" % Department.objects.get(name="Departamento5").id)
+        response = c.get("/department/ajaxTimePerTask?department_id={0}" .format( Department.objects.get(name="Departamento5").id))
         self.assertEquals(response.status_code, 403)
 
     def test_bad_request_timepertask(self):
@@ -425,7 +425,7 @@ class DepartmentMetricsTestCase(TestCase):
                     true_data['names'].append(task.name)
                     true_data['values'].append(used_time)
 
-        response = c.get("/department/ajaxTimePerTask?department_id=%d&start_date=2016-01-01&end_date=2016-12-31" % Department.objects.get(name="Dep_rand").id)
+        response = c.get("/department/ajaxTimePerTask?department_id={0}&start_date=2016-01-01&end_date=2016-12-31" .format( Department.objects.get(name="Dep_rand").id))
         self.assertEquals(response.status_code, 200)
         checkJsonMetricsAreEqual(self, str(response.content, encoding='utf8'), true_data)
 
@@ -436,7 +436,7 @@ class DepartmentMetricsTestCase(TestCase):
         """
         c = Client()
 
-        response = c.get("/department/ajaxProfit/%d/" % Department.objects.get(name="Departamento2").id)
+        response = c.get("/department/ajaxProfit/{0}/" .format( Department.objects.get(name="Departamento2").id))
         self.assertEquals(response.status_code, 403)
 
     def test_access_denied_low_role_profit(self):
@@ -446,7 +446,7 @@ class DepartmentMetricsTestCase(TestCase):
         c = Client()
         c.login(username="emp1", password="123456")
 
-        response = c.get("/department/ajaxProfit/%d/" % Department.objects.get(name="Departamento2").id)
+        response = c.get("/department/ajaxProfit/{0}/" .format( Department.objects.get(name="Departamento2").id))
         self.assertEquals(response.status_code, 403)
 
     def test_access_ok_executive_profit(self):
@@ -456,7 +456,7 @@ class DepartmentMetricsTestCase(TestCase):
         c = Client()
         c.login(username="emp2", password="123456")
 
-        response = c.get("/department/ajaxProfit/%d/" % Department.objects.get(name="Departamento2").id)
+        response = c.get("/department/ajaxProfit/{0}/" .format( Department.objects.get(name="Departamento2").id))
         self.assertEquals(response.status_code, 200)
 
     def test_access_other_company_executive_profit(self):
@@ -466,7 +466,7 @@ class DepartmentMetricsTestCase(TestCase):
         c = Client()
         c.login(username="emp2", password="123456")
 
-        response = c.get("/department/ajaxProfit/%d/" % Department.objects.get(name="Departamento5").id)
+        response = c.get("/department/ajaxProfit/{0}/" .format(Department.objects.get(name="Departamento5").id))
         self.assertEquals(response.status_code, 403)
 
     def test_bad_request_profit(self):

@@ -187,6 +187,9 @@ def delete(request, role_id):
 ###########################################################################################
 
 def process_post_form(logged, form):
+    """
+    checks the form verifies all logic constraints and generate errors if they are violated
+    """
     res = {'errors': [], 'ok': False}
 
     employee_id = form.cleaned_data["employee_id"]
@@ -285,7 +288,9 @@ def return_invalid_form(request, form, logged, errors=None):
                                              })
 
 def get_form(request, logged):
-
+    """
+    returns the form and populates with the role data if we are editing, otherwise we are assigning a new role to an employee
+    """
     departments = get_allowed_departments(logged)
     projects = get_allowed_projects(logged)
     roles = Role.objects.all()

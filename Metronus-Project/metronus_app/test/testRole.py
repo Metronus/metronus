@@ -187,7 +187,7 @@ class RoleTestCase(TestCase):
         c = Client()
         c.login(username="admin1", password="123456")
         emp = Employee.objects.get(identifier="emp01")
-        response = c.get("/roles/manage?employee_id=%d" % emp.id)
+        response = c.get("/roles/manage?employee_id={0}" .format( emp.id))
 
         self.assertEquals(response.status_code, 200)
         self.assertEquals(len(Department.objects.filter(company_id=emp.company_id)), len(response.context["departments"]))
@@ -208,7 +208,7 @@ class RoleTestCase(TestCase):
         c = Client()
         c.login(username="emp1", password="123456")
         emp = Employee.objects.get(identifier="emp02")
-        response = c.get("/roles/manage?employee_id=%d" % emp.id)
+        response = c.get("/roles/manage?employee_id={0}" .format( emp.id))
 
         self.assertEquals(response.status_code, 200)
         self.assertEquals(1, len(response.context["departments"]))
@@ -234,7 +234,7 @@ class RoleTestCase(TestCase):
 
         employee = Employee.objects.get(identifier="emp01")
         role = ProjectDepartmentEmployeeRole.objects.get(employee_id=employee)
-        response = c.get("/roles/manage?role_id=%d" % role.id)
+        response = c.get("/roles/manage?role_id={0}" .format( role.id))
 
         form = response.context["form"]
         self.assertEquals(form.initial["employee_id"], role.employee_id.id)
@@ -544,7 +544,7 @@ class RoleTestCase(TestCase):
         employeeroles_before = ProjectDepartmentEmployeeRole.objects.all().count()
 
         role = ProjectDepartmentEmployeeRole.objects.get(employee_id=employee)
-        response = c.get("/roles/delete/%d/" % role.id)
+        response = c.get("/roles/delete/{0}/" .format( role.id))
 
         employeeroles_after = ProjectDepartmentEmployeeRole.objects.all().count()
 
@@ -562,9 +562,9 @@ class RoleTestCase(TestCase):
         employeeroles_before = ProjectDepartmentEmployeeRole.objects.all().count()
 
         role = ProjectDepartmentEmployeeRole.objects.get(employee_id=employee)
-        response = c.get("/roles/delete/%d/" % role.id)
+        response = c.get("/roles/delete/{0}/" .format( role.id))
 
         employeeroles_after = ProjectDepartmentEmployeeRole.objects.all().count()
 
         self.assertEquals(employeeroles_before, employeeroles_after + 1)
-        self.assertRedirects(response, "/employee/view/%s" % employee.user.username, fetch_redirect_response=False)
+        self.assertRedirects(response, "/employee/view/{0}" .format( employee.user.username), fetch_redirect_response=False)

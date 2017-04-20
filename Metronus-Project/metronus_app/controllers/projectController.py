@@ -125,6 +125,22 @@ def list(request):
     return render(request, "project/project_list.html", {"projects": lista})
 
 def show(request,project_id):
+    """
+    parameters:
+    project_id
+
+    returns:
+    -project
+    -project_manager
+    -employees
+    -tasks
+    -departments
+    all related to this project
+
+    template:
+    project_form.html
+
+    """
     project = get_object_or_404(Project, pk=project_id)
     project_manager = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__project_id=project, projectdepartmentemployeerole__role_id__tier__gte=40).first()
     employees = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__project_id=project).distinct()
