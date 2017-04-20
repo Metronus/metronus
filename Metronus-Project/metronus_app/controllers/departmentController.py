@@ -348,17 +348,17 @@ def ajax_profit_per_date(request,department_id):
     check_metrics_authorized_for_department(request.user, department_id)
     #Get all dates between start and end
     dates=[]
-    strDates=[]
+    str_dates=[]
 
     d1 = datetime.strptime(start_date[0:19]+start_date[20:22], '%Y-%m-%d %H:%M%z')
     d2 = datetime.strptime(end_date[0:19]+end_date[20:22], '%Y-%m-%d %H:%M%z')
     delta = d2 - d1         # timedelta
     for i in range(delta.days + 1):
-        strDates.append((d1 + timedelta(days=i)).date().strftime("%Y-%m-%d"))
+        str_dates.append((d1 + timedelta(days=i)).date().strftime("%Y-%m-%d"))
         dates.append(d1 + timedelta(days=i))
 
 
-    data = {'dates':strDates,'expenses':[],'income':[],'acumExpenses':[],'acumIncome':[]}
+    data = {'dates':str_dates,'expenses':[],'income':[],'acumExpenses':[],'acumIncome':[]}
     
 
     #Profit

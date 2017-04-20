@@ -102,8 +102,11 @@ def list_all(request):
         "form":form,"valid_production_units":valid_production_units,"over_day_limit":over_day_limit,'has_permissions':has_permissions})
 
 
-#Método para eliminar un registro siempre que la fecha del registro sea la misma que cuando se llama al método
+
 def delete(request, timeLog_id):
+    """
+    Método para eliminar un registro siempre que la fecha del registro sea la misma que cuando se llama al método
+    """
     employee = get_current_employee_or_403(request)
     timeLog = findTimeLog(timeLog_id)
     task = timeLog.task_id
@@ -190,6 +193,9 @@ def findTimeLog(timeLog_id):
     return timeLog
 
 class MyTask():
+    """
+    This class holds data for timelogs from an employee
+    """
     id = 0
     name = ""
     durations = []

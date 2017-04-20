@@ -408,17 +408,17 @@ def ajax_productivity_per_task_and_date(request,username):
 
     #Get all dates between start and end
     dates=[]
-    strDates=[]
+    str_dates=[]
     d1 = datetime.strptime(start_date[0:19]+start_date[20:22], '%Y-%m-%d %H:%M%z')
     d2 = datetime.strptime(end_date[0:19]+end_date[20:22], '%Y-%m-%d %H:%M%z')
     delta = d2 - d1         # timedelta
 
     for i in range(delta.days + 1):
-        strDates.append((d1 + timedelta(days=i)).date().strftime("%Y-%m-%d"))
+        str_dates.append((d1 + timedelta(days=i)).date().strftime("%Y-%m-%d"))
         dates.append(d1 + timedelta(days=i))
     print (len(dates))
 
-    data = {'dates':strDates,'task':{'task_id':task.id,'name': task.name,'real_productivity':[],'expected_productivity':[]}}
+    data = {'dates':str_dates,'task':{'task_id':task.id,'name': task.name,'real_productivity':[],'expected_productivity':[]}}
     
 
     #Save productivity for each  date

@@ -284,7 +284,7 @@ class RoleTestCase(TestCase):
             'role_id': role.id,
         })
 
-        self.assertRedirects(response, "/employee/view/%s/" % employee.user.username, fetch_redirect_response=False)
+        self.assertRedirects(response, "/employee/view/{0}/" .format( employee.user.username), fetch_redirect_response=False)
 
         projdepts_after = ProjectDepartment.objects.all().count()
         employeeroles_after = ProjectDepartmentEmployeeRole.objects.all().count()
@@ -321,7 +321,7 @@ class RoleTestCase(TestCase):
             'role_id': role.id,
         })
 
-        self.assertRedirects(response, "/employee/view/%s/" % employee.user.username, fetch_redirect_response=False)
+        self.assertRedirects(response, "/employee/view/{0}/".format( employee.user.username), fetch_redirect_response=False)
 
         projdepts_after = ProjectDepartment.objects.all().count()
         employeeroles_after = ProjectDepartmentEmployeeRole.objects.all().count()
@@ -498,7 +498,7 @@ class RoleTestCase(TestCase):
         self.assertEquals(projdepts_before, projdepts_after)
         self.assertEquals(employeeroles_before, employeeroles_after)
 
-        self.assertRedirects(response, "/employee/view/%s/" % employee.user.username, fetch_redirect_response=False)
+        self.assertRedirects(response, "/employee/view/{0}/" .format( employee.user.username), fetch_redirect_response=False)
 
         try:
             createdrole = ProjectDepartmentEmployeeRole.objects.get(employee_id=employee, role_id=role, projectDepartment_id__project_id=project, projectDepartment_id__department_id=department)
