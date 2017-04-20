@@ -83,7 +83,7 @@ def createTaskInProjDept(project, department,admin,rDate):
     if measure:
         pgoal=random.uniform(50,100)
         pdescription=random.choice(["kgs", "fresas", "granos de harina", "estrellitas", "cms"])
-        pprice_units=random.uniform(4,20)
+        pprice_units=random.uniform(0.02,2)
         pprice_hours=None
     else:
         pgoal=None
@@ -116,7 +116,7 @@ def createGoalEvolution(task,actor,rDate,measure):
     """
     if measure:
         pgoal=random.uniform(40,100)
-        pprice_units=random.uniform(4,20)
+        pprice_units=random.uniform(0.02,2)
         pprice_hours=None
     else:
         pgoal=None
@@ -141,7 +141,7 @@ def createTimelogInTask(task, duration, date, employee):
     creates a timelog for an employee involving a task during a specific date
     """
     if task.production_goal is not None and task.production_goal !="":
-        punits=random.uniform(0.8,2)*duration/60*task.production_goal
+        punits=random.uniform(0.1,0.5)*duration/60*task.production_goal
     else:
         punits=None
     TimeLog.objects.create(

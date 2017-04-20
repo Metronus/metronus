@@ -311,7 +311,19 @@ msgid "empTaskChartTitle"
 msgstr "Número de empleados por tarea"
 msgid "empTaskChartSubtitle"
 msgstr "De este departamento"
-
+#: Profit charts
+msgid "notAcum"
+msgstr "Diario"
+msgid "acum"
+msgstr "Acumulado diario"
+msgid "dep_profit"
+msgstr "Gastos e ingresos del departamento"
+msgid "income"
+msgstr "Ingresos"
+msgid "expenses"
+msgstr "Gastos"
+msgid "acum_not_acum"
+msgstr "Cambiar acumulado/diario"
 
 #: Task's charts
 msgid "taskChartTitle"

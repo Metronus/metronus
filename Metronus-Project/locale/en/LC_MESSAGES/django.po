@@ -311,7 +311,19 @@ msgid "empTaskChartTitle"
 msgstr "Employees per task"
 msgid "empTaskChartSubtitle"
 msgstr "For this department"
-
+#: Profit charts
+msgid "notAcum"
+msgstr "Diary"
+msgid "acum"
+msgstr "Diary accumulate"
+msgid "dep_profit"
+msgstr "Department expenses and income"
+msgid "income"
+msgstr "Income"
+msgid "expenses"
+msgstr "Expenses"
+msgid "acum_not_acum"
+msgstr "Change accumulate/diary"
 
 #: Task's charts
 msgid "taskChartTitle"

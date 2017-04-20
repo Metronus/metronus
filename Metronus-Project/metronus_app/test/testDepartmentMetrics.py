@@ -430,56 +430,6 @@ class DepartmentMetricsTestCase(TestCase):
         checkJsonMetricsAreEqual(self, str(response.content, encoding='utf8'), true_data)
 
 
-    def test_access_denied_not_logged_acum_profit(self):
-        """
-        Without authentication, try getting the acum_profit JSON
-        """
-        c = Client()
-
-        response = c.get("/department/ajaxAcumProfit/%d/" % Department.objects.get(name="Departamento2").id)
-        self.assertEquals(response.status_code, 403)
-
-    def test_access_denied_low_role_acum_profit(self):
-        """
-        Without proper roles, try getting the acum_profit JSON
-        """
-        c = Client()
-        c.login(username="emp1", password="123456")
-
-        response = c.get("/department/ajaxAcumProfit/%d/" % Department.objects.get(name="Departamento2").id)
-        self.assertEquals(response.status_code, 403)
-
-    def test_access_ok_executive_acum_profit(self):
-        """
-        As an executive, try getting the acum_profit JSON
-        """
-        c = Client()
-        c.login(username="emp2", password="123456")
-
-        response = c.get("/department/ajaxAcumProfit/%d/" % Department.objects.get(name="Departamento2").id)
-        self.assertEquals(response.status_code, 200)
-
-    def test_access_other_company_executive_acum_profit(self):
-        """
-        As an executive, try getting the acum_profit JSON from other company
-        """
-        c = Client()
-        c.login(username="emp2", password="123456")
-
-        response = c.get("/department/ajaxAcumProfit/%d/" % Department.objects.get(name="Departamento5").id)
-        self.assertEquals(response.status_code, 403)
-
-    def test_bad_request_acum_profit(self):
-        """
-        Try getting the acum_profit JSON without providing a department
-        """
-        c = Client()
-        c.login(username="emp2", password="123456")
-
-        response = c.get("/department/ajaxAcumProfit")
-        self.assertEquals(response.status_code, 404)
-    
-
     def test_access_denied_not_logged_profit(self):
         """
         Without authentication, try getting the profit JSON
