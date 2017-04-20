@@ -4,10 +4,10 @@ from metronus_app.model.actor import Actor
 from metronus_app.model.task import Task
 from metronus_app.model.projectDepartment import ProjectDepartment
 class GoalEvolution(models.Model):
-	"""
-	Each time the goal or the price per unit/hour from a task is changed, a new entry is created in the log
-	Maybe should have been named TaskLog, but...
-	"""
+    """
+    Each time the goal or the price per unit/hour from a task is changed, a new entry is created in the log
+    Maybe should have been named TaskLog, but...
+    """
     task_id  = models.ForeignKey(Task)
 
     registryDate = models.DateTimeField(auto_now=True)
