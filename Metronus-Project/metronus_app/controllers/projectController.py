@@ -272,8 +272,8 @@ def ajax_time_per_department(request):
     check_metrics_authorized_for_project(request.user, project_id)
 
     # Get and parse the dates
-    start_date = request.GET.get("start_date", str(date.today()))
-    end_date = request.GET.get("end_date", str(date.today() - timedelta(days=30)))
+    start_date = request.GET.get("start_date", str(date.today()- timedelta(days=30)))
+    end_date = request.GET.get("end_date", str(date.today() ))
     date_regex = re.compile("^\d{4}-\d{2}-\d{2}$")
 
     if date_regex.match(start_date) is None or date_regex.match(end_date) is None:
@@ -307,6 +307,7 @@ def ajax_time_per_department(request):
         data['values'].append(time_total)
 
     return JsonResponse(data)
+
 
 ##################################################################################################################
 #Auxiliar methods, containing the operation logic

@@ -372,8 +372,8 @@ def ajax_productivity_per_task_and_date(request,username):
     """
 
     # Get and parse the dates
-    start_date = request.GET.get("start_date", str(date.today()))
-    end_date = request.GET.get("end_date", str(date.today() - timedelta(days=30)))
+    start_date = request.GET.get("start_date", str(date.today()- timedelta(days=30)))
+    end_date = request.GET.get("end_date", str(date.today()))
     date_regex = re.compile("^\d{4}-\d{2}-\d{2}$")
 
     if date_regex.match(start_date) is None or date_regex.match(end_date) is None:

@@ -55,7 +55,8 @@ urlpatterns += [#i18n_patterns(
     url(r'^department/delete/(?P<department_id>\w{0,50})/$', departmentController.delete, name='department_delete'),
     url(r'^department/ajaxEmployeesPerTask$', departmentController.ajax_employees_per_task, name='department_employees_per_task'),
     url(r'^department/ajaxTimePerTask$', departmentController.ajax_time_per_task, name='department_time_per_task'),
-
+    url(r'^department/ajaxProfit/(?P<department_id>\w{0,50})/$', departmentController.ajax_profit_per_date, name='department_profit_per_date'),
+    url(r'^department/ajaxAcumProfit/(?P<department_id>\w{0,50})/$', departmentController.ajax_acum_profit_per_date, name='department_acum_profit_per_date'),
     #Task
     url(r'^task/create$', taskController.create, name='task_create'),
     url(r'^task/createAsync$', taskController.createAsync),

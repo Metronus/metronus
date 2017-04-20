@@ -252,7 +252,8 @@ def edit(request,task_id):
         task=get_object_or_404(Task,pk=task_id)
         form = TaskForm(initial={"name":task.name,"description":task.description,
                 "task_id":task.id,
-                "production_goal":task.production_goal,"goal_description":task.goal_description,
+                "production_goal":task.production_goal if task.production_goal is not None else "",
+                "goal_description":task.goal_description if task.goal_description is not None else "",
                 "project_id":task.projectDepartment_id.project_id,
                 "department_id":task.projectDepartment_id.department_id,
                 "price_per_unit":task.price_per_unit if task.price_per_unit is not None else "",
@@ -314,8 +315,8 @@ def ajax_productivity_per_task(request):
     task_id = request.GET["task_id"]
 
     # Get and parse the dates and the offset
-    start_date = request.GET.get("start_date", str(date.today()))
-    end_date = request.GET.get("end_date", str(date.today() + timedelta(days=30)))
+    start_date = request.GET.get("start_date", str(date.today()- timedelta(days=30)))
+    end_date = request.GET.get("end_date", str(date.today()))
     date_regex = re.compile("^\d{4}-\d{2}-\d{2}$")
 
     if date_regex.match(start_date) is None or date_regex.match(end_date) is None:

@@ -2,8 +2,7 @@ from django.shortcuts                                   import render, get_objec
 from django.http                                        import HttpResponseRedirect, JsonResponse, HttpResponseBadRequest
 from django.core.exceptions                             import ObjectDoesNotExist, PermissionDenied
 from django.contrib.auth                                import authenticate,login
-from django.db.models                                   import Sum
-
+from django.db.models                                   import Sum,F,FloatField
 from metronus_app.forms.departmentForm                  import DepartmentForm
 from metronus_app.model.department                      import Department
 from metronus_app.model.projectDepartmentEmployeeRole   import ProjectDepartmentEmployeeRole
@@ -15,7 +14,7 @@ from metronus_app.model.administrator                   import Administrator
 from metronus_app.common_utils                          import get_current_admin_or_403,get_current_employee_or_403
 
 from populate_database                                  import basicLoad
-from datetime                                           import date, timedelta
+from datetime                                           import date, timedelta,datetime
 
 import re
 
@@ -266,8 +265,8 @@ def ajax_time_per_task(request):
     check_metrics_authorized_for_department(request.user, department_id)
 
     # Get and parse the dates and the offset
-    start_date = request.GET.get("start_date", str(date.today()))
-    end_date = request.GET.get("end_date", str(date.today() - timedelta(days=30)))
+    start_date = request.GET.get("start_date", str(date.today()- timedelta(days=30)))
+    end_date = request.GET.get("end_date", str(date.today() ))
     date_regex = re.compile("^\d{4}-\d{2}-\d{2}$")
 
     if date_regex.match(start_date) is None or date_regex.match(end_date) is None:
@@ -301,6 +300,162 @@ def ajax_time_per_task(request):
         data['values'].append(time_total)
 
     return JsonResponse(data)
+def ajax_profit_per_date(request,department_id):
+    """
+    # url = employee/ajax_profit_per_date/<department_id>
+    # Devuelve un objeto con las fechas y las productividades de la tarea real y esperada
+    #{'name': ..., 'total_productivity': X,'expected_productivity':Y} (X en unidades goal_description/hora)
+
+    # Parámetro obligatorio:
+
+    # Parámetros opcionales: 
+    # start_date - fecha en formato YYYY-MM-DD que indica el inicio de la medición. Por defecto, 30 días antes de la fecha actual.
+    # end_date - fecha en formato YYYY-MM-DD que indica el final de la medición. Por defecto, fecha actual.
+    # offset - desplazamiento (huso) horario en formato +/-HH:MM - Por defecto +00:00
+
+    # Si se proporcionan pero no tienen el formato correcto se lanzará un error HTTP 400 Bad Request
+
+    #Ejemplo
+    #/department/ajaxAcumProfit/1/
+    
+    #devuelve lo siguiente
+    #{"dates": ["2017-03-21", "2017-03-22", "2017-03-23", "2017-03-24", "2017-03-25", "2017-03-26", "2017-03-27", "2017-03-28", "2017-03-29", "2017-03-30", "2017-03-31", "2017-04-01", "2017-04-02", "2017-04-03", "2017-04-04", "2017-04-05", "2017-04-06", "2017-04-07", "2017-04-08", "2017-04-09", "2017-04-10", "2017-04-11", "2017-04-12", "2017-04-13", "2017-04-14", "2017-04-15", "2017-04-16", "2017-04-17", "2017-04-18", "2017-04-19", "2017-04-20"], 
+    "income": [0, 155861.848663544, 106596.060817813, 133996.946277026, 176182.618433908, 130780.529090679, 185712.238665422, 168691.006425482, 201528.027548702, 133961.680656505, 146130.652317868, 160978.773806858, 254646.651869028, 232419.619341417, 113043.655527752, 128847.7293944, 186411.255163309, 126824.943128807, 261600.084774754, 200811.161504088, 158938.293244699, 188362.131387002, 166524.276102895, 114811.676076952, 210347.838939301, 115268.666410966, 126145.268594169, 131910.452677469, 274896.663475654, 127528.492837469, 177974.319716889], 
+    "expenses": [0, 1457.18015695298, 1614.1458826106, 1367.62026485911, 2026.87328274918, 1446.83842607798, 1878.80598163726, 1823.8647251497, 1879.3977160153, 1607.99448986952, 1615.72129910026, 1609.49391115067, 2513.94326680278, 2112.07014158364, 1360.67562490714, 1368.60590722518, 1603.92947753372, 1473.68308776497, 2343.40799525207, 1704.64596258349, 1938.38239104717, 1403.70478335668, 1372.6250345277, 1076.44946125988, 2353.7065671626, 1516.12119421768, 1611.60427318295, 1338.82219760799, 2525.26576799895, 1422.68356444232, 1765.66996904502]}  "expected_productivity": [9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 4.0, 4.0, 2.0, 2.0, 2.0]}}
+    """
+
+    # Get and parse the dates
+    start_date = request.GET.get("start_date", str(date.today()- timedelta(days=30)))
+    end_date = request.GET.get("end_date", str(date.today()))
+    date_regex = re.compile("^\d{4}-\d{2}-\d{2}$")
+
+    if date_regex.match(start_date) is None or date_regex.match(end_date) is None:
+        return HttpResponseBadRequest("Start/end date are not valid")
+
+    offset = request.GET.get("offset", "+00:00")
+    offset_regex = re.compile("^(\+|-)\d{2}:\d{2}$")
+
+    if offset_regex.match(offset) is None:
+        return HttpResponseBadRequest("Time offset is not valid")
+
+    # Append time offsets
+    start_date += " 00:00" + offset
+    end_date += " 00:00" + offset
+
+    check_metrics_authorized_for_department(request.user, department_id)
+    #Get all dates between start and end
+    dates=[]
+    strDates=[]
+
+    d1 = datetime.strptime(start_date[0:19]+start_date[20:22], '%Y-%m-%d %H:%M%z')
+    d2 = datetime.strptime(end_date[0:19]+end_date[20:22], '%Y-%m-%d %H:%M%z')
+    delta = d2 - d1         # timedelta
+    print(range(delta.days))
+    for i in range(delta.days + 1):
+        strDates.append((d1 + timedelta(days=i)).date().strftime("%Y-%m-%d"))
+        dates.append(d1 + timedelta(days=i))
+    print (len(dates))
+
+    data = {'dates':strDates,'expenses':[],'income':[]}
+    
+
+    #Profit
+    #for each date, we will find all logs, calculate the sum and acumulate it
+    index=0
+    for logDate in dates:
+        logs=TimeLog.objects.filter(task_id__projectDepartment_id__department_id_id=department_id,
+            workDate__year=logDate.year,workDate__month=logDate.month
+            ,workDate__day=logDate.day).distinct()
+        expenses=logs.aggregate(total_expenses=Sum(F("duration")/60.0*F("employee_id__price_per_hour"),output_field=FloatField()))["total_expenses"]
+        expenses=expenses if expenses is not None else 0
+        income=logs.aggregate(total_income=Sum(F("task_id__price_per_unit")*F("produced_units"))
+            )["total_income"]
+        income=income if income is not None else 0
+        
+        data['expenses'].append(expenses)
+        data['income'].append(income)
+
+    return JsonResponse(data)
+
+def ajax_acum_profit_per_date(request,department_id):
+    """
+    # url = employee/ajax_acum_profit_per_date/<department_id>
+    # Devuelve un objeto con las fechas y las productividades de la tarea real y esperada
+    #{'name': ..., 'total_productivity': X,'expected_productivity':Y} (X en unidades goal_description/hora)
+
+    # Parámetro obligatorio:
+
+    # Parámetros opcionales: 
+    # start_date - fecha en formato YYYY-MM-DD que indica el inicio de la medición. Por defecto, 30 días antes de la fecha actual.
+    # end_date - fecha en formato YYYY-MM-DD que indica el final de la medición. Por defecto, fecha actual.
+    # offset - desplazamiento (huso) horario en formato +/-HH:MM - Por defecto +00:00
+
+    # Si se proporcionan pero no tienen el formato correcto se lanzará un error HTTP 400 Bad Request
+
+    #Ejemplo
+    #/department/ajaxAcumProfit/1/
+    
+    #devuelve lo siguiente
+    #{"acumExpenses": [0, 1457.18015695298, 3071.32603956358, 4438.9463044226895, 6465.819587171869, 7912.658013249849, 9791.46399488711, 11615.32872003681, 13494.726436052111, 15102.72092592163, 16718.442225021892, 18327.93613617256, 20841.87940297534, 22953.949544558982, 24314.625169466122, 25683.231076691303, 27287.16055422502, 28760.84364198999, 31104.25163724206, 32808.89759982555, 34747.27999087272, 36150.9847742294, 37523.6098087571, 38600.05927001698, 40953.76583717958, 42469.88703139726, 44081.49130458021, 45420.3135021882, 47945.57927018715, 49368.262834629466, 51133.932803674485], 
+    "acumIncome": [0, 155861.848663544, 262457.90948135697, 396454.85575838294, 572637.4741922909, 703418.0032829699, 889130.2419483919, 1057821.248373874, 1259349.275922576, 1393310.956579081, 1539441.608896949, 1700420.3827038072, 1955067.034572835, 2187486.6539142523, 2300530.309442004, 2429378.038836404, 2615789.2939997134, 2742614.2371285204, 3004214.3219032744, 3205025.4834073624, 3363963.7766520614, 3552325.908039063, 3718850.184141958, 3833661.86021891, 4044009.6991582112, 4159278.365569177, 4285423.634163346, 4417334.086840815, 4692230.750316469, 4819759.243153938, 4997733.5628708275], 
+    "dates": ["2017-03-21", "2017-03-22", "2017-03-23", "2017-03-24", "2017-03-25", "2017-03-26", "2017-03-27", "2017-03-28", "2017-03-29", "2017-03-30", "2017-03-31", "2017-04-01", "2017-04-02", "2017-04-03", "2017-04-04", "2017-04-05", "2017-04-06", "2017-04-07", "2017-04-08", "2017-04-09", "2017-04-10", "2017-04-11", "2017-04-12", "2017-04-13", "2017-04-14", "2017-04-15", "2017-04-16", "2017-04-17", "2017-04-18", "2017-04-19", "2017-04-20"]}
+    """
+
+    # Get and parse the dates
+    start_date = request.GET.get("start_date", str(date.today()- timedelta(days=30)))
+    end_date = request.GET.get("end_date", str(date.today()))
+    date_regex = re.compile("^\d{4}-\d{2}-\d{2}$")
+
+    if date_regex.match(start_date) is None or date_regex.match(end_date) is None:
+        return HttpResponseBadRequest("Start/end date are not valid")
+
+    offset = request.GET.get("offset", "+00:00")
+    offset_regex = re.compile("^(\+|-)\d{2}:\d{2}$")
+
+    if offset_regex.match(offset) is None:
+        return HttpResponseBadRequest("Time offset is not valid")
+
+    # Append time offsets
+    start_date += " 00:00" + offset
+    end_date += " 00:00" + offset
+
+    check_metrics_authorized_for_department(request.user, department_id)
+    #Get all dates between start and end
+    dates=[]
+    strDates=[]
+
+    d1 = datetime.strptime(start_date[0:19]+start_date[20:22], '%Y-%m-%d %H:%M%z')
+    d2 = datetime.strptime(end_date[0:19]+end_date[20:22], '%Y-%m-%d %H:%M%z')
+    delta = d2 - d1         # timedelta
+    print(range(delta.days))
+    for i in range(delta.days + 1):
+        strDates.append((d1 + timedelta(days=i)).date().strftime("%Y-%m-%d"))
+        dates.append(d1 + timedelta(days=i))
+    print (len(dates))
+
+    data = {'dates':strDates,'acumExpenses':[],'acumIncome':[]}
+    
+
+    #Profit
+    #for each date, we will find all logs, calculate the sum and acumulate it
+    index=0
+    for logDate in dates:
+        logs=TimeLog.objects.filter(task_id__projectDepartment_id__department_id_id=department_id,
+            workDate__year=logDate.year,workDate__month=logDate.month
+            ,workDate__day=logDate.day).distinct()
+        expenses=logs.aggregate(total_expenses=Sum(F("duration")/60.0*F("employee_id__price_per_hour"),output_field=FloatField()))["total_expenses"]
+        expenses=expenses if expenses is not None else 0
+        income=logs.aggregate(total_income=Sum(F("task_id__price_per_unit")*F("produced_units"))
+            )["total_income"]
+        income=income if income is not None else 0
+        if index==0:
+            data['acumExpenses'].append(expenses)
+            data['acumIncome'].append(income)
+        else:
+            data['acumExpenses'].append(data['acumExpenses'][index-1]+expenses)
+            data['acumIncome'].append(data['acumIncome'][index-1]+income)
+        index=index+1
+    return JsonResponse(data)
 
 
 ##################################################################################################################
@@ -308,7 +463,7 @@ def ajax_time_per_task(request):
 ##################################################################################################################
 
 def check_metrics_authorized_for_department(user, dpmt_id):
-    """Raises 403 if the current actor is not allowed to obtain metrics for the project"""
+    """Raises 403 if the current actor is not allowed to obtain metrics for the department"""
     if not user.is_authenticated():
         raise PermissionDenied
 
