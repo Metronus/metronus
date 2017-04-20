@@ -324,6 +324,12 @@ msgid "expenses"
 msgstr "Gastos"
 msgid "acum_not_acum"
 msgstr "Cambiar acumulado/diario"
+msgid "non_cumulative_values"
+msgstr "Valores Sin Acumular"
+msgid "cumulative_values"
+msgstr "Valores Acumulados"
+msgid "data_output_to"
+msgstr "Cambiar salida a"
 
 #: Task's charts
 msgid "taskChartTitle"

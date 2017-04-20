@@ -311,6 +311,14 @@ msgid "empTaskChartTitle"
 msgstr "Employees per task"
 msgid "empTaskChartSubtitle"
 msgstr "For this department"
+msgid "non_cumulative_values"
+msgstr "Non-Cumulative Values"
+msgid "cumulative_values"
+msgstr "Cumulative Values"
+msgid "data_output_to"
+msgstr "Data Output As"
+
+
 #: Profit charts
 msgid "notAcum"
 msgstr "Diary"
