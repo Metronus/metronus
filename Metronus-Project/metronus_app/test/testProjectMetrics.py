@@ -504,3 +504,51 @@ class ProjectMetricsTestCase(TestCase):
             self.assertEquals(response.status_code, 200)
             checkJsonMetricsAreEqual(self, str(response.content, encoding='utf8'), true_data)
 
+    def test_access_denied_not_logged_profit(self):
+        """
+        Without authentication, try getting the profit JSON
+        """
+        c = Client()
+
+        response = c.get("/project/ajaxProfit/{0}/" .format( Project.objects.get(name="pro1").id))
+        self.assertEquals(response.status_code, 403)
+
+    def test_access_denied_low_role_profit(self):
+        """
+        Without proper roles, try getting the profit JSON
+        """
+        c = Client()
+        c.login(username="emp1", password="123456")
+
+        response = c.get("/project/ajaxProfit/{0}/" .format( Project.objects.get(name="pro1").id))
+        self.assertEquals(response.status_code, 403)
+
+    def test_access_ok_executive_profit(self):
+        """
+        As an executive, try getting the profit JSON
+        """
+        c = Client()
+        c.login(username="emp2", password="123456")
+
+        response = c.get("/project/ajaxProfit/{0}/" .format( Project.objects.get(name="pro1").id))
+        self.assertEquals(response.status_code, 200)
+
+    def test_access_other_company_executive_profit(self):
+        """
+        As an executive, try getting the profit JSON from other company
+        """
+        c = Client()
+        c.login(username="emp2", password="123456")
+
+        response = c.get("/project/ajaxProfit/{0}/" .format( Project.objects.get(name="pro2").id))
+        self.assertEquals(response.status_code, 403)
+
+    def test_bad_request_profit(self):
+        """
+        Try getting the profit JSON without providing a department
+        """
+        c = Client()
+        c.login(username="emp2", password="123456")
+
+        response = c.get("/project/ajaxProfit")
+        self.assertEquals(response.status_code, 404)
