@@ -36,20 +36,19 @@ def create(request):
     form: el formulario con los datos de la tarea
     departments:eso
     projects:eso
+
+    errors: una lista con lo siguiente, empezando por task_creation_
     repeated_name: si el nombre es repetido
-    valid_goal:si el objetivo es correcto(no está uno en blanco y otro no)
-    project_department_related: si nos están relacionados projectdepartment
-    valid_price: si el precio esta puesto acorde al objetivo de producción (y es positivo)
+    invalid_goal:si el objetivo es incorrecto(está uno en blanco y otro no)
+    project_department_not_related: si no están relacionados projectdepartment
+    invalid_price: si el precio no esta puesto acorde al objetivo de producción (o no es positivo)
     template:
     task_form.html
     """
      # Check that the user is logged in
     actor=checkTask(None,request)
+    errors = []
 
-    project_department_related=True
-    repeated_name=False
-    valid_goal=True
-    valid_price=True
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -58,35 +57,39 @@ def create(request):
 
         if form.is_valid():
             # process the data in form.cleaned_data as required
-            valid_goal = checkGoal(form)
-            valid_price=checkPrice(form)
-            if valid_goal and valid_price:
-                pname=form.cleaned_data['name']
-                ppro=form.cleaned_data['project_id']
-                pdep=form.cleaned_data['department_id']
-                pdtuple=find_tuple(ppro.id,pdep.id,actor)
-                if pdtuple is not None:
-                    pro=find_name(pname,pdtuple)
-                    if pro is not None:
-                        if not pro.active:
-                            checkTask(pro,request)
-                            pro.active=True
-                            pro.save()
-                            return HttpResponseRedirect('/task/list')
-                        else:
-                            repeated_name=True
-                    else:
-                        actor=checkTask(pro,request)
-                        createTask(form,pdtuple,actor)
+            if not checkGoal(form):
+                errors.append('task_creation_invalid_goal')
+            if not checkPrice(form):
+                errors.append('task_creation_invalid_price')
+            
+            pname=form.cleaned_data['name']
+            ppro=form.cleaned_data['project_id']
+            pdep=form.cleaned_data['department_id']
+            pdtuple=find_tuple(ppro.id,pdep.id,actor)
+            if pdtuple is None:
+                errors.append('task_creation_project_department_not_related')
+            else:
+                pro=find_name(pname,pdtuple)
+                if pro is not None and pro.active:
+                    errors.append('task_creation_repeated_name')
+
+            if not errors:
+                if pro is not None:
+                    if not pro.active:
+                        checkTask(pro,request)
+                        pro.active=True
+                        pro.save()
                         return HttpResponseRedirect('/task/list')
                 else:
-                    project_department_related=False
+                    actor=checkTask(pro,request)
+                    createTask(form,pdtuple,actor)
+                    return HttpResponseRedirect('/task/list')
+                
     # if a GET (or any other method) we'll create a blank form
     else:
         form = TaskForm()
     coll=find_collections(request)
-    return render(request, 'task_form.html', {'form': form,'repeated_name':repeated_name,"valid_goal":valid_goal,
-        'project_department_related':project_department_related,'valid_price':valid_price,
+    return render(request, 'task_form.html', {'form': form,'errors':errors,
         "departments":coll["departments"],"projects":coll["projects"]})
 
 
@@ -96,24 +99,25 @@ def createAsync(request):
     form: el formulario con los datos de la tarea
     departments:eso
     projects:eso
+
+    errors: una lista con lo siguiente, empezando por task_creation_
     repeated_name: si el nombre es repetido
-    project_department_related: si nos están relacionados projectdepartment
-    valid_price: si el precio esta puesto acorde al objetivo de producción (y es positivo)
-    valid_goal:si el objetivo es correcto(no está uno en blanco y otro no)
+    invalid_goal:si el objetivo es incorrecto(está uno en blanco y otro no)
+    project_department_not_related: si no están relacionados projectdepartment
+    invalid_price: si el precio no esta puesto acorde al objetivo de producción (o no es positivo)
+    
+    success:si tuvo éxito la operación
 
     template:
     task_form.html
     """
      # Check that the user is logged in
     actor=checkTask(None,request)
+    
+    errors=[]
     data = {
-        'repeated_name': False,
-        'success':True,
-        'project_department_related':True,
-        'valid_goal':True,
-        'valid_price':True
+        'success':True
     }
-
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -122,33 +126,38 @@ def createAsync(request):
 
         if form.is_valid():
             # process the data in form.cleaned_data as required
-            data['valid_goal'] = checkGoal(form)
-            data['valid_price']=checkPrice(form)
-            if data['valid_goal'] and data['valid_price']:
-                pname=form.cleaned_data['name']
-                ppro=form.cleaned_data['project_id']
-                pdep=form.cleaned_data['department_id']
-                pdtuple=find_tuple(ppro.id,pdep.id,actor)
-                if pdtuple is not None:
-                    pro=find_name(pname,pdtuple)
-                    if pro is not None:
-                        if not pro.active:
-                            checkTask(pro,request)
-                            pro.active=True
-                            pro.save()
-                            return JsonResponse(data)
-                        else:
-                            data['repeated_name']=True
-                    else:
-                        actor=checkTask(pro,request)
-                        createTask(form,pdtuple,actor)
+            if not checkGoal(form):
+                errors.append('task_creation_invalid_goal')
+            if not checkPrice(form):
+                errors.append('task_creation_invalid_price')
+            
+            pname=form.cleaned_data['name']
+            ppro=form.cleaned_data['project_id']
+            pdep=form.cleaned_data['department_id']
+            pdtuple=find_tuple(ppro.id,pdep.id,actor)
+            if pdtuple is None:
+                errors.append('task_creation_project_department_not_related')
+            else:
+                pro=find_name(pname,pdtuple)
+                if pro is not None and pro.active:
+                    errors.append('task_creation_repeated_name')
+
+            if not errors:
+                if pro is not None:
+                    if not pro.active:
+                        checkTask(pro,request)
+                        pro.active=True
+                        pro.save()
                         return JsonResponse(data)
                 else:
-                    data['project_department_related']=False
+                    actor=checkTask(pro,request)
+                    createTask(form,pdtuple,actor)
+                    return JsonResponse(data)
     # if a GET (or any other method) we'll create a blank form
     else:
         return HttpResponseRedirect('/department/create')
     data['success']=False
+    data['errors']=errors
 
     return JsonResponse(data)
 def form_projects(request):
@@ -210,21 +219,21 @@ def edit(request,task_id):
     form: el formulario con los datos de la tarea
     departments:eso
     projects:eso
-    repeated_name: si el nombre es repetido
-    valid_goal:si los objetivos son válidos
-    project_department_related: si nos están relacionados projectdepartment
-    valid_price: si el precio esta puesto acorde al objetivo de producción (y es positivo)
     
+    errors: ver create
+    repeated_name: si el nombre es repetido
+    invalid_goal:si el objetivo es incorrecto(está uno en blanco y otro no)
+    project_department_not_related: si no están relacionados projectdepartment
+    invalid_price: si el precio no esta puesto acorde al objetivo de producción (o no es positivo)
+   
     template:
     task_form.html
     """
      # Check that the user is logged in
     actor=checkTask(None,request)
-    repeated_name=False
-    valid_goal=True
-    valid_price=True
+
+    errors=[]
     
-    project_department_related=True
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -232,20 +241,25 @@ def edit(request,task_id):
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
-            valid_goal = checkGoal(form)
-            valid_price=checkPrice(form)
-            if valid_goal and valid_price:
-                task=get_object_or_404(Task,pk=form.cleaned_data['task_id'])
-                checkTask(task,request)
-                #find tasks with the same name
-                pro=Task.objects.filter(name=form.cleaned_data['name'],projectDepartment_id=task.projectDepartment_id).first()
-                #pro does not exists or it's the same
-                if pro is None or pro.id==task.id:
-                    updateTask(task,form,actor)
-                    return HttpResponseRedirect('/task/list')
-                else:
-                    if pro.active:
-                        repeated_name=True
+            if not checkGoal(form):
+                errors.append('task_creation_invalid_goal')
+            if not checkPrice(form):
+                errors.append('task_creation_invalid_price')
+
+            
+            task=get_object_or_404(Task,pk=form.cleaned_data['task_id'])
+            checkTask(task,request)
+            #find tasks with the same name
+            pro=Task.objects.filter(name=form.cleaned_data['name'],projectDepartment_id=task.projectDepartment_id).first()
+
+            #pro does not exists or it's the same
+            if pro is not None and pro.id!=task.id and pro.active:
+                errors.append('task_creation_repeated_name')
+            
+            if not errors:
+                updateTask(task,form,actor)
+                return HttpResponseRedirect('/task/list')
+
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -260,8 +274,7 @@ def edit(request,task_id):
                 "price_per_hour":task.price_per_hour if task.price_per_hour is not None else ""})
     #The project
     coll=find_collections(request)
-    return render(request, 'task_form.html', {'form': form,'repeated_name':repeated_name,
-        "valid_goal":valid_goal,'project_department_related':project_department_related,'valid_price':valid_price,
+    return render(request, 'task_form.html', {'form': form,"errors":errors,
         "departments":coll["departments"],"projects":coll["projects"]})
 
 def delete(request,task_id):
@@ -423,7 +436,8 @@ def checkPrice(form):
     fgoaldescription=form.cleaned_data['goal_description']
     fperunit=form.cleaned_data['price_per_unit']
     fperhour=form.cleaned_data['price_per_hour']
-    return (fgoaldescription!="" and not fperhour and fperunit and fperunit>0 ) or  (not fgoaldescription and not fperunit and fperhour and fperhour>0)
+    return (fgoaldescription is not None and fgoaldescription!="" and  fperhour is None and fperunit is not None and fperunit>0 ) or \
+        ( (fgoaldescription is None or fgoaldescription=="") and fperunit is None and fperhour is not None and fperhour>0)
 
 
 def deleteTask(task):
@@ -451,13 +465,13 @@ def checkRoleForList(request):
 
         if res:
             #is manager
-            task=Task.objects.filter(actor_id__company_id=actor.company_id,active=True)
+            task=Task.objects.filter(actor_id__company_id=actor.company_id,active=True).distinct()
         else:
             #not a manager
             task=Task.objects.filter(actor_id__company_id=actor.company_id,projectDepartment_id__projectdepartmentemployeerole__employee_id=actor,active=True).distinct()
     else:
         #is admin
-        task=Task.objects.filter(actor_id__company_id=actor.company_id,active=True)
+        task=Task.objects.filter(actor_id__company_id=actor.company_id,active=True).distinct()
     return task
 def checkTask(task,request):
     """

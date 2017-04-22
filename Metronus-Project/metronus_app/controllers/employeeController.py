@@ -292,7 +292,7 @@ def delete(request, username):
     employee_user.save()
 
     EmployeeLog.objects.create(employee_id=employee, event="B", price_per_hour=employee.price_per_hour)
-    return HttpResponseRedirect('/employee/list/')
+    return HttpResponseRedirect('/employee/list')
 
 ###AJAX methods
 def ajax_productivity_per_task(request,username):

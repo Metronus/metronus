@@ -8,7 +8,7 @@ from metronus_app.model.project import Project
 from metronus_app.model.goalEvolution import GoalEvolution
 from django.core.exceptions                      import ObjectDoesNotExist, PermissionDenied
 from populate_database import populate_database
-
+import json
 class TaskTestCase(TestCase):
     """This class provides a test case for using and managing tasks"""
     @classmethod
@@ -58,7 +58,7 @@ class TaskTestCase(TestCase):
 
         dep_id=Department.objects.get(name="Frontend").id
 
-        response = c.post("/task/create", {
+        response = c.post("/task/createAsync", {
             "task_id": "0",
             "name": "hacer memes",
             "description":"alguno",
@@ -67,16 +67,23 @@ class TaskTestCase(TestCase):
             "price_per_hour":2.0
               })
 
-        self.assertEquals(response.status_code, 302)
+        self.assertEquals(response.status_code, 200)
 
         # Check that the task has been successfully created
 
         dep = Task.objects.all().last()
         self.assertEquals(dep.name, "hacer memes")
         self.assertEquals(dep.active,True)
+        
+        #response in bytes must be decode to string
+        data=response.content.decode("utf-8")
+        #string to dict
+        data=json.loads(data)
+        self.assertEquals(data["success"],True)
         logs_after = Task.objects.all().count()
 
         self.assertEquals(logs_before + 1, logs_after)
+
     def test_create_invalid_task_filled_price(self):
         """Logged in as an employee with appropiate role, try to create a task
         both fields filled
@@ -102,8 +109,8 @@ class TaskTestCase(TestCase):
         self.assertEquals(response.status_code, 200)
         logs_after = GoalEvolution.objects.all().count()
         self.assertEquals(logs_before, logs_after)
-        self.assertEquals(response.context["valid_goal"],True)
-        self.assertEquals(response.context["valid_price"],False)
+        self.assertNotIn("task_creation_invalid_goal",response.context["errors"])
+        self.assertIn("task_creation_invalid_price",response.context["errors"])
 
 
 
@@ -124,8 +131,9 @@ class TaskTestCase(TestCase):
         })
 
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.context["repeated_name"],True)
-        self.assertEquals(response.context["project_department_related"],True)
+        self.assertIn("task_creation_repeated_name",response.context["errors"])
+        self.assertNotIn("task_creation_project_department_not_related",response.context["errors"])
+
     def test_create_task_project_department_not_related(self):
         """
         Logged in as an administrator, try to create an task with the name of an existing company
@@ -142,9 +150,9 @@ class TaskTestCase(TestCase):
             "price_per_hour":"3.0"
         })
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.context["repeated_name"],False)
-        self.assertEquals(response.context["project_department_related"],False)
-
+        self.assertNotIn("task_creation_repeated_name",response.context["errors"])
+        self.assertIn("task_creation_project_department_not_related",response.context["errors"])
+    
 
     def test_create_task_not_logged(self):
         """
@@ -386,8 +394,9 @@ class TaskTestCase(TestCase):
         self.assertEquals(response.status_code, 200)
         logs_after = GoalEvolution.objects.all().count()
         self.assertEquals(logs_before, logs_after)
-        self.assertEquals(response.context["valid_goal"],True)
-        self.assertEquals(response.context["valid_price"],False)
+     
+        self.assertNotIn("task_creation_invalid_goal",response.context["errors"])
+        self.assertIn("task_creation_invalid_price",response.context["errors"])
 
     def test_edit_task_invalid_price_all_filled(self):
         """
@@ -421,8 +430,8 @@ class TaskTestCase(TestCase):
         self.assertEquals(response.status_code, 200)
         logs_after = GoalEvolution.objects.all().count()
         self.assertEquals(logs_before, logs_after)
-        self.assertEquals(response.context["valid_goal"],True)
-        self.assertEquals(response.context["valid_price"],False)
+        self.assertNotIn("task_creation_invalid_goal",response.context["errors"])
+        self.assertIn("task_creation_invalid_price",response.context["errors"])
 
 
     def test_edit_task_invalid_goal(self):
@@ -450,7 +459,9 @@ class TaskTestCase(TestCase):
               })
 
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.context["valid_goal"],False)
+        self.assertIn("task_creation_invalid_goal",response.context["errors"])
+        self.assertIn("task_creation_invalid_price",response.context["errors"])
+
 
     def test_edit_task_duplicate(self):
         """
@@ -474,7 +485,8 @@ class TaskTestCase(TestCase):
               })
 
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.context["repeated_name"],True)
+
+        self.assertIn("task_creation_repeated_name",response.context["errors"])
 
     def test_delete_task_positive(self):
         """
