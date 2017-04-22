@@ -300,9 +300,10 @@ def ajax_time_per_task(request):
         data['values'].append(time_total)
 
     return JsonResponse(data)
+
 def ajax_profit_per_date(request,department_id):
     """
-    # url = employee/ajax_profit_per_date/<department_id>
+    # url = department/ajax_profit_per_date/<department_id>
     # Devuelve un objeto con las fechas y las rentabilidades diarias y acumuladas
     #
 

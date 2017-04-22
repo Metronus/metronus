@@ -342,6 +342,8 @@ msgid "production"
 msgstr "Production"
 msgid "goal_evolution"
 msgstr "Goal's Evolution"
+msgid "task_profit"
+msgstr "Task expenses and income"
 
 
 #: Employee

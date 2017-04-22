@@ -76,6 +76,7 @@ urlpatterns += [#i18n_patterns(
     url(r'^project/ajaxEmployeesPerDpmt$', projectController.ajax_employees_per_department, name='project_employees_per_department'),
     url(r'^project/ajaxTasksPerDpmt$', projectController.ajax_tasks_per_department, name='project_tasks_per_department'),
     url(r'^project/ajaxTimePerDpmt$', projectController.ajax_time_per_department, name='project_time_per_department'),
+    url(r'^project/ajaxProfit/(?P<project_id>\w{0,50})/$', projectController.ajax_profit_per_date, name='project_profit_per_date'),
 
     #Project-Department relationship
     url(r'^projectdepartment/create$', projectDepartmentController.create, name='projectdepartment_create'),
