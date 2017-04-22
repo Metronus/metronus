@@ -137,6 +137,8 @@ msgid "registerCompanyAdmin"
 msgstr "Información del Administrador"
 msgid "registerCompanyAdminInfo"
 msgstr "¡Alguien debe gestionar tu compañía!"
+msgid "browseFile"
+msgstr "Examinar..."
 
 # Contact form
 msgid "contact_form"
@@ -681,3 +683,9 @@ msgid "timePerProjectTitle"
 msgstr "Tiempo invertido"
 msgid "timePerProjectSubtitle"
 msgstr "Tiempo invertido por proyecto"
+
+#General errors
+msgid "companyRegister_usernameNotUnique"
+msgstr "Nombre de usuario inválido. Este usuario ya está en uso."
+msgid "companyRegister_adminEmailNotUnique"
+msgstr "Email de administrador no válido. Ya está en uso."

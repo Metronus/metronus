@@ -136,6 +136,8 @@ msgid "registerCompanyAdmin"
 msgstr "Admin information"
 msgid "registerCompanyAdminInfo"
 msgstr "Someone has to rule your app"
+msgid "browseFile"
+msgstr "Browse..."
 
 # Contact form
 msgid "contact_form"
@@ -681,3 +683,9 @@ msgid "timePerProjectTitle"
 msgstr "Invested Time"
 msgid "timePerProjectSubtitle"
 msgstr "Invested time per project"
+
+#General errors
+msgid "companyRegister_usernameNotUnique"
+msgstr "Invalid username. It's already taken."
+msgid "companyRegister_adminEmailNotUnique"
+msgstr "Invalid admin email. It's already taken."
