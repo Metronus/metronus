@@ -23,7 +23,7 @@ class TimeLog2Form(forms.Form):
     description = forms.CharField(label=_("description"),max_length=200,required=False,initial="",
                                   widget=forms.TextInput(attrs={'class':'form-control'}))
     workDate = forms.DateTimeField(label=_("workdate"),widget=forms.widgets.DateTimeInput(
-                attrs={'class':'form-control form_datetime','readonly':'readonly'}))
+                attrs={'class':'form-control'}))
     duration = forms.IntegerField(label=_("duration"),validators = [MinValueValidator(0)],
                                   widget=forms.NumberInput(attrs={'class':'form-control'}))
 
