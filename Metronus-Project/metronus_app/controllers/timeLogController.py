@@ -27,6 +27,12 @@ def list_all(request):
     has_permissions = True
     today = datetime.today()
     employee = get_current_employee_or_403(request)
+
+    if request.GET.get('currentDay'):
+        current_day = int(request.GET['currentDay'])
+    else:
+        current_day = today.day
+
     if request.GET.get('currentMonth'):
         current_month = int(request.GET['currentMonth'])
     else:
@@ -87,8 +93,8 @@ def list_all(request):
     month_total = sum(total)
     total.append(month_total)
 
-    return render(request, "timeLog/timeLog_list_all.html", {"my_tasks": my_tasks, "month": month, "total": total, "currentMonth": current_month, "currentYear": current_year,
-                                                             "form": form, "valid_production_units": valid_production_units, "over_day_limit": over_day_limit, 'has_permissions': has_permissions})
+    return render(request, "timeLog/timeLog_list_all.html", {"my_tasks": my_tasks, "month":month,"total":total, "currentMonth":current_month, "currentYear":current_year,  "currentDay":current_day,
+        "form":form,"valid_production_units":valid_production_units,"over_day_limit":over_day_limit,'has_permissions':has_permissions})
 
 
 def delete(request, time_log_id):
@@ -149,7 +155,8 @@ def check_produced_units(form):
     task = find_task(form.cleaned_data['task_id'])
     prod_units = form.cleaned_data['produced_units']
     # both null or empty OR both not null or empty
-    return (prod_units is not None and prod_units != "" and task.production_goal is not None and task.production_goal != "") or ((prod_units is None or prod_units == "") and (task.production_goal is None or task.production_goal == ""))
+    return (prod_units is not None and prod_units != "" and prod_units > 0 and task.production_goal is not None and task.production_goal != "") or \
+           ((prod_units is None or prod_units == "") and (task.production_goal is None or task.production_goal == ""))
 
 
 def check_permission_for_task(employee, task):

@@ -460,7 +460,7 @@ def ajax_productivity_per_task_and_date(request,username):
 
 def ajax_profit_per_date(request, employee_id):
     """
-    # url = department/ajax_profit_per_date/<department_id>
+    # url = employee/ajax_profit_per_date/<employee_id>
     # Devuelve un objeto con las fechas y las rentabilidades diarias y acumuladas
     #
 
@@ -475,7 +475,7 @@ def ajax_profit_per_date(request, employee_id):
     # Si se proporcionan pero no tienen el formato correcto se lanzará un error HTTP 400 Bad Request
 
     #Ejemplo
-    #/department/ajaxAcumProfit/1/
+    #/employee/ajaxAcumProfit/1/
 
     #devuelve lo siguiente
     #{"acumExpenses": [0, 1457.18015695298, 3071.32603956358, 4438.9463044226895, 6465.819587171869, 7912.658013249849, 9791.46399488711, 11615.32872003681, 13494.726436052111, 15102.72092592163, 16718.442225021892, 18327.93613617256, 20841.87940297534, 22953.949544558982, 24314.625169466122, 25683.231076691303, 27287.16055422502, 28760.84364198999, 31104.25163724206, 32808.89759982555, 34747.27999087272, 36150.9847742294, 37523.6098087571, 38600.05927001698, 40953.76583717958, 42469.88703139726, 44081.49130458021, 45420.3135021882, 47945.57927018715, 49368.262834629466, 51133.932803674485],

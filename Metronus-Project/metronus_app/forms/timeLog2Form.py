@@ -14,11 +14,21 @@ class MyModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
         return  obj.name
 
+class TaskModelChoiceField(ModelChoiceField):
+    """Custom Dropdown List which shows the name of the object instead of some weird or standard message"""
+
+    def label_from_instance(self, obj):
+        desc=obj.goal_description
+        if desc is None or desc =="":
+            desc=_('no_goal')
+        return  "{0} ({1})".format(obj.name,desc)
+
+
 class TimeLog2Form(forms.Form):
     """Form for TimeLog model class"""
     project_id = MyModelChoiceField(label=_("project"),queryset=None, widget=forms.Select(attrs={'class':'form-control'}))
     department_id = MyModelChoiceField(label=_("department"),queryset=None, widget=forms.Select(attrs={'class':'form-control'}))
-    task_id = MyModelChoiceField(label=_("task"),queryset=None, widget=forms.Select(attrs={'class':'form-control'}))
+    task_id = TaskModelChoiceField(label=_("task"),queryset=None, widget=forms.Select(attrs={'class':'form-control'}))
 
     description = forms.CharField(label=_("description"),max_length=200,required=False,initial="",
                                   widget=forms.TextInput(attrs={'class':'form-control'}))
@@ -30,7 +40,7 @@ class TimeLog2Form(forms.Form):
     timeLog_id = forms.IntegerField(widget=forms.HiddenInput())
 
 
-    produced_units = forms.FloatField(label=_("produced_units"),required=False,initial="",
+    produced_units = forms.FloatField(label=_("produced_units"),required=False,initial="",validators = [MinValueValidator(0)],
                                       widget=forms.NumberInput(attrs={'class':'form-control'}))
     def __init__(self, request,*args, **kwargs):
         super(TimeLog2Form, self).__init__(*args, **kwargs)
