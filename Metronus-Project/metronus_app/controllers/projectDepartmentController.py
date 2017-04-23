@@ -4,7 +4,7 @@ from metronus_app.forms.projectDepartmentForm import ProjectDepartmentForm
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.project import Project
 from metronus_app.model.department import Department
-from metronus_app.controllers.projectController import checkCompanyProjectSession
+from metronus_app.controllers.projectController import check_company_project_session
 from metronus_app.controllers.departmentController import check_company_department_session
 
 from django.http import HttpResponseRedirect
@@ -77,7 +77,7 @@ def list(request):
 
     if project_id is not None:
         project = get_object_or_404(Project, id=project_id)
-        checkCompanyProjectSession(project, admin)
+        check_company_project_session(project, admin)
         lista = ProjectDepartment.objects.filter(project_id=project)
 
     elif department_id is not None:
@@ -124,7 +124,7 @@ def create_project_department(form, admin):
     project = form.cleaned_data['project_id']
     department = form.cleaned_data['department_id']
 
-    legal_form = checkCompanyProjectSession(project, admin) and check_company_department_session(department, admin)
+    legal_form = check_company_project_session(project, admin) and check_company_department_session(department, admin)
     if not legal_form:
         raise PermissionDenied
 
@@ -163,7 +163,7 @@ def check_company_project_department(project_department, admin):
     """
     checks if the projectDepartment belongs to the specified company, and neither project nor department are deleted
     """
-    res = checkCompanyProjectSession(project_department.project_id, admin)
+    res = check_company_project_session(project_department.project_id, admin)
     res = res and check_company_department_session(project_department.department_id, admin)
 
     return res

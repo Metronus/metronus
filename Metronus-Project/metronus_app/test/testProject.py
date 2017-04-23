@@ -5,7 +5,7 @@ from django.contrib.auth.models                  import User
 from django.test import TestCase, Client
 from metronus_app.model.employee         import Employee
 from django.core.exceptions                      import ObjectDoesNotExist, PermissionDenied
-from metronus_app.controllers.projectController import checkCompanyProject
+from metronus_app.controllers.projectController import check_company_project
 class ProjectTestCase(TestCase):
 	"""This class provides a test case for project management"""
 	def setUp(self):
@@ -224,7 +224,7 @@ class ProjectTestCase(TestCase):
         """
 		project = Project.objects.get(name="pro1")
 		company = Company.objects.get(cif="123")
-		self.assertTrue(checkCompanyProject(project, company))
+		self.assertTrue(check_company_project(project, company))
 
 	def test_check_not_valid_company_project(self):
 		"""
@@ -232,4 +232,4 @@ class ProjectTestCase(TestCase):
         """
 		project = Project.objects.get(name="pro1")
 		company = Company.objects.get(cif="456")
-		self.assertRaises(PermissionDenied, checkCompanyProject, project, company)
+		self.assertRaises(PermissionDenied, check_company_project, project, company)
