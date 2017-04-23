@@ -1,25 +1,29 @@
-from django.contrib.auth.models                       import User
-from django.test                                      import TestCase, Client
-from django.core.exceptions                           import ObjectDoesNotExist, PermissionDenied
+from django.contrib.auth.models import User
+from django.test import TestCase, Client
+from django.core.exceptions import ObjectDoesNotExist
 
-from metronus_app.model.employee                      import Employee
-from metronus_app.model.projectDepartment             import ProjectDepartment
+from metronus_app.model.employee import Employee
+from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
-from metronus_app.model.task                          import Task
-from metronus_app.model.timeLog                       import TimeLog
-from metronus_app.model.project                       import Project
-from metronus_app.model.company                       import Company
-from metronus_app.model.role                          import Role
-from metronus_app.model.administrator                 import Administrator
-from metronus_app.model.department                    import Department
+from metronus_app.model.task import Task
+from metronus_app.model.timeLog import TimeLog
+from metronus_app.model.project import Project
+from metronus_app.model.company import Company
+from metronus_app.model.role import Role
+from metronus_app.model.administrator import Administrator
+from metronus_app.model.department import Department
 
-import string, random, json
+import string
+import random
+import json
+
 
 def ranstr():
     """Returns a 10-character random string"""
     return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
 
-### Son herramientas sorpresa que nos ayudarán más tarde
+
+# Son herramientas sorpresa que nos ayudarán más tarde
 
 def checkJsonMetricsAreEqual(self, response_string, data):
     """
@@ -99,8 +103,8 @@ def createTimelogInTask(task, duration, date, employee = None):
         employee_id = Employee.objects.get(identifier="emp01") if employee is None else employee
     )
 
-################################## Party hard a partir de aquí ##################################
 
+# ################################# Party hard a partir de aquí ##################################
 class DepartmentMetricsTestCase(TestCase):
     """This class provides a test case for accessing department-related metrics"""
     def setUp(self):
@@ -131,7 +135,8 @@ class DepartmentMetricsTestCase(TestCase):
             last_name="Pérez"
         )
 
-        admin = Administrator.objects.create(
+        # Admin
+        Administrator.objects.create(
             user=admin_user,
             user_type="A",
             identifier="adm01",

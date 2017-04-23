@@ -1,5 +1,4 @@
 from metronus_app.model.company import Company
-
 from django.test import TestCase
 
 
@@ -16,6 +15,5 @@ class CompanyTestCase(TestCase):
             short_name="cosa",
             email="company1@gmail.com",
             phone="123456789")
-        count2=Company.objects.count()
+        count2 = Company.objects.count()
         self.assertTrue(count1+1, count2)
-
