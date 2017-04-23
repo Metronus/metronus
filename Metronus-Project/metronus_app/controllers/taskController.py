@@ -1,27 +1,23 @@
-from django.shortcuts                                   import render, get_object_or_404
-from django.http                                        import HttpResponseRedirect, HttpResponseBadRequest, JsonResponse, HttpResponse
-from django.core.exceptions                             import ObjectDoesNotExist, PermissionDenied
-from django.contrib.auth.decorators                     import login_required
-from django.db.models                                   import Sum, F, FloatField
-from django.core                                        import serializers
-from django.utils.dateparse                             import parse_datetime
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponseRedirect, HttpResponseBadRequest, JsonResponse, HttpResponse
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.contrib.auth.decorators import login_required
+from django.db.models import Sum, F, FloatField
+from django.core import serializers
+from django.utils.dateparse import parse_datetime
 
-from metronus_app.forms.taskForm                        import TaskForm
-from metronus_app.model.task                            import Task
-from metronus_app.common_utils                          import get_current_admin_or_403,get_current_employee_or_403
-from metronus_app.model.administrator                   import Administrator
-from metronus_app.model.actor                           import Actor
-from metronus_app.model.project                         import Project
-from metronus_app.model.timeLog                         import TimeLog
-from metronus_app.model.employee                        import Employee
-from metronus_app.model.department                      import Department
-from metronus_app.model.goalEvolution                   import GoalEvolution
-from metronus_app.model.projectDepartment               import ProjectDepartment
-from metronus_app.model.projectDepartmentEmployeeRole   import ProjectDepartmentEmployeeRole
+from metronus_app.forms.taskForm import TaskForm
+from metronus_app.model.task import Task
+from metronus_app.model.actor import Actor
+from metronus_app.model.project import Project
+from metronus_app.model.timeLog import TimeLog
+from metronus_app.model.employee import Employee
+from metronus_app.model.department import Department
+from metronus_app.model.goalEvolution import GoalEvolution
+from metronus_app.model.projectDepartment import ProjectDepartment
+from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 
-from populate_database                                  import basicLoad
-
-from datetime                                           import date, timedelta, datetime
+from datetime import date, timedelta, datetime
 
 import re
 import calendar
@@ -42,8 +38,8 @@ def create(request):
     template:
     task_form.html
     """
-     # Check that the user is logged in
-    actor=checkTask(None,request)
+    # Check that the user is logged in
+    actor = check_task(None, request)
     errors = []
 
     # if this is a POST request we need to process the form data
@@ -54,43 +50,43 @@ def create(request):
 
         if form.is_valid():
             # process the data in form.cleaned_data as required
-            if not checkGoal(form):
+            if not check_goal(form):
                 errors.append('task_creation_invalid_goal')
-            if not checkPrice(form):
+            if not check_price(form):
                 errors.append('task_creation_invalid_price')
             
-            pname=form.cleaned_data['name']
-            ppro=form.cleaned_data['project_id']
-            pdep=form.cleaned_data['department_id']
-            pdtuple=find_tuple(ppro.id,pdep.id,actor)
+            pname = form.cleaned_data['name']
+            ppro = form.cleaned_data['project_id']
+            pdep = form.cleaned_data['department_id']
+            pdtuple = find_tuple(ppro.id, pdep.id, actor)
             if pdtuple is None:
                 errors.append('task_creation_project_department_not_related')
             else:
-                pro=find_name(pname,pdtuple)
+                pro = find_name(pname,pdtuple)
                 if pro is not None and pro.active:
                     errors.append('task_creation_repeated_name')
 
             if not errors:
                 if pro is not None:
                     if not pro.active:
-                        checkTask(pro,request)
-                        pro.active=True
+                        check_task(pro, request)
+                        pro.active = True
                         pro.save()
                         return HttpResponseRedirect('/task/list')
                 else:
-                    actor=checkTask(pro,request)
-                    createTask(form,pdtuple,actor)
+                    actor = check_task(pro, request)
+                    create_task(form, pdtuple, actor)
                     return HttpResponseRedirect('/task/list')
                 
     # if a GET (or any other method) we'll create a blank form
     else:
         form = TaskForm()
-    coll=find_collections(request)
-    return render(request, 'task_form.html', {'form': form,'errors':errors,
-        "departments":coll["departments"],"projects":coll["projects"]})
+    coll = find_collections(request)
+    return render(request, 'task_form.html', {'form': form, 'errors': errors,
+                                              "departments": coll["departments"], "projects": coll["projects"]})
 
 
-def createAsync(request):
+def create_async(request):
     """
     parameters/returns:
     form: el formulario con los datos de la tarea
@@ -108,12 +104,12 @@ def createAsync(request):
     template:
     task_form.html
     """
-     # Check that the user is logged in
-    actor=checkTask(None,request)
+    # Check that the user is logged in
+    actor = check_task(None, request)
     
-    errors=[]
+    errors = []
     data = {
-        'success':True
+        'success': True
     }
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -123,40 +119,42 @@ def createAsync(request):
 
         if form.is_valid():
             # process the data in form.cleaned_data as required
-            if not checkGoal(form):
+            if not check_goal(form):
                 errors.append('task_creation_invalid_goal')
-            if not checkPrice(form):
+            if not check_price(form):
                 errors.append('task_creation_invalid_price')
             
-            pname=form.cleaned_data['name']
-            ppro=form.cleaned_data['project_id']
-            pdep=form.cleaned_data['department_id']
-            pdtuple=find_tuple(ppro.id,pdep.id,actor)
+            pname = form.cleaned_data['name']
+            ppro = form.cleaned_data['project_id']
+            pdep = form.cleaned_data['department_id']
+            pdtuple = find_tuple(ppro.id, pdep.id, actor)
             if pdtuple is None:
                 errors.append('task_creation_project_department_not_related')
             else:
-                pro=find_name(pname,pdtuple)
+                pro = find_name(pname,pdtuple)
                 if pro is not None and pro.active:
                     errors.append('task_creation_repeated_name')
 
             if not errors:
                 if pro is not None:
                     if not pro.active:
-                        checkTask(pro,request)
-                        pro.active=True
+                        check_task(pro, request)
+                        pro.active = True
                         pro.save()
                         return JsonResponse(data)
                 else:
-                    actor=checkTask(pro,request)
-                    createTask(form,pdtuple,actor)
+                    actor = check_task(pro, request)
+                    create_task(form, pdtuple, actor)
                     return JsonResponse(data)
     # if a GET (or any other method) we'll create a blank form
     else:
         return HttpResponseRedirect('/department/create')
-    data['success']=False
-    data['errors']=errors
+    data['success'] = False
+    data['errors'] = errors
 
     return JsonResponse(data)
+
+
 def form_projects(request):
     """
     parameters:
@@ -166,6 +164,7 @@ def form_projects(request):
     """
     response = serializers.serialize("json", find_projects(request))
     return HttpResponse(response, content_type='application/json')
+
 
 def form_departments(request):
     """
@@ -177,6 +176,7 @@ def form_departments(request):
     response = serializers.serialize("json", find_departments(request))
     return HttpResponse(response, content_type='application/json')
 
+
 def list(request):
     """
     returns:
@@ -185,9 +185,10 @@ def list(request):
     template:
     task_list.html
     """
-     # Check that the user is logged in
-    tasks=checkRoleForList(request)
+    # Check that the user is logged in
+    tasks = check_role_for_list(request)
     return render(request, "task_list.html", {"tasks": tasks})
+
 
 def view(request,task_id):
     """
@@ -204,13 +205,14 @@ def view(request,task_id):
     """
 
     task = get_object_or_404(Task, pk=task_id)
-    checkTask(task, request)
+    check_task(task, request)
     goal_evolution = GoalEvolution.objects.filter(task_id=task.id)
     employees = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__task=task.id).distinct()
   
     return render(request, "task_view.html", {"task": task, "goal_evolution": goal_evolution, "employees": employees})
 
-def edit(request,task_id):
+
+def edit(request, task_id):
     """
     parameters/returns:
     form: el formulario con los datos de la tarea
@@ -226,10 +228,10 @@ def edit(request,task_id):
     template:
     task_form.html
     """
-     # Check that the user is logged in
-    actor=checkTask(None,request)
+    # Check that the user is logged in
+    actor = check_task(None, request)
 
-    errors=[]
+    errors = []
     
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -238,25 +240,23 @@ def edit(request,task_id):
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
-            if not checkGoal(form):
+            if not check_goal(form):
                 errors.append('task_creation_invalid_goal')
-            if not checkPrice(form):
+            if not check_price(form):
                 errors.append('task_creation_invalid_price')
 
-            
-            task=get_object_or_404(Task,pk=form.cleaned_data['task_id'])
-            checkTask(task,request)
-            #find tasks with the same name
-            pro=Task.objects.filter(name=form.cleaned_data['name'],projectDepartment_id=task.projectDepartment_id).first()
+            task = get_object_or_404(Task, pk=form.cleaned_data['task_id'])
+            check_task(task, request)
+            # find tasks with the same name
+            pro = Task.objects.filter(name=form.cleaned_data['name'], projectDepartment_id=task.projectDepartment_id).first()
 
-            #pro does not exists or it's the same
-            if pro is not None and pro.id!=task.id and pro.active:
+            # pro does not exists or it's the same
+            if pro is not None and pro.id != task.id and pro.active:
                 errors.append('task_creation_repeated_name')
             
             if not errors:
-                updateTask(task,form,actor)
+                update_task(task, form, actor)
                 return HttpResponseRedirect('/task/list')
-
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -269,10 +269,11 @@ def edit(request,task_id):
                 "department_id":task.projectDepartment_id.department_id,
                 "price_per_unit":task.price_per_unit if task.price_per_unit is not None else "",
                 "price_per_hour":task.price_per_hour if task.price_per_hour is not None else ""})
-    #The project
-    coll=find_collections(request)
-    return render(request, 'task_form.html', {'form': form,"errors":errors,
-        "departments":coll["departments"],"projects":coll["projects"]})
+    # The project
+    coll = find_collections(request)
+    return render(request, 'task_form.html', {'form': form, "errors": errors,
+                                              "departments": coll["departments"], "projects": coll["projects"]})
+
 
 def delete(request,task_id):
     """
@@ -285,15 +286,15 @@ def delete(request,task_id):
     template:
     task_list.html
     """
-     # Check that the user is logged in
-    task=get_object_or_404(Task,pk=task_id,active=True)
-    checkTask(task,request)
-    deleteTask(task)
+    # Check that the user is logged in
+    task = get_object_or_404(Task, pk=task_id, active=True)
+    check_task(task, request)
+    delete_task(task)
 
     return HttpResponseRedirect('/task/list')
 
-#Métodos para métricas
 
+# Métodos para métricas
 @login_required
 def ajax_productivity_per_task(request):
     """
@@ -315,7 +316,7 @@ def ajax_productivity_per_task(request):
     if not request.user.is_authenticated():
         raise PermissionDenied
     try:
-        actor= Actor.objects.get(user=request.user)
+        Actor.objects.get(user=request.user)
     except ObjectDoesNotExist:
         raise PermissionDenied
         
@@ -450,27 +451,28 @@ def ajax_profit_per_date(request, task_id):
     return JsonResponse(data)
 
 
-##########################################################################################################################################
-#Auxiliar methods, containing the operation logic
-##########################################################################################################################################
+# #########################################################################################################################################
+# Auxiliar methods, containing the operation logic
+# #########################################################################################################################################
 
-def createTask(form, project_department,actor):
+def create_task(form, project_department, actor):
     """Creates a task supposing the data in the form is ok"""
-    fname=form.cleaned_data['name']
-    fdescription=form.cleaned_data['description']
-    fgoal=form.cleaned_data['production_goal']
-    fgoaldescription=form.cleaned_data['goal_description']
-    fperunit=form.cleaned_data['price_per_unit']
-    fperhour=form.cleaned_data['price_per_hour']
+    fname = form.cleaned_data['name']
+    fdescription = form.cleaned_data['description']
+    fgoal = form.cleaned_data['production_goal']
+    fgoaldescription = form.cleaned_data['goal_description']
+    fperunit = form.cleaned_data['price_per_unit']
+    fperhour = form.cleaned_data['price_per_hour']
 
-    task=Task.objects.create(name=fname,description=fdescription,
-        projectDepartment_id=project_department,actor_id=actor,
-        production_goal=fgoal,goal_description=fgoaldescription,
-        price_per_unit=fperunit,price_per_hour=fperhour)
+    Task.objects.create(name=fname, description=fdescription,
+                        projectDepartment_id=project_department, actor_id=actor,
+                        production_goal=fgoal, goal_description=fgoaldescription,
+                        price_per_unit=fperunit, price_per_hour=fperhour)
 
-def updateTask(task,form,actor):
+
+def update_task(task, form, actor):
     """Updates a task and saves the data in the log"""
-    newGoalEntry(task,form,actor)
+    new_goal_entry(task, form, actor)
     task.name = form.cleaned_data['name']
     task.description = form.cleaned_data['description']
     task.production_goal = form.cleaned_data['production_goal']
@@ -479,88 +481,92 @@ def updateTask(task,form,actor):
     task.price_per_hour=form.cleaned_data['price_per_hour']
     task.save()
 
-def newGoalEntry(task,form,actor):
+
+def new_goal_entry(task, form, actor):
     """
     Creates a new entry in the goal production if the parameters were checked
     """
-    fgoal=form.cleaned_data['production_goal']
-    fgoaldescription=form.cleaned_data['goal_description']
-    fperunit=form.cleaned_data['price_per_unit']
-    fperhour=form.cleaned_data['price_per_hour']
-    if fgoal!=task.production_goal or fgoaldescription!=task.goal_description or \
-        fperhour!=task.price_per_hour or fperunit!=task.price_per_unit:
-        GoalEvolution.objects.create(task_id  = task,
-            actor_id = actor,
-            production_goal=task.production_goal,
-            goal_description=task.goal_description,
-            price_per_unit=task.price_per_unit,
-            price_per_hour=task.price_per_hour)
+    fgoal = form.cleaned_data['production_goal']
+    fgoaldescription = form.cleaned_data['goal_description']
+    fperunit = form.cleaned_data['price_per_unit']
+    fperhour = form.cleaned_data['price_per_hour']
+    if fgoal != task.production_goal or fgoaldescription != task.goal_description or fperhour != task.price_per_hour or fperunit != task.price_per_unit:
+        GoalEvolution.objects.create(task_id=task,
+                                     actor_id=actor,
+                                     production_goal=task.production_goal,
+                                     goal_description=task.goal_description,
+                                     price_per_unit=task.price_per_unit,
+                                     price_per_hour=task.price_per_hour)
 
-def checkGoal(form):
+
+def check_goal(form):
     """
     This returns true if both goal and description are empty or both are not empty
     """
-    fgoal=form.cleaned_data['production_goal']
-    fgoaldescription=form.cleaned_data['goal_description']
-    return (fgoal!="" and fgoaldescription!="") or (not fgoal and not fgoaldescription)
+    fgoal = form.cleaned_data['production_goal']
+    fgoaldescription = form.cleaned_data['goal_description']
+    return (fgoal != "" and fgoaldescription != "") or (not fgoal and not fgoaldescription)
 
-def checkPrice(form):
+
+def check_price(form):
     """
     This returns true if the price field is valid
     This means only per_unit or per_hour must be filled 
     and only if there is a valid goal description for the first field, or no goal for the second
     """
-    fgoal=form.cleaned_data['production_goal']
-    fgoaldescription=form.cleaned_data['goal_description']
-    fperunit=form.cleaned_data['price_per_unit']
-    fperhour=form.cleaned_data['price_per_hour']
-    return (fgoaldescription is not None and fgoaldescription!="" and  fperhour is None and fperunit is not None and fperunit>0 ) or \
-        ( (fgoaldescription is None or fgoaldescription=="") and fperunit is None and fperhour is not None and fperhour>0)
+    # fgoal = form.cleaned_data['production_goal']
+    fgoaldescription = form.cleaned_data['goal_description']
+    fperunit = form.cleaned_data['price_per_unit']
+    fperhour = form.cleaned_data['price_per_hour']
+    return (fgoaldescription is not None and fgoaldescription != "" and fperhour is None and fperunit is not None and fperunit > 0) or \
+        ((fgoaldescription is None or fgoaldescription == "") and fperunit is None and fperhour is not None and fperhour > 0)
 
 
-def deleteTask(task):
+def delete_task(task):
     """Deletes a task"""
-    task.active=False
+    task.active = False
     task.save()
 
-def checkRoleForList(request):
+
+def check_role_for_list(request):
     """
     returns the list depending on the actor
     """
-    actor=None
     if not request.user.is_authenticated():
         raise PermissionDenied
     try:
-        actor= Actor.objects.get(user=request.user)
+        actor = Actor.objects.get(user=request.user)
     except ObjectDoesNotExist:
         raise PermissionDenied
 
-    if actor.user_type!='A':
-        #not an admin
-        is_team_manager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                    role_id__tier= 30)
-        res=is_team_manager.count()>0
+    if actor.user_type != 'A':
+        # not an admin
+        is_team_manager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier= 30)
+        res = is_team_manager.count() > 0
 
         if res:
-            #is manager
-            task=Task.objects.filter(actor_id__company_id=actor.company_id,active=True).distinct()
+            # is manager
+            task = Task.objects.filter(actor_id__company_id=actor.company_id, active=True).distinct()
         else:
-            #not a manager
-            task=Task.objects.filter(actor_id__company_id=actor.company_id,projectDepartment_id__projectdepartmentemployeerole__employee_id=actor,active=True).distinct()
+            # not a manager
+            task = Task.objects.filter(actor_id__company_id=actor.company_id,
+                                       projectDepartment_id__projectdepartmentemployeerole__employee_id=actor,
+                                       active=True).distinct()
     else:
-        #is admin
-        task=Task.objects.filter(actor_id__company_id=actor.company_id,active=True).distinct()
+        # is admin
+        task = Task.objects.filter(actor_id__company_id=actor.company_id, active=True).distinct()
     return task
-def checkTask(task,request):
+
+
+def check_task(task, request):
     """
     checks if the task belongs to the logged actor with appropiate roles
     Admin, manager or dep/proj manager
     """
-    actor=None
     if not request.user.is_authenticated():
         raise PermissionDenied
     try:
-        actor= Actor.objects.get(user=request.user)
+        actor = Actor.objects.get(user=request.user)
     except ObjectDoesNotExist:
         raise PermissionDenied
 
@@ -568,182 +574,173 @@ def checkTask(task,request):
     if task is not None and task.actor_id.company_id != actor.company_id:
         raise PermissionDenied
 
-    if actor.user_type!='A':
-        is_team_manager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                    role_id__tier= 30)
-        res=is_team_manager.count()>0
+    if actor.user_type != 'A':
+        is_team_manager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=30)
+        res = is_team_manager.count() > 0
 
         if not res:
-            roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                    role_id__tier__in=[50,40,20])
-            res=roles.count()>0
+            roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__in=[50, 40, 20])
+            res = roles.count() > 0
         if not res:
             raise PermissionDenied
 
     return actor
-def find_name(pname,projectDepartment):
+
+
+def find_name(pname, project_department):
     """
     Returns whether there is already a task with the tuple project-department
     """
-    return Task.objects.filter(name=pname,projectDepartment_id=projectDepartment).first()
+    return Task.objects.filter(name=pname, projectDepartment_id=project_department).first()
 
-def find_tuple(project_id,department_id,actor):
+
+def find_tuple(project_id, department_id, actor):
     """
     Returns a tuple project-department
     """
-    project=get_object_or_404(Project,pk=project_id)
-    department=get_object_or_404(Department,pk=department_id)
+    project = get_object_or_404(Project, pk=project_id)
+    department = get_object_or_404(Department, pk=department_id)
 
-    if project.company_id!=department.company_id or  project.company_id!=actor.company_id :
+    if project.company_id != department.company_id or project.company_id != actor.company_id:
         raise PermissionDenied
-    return ProjectDepartment.objects.filter(project_id=project,department_id=department).first()
+    return ProjectDepartment.objects.filter(project_id=project, department_id=department).first()
 
 
 def find_collections(request):
     """
     Gets the projects and departments the logged user can create tasks for, depending to their roles
     """
-    actor=None
     if not request.user.is_authenticated():
         raise PermissionDenied
     try:
-        actor= Actor.objects.get(user=request.user)
+        actor = Actor.objects.get(user=request.user)
     except ObjectDoesNotExist:
         raise PermissionDenied
 
-    if actor.user_type!='A':
-        #not an admin
-        is_team_manager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                    role_id__tier= 30)
-        res=is_team_manager.count()>0
+    if actor.user_type != 'A':
+        # not an admin
+        is_team_manager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=30)
+        res = is_team_manager.count()>0
 
         if res:
-            #is manager
-            proyectos=Project.objects.filter(company_id=actor.company_id,deleted=False)
-            departamentos=Department.objects.filter(company_id=actor.company_id,active=True)
+            # is manager
+            proyectos = Project.objects.filter(company_id=actor.company_id, deleted=False)
+            departamentos = Department.objects.filter(company_id=actor.company_id, active=True)
         else:
-            #not a manager
-            roles_pro = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                     role_id__tier__gte=40)
-            roles_dep=ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                     role_id__tier=20)
+            # not a manager
+            roles_pro = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=40)
+            roles_dep = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=20)
 
-            if  roles_pro.count()>0:
-                #you're a project manager. Loading your projects
-                proyectos=Project.objects.filter(company_id=actor.company_id,deleted=False,
-                    projectdepartment__projectdepartmentemployeerole__employee_id=actor).distinct()
-                departamentos=Department.objects.filter(company_id=actor.company_id,active=True,
-                    projectdepartment__projectdepartmentemployeerole__employee_id=actor).distinct()
-            elif roles_dep.count()>0:
-                #you're a department coordinator. loading your departments
-                proyectos=Project.objects.filter(company_id=actor.company_id,deleted=False,
-                    projectdepartment__projectdepartmentemployeerole__employee_id=actor).distinct()
-                departamentos=Department.objects.filter(company_id=actor.company_id,active=True,
-                    projectdepartment__projectdepartmentemployeerole__employee_id=actor).distinct()
+            if roles_pro.count() > 0:
+                # you're a project manager. Loading your projects
+                proyectos = Project.objects.filter(company_id=actor.company_id, deleted=False,
+                                                   projectdepartment__projectdepartmentemployeerole__employee_id=actor).distinct()
+                departamentos = Department.objects.filter(company_id=actor.company_id, active=True,
+                                                          projectdepartment__projectdepartmentemployeerole__employee_id=actor).distinct()
+            elif roles_dep.count() > 0:
+                # you're a department coordinator. loading your departments
+                proyectos = Project.objects.filter(company_id=actor.company_id, deleted=False,
+                                                   projectdepartment__projectdepartmentemployeerole__employee_id=actor).distinct()
+                departamentos=Department.objects.filter(company_id=actor.company_id, active=True,
+                                                        projectdepartment__projectdepartmentemployeerole__employee_id=actor).distinct()
             else:
-                #not any of this? get outta here!!
+                # not any of this? get outta here!!
                 raise PermissionDenied
     else:
-        #is admin
-        proyectos=Project.objects.filter(company_id=actor.company_id,deleted=False)
-        departamentos=Department.objects.filter(company_id=actor.company_id,active=True)
-    return {"departments":departamentos,"projects":proyectos}
+        # is admin
+        proyectos = Project.objects.filter(company_id=actor.company_id, deleted=False)
+        departamentos = Department.objects.filter(company_id=actor.company_id, active=True)
+    return {"departments": departamentos, "projects": proyectos}
 
 
 def find_departments(request):
     """
     Gets the  departments the logged user can create tasks for a project, depending to their roles
     """
-    project_id=request.GET.get("project_id")
-    actor=None
+    project_id = request.GET.get("project_id")
     if not request.user.is_authenticated():
         raise PermissionDenied
     try:
-        actor= Actor.objects.get(user=request.user)
+        actor = Actor.objects.get(user=request.user)
     except ObjectDoesNotExist:
         raise PermissionDenied
 
-    if actor.user_type!='A':
-        #not an admin
-        is_team_manager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                    role_id__tier= 30)
-        res=is_team_manager.count()>0
+    if actor.user_type != 'A':
+        # not an admin
+        is_team_manager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=30)
+        res = is_team_manager.count() > 0
 
         if res:
-            #is manager
-            departamentos=Department.objects.filter(company_id=actor.company_id,active=True)
+            # is manager
+            departamentos=Department.objects.filter(company_id=actor.company_id, active=True)
         else:
-            #not a manager
-            roles_pro = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                     role_id__tier__gte=40)
-            roles_dep=ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                     role_id__tier=20)
+            # not a manager
+            roles_pro = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=40)
+            roles_dep = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=20)
 
-            if  roles_pro.count()>0:
-                #you're a project manager. Loading your projects
-                departamentos=Department.objects.filter(company_id=actor.company_id,active=True,
-                    projectdepartment__projectdepartmentemployeerole__employee_id=actor,projectdepartment__project_id_id=project_id).distinct()
-            elif roles_dep.count()>0:
-                #you're a department coordinator. loading your departments
-                departamentos=Department.objects.filter(company_id=actor.company_id,active=True,
-                    projectdepartment__projectdepartmentemployeerole__employee_id=actor,projectdepartment__project_id_id=project_id).distinct()
+            if roles_pro.count() > 0:
+                # you're a project manager. Loading your projects
+                departamentos = Department.objects.filter(company_id=actor.company_id, active=True,
+                                                          projectdepartment__projectdepartmentemployeerole__employee_id=actor, projectdepartment__project_id_id=project_id).distinct()
+            elif roles_dep.count() > 0:
+                # you're a department coordinator. loading your departments
+                departamentos = Department.objects.filter(company_id=actor.company_id, active=True,
+                                                          projectdepartment__projectdepartmentemployeerole__employee_id=actor, projectdepartment__project_id_id=project_id).distinct()
             else:
-                #not any of this? get outta here!!
+                # not any of this? get outta here!!
                 raise PermissionDenied
     else:
-        #is admin
+        # is admin
 
-        departamentos=Department.objects.filter(company_id=actor.company_id,active=True)
+        departamentos = Department.objects.filter(company_id=actor.company_id, active=True)
     return departamentos
+
 
 def find_projects(request):
     """
     Gets the projects and departments the logged user can create tasks for a department, depending to their roles
     """
-    department_id=request.GET.get("department_id")
-    actor=None
+    department_id = request.GET.get("department_id")
+
     if not request.user.is_authenticated():
         raise PermissionDenied
     try:
-        actor= Actor.objects.get(user=request.user)
+        actor = Actor.objects.get(user=request.user)
     except ObjectDoesNotExist:
         raise PermissionDenied
 
-    if actor.user_type!='A':
-        #not an admin
-        is_team_manager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                    role_id__tier= 30)
-        res=is_team_manager.count()>0
+    if actor.user_type != 'A':
+        # not an admin
+        is_team_manager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=30)
+        res = is_team_manager.count() > 0
 
         if res:
-            #is manager
-            proyectos=Project.objects.filter(company_id=actor.company_id,deleted=False)
+            # is manager
+            proyectos = Project.objects.filter(company_id=actor.company_id,deleted=False)
 
         else:
-            #not a manager
-            roles_pro = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                     role_id__tier__gte=40)
-            roles_dep=ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                     role_id__tier=20)
+            # not a manager
+            roles_pro = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=40)
+            roles_dep = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=20)
 
-            if  roles_pro.count()>0:
-                #you're a project manager. Loading your projects
-                proyectos=Project.objects.filter(company_id=actor.company_id,deleted=False,
-                    projectdepartment__projectdepartmentemployeerole__employee_id=actor
-                    ,projectdepartment__department_id_id=department_id).distinct()
+            if roles_pro.count()>0:
+                # you're a project manager. Loading your projects
+                proyectos = Project.objects.filter(company_id=actor.company_id,deleted=False,
+                                                   projectdepartment__projectdepartmentemployeerole__employee_id=actor,
+                                                   projectdepartment__department_id_id=department_id).distinct()
 
-            elif roles_dep.count()>0:
-                #you're a department coordinator. loading your departments
-                proyectos=Project.objects.filter(company_id=actor.company_id,deleted=False,
-                    projectdepartment__projectdepartmentemployeerole__employee_id=actor
-                    ,projectdepartment__department_id_id=department_id).distinct()
+            elif roles_dep.count() > 0:
+                # you're a department coordinator. loading your departments
+                proyectos = Project.objects.filter(company_id=actor.company_id, deleted=False,
+                                                   projectdepartment__projectdepartmentemployeerole__employee_id=actor,
+                                                   projectdepartment__department_id_id=department_id).distinct()
 
             else:
-                #not any of this? get outta here!!
+                # not any of this? get outta here!!
                 raise PermissionDenied
     else:
-        #is admin
-        proyectos=Project.objects.filter(company_id=actor.company_id,deleted=False)
+        # is admin
+        proyectos = Project.objects.filter(company_id=actor.company_id, deleted=False)
 
     return proyectos
 
