@@ -23,7 +23,6 @@ def show_form(form):
 
 @register.inclusion_tag('tags/field.html')
 def show_field(field, required = True):
-    print(get_form_type(get_type(field)))
     return {'field':field, 'required': "required" if required  else "", 'type':get_form_type(get_type(field))}
 @register.inclusion_tag('tags/ajaxErrors.html')
 def show_ajax_errors():

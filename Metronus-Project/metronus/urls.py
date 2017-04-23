@@ -56,6 +56,7 @@ urlpatterns += [#i18n_patterns(
     url(r'^department/ajaxEmployeesPerTask$', departmentController.ajax_employees_per_task, name='department_employees_per_task'),
     url(r'^department/ajaxTimePerTask$', departmentController.ajax_time_per_task, name='department_time_per_task'),
     url(r'^department/ajaxProfit/(?P<department_id>\w{0,50})/$', departmentController.ajax_profit_per_date, name='department_profit_per_date'),
+
     #Task
     url(r'^task/create$', taskController.create, name='task_create'),
     url(r'^task/createAsync$', taskController.createAsync),
@@ -65,6 +66,7 @@ urlpatterns += [#i18n_patterns(
     url(r'^task/delete/(?P<task_id>\w{0,50})/$', taskController.delete, name='task_delete'),
     url(r'^task/getdepartments$', taskController.form_departments),
     url(r'^task/ajaxProdPerTask', taskController.ajax_productivity_per_task, name='productivity_per_task'),
+    url(r'^task/ajaxProfit/(?P<task_id>\w{0,50})/$', taskController.ajax_profit_per_date, name='task_profit_per_date'),
 
     #Project
     url(r'^project/list$', projectController.list, name='project_list'),
@@ -81,7 +83,7 @@ urlpatterns += [#i18n_patterns(
     #Project-Department relationship
     url(r'^projectdepartment/create$', projectDepartmentController.create, name='projectdepartment_create'),
     url(r'^projectdepartment/list$', projectDepartmentController.list, name='projectdepartment_list'),
-    #url(r'^projectdepartment/edit$', projectDepartmentController.edit, name='projectdepartment_edit'),No necesario, en un principio
+    #url(r'^projectdepartment/edit$', projectDepartmentController.edit, name='projectdepartment_edit'),No necesario, en un principio (y en un final tampoco)
     url(r'^projectdepartment/delete$', projectDepartmentController.delete, name='projectdepartment_delete'),
 
     #Employee
