@@ -113,7 +113,47 @@
                 </div>
             </div>
         </div>
+    <!-- Here comes profit graphics-->
+      <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+          <div class="x_content">
 
+            <div id="welp3" style="height:350px;"></div>
+
+            <div style="display: flex;/*!  */justify-content: space-around;">
+              <form class="form-horizontal">
+                <label for"datepickerlabel">{% trans 'datePicker' %}</label>
+                <fieldset>
+                  <div class="control-group">
+                    <div class="controls">
+                      <div class="input-prepend input-group">
+                        <span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
+                        <input type="text" style="width: 200px" name="project_profit_chart" id="project_profit_chart" class="form-control" value=""/>
+                      </div>
+                    </div>
+                  </div>
+                </fieldset>
+              </form>
+              <form class="form-horizontal">
+                <label for"datepickerlabel">{% trans 'data_output_to' %}</label>
+                <fieldset>
+                  <div class="control-group">
+                    <div class="controls">
+                      <div class="input-prepend input-group">
+                        <span class="add-on input-group-addon"><i class="glyphicon glyphicon-refresh fa fa-refresh"></i></span>
+                        
+                        <div style="display: table-cell;border-radius: 0px 3px 3px 0px; min-width: 197px" id="switch-acum-button" type="text" class="btn btn-success">{% trans 'cumulative_values' %}</div>
+                      </div>
+                    </div>
+                  </div>
+                </fieldset>
+              </form>
+            </div>
+            <br/>
+          </div>
+        </div>
+      </div>
+     <!-- Here ends profit graphics-->
 
         <!-- FIN MISILES -->
 
@@ -303,6 +343,62 @@ $(document).ready(function() {
             echartLine.setOption( fromDataBarChart( names, data ) );
         });
 
+              ///////////////////////////////////
+      // Gráfico de Gastos y Ganancias //
+      ///////////////////////////////////
+      var useAcum=false;
+      var echartLine2 = echarts.init(document.getElementById('welp3'), theme);
+      var  defaultProfitBackendData = {'dates':[],'expenses':[],'income':[],'acumExpenses':[],'acumIncome':[]};
+      $.get({
+        url: "/project/ajaxProfit/"+ {{project.id}} +"/",
+        success: function ( backendData )  {
+          defaultProfitBackendData = backendData
+          echartLine2.setOption( fromProfitData( backendData,useAcum ) );
+        }
+      })
+      //Date picker for profit
+      defaultRange = moment().startOf('month').format('MM/DD/YYYY') +' - '+ moment().endOf('month').format('MM/DD/YYYY')
+      $('input[name="project_profit_chart"]').val(defaultRange)
+
+      $('input[name="project_profit_chart"]').daterangepicker({
+        autoUpdateInput: false,
+        locale: {
+          cancelLabel: '{% trans 'default' %}',
+          applyLabel: '{% trans 'apply' %}'
+        }
+      });
+
+      $('input[name="project_profit_chart"]').on('apply.daterangepicker', function(ev, picker) {
+        $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+        $.get({
+          url:"/project/ajaxProfit/"+{{project.id}}+"/",
+          data: {
+            start_date: picker.startDate.format('YYYY-MM-DD'),
+            end_date: picker.endDate.format('YYYY-MM-DD')
+          },
+          success: function ( backendData )  {
+            defaultProfitBackendData = backendData
+            echartLine2.setOption( fromProfitData( backendData ,useAcum) );
+          }
+        })
+      });
+
+      $('input[name="project_profit_chart"]').on('cancel.daterangepicker', function(ev, picker) {
+        $(this).val(defaultRange);
+        echartLine2.setOption( fromProfitData( defaultProfitBackendData,useAcum ) );
+      });
+      var switcher= $('#switch-acum-button');
+      switcher.click(function(){
+        useAcum=!useAcum;
+        if(useAcum){
+          switcher.html("{% trans 'non_cumulative_values' %}")
+          echartLine2.setOption( fromProfitData( defaultProfitBackendData ,useAcum) );
+        } else {
+          switcher.html("{% trans 'cumulative_values' %}")
+          echartLine2.setOption( fromProfitData( defaultProfitBackendData ,useAcum) );
+        }
+      })
+
 
     });
 
@@ -392,6 +488,88 @@ function fromData (backendData, type) {
               }
               return opts;
           }
+
+    function fromProfitData (backendData,acum) {
+      dates=backendData["dates"];
+      expenses=backendData["expenses"]
+      income=backendData["income"]
+      subtext='{% trans 'notAcum' %}';
+      if(acum){
+        subtext='{% trans 'acum' %}';
+        expenses=backendData["acumExpenses"];
+        income=backendData["acumIncome"];
+      }
+      //en xAxis data pones lo que va en el eje X (en este caso las fechas)
+      //cada dato necesita una serie
+      //incomes y expenses, dos series, cada una con un campo data
+
+      return {
+        title : {
+          text: '{% trans 'pro_profit' %}',
+          subtext: subtext
+        },
+        tooltip : {
+          trigger: 'axis'
+        },
+        legend: {
+          data:['Expenses and income']
+        },
+        toolbox: {
+          show : true,
+          feature : {
+            saveAsImage : {show: true}
+          }
+        },
+        calculable : true,
+        xAxis : [
+        {
+          type : 'category',
+          show : false,
+          data : dates
+        }
+        ],
+        yAxis : [
+        {
+          type : 'value'
+        }
+        ],
+        series : [
+        {
+          name:'{% trans 'expenses' %}',
+          type:'line',
+          data: expenses,
+          markPoint : {
+            data : [
+            {type : 'max', name: 'Max'},
+            {type : 'min', name: 'Min'}
+            ]
+          },
+          markLine : {
+            data : [
+            {type : 'average', name: 'Avg'}
+            ]
+          }
+        },
+        {
+          name:'{% trans 'income' %}',
+          type:'line',
+          data: income,
+          markPoint : {
+            data : [
+            {type : 'max', name: 'Max'},
+            {type : 'min', name: 'Min'}
+            ]
+          },
+          markLine : {
+            data : [
+            {type : 'average', name: 'Avg'}
+            ]
+          }
+        }
+        ]
+      }
+
+    }
 
 
 </script>
