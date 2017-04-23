@@ -427,6 +427,8 @@ msgid "realProfit"
 msgstr "Ganancia real"
 msgid "expectedProfit"
 msgstr "Ganancia esperada"
+msgid "emp_profit"
+msgstr "Gastos e ingresos del empleado"
 
 
 #: Project
