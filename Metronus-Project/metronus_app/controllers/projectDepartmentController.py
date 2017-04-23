@@ -1,5 +1,5 @@
-from django.shortcuts import render, render_to_response, get_object_or_404
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.shortcuts import render, get_object_or_404
+from django.core.exceptions import PermissionDenied
 from metronus_app.forms.projectDepartmentForm import ProjectDepartmentForm
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.project import Project
@@ -7,8 +7,8 @@ from metronus_app.model.department import Department
 from metronus_app.controllers.projectController import checkCompanyProjectSession
 from metronus_app.controllers.departmentController import check_company_department_session
 
-from django.http                                 import HttpResponseRedirect
-from metronus_app.common_utils                   import get_current_admin_or_403
+from django.http import HttpResponseRedirect
+from metronus_app.common_utils import get_current_admin_or_403
 
 
 def create(request):
@@ -27,12 +27,15 @@ def create(request):
         form = ProjectDepartmentForm(data=request.POST, user=admin)
 
         if form.is_valid():
-            createProjectDepartment(form, admin)
-            return render(request, 'projectdepartment_create.html', {'form': ProjectDepartmentForm(user=admin), 'success': True})
+            create_project_department(form, admin)
+            return render(request, 'projectdepartment_create.html',
+                          {'form': ProjectDepartmentForm(user=admin), 'success': True})
 
-    #GET -> Create an empty form
+    # GET -> Create an empty form
     else:
-        form = ProjectDepartmentForm(initial={"project_id":0, "department_id":0, "projectDepartment_id":0}, user=admin)
+        form = ProjectDepartmentForm(initial={"project_id": 0,
+                                              "department_id": 0,
+                                              "projectDepartment_id": 0}, user=admin)
 
     return render(request, 'projectdepartment_form.html', {'form': form})
 
@@ -47,9 +50,9 @@ def delete(request):
 
     admin = get_current_admin_or_403(request)
     project_department_id = request.GET.get("projectDepartment_id")
-    projectDepartment = get_object_or_404(ProjectDepartment, id=project_department_id)
+    project_department = get_object_or_404(ProjectDepartment, id=project_department_id)
 
-    deleteProjectDepartment(projectDepartment, admin)
+    delete_project_department(project_department, admin)
 
     return HttpResponseRedirect('/projectdepartment/list/')
 
@@ -83,7 +86,7 @@ def list(request):
         lista = ProjectDepartment.objects.filter(department_id=department)
 
     else:
-        lista = ProjectDepartment.objects.filter(project_id__company_id = admin.company_id)
+        lista = ProjectDepartment.objects.filter(project_id__company_id=admin.company_id)
 
     return render(request, "projectdepartment_list.html", {"projectDepartments": lista})
 
@@ -97,72 +100,70 @@ def edit(request):
         form = ProjectDepartmentForm(data=request.POST, user=admin)
 
         if form.is_valid():
-            projectDepartment=ProjectDepartment.objects.get(pk=form.cleaned_data['projectDepartment_id'])
+            project_department = ProjectDepartment.objects.get(pk=form.cleaned_data['projectDepartment_id'])
 
-            updateProjectDepartment(projectDepartment,form,admin)
+            update_project_department(project_department, form, admin)
 
             return HttpResponseRedirect('/projectdepartment/list')
 
-    #GET -> Create an empty form
+    # GET -> Create an empty form
     else:
-        projectDepartment=request.GET.get('projectDepartment_id')
-        projectDepartment=get_object_or_404(ProjectDepartment, id=projectDepartment)
+        project_department = request.GET.get('projectDepartment_id')
+        project_department = get_object_or_404(ProjectDepartment, id=project_department)
         form = ProjectDepartmentForm(
-            initial={"department_id":projectDepartment.department_id,
-                     "project_id":projectDepartment.project_id},
-                     user=admin)
+            initial={"department_id": project_department.department_id,
+                     "project_id": project_department.project_id}, user=admin)
 
     return render(request, 'projectdepartment_form.html', {'form': form})
 
 
-#Auxiliar methods, containing the operation logic
+# Auxiliar methods, containing the operation logic
 
-def createProjectDepartment(form, admin):
+def create_project_department(form, admin):
     """ Creates a link between a project and a department so that tasks can be created for them"""
-    project=form.cleaned_data['project_id']
+    project = form.cleaned_data['project_id']
     department = form.cleaned_data['department_id']
 
-    legalForm = checkCompanyProjectSession(project, admin) and check_company_department_session(department, admin)
-    if not legalForm:
+    legal_form = checkCompanyProjectSession(project, admin) and check_company_department_session(department, admin)
+    if not legal_form:
         raise PermissionDenied
 
-    return ProjectDepartment.objects.create(project_id = project, department_id = department)
+    return ProjectDepartment.objects.create(project_id=project, department_id=department)
 
 
-
-def updateProjectDepartment(projectDepartment, form, admin):
+def update_project_department(project_department, form, admin):
     """Se permitirán los updates de projectDepartment? -> Nope"""
-    projectDepartment.project_id = form.cleaned_data['project_id']
-    projectDepartment.department_id = form.cleaned_data['department_id']
+    project_department.project_id = form.cleaned_data['project_id']
+    project_department.department_id = form.cleaned_data['department_id']
 
-    if not checkCompanyProjectDepartmentSession(projectDepartment, admin):
+    if not check_company_project_department_session(project_department, admin):
         raise PermissionDenied
 
-    return projectDepartment.save()
+    return project_department.save()
 
 
-def deleteProjectDepartment(projectDepartment, admin):
+def delete_project_department(project_department, admin):
     """Deletes the relationship between a project and a department"""
-    if not checkCompanyProjectDepartmentSession(projectDepartment, admin):
+    if not check_company_project_department_session(project_department, admin):
         raise PermissionDenied
 
-    projectDepartment.delete()
+    project_department.delete()
 
 
-#Utility methods, mostly checkers
+# Utility methods, mostly checkers
 
-def checkCompanyProjectDepartmentSession(projectDepartment, admin):
+def check_company_project_department_session(project_department, admin):
     """
     checks if the projectDepartment belongs to the logged company, and neither project nor department are deleted
     """
-    return checkCompanyProjectDepartment(projectDepartment,admin)
+    return check_company_project_department(project_department, admin)
 
 
-def checkCompanyProjectDepartment(projectDepartment, admin):
+def check_company_project_department(project_department, admin):
     """
     checks if the projectDepartment belongs to the specified company, and neither project nor department are deleted
     """
-    res = checkCompanyProjectSession(projectDepartment.project_id, admin)
-    res = res and check_company_department_session(projectDepartment.department_id, admin)
+    res = checkCompanyProjectSession(project_department.project_id, admin)
+    res = res and check_company_department_session(project_department.department_id, admin)
 
     return res

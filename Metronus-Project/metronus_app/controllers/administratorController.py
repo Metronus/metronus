@@ -66,28 +66,27 @@ def edit(request, username):
 
     return render(request, 'company/administrator_edit.html', {'form': form})
 
-'''
-def view(request, username):
-    """
-    url = administrator/view/<username>
+#
+# def view(request, username):
+#    """
+#    url = administrator/view/<username>
+#
+#    parameters/returns:
+#    administrator: datos del administrador
+#
+#    template: company_view.html
+#    """
+#
+#    # Check that the user is logged in and it's an administrator
+#    admin = get_current_admin_or_403(request)
+#
+#    admin2 = get_object_or_404(Administrator, username=username)
+#
+#   # Check that the admin has permission to view that company
+#    if admin2.company_id != admin.company_id:
+#        raise PermissionDenied
 
-    parameters/returns:
-    administrator: datos del administrador
-
-    template: company_view.html
-    """
-
-    # Check that the user is logged in and it's an administrator
-    admin = get_current_admin_or_403(request)
-
-    admin2 = get_object_or_404(Administrator, username=username)
-
-    # Check that the admin has permission to view that company
-    if admin2.company_id != admin.company_id:
-        raise PermissionDenied
-
-    return render(request, 'administrator_view.html', {'admin': admin2})
-'''
+#    return render(request, 'administrator_view.html', {'admin': admin2})
 
 
 def delete(request, username):

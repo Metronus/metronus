@@ -23,8 +23,6 @@ from django.contrib.auth.views import deprecate_current_app
 from metronus_app.model.company import Company
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import render
-from metronus_app.common_utils import check_company_contains_actor
 
 
 def _get_login_redirect_url(request, redirect_to):
@@ -67,7 +65,7 @@ def login(request, template_name='registration/login.html',
         form = authentication_form(request, data=request.POST)
         if form.is_valid():
 
-            #if company is not None:
+            # if company is not None:
             #    check_company_contains_actor(company, form.get_user())
             user = form.get_user()
 
@@ -78,7 +76,7 @@ def login(request, template_name='registration/login.html',
                 return HttpResponseRedirect("/timeLog/list_all")
             else:
                 return HttpResponseRedirect("/app/")
-            #return HttpResponseRedirect(_get_login_redirect_url(request, redirect_to))
+            # return HttpResponseRedirect(_get_login_redirect_url(request, redirect_to))
     else:
         form = authentication_form(request)
 
