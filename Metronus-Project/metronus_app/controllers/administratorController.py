@@ -34,7 +34,7 @@ def edit(request, username):
         # Process the received form
         
         form = AdministratorForm(request.POST)
-        if form.is_valid() and checkPasswords(form):
+        if form.is_valid() and check_passwords(form):
             if check_image(form, 'photo'):
             
                 # Update employee data
@@ -58,7 +58,8 @@ def edit(request, username):
 
                 return HttpResponseRedirect('/company/view/')
             else:
-                return render(request, 'company/administrator_edit.html', {'form': form, 'errors': ['error.imageNotValid']})
+                return render(request, 'company/administrator_edit.html',
+                              {'form': form, 'errors': ['error.imageNotValid']})
 
     else:
         raise PermissionDenied
@@ -88,6 +89,7 @@ def view(request, username):
     return render(request, 'administrator_view.html', {'admin': admin2})
 '''
 
+
 def delete(request, username):
     """
     url = administrator/delete/<username>
@@ -100,7 +102,7 @@ def delete(request, username):
     pass  # TODO
 
 
-def checkPasswords(form):
+def check_passwords(form):
     """
     Check the passwords in the form match
     """
@@ -118,5 +120,4 @@ def notify_password_change(email):
 
     template: ..
     """
-
-    pass # TODO
+    pass  # TODO
