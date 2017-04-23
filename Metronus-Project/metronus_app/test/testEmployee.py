@@ -7,8 +7,11 @@ from django.contrib.auth.models                  import User
 from metronus_app.model.employeeLog              import EmployeeLog
 
 class EmployeeTestCase(TestCase):
-
+    """This class provides a test case for employee management"""
     def setUp(self):
+        """
+        Loads the data to the database for tests to be done
+        """
         company1 = Company.objects.create(
             cif="123",
             company_name = "company1",
@@ -74,7 +77,7 @@ class EmployeeTestCase(TestCase):
         )
 
     def test_create_employee_positive(self):
-        # Logged in as an administrator, try to create an employee
+        """ Logged in as an administrator, try to create an employee"""
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -89,6 +92,7 @@ class EmployeeTestCase(TestCase):
             "email": "frc@empresa.com",
             "identifier": "frc01",
             "phone": "654321987",
+            "price_per_hour": "1.0"
         })
 
         self.assertEquals(response.status_code, 200)
@@ -110,7 +114,7 @@ class EmployeeTestCase(TestCase):
         self.assertEquals(logs_before + 1, logs_after)
 
     def test_create_employee_with_redirect_positive(self):
-        # Logged in as an administrator, try to create an employee
+        """ Logged in as an administrator, try to create an employee"""
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -125,6 +129,7 @@ class EmployeeTestCase(TestCase):
             "email": "frc2@empresa.com",
             "identifier": "frc02",
             "phone": "654321987",
+            "price_per_hour": "2.0"
         })
 
         self.assertRedirects(response, "/employee/view/employee11343154/", fetch_redirect_response=False)
@@ -145,7 +150,7 @@ class EmployeeTestCase(TestCase):
         self.assertEquals(logs_before + 1, logs_after)
 
     def test_create_employee_password_not_match_negative(self):
-        # Logged in as an administrator, try to create an employee
+        """ Logged in as an administrator, try to create an employee"""
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -160,6 +165,7 @@ class EmployeeTestCase(TestCase):
             "email": "frc@empresa.com",
             "identifier": "frc01",
             "phone": "654321987",
+            "price_per_hour": "2.0",
         })
 
         self.assertEquals(response.status_code, 200)
@@ -170,8 +176,37 @@ class EmployeeTestCase(TestCase):
         logs_after = EmployeeLog.objects.all().count()
         self.assertEquals(logs_before, logs_after)
 
+    def test_create_employee_negative_price_negative(self):
+        """ Logged in as an administrator, try to create an employee"""
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        logs_before = EmployeeLog.objects.all().count()
+
+        response = c.post("/employee/create", {
+            "username": "employee_creating",
+            "password1": "dontmatch",
+            "password2": "dontmatch",
+            "first_name": "Francisco",
+            "last_name": "Romualdo",
+            "email": "frc@empresa.com",
+            "identifier": "frc01",
+            "phone": "654321987",
+            "price_per_hour": "-1.0",
+        })
+
+        self.assertEquals(response.status_code, 200)
+        self.assertTrue('employeeCreation_priceNotValid' in response.context["errors"])
+
+        # Check that the employee has not been created
+
+        logs_after = EmployeeLog.objects.all().count()
+        self.assertEquals(logs_before, logs_after)
+
+
+
     def test_create_employee_username_taken_negative(self):
-        # Logged in as an administrator, try to create an employee
+        """ Logged in as an administrator, try to create an employee"""
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -186,6 +221,7 @@ class EmployeeTestCase(TestCase):
             "email": "frc@empresa.com",
             "identifier": "frc01",
             "phone": "654321987",
+            "price_per_hour": "2.0",
         })
 
         self.assertEquals(response.status_code, 200)
@@ -197,7 +233,7 @@ class EmployeeTestCase(TestCase):
         self.assertEquals(logs_before, logs_after)
 
     def test_create_employee_invalid_form_negative(self):
-        # Logged in as an administrator, try to create an employee
+        """ Logged in as an administrator, try to create an employee"""
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -224,6 +260,9 @@ class EmployeeTestCase(TestCase):
 
 
     def test_list_employees_positive(self):
+        """
+        As an admin, list the employees
+        """
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -234,11 +273,17 @@ class EmployeeTestCase(TestCase):
         self.assertEquals(response.context["employees"][0].identifier, "emp01")
 
     def test_list_employees_not_logged(self):
+        """
+        Try listing the employees without authentication
+        """
         c = Client()
         response = c.get("/employee/list")
         self.assertEquals(response.status_code, 403)
 
     def test_view_employee_positive(self):
+        """
+        As an admin, view an employee profile
+        """
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -251,6 +296,9 @@ class EmployeeTestCase(TestCase):
         self.assertEquals(employee.user.first_name, "Álvaro")
 
     def test_view_employee_not_allowed(self):
+        """
+        As an admin, try viewing an employee profile from other company
+        """
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -258,6 +306,9 @@ class EmployeeTestCase(TestCase):
         self.assertEquals(response.status_code, 403)
 
     def test_view_employee_404(self):
+        """
+        Try getting an inexistent employee profile
+        """
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -265,6 +316,9 @@ class EmployeeTestCase(TestCase):
         self.assertEquals(response.status_code, 404)
 
     def test_edit_employee_get(self):
+        """
+        As an admin, get the edit employee form
+        """
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -279,17 +333,21 @@ class EmployeeTestCase(TestCase):
         self.assertEquals(form.initial["phone"], "666555444")
 
     def test_edit_employee_positive_without_pass(self):
+        """
+        As an admin, edit an employee profile
+        """
         c = Client()
         c.login(username="admin1", password="123456")
 
         initialpass = User.objects.get(username="emp1").password
-
+        logs_before = EmployeeLog.objects.all().count()
         response = c.post("/employee/edit/emp1/", {
             "first_name": "NuevoNombre",
             "last_name": "NuevoApellido",
             "email": "nuevocorreo@empresa.com",
             "identifier": "nuevoid",
             "phone": "nuevotelefono",
+            "price_per_hour": "4.0",
         })
 
         self.assertRedirects(response, "/employee/view/emp1/", fetch_redirect_response=False)
@@ -301,8 +359,17 @@ class EmployeeTestCase(TestCase):
         self.assertEquals(final.user.last_name, "NuevoApellido")
         self.assertEquals(final.user.email, "nuevocorreo@empresa.com")
         self.assertEquals(final.user.password, initialpass)
+        self.assertEquals(final.price_per_hour, 4.0)
+
+        #Assert a new log was created with the price change
+        logs_after = EmployeeLog.objects.all().count()
+        self.assertEquals(logs_before + 1, logs_after)
+
 
     def test_edit_employee_pass_positive(self):
+        """
+        As an admin, edit an employee password
+        """
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -317,6 +384,9 @@ class EmployeeTestCase(TestCase):
         self.assertTrue(final.user.password != initialpass)
 
     def test_edit_employee_pass_negative(self):
+        """
+        As an admin, try editing an employee password when password repeat do not match
+        """
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -331,18 +401,27 @@ class EmployeeTestCase(TestCase):
         self.assertTrue(final.user.password == initialpass)
 
     def test_edit_employee_not_allowed(self):
+        """
+        Try editing an employee from other company
+        """
         c = Client()
         c.login(username="admin1", password="123456")
         response = c.get("/employee/edit/emp2/")
         self.assertEquals(response.status_code, 403)
 
     def test_edit_employee_404(self):
+        """
+        Try editing an inexistent employee
+        """
         c = Client()
         c.login(username="admin1", password="123456")
         response = c.get("/employee/edit/diana/")
         self.assertEquals(response.status_code, 404)
 
     def test_delete_employee_positive(self):
+        """
+        As an admin, delete an employee from the company and check the log updates
+        """
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -350,7 +429,7 @@ class EmployeeTestCase(TestCase):
         self.assertTrue(User.objects.get(username="emp1").is_active)
 
         response = c.get("/employee/delete/emp1/")
-        self.assertRedirects(response, "/employee/list/", fetch_redirect_response=False)
+        self.assertRedirects(response, "/employee/list", fetch_redirect_response=False)
 
         self.assertFalse(User.objects.get(username="emp1").is_active)
         logs_after = EmployeeLog.objects.all().count()

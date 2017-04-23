@@ -4,7 +4,7 @@ from django.test import TestCase
 
 
 class CompanyTestCase(TestCase):
-
+    """This class provides a test case for companies signing up to the system"""
     def test_create_company(self):
         """
         checks the number of companies increased

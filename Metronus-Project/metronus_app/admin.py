@@ -11,8 +11,14 @@ from django.contrib.sessions.models import Session
 from django.contrib.auth.models                  import User
 from django.db.models import Count
 class MyAdminSite(AdminSite):
+    """
+    Creates a custom site for django superuser, for app use, statistics, etc.
+    """
     site_header = 'Metronus administration'
     def get_urls(self):
+        """
+        Adds the new urls
+        """
         urls = super().get_urls()
         my_urls = [
             url(r'^dashboard/$', self.admin_view(self.dashboard))
@@ -20,7 +26,10 @@ class MyAdminSite(AdminSite):
         return my_urls + urls
 
     def dashboard(self, request):
-        # ...
+        """
+        Returns a JSON which contains the number of tasks per company, 
+        as well as the number of users currently logged
+        """
         employees=list(Company.objects.all().annotate(num_emp=Count("actor")).values_list("id","num_emp"))
         context = {"employees":employees}
         sessions=Session.objects.all()
@@ -30,14 +39,15 @@ class MyAdminSite(AdminSite):
             users.append(u.id)
         #logged users
         context["users"]=users
-        print(users)
 
         #task by company
         context["tasks"]=list(Company.objects.all().annotate(num_task=Count("project__projectdepartment__task")).values_list("id","num_task"))
-        print(context["tasks"])
         return JsonResponse(context)#(request, "dashboard.html", context)
 
 
 class MyModelAdmin(admin.ModelAdmin):
+    """
+    I think this now does nothing, so maybe it can be removed
+    """
     pass
 admin_site = MyAdminSite(name='myadmin')

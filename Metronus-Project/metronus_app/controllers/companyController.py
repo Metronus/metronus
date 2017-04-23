@@ -12,7 +12,8 @@ from django.contrib.auth.decorators import login_required
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
-from metronus_app.common_utils import get_current_admin_or_403, get_or_none, checkImage, send_mail
+from metronus_app.common_utils import (get_current_admin_or_403, checkImage, send_mail, is_email_unique
+, get_or_none, is_username_unique)
 from django.core.exceptions import PermissionDenied
 
 
@@ -34,8 +35,26 @@ def create(request,
         # create a form instance and populate it with data from the request:
         form = RegistrationForm(request.POST, request.FILES)
         # check whether it's valid:
-        if form.is_valid() and checkPasswords(form):
-            if checkImage(form, 'logo'):
+        if form.is_valid():
+            errors = []
+
+            # Check that the passwords match
+            if not checkPasswords(form):
+                errors.append('companyRegister_passwordsDontMatch')
+
+            # Check that the username is unique
+            if not is_username_unique(form.cleaned_data["username"]):
+                errors.append('companyRegister_usernameNotUnique')
+
+            # Check that the admin email is unique
+            if not is_email_unique(form.cleaned_data["admin_email"]):
+                errors.append('companyRegister_adminEmailNotUnique')
+
+            # Check that the image is OK
+            if not checkImage(form, 'photo'):
+                errors.append('companyRegister_imageNotValid')
+
+            if not errors:
                 # process the data in form.cleaned_data as required
                 # ...
                 # redirect to a new URL:
@@ -63,7 +82,7 @@ def create(request,
 
                 return HttpResponseRedirect('/' + company.short_name + '/login/')
             else:
-                return render(request, 'company/company_register.html', {'form': form, 'errors': ['error.imageNotValid']})
+                return render(request, 'company/company_register.html', {'form': form, 'errors': errors})
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -104,7 +123,6 @@ def edit(request):
         if form.is_valid():
             if checkImage(form, 'logo'):
                 # Company data
-                print(form.cleaned_data["company_email"])
                 company.visible_short_name = form.cleaned_data["visible_short_name"]
                 company.email = form.cleaned_data["company_email"]
                 company.phone = form.cleaned_data["company_phone"]
@@ -170,6 +188,9 @@ def delete(request):
 #Auxiliar methods, containing the operation logic
 
 def createCompany(form):
+    """
+    Creates a company, supposing the data provided by the form is OK
+    """
     cif=form.cleaned_data['cif']
     company_name = form.cleaned_data['company_name']
     short_name = form.cleaned_data['short_name']
@@ -182,6 +203,9 @@ def createCompany(form):
 
 
 def registerAdministrator(form, company):
+    """
+    Tegisters an administrator for a company, supposing the data provided by the form is OK
+    """
     username = form.cleaned_data['username']
     password = form.cleaned_data['password']
     first_name = form.cleaned_data['first_name']
@@ -208,7 +232,7 @@ def validateCIF(request):
     """
     checks if the company cif already exist
     """
-    cif = request.GET.get('cif', None)
+    cif = request.GET.get('cif')
 
     check = get_or_none(Company, cif=cif)
     if check is not None:
@@ -226,7 +250,7 @@ def validateAdmin(request):
     """
     checks if the company administrator is registered
     """
-    admin = request.GET.get('admin', None)
+    admin = request.GET.get('admin')
 
     check = get_or_none(Administrator, user__username=admin)
     if check is not None:
@@ -243,7 +267,7 @@ def validateShortName(request):
     """
     checks if the company short name already exist
     """
-    short_name = request.GET.get('short_name', None)
+    short_name = request.GET.get('short_name')
 
     check = get_or_none(Company, short_name=short_name)
     if check is not None:

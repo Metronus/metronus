@@ -28,7 +28,8 @@ from metronus_app.common_utils import check_company_contains_actor
 
 
 def _get_login_redirect_url(request, redirect_to):
-    # Ensure the user-originating redirection URL is safe.
+    """ Ensure the user-originating redirection URL is safe.
+    """
     if not is_safe_url(url=redirect_to, host=request.get_host()):
         return resolve_url(settings.LOGIN_REDIRECT_URL)
     return redirect_to
@@ -56,7 +57,6 @@ def login(request, template_name='registration/login.html',
     redirect_to = request.POST.get(redirect_field_name, request.GET.get(redirect_field_name, ''))
     if redirect_authenticated_user and request.user.is_authenticated:
         redirect_to = _get_login_redirect_url(request, redirect_to)
-        print(redirect_to)
         if redirect_to == request.path:
             raise ValueError(
                 "Redirection loop for authenticated user detected. Check that "
@@ -69,9 +69,15 @@ def login(request, template_name='registration/login.html',
 
             #if company is not None:
             #    check_company_contains_actor(company, form.get_user())
+            user = form.get_user()
 
-            auth_login(request, form.get_user())
-            return HttpResponseRedirect("/app/")
+            auth_login(request, user)
+            if user.actor.user_type == 'A':
+                return HttpResponseRedirect("/dashboard/view")
+            elif user.actor.user_type == 'E':
+                return HttpResponseRedirect("/timeLog/list_all")
+            else:
+                return HttpResponseRedirect("/app/")
             #return HttpResponseRedirect(_get_login_redirect_url(request, redirect_to))
     else:
         form = authentication_form(request)

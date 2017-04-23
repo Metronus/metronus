@@ -14,8 +14,11 @@ from metronus_app.forms.roleManagementForm            import RoleManagementForm
 
 
 class RoleTestCase(TestCase):
-
+    """This class provides a test case for using and managing roles"""
     def setUp(self):
+        """
+        Loads the data to the database for tests to be done
+        """
         company1 = Company.objects.create(
             cif="123",
             company_name = "company1",
@@ -161,21 +164,30 @@ class RoleTestCase(TestCase):
 
 
     def test_get_form_not_logged(self):
+        """
+        Try managing the roles without authentication
+        """
         c = Client()
         response = c.get("/roles/manage")
         self.assertEquals(response.status_code, 403)
 
     def test_get_form_admin_without_params(self):
+        """
+        Try managing the roles providing proper parameters
+        """
         c = Client()
         c.login(username="admin1", password="123456")
         response = c.get("/roles/manage")
         self.assertEquals(response.status_code, 400)
 
     def test_get_form_admin_ok(self):
+        """
+        As an admin, get the role edit form for an employee
+        """
         c = Client()
         c.login(username="admin1", password="123456")
         emp = Employee.objects.get(identifier="emp01")
-        response = c.get("/roles/manage?employee_id=%d" % emp.id)
+        response = c.get("/roles/manage?employee_id={0}" .format( emp.id))
 
         self.assertEquals(response.status_code, 200)
         self.assertEquals(len(Department.objects.filter(company_id=emp.company_id)), len(response.context["departments"]))
@@ -190,10 +202,13 @@ class RoleTestCase(TestCase):
         self.assertTrue("role_id" not in form.initial)
 
     def test_get_form_user_ok(self):
+        """
+        With proper roles, get the role edit form for an employee
+        """
         c = Client()
         c.login(username="emp1", password="123456")
         emp = Employee.objects.get(identifier="emp02")
-        response = c.get("/roles/manage?employee_id=%d" % emp.id)
+        response = c.get("/roles/manage?employee_id={0}" .format( emp.id))
 
         self.assertEquals(response.status_code, 200)
         self.assertEquals(1, len(response.context["departments"]))
@@ -211,12 +226,15 @@ class RoleTestCase(TestCase):
         self.assertTrue("role_id" not in form.initial)
     
     def test_get_form_existing_role_positive(self):
+        """
+        With proper roles, edit the role of an employee
+        """
         c = Client()
         c.login(username="admin1", password="123456")
 
         employee = Employee.objects.get(identifier="emp01")
         role = ProjectDepartmentEmployeeRole.objects.get(employee_id=employee)
-        response = c.get("/roles/manage?role_id=%d" % role.id)
+        response = c.get("/roles/manage?role_id={0}" .format( role.id))
 
         form = response.context["form"]
         self.assertEquals(form.initial["employee_id"], role.employee_id.id)
@@ -226,18 +244,27 @@ class RoleTestCase(TestCase):
         self.assertEquals(form.initial["role_id"], role.role_id.id)
 
     def test_get_form_existing_role_404(self):
+        """
+        With proper roles, try editing  an inexistent role
+        """
         c = Client()
         c.login(username="admin1", password="123456")
         response = c.get("/roles/manage?role_id=99999")
         self.assertEquals(response.status_code, 404)
 
     def test_get_form_existing_user_404(self):
+        """
+        With proper roles, try editing the role of an inexistent employee
+        """
         c = Client()
         c.login(username="admin1", password="123456")
         response = c.get("/roles/manage?employee_id=9999")
         self.assertEquals(response.status_code, 404)
 
     def test_post_new_role_admin_positive(self):
+        """
+        As an admin, add a new role to an employee
+        """
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -257,7 +284,7 @@ class RoleTestCase(TestCase):
             'role_id': role.id,
         })
 
-        self.assertRedirects(response, "/employee/view/%s/" % employee.user.username, fetch_redirect_response=False)
+        self.assertRedirects(response, "/employee/view/{0}/" .format( employee.user.username), fetch_redirect_response=False)
 
         projdepts_after = ProjectDepartment.objects.all().count()
         employeeroles_after = ProjectDepartmentEmployeeRole.objects.all().count()
@@ -272,6 +299,9 @@ class RoleTestCase(TestCase):
             self.fail("The role was not successfully created")
 
     def test_post_new_role_user_positive(self):
+        """
+        With proper roles, add a new role to an employee
+        """
         c = Client()
         c.login(username="emp1", password="123456")
 
@@ -291,7 +321,7 @@ class RoleTestCase(TestCase):
             'role_id': role.id,
         })
 
-        self.assertRedirects(response, "/employee/view/%s/" % employee.user.username, fetch_redirect_response=False)
+        self.assertRedirects(response, "/employee/view/{0}/".format( employee.user.username), fetch_redirect_response=False)
 
         projdepts_after = ProjectDepartment.objects.all().count()
         employeeroles_after = ProjectDepartmentEmployeeRole.objects.all().count()
@@ -306,6 +336,9 @@ class RoleTestCase(TestCase):
             self.fail("The role was not successfully created")
 
     def test_post_new_role_user_projdept_not_allowed(self):
+        """
+        Try adding a role to an employee when you do not have permissions for that project-department pair
+        """
         c = Client()
         c.login(username="emp1", password="123456")
 
@@ -335,6 +368,9 @@ class RoleTestCase(TestCase):
         self.assertTrue('roleCreation_notAuthorizedProjectDepartment' in response.context["errors"])
 
     def test_post_new_role_user_role_not_allowed(self):
+        """
+        Try adding a role to an employee when you cannot assign that role
+        """
         c = Client()
         c.login(username="emp1", password="123456")
 
@@ -364,6 +400,10 @@ class RoleTestCase(TestCase):
         self.assertTrue('roleCreation_notAuthorizedRole' in response.context["errors"])
 
     def test_post_new_role_admin_duplicated(self):
+        """
+        Try adding a duplicate role for an user
+        """
+        
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -393,6 +433,10 @@ class RoleTestCase(TestCase):
         self.assertTrue('roleCreation_alreadyExists' in response.context["errors"])
 
     def test_edit_role_above_current_user(self):
+        """
+        Try adding a role to an employee when your role is lower than which you are trying to assign
+        """
+
         c = Client()
         c.login(username="emp3", password="123456")
 
@@ -404,13 +448,13 @@ class RoleTestCase(TestCase):
         projdepts_before = ProjectDepartment.objects.all().count()
         employeeroles_before = ProjectDepartmentEmployeeRole.objects.all().count()
 
-        curRole = ProjectDepartmentEmployeeRole.objects.get(employee_id=employee)
+        cur_role = ProjectDepartmentEmployeeRole.objects.get(employee_id=employee)
 
         response = c.post("/roles/manage", {
             'employee_id': employee.id,
             'department_id': department.id,
             'project_id': project.id,
-            'employeeRole_id': curRole.id,
+            'employeeRole_id': cur_role.id,
             'role_id': role.id,
         })
 
@@ -424,6 +468,9 @@ class RoleTestCase(TestCase):
         self.assertTrue('roleCreation_editingHigherRole' in response.context["errors"])
 
     def test_edit_role_positive(self):
+        """
+        Edit a role successfully
+        """
         c = Client()
         c.login(username="emp1", password="123456")
 
@@ -435,13 +482,13 @@ class RoleTestCase(TestCase):
         projdepts_before = ProjectDepartment.objects.all().count()
         employeeroles_before = ProjectDepartmentEmployeeRole.objects.all().count()
 
-        curRole = ProjectDepartmentEmployeeRole.objects.get(employee_id=employee)
+        cur_role = ProjectDepartmentEmployeeRole.objects.get(employee_id=employee)
 
         response = c.post("/roles/manage", {
             'employee_id': employee.id,
             'department_id': department.id,
             'project_id': project.id,
-            'employeeRole_id': curRole.id,
+            'employeeRole_id': cur_role.id,
             'role_id': role.id,
         })
 
@@ -451,7 +498,7 @@ class RoleTestCase(TestCase):
         self.assertEquals(projdepts_before, projdepts_after)
         self.assertEquals(employeeroles_before, employeeroles_after)
 
-        self.assertRedirects(response, "/employee/view/%s/" % employee.user.username, fetch_redirect_response=False)
+        self.assertRedirects(response, "/employee/view/{0}/" .format( employee.user.username), fetch_redirect_response=False)
 
         try:
             createdrole = ProjectDepartmentEmployeeRole.objects.get(employee_id=employee, role_id=role, projectDepartment_id__project_id=project, projectDepartment_id__department_id=department)
@@ -459,6 +506,9 @@ class RoleTestCase(TestCase):
             self.fail("The role was not successfully created")
 
     def test_error_codes_404(self):
+        """
+        Forces all types of errores in each case
+        """
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -466,7 +516,7 @@ class RoleTestCase(TestCase):
         department = Department.objects.get(name="departamento 1")
         project = Project.objects.get(name="proyecto 1")
         role = Role.objects.get(name="EMPLOYEE")
-        curRole = ProjectDepartmentEmployeeRole.objects.get(employee_id=employee)
+        cur_role = ProjectDepartmentEmployeeRole.objects.get(employee_id=employee)
 
         errors = ['departmentDoesNotExist', 'projectDoesNotExist', 'employeeRoleDoesNotExist', 'roleDoesNotExist']
 
@@ -475,7 +525,7 @@ class RoleTestCase(TestCase):
                 'employee_id': employee.id,
                 'department_id': department.id if i!=0 else 9999,
                 'project_id': project.id if i!=1 else 9999,
-                'employeeRole_id': curRole.id if i!=2 else 9999,
+                'employeeRole_id': cur_role.id if i!=2 else 9999,
                 'role_id': role.id if i!=3 else 9999,
             })
 
@@ -484,6 +534,9 @@ class RoleTestCase(TestCase):
             self.assertTrue('roleCreation_' + errors[i] in response.context["errors"])
 
     def test_delete_role_user_negative(self):
+        """
+        Try deleting a role you have no permissions to access
+        """
         c = Client()
         c.login(username="emp3", password="123456")
 
@@ -491,7 +544,7 @@ class RoleTestCase(TestCase):
         employeeroles_before = ProjectDepartmentEmployeeRole.objects.all().count()
 
         role = ProjectDepartmentEmployeeRole.objects.get(employee_id=employee)
-        response = c.get("/roles/delete/%d/" % role.id)
+        response = c.get("/roles/delete/{0}/" .format( role.id))
 
         employeeroles_after = ProjectDepartmentEmployeeRole.objects.all().count()
 
@@ -499,6 +552,9 @@ class RoleTestCase(TestCase):
         self.assertTrue(response.status_code == 403)
 
     def test_delete_role_user_positive(self):
+        """
+        Delete a role from an employee successfully
+        """
         c = Client()
         c.login(username="emp1", password="123456")
 
@@ -506,9 +562,9 @@ class RoleTestCase(TestCase):
         employeeroles_before = ProjectDepartmentEmployeeRole.objects.all().count()
 
         role = ProjectDepartmentEmployeeRole.objects.get(employee_id=employee)
-        response = c.get("/roles/delete/%d/" % role.id)
+        response = c.get("/roles/delete/{0}/" .format( role.id))
 
         employeeroles_after = ProjectDepartmentEmployeeRole.objects.all().count()
 
         self.assertEquals(employeeroles_before, employeeroles_after + 1)
-        self.assertRedirects(response, "/employee/view/%s" % employee.user.username, fetch_redirect_response=False)
+        self.assertRedirects(response, "/employee/view/{0}" .format( employee.user.username), fetch_redirect_response=False)

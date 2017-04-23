@@ -10,6 +10,7 @@ from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEm
 
 
 class TaskForm(forms.Form):
+    """Form for Task model class"""
     name = forms.CharField(label=_("name"),max_length=30,initial="")
     description = forms.CharField(label=_("description"),max_length=200,initial="")
     task_id=forms.IntegerField(widget=forms.HiddenInput(),initial="0")
@@ -17,3 +18,6 @@ class TaskForm(forms.Form):
     department_id = forms.ModelChoiceField(queryset=Department.objects.all())
     production_goal = forms.FloatField(label=_("production_goal"),required=False,initial="")
     goal_description = forms.CharField(label=_("goal_description"),max_length=100,required=False,initial="")
+
+    price_per_unit=forms.FloatField(label=_("price_per_unit"),required=False,initial="")
+    price_per_hour=forms.FloatField(label=_("price_per_hour"),required=False,initial="")

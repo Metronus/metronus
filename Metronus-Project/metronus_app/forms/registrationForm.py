@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class RegistrationForm(Form):
-
+    """Form for Company signing up to Metronus"""
     # Company
     cif = forms.CharField(label=_("cif"),max_length=9)
     company_name = forms.CharField(label=_("company_name"),max_length=100)

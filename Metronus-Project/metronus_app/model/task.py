@@ -14,6 +14,8 @@ class Task(models.Model):
     production_goal=models.FloatField(null=True,blank=True)
     goal_description=models.CharField(blank=True,max_length=100,default="")
 
+    price_per_unit=models.FloatField(null=True,blank=True)
+    price_per_hour=models.FloatField(null=True,blank=True)
     def __unicode__(self):
         return self.name
 

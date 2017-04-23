@@ -10,19 +10,21 @@ from django.core.exceptions                      import PermissionDenied, Object
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 class MyModelChoiceField(ModelChoiceField):
+    """Custom Dropdown List which shows the name of the object instead of some weird or standard message"""
     def label_from_instance(self, obj):
         return  obj.name
 
 class TimeLog2Form(forms.Form):
+    """Form for TimeLog model class"""
     project_id = MyModelChoiceField(label=_("project"),queryset=None, widget=forms.Select(attrs={'class':'form-control'}))
     department_id = MyModelChoiceField(label=_("department"),queryset=None, widget=forms.Select(attrs={'class':'form-control'}))
     task_id = MyModelChoiceField(label=_("task"),queryset=None, widget=forms.Select(attrs={'class':'form-control'}))
 
-    description = forms.CharField(label=_("description"),max_length=200,
+    description = forms.CharField(label=_("description"),max_length=200,required=False,initial="",
                                   widget=forms.TextInput(attrs={'class':'form-control'}))
-    workDate = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'class':'form-control form_datetime',
-                                                                     'readonly':'readonly'}))
-    duration = forms.IntegerField(label=_("duration"),validators = [MinValueValidator(0), MaxValueValidator(1440)],
+    workDate = forms.DateTimeField(label=_("workdate"),widget=forms.widgets.DateTimeInput(
+                attrs={'class':'form-control'}))
+    duration = forms.IntegerField(label=_("duration"),validators = [MinValueValidator(0)],
                                   widget=forms.NumberInput(attrs={'class':'form-control'}))
 
     timeLog_id = forms.IntegerField(widget=forms.HiddenInput())
@@ -40,8 +42,8 @@ class TimeLog2Form(forms.Form):
         except ObjectDoesNotExist:
             raise PermissionDenied
         projects = Project.objects.filter(company_id=actor.company_id,deleted=False)
-        none = Project.objects.none()
+
 
         self.fields['project_id'].queryset = projects
-        self.fields['task_id'].queryset = none
-        self.fields['department_id'].queryset = none
+        self.fields['task_id'].queryset = Task.objects.filter(actor_id__company_id=actor.company_id,active=True)
+        self.fields['department_id'].queryset = Department.objects.filter(company_id=actor.company_id,active=True)

@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.conf.urls               import url, include
 from django.contrib                 import admin
-from django.contrib.auth.views      import password_reset, password_reset_complete, password_reset_confirm, password_reset_done
+from django.contrib.auth.views      import password_reset_complete, password_reset_confirm, password_reset_done
 from metronus_app.admin             import admin_site
 from django.conf.urls.i18n          import i18n_patterns
 from metronus_app                   import views
@@ -55,6 +55,7 @@ urlpatterns += [#i18n_patterns(
     url(r'^department/delete/(?P<department_id>\w{0,50})/$', departmentController.delete, name='department_delete'),
     url(r'^department/ajaxEmployeesPerTask$', departmentController.ajax_employees_per_task, name='department_employees_per_task'),
     url(r'^department/ajaxTimePerTask$', departmentController.ajax_time_per_task, name='department_time_per_task'),
+    url(r'^department/ajaxProfit/(?P<department_id>\w{0,50})/$', departmentController.ajax_profit_per_date, name='department_profit_per_date'),
 
     #Task
     url(r'^task/create$', taskController.create, name='task_create'),
@@ -64,22 +65,25 @@ urlpatterns += [#i18n_patterns(
     url(r'^task/edit/(?P<task_id>\w{0,50})/$', taskController.edit, name='task_edit'),
     url(r'^task/delete/(?P<task_id>\w{0,50})/$', taskController.delete, name='task_delete'),
     url(r'^task/getdepartments$', taskController.form_departments),
+    url(r'^task/ajaxProdPerTask', taskController.ajax_productivity_per_task, name='productivity_per_task'),
+    url(r'^task/ajaxProfit/(?P<task_id>\w{0,50})/$', taskController.ajax_profit_per_date, name='task_profit_per_date'),
 
     #Project
     url(r'^project/list$', projectController.list, name='project_list'),
     url(r'^project/edit/(?P<project_id>\w{0,50})/$', projectController.edit, name='project_edit'),
-    url(r'^project/show/(?P<project_id>\w{0,50})/$', projectController.show, name='project_show'),
+    url(r'^project/view/(?P<project_id>\w{0,50})/$', projectController.show, name='project_view'),
     url(r'^project/delete/(?P<project_id>\w{0,50})/$', projectController.delete, name='project_delete'),
     url(r'^project/create$', projectController.create, name='project_create'),
     url(r'^project/createAsync$', projectController.createAsync, name='project_create_async'),
     url(r'^project/ajaxEmployeesPerDpmt$', projectController.ajax_employees_per_department, name='project_employees_per_department'),
     url(r'^project/ajaxTasksPerDpmt$', projectController.ajax_tasks_per_department, name='project_tasks_per_department'),
     url(r'^project/ajaxTimePerDpmt$', projectController.ajax_time_per_department, name='project_time_per_department'),
+    url(r'^project/ajaxProfit/(?P<project_id>\w{0,50})/$', projectController.ajax_profit_per_date, name='project_profit_per_date'),
 
     #Project-Department relationship
     url(r'^projectdepartment/create$', projectDepartmentController.create, name='projectdepartment_create'),
     url(r'^projectdepartment/list$', projectDepartmentController.list, name='projectdepartment_list'),
-    #url(r'^projectdepartment/edit$', projectDepartmentController.edit, name='projectdepartment_edit'),No necesario, en un principio
+    #url(r'^projectdepartment/edit$', projectDepartmentController.edit, name='projectdepartment_edit'),No necesario, en un principio (y en un final tampoco)
     url(r'^projectdepartment/delete$', projectDepartmentController.delete, name='projectdepartment_delete'),
 
     #Employee
@@ -91,13 +95,11 @@ urlpatterns += [#i18n_patterns(
     url(r'^employee/delete/(?P<username>\w{0,50})/$', employeeController.delete, name='employee_delete'),
     url(r'^employee/ajax_productivity_per_task/(?P<username>\w{0,50})$', employeeController.ajax_productivity_per_task, name='employee_ajax_productivity_per_task'),
     url(r'^employee/ajax_productivity_per_task_and_date/(?P<username>\w{0,50})$', employeeController.ajax_productivity_per_task_and_date, name='employee_ajax_productivity_per_task_and_date'),
+    url(r'^employee/ajaxProfit/(?P<employee_id>\w{0,50})$', employeeController.ajax_profit_per_date, name='employee_profit_per_date'),
+    url(r'^employee/ajaxProfit/(?P<employee_id>\w{0,50})/(?P<project_id>\w{0,50})/$', employeeController.ajax_profit_per_date_in_project, name='employee_profit_per_date_in_project'),
 
     # TimeLogs
     url(r'^timeLog/list_all/$', timeLogController.list_all, name='timeLog_list_all'),
-    url(r'^timeLog/list/(?P<task_id>\w{0,50})/$', timeLogController.list, name='timeLog_list'),
-    url(r'^timeLog/create/(?P<task_id>\w{0,50})/$', timeLogController.create_by_task, name='timeLog_create_by_task'),
-    url(r'^timeLog/create_all/$', timeLogController.create_all, name='timeLog_create_all'),
-    url(r'^timeLog/edit/(?P<timeLog_id>\w{0,50})/$', timeLogController.edit, name='timeLog_edit'),
     url(r'^timeLog/delete/(?P<timeLog_id>\w{0,50})/$', timeLogController.delete, name='timeLog_delete'),
 
     # Roles
@@ -117,6 +119,7 @@ urlpatterns += [#i18n_patterns(
     url(r'^company/delete/$', companyController.view, name='company_delete'),
 
     #Dashboard
+    url(r'^dashboard/view$', dashboardController.view, name='dashboard_view'),
     url(r'^dashboard/ajaxTimePerProject$', dashboardController.ajax_time_per_project, name='dashboard_time_per_project'),
     url(r'^dashboard/ajaxEmployeesPerProject$', dashboardController.ajax_employees_per_project, name='dashboard_employees_per_project'),
     url(r'^dashboard/ajaxDepartmentsPerProject$', dashboardController.ajax_departments_per_project, name='dashboard_departments_per_project'),
@@ -130,7 +133,7 @@ urlpatterns += [#i18n_patterns(
     ])),
 
     # Pass recovery
-    url(r'^lost-password/$', password_reset, {'template_name': 'auth/password_reset.html',
+    url(r'^lost-password/$', appController.password_reset, {'template_name': 'auth/password_reset.html',
         'post_reset_redirect': '/reset-password/', 'from_email': DEFAULT_FROM_EMAIL,
         'email_template_name': 'auth/password_reset_email.html',
         'subject_template_name': 'auth/password_reset_subject.txt',
