@@ -85,7 +85,9 @@
                 </div>
             </div>
         </div>
-
+        {% if form.errors %}
+            <p>{{ form.errors }}</p>
+        {% endif %}
         <div class="clearfix"></div>
         <div id="successDiv" class="alert alert-success" hidden='true'></div>
         <div id="errorDiv" class="alert alert-danger"  hidden='true'></div>
@@ -183,7 +185,7 @@
         $('input[name="workDate').daterangepicker({
             singleDatePicker: true,
             showDropdowns: true,
-            startDate: '{{ currentYear }}/{{ currentMonth }}/1',
+            startDate: '{{ currentYear }}/{{ currentMonth }}/{{ currentDay }}',
             locale: {
                 format: 'YYYY-MM-DD'
             }
@@ -244,6 +246,7 @@
     });
 
     $(document).ready(function() {
+        
         $("#id_department_id").change(function(){
             $.ajax({
                 type: 'POST',

@@ -78,6 +78,10 @@ msgid "landingPricingBusiness"
 msgstr "Empresarial"
 msgid "landingPricingEmployeesBusiness"
 msgstr "+5 empleados"
+msgid "Productivity"
+msgstr "Productividad"
+msgid "Profitability"
+msgstr "Rentabilidad"
 
 #: Index Login
 msgid "dashWelcome"
@@ -417,6 +421,8 @@ msgid "realProductivity"
 msgstr "Productividad real"
 msgid "expectedProductivity"
 msgstr "Productividad esperada"
+msgid "emp_profit"
+msgstr "Gastos e ingresos generados por el empleado"
 msgid "employeeConfirm"
 msgstr "¿Está seguro de eliminar el empleado? Se eliminará también todo lo relacionado con el mismo"
 
@@ -464,6 +470,8 @@ msgid "timePerDepartment2"
 msgstr "Tiempo imputado por cada departamento en el rango de fechas seleccionado"
 msgid "imputedTime"
 msgstr "Tiempo imputado"
+msgid "pro_profit"
+msgstr "Gastos e ingresos del proyecto"
 
 #: TimeLog
 msgid "timeLog"
