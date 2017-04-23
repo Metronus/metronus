@@ -23,7 +23,7 @@ from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEm
 from django.core import serializers
 from django.http import HttpResponse
 
-from metronus_app.common_utils                   import (get_current_admin_or_403, checkImage, get_current_employee_or_403, send_mail
+from metronus_app.common_utils                   import (get_current_admin_or_403, check_image, get_current_employee_or_403, send_mail
                                                         , is_email_unique, is_username_unique)
 from datetime                                           import date, timedelta,datetime
 
@@ -78,7 +78,7 @@ def create(request):
                 errors.append('employeeCreation_emailNotUnique')
 
             # Check that the image is OK
-            if not checkImage(form, 'photo'):
+            if not check_image(form, 'photo'):
                 errors.append('employeeCreation_imageNotValid')
 
             # Check that the price is OK

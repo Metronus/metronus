@@ -13,6 +13,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.views import deprecate_current_app
 from metronus_app.common_utils import check_user_email
 
+
 def index(request):
     """
     returns:

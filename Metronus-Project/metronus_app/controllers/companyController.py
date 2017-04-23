@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
-from metronus_app.common_utils import (get_current_admin_or_403, checkImage, send_mail, is_email_unique,
+from metronus_app.common_utils import (get_current_admin_or_403, check_image, send_mail, is_email_unique,
                                        get_or_none, is_username_unique)
 from django.core.exceptions import PermissionDenied
 
@@ -51,7 +51,7 @@ def create(request,
                 errors.append('companyRegister_adminEmailNotUnique')
 
             # Check that the image is OK
-            if not checkImage(form, 'photo'):
+            if not check_image(form, 'photo'):
                 errors.append('companyRegister_imageNotValid')
 
             if not errors:
@@ -120,7 +120,7 @@ def edit(request):
 
         form = CompanyForm(request.POST)
         if form.is_valid():
-            if checkImage(form, 'logo'):
+            if check_image(form, 'logo'):
                 # Company data
                 company.visible_short_name = form.cleaned_data["visible_short_name"]
                 company.email = form.cleaned_data["company_email"]

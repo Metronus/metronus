@@ -1,13 +1,11 @@
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
-from django.core.exceptions import  PermissionDenied
+from django.core.exceptions import PermissionDenied
 from metronus_app.forms.administratorForm import AdministratorForm
 from metronus_app.model.administrator import Administrator
-from metronus_app.model.company import Company
-from metronus_app.common_utils import get_current_admin_or_403
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from metronus_app.common_utils import checkImage
+from metronus_app.common_utils import check_image
 
 
 @login_required
@@ -37,7 +35,7 @@ def edit(request, username):
         
         form = AdministratorForm(request.POST)
         if form.is_valid() and checkPasswords(form):
-            if checkImage(form, 'photo'):
+            if check_image(form, 'photo'):
             
                 # Update employee data
                 administrator.identifier = form.cleaned_data["identifier"]
@@ -61,7 +59,6 @@ def edit(request, username):
                 return HttpResponseRedirect('/company/view/')
             else:
                 return render(request, 'company/administrator_edit.html', {'form': form, 'errors': ['error.imageNotValid']})
-
 
     else:
         raise PermissionDenied
