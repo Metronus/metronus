@@ -108,7 +108,7 @@ urlpatterns += [  # i18n_patterns(
 
     # Roles
     url(r'^roles/manage$', roleController.manage, name='roles_manage'),
-    url(r'^roles/manageAsync$', roleController.manageAsync, name='roles_manageAsync'),
+    url(r'^roles/manageAsync$', roleController.manage_async, name='roles_manageAsync'),
     url(r'^roles/delete/(?P<role_id>\d{0,50})/$', roleController.delete, name='roles_delete'),
     url(r'^roles/availableDepartments', roleController.ajax_departments_from_projects, name='roles_dpmt_ajax'),
     url(r'^roles/availableRoles', roleController.ajax_roles_from_tuple, name='roles_role_ajax'),
