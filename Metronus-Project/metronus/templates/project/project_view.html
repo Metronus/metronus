@@ -442,7 +442,10 @@ function fromData (backendData, type) {
                 data: (function () {
                           var res = [];
                           for (var n in backendData.names) {
+                            if(backendData.values[n] != 0){
                                 res.push(backendData.names[n]);
+                            }
+                                
                             }
                           return res;
                       })()
@@ -469,7 +472,10 @@ function fromData (backendData, type) {
                                   name: backendData.names[n],
                                   value: backendData.values[n]
                               };
-                              res.push(obj);
+                              if(backendData.values[n] != 0){
+                                res.push(obj);
+                            }
+                              
                             }
                           return res;
                       })()

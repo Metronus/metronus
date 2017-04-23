@@ -70,6 +70,12 @@
         </li>
         <li style="text-align: center">
           <span>{{employee.registryDate}}</span>
+        </li>        
+        <li style="text-align: center">
+        <span>
+            <a href="{% url 'employee_edit' employee.user.username %}" type="button" class="btn btn-primary">
+                                        {% trans 'update' %}</a>
+        <span>
         </li>
         </div>
         </ul>

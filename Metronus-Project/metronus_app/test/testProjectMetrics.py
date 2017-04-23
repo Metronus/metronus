@@ -169,7 +169,7 @@ class ProjectMetricsTestCase(TestCase):
         """
         c = Client()
 
-        response = c.get("/project/ajaxEmployeesPerDpmt?project_id=%d" % Project.objects.get(name="pro1").id)
+        response = c.get("/project/ajaxEmployeesPerDpmt?project_id={0}".format( Project.objects.get(name="pro1").id))
         self.assertEquals(response.status_code, 403)
 
     def test_access_denied_low_role_empperdmtp(self):
@@ -179,7 +179,7 @@ class ProjectMetricsTestCase(TestCase):
         c = Client()
         c.login(username="emp1", password="123456")
 
-        response = c.get("/project/ajaxEmployeesPerDpmt?project_id=%d" % Project.objects.get(name="pro1").id)
+        response = c.get("/project/ajaxEmployeesPerDpmt?project_id={0}" .format( Project.objects.get(name="pro1").id))
         self.assertEquals(response.status_code, 403)
 
     def test_access_ok_executive_empperdmtp(self):
@@ -189,7 +189,7 @@ class ProjectMetricsTestCase(TestCase):
         c = Client()
         c.login(username="emp2", password="123456")
 
-        response = c.get("/project/ajaxEmployeesPerDpmt?project_id=%d" % Project.objects.get(name="pro1").id)
+        response = c.get("/project/ajaxEmployeesPerDpmt?project_id={0}" .format( Project.objects.get(name="pro1").id))
         self.assertEquals(response.status_code, 200)
 
     def test_access_other_company_executive_empperdmtp(self):
@@ -199,7 +199,7 @@ class ProjectMetricsTestCase(TestCase):
         c = Client()
         c.login(username="emp2", password="123456")
 
-        response = c.get("/project/ajaxEmployeesPerDpmt?project_id=%d" % Project.objects.get(name="pro2").id)
+        response = c.get("/project/ajaxEmployeesPerDpmt?project_id={0}" .format( Project.objects.get(name="pro2").id))
         self.assertEquals(response.status_code, 403)
 
     def test_bad_request_empperdmtp(self):
@@ -271,7 +271,7 @@ class ProjectMetricsTestCase(TestCase):
 
             # Check that the data returned by the AJAX query matches the generated data
 
-            response = c.get("/project/ajaxEmployeesPerDpmt?project_id=%d" % project.id)
+            response = c.get("/project/ajaxEmployeesPerDpmt?project_id={0}" .format( project.id))
             self.assertEquals(response.status_code, 200)
             checkJsonMetricsAreEqual(self, str(response.content, encoding='utf8'), true_data)
 
@@ -281,7 +281,7 @@ class ProjectMetricsTestCase(TestCase):
         """
         c = Client()
 
-        response = c.get("/project/ajaxTasksPerDpmt?project_id=%d" % Project.objects.get(name="pro1").id)
+        response = c.get("/project/ajaxTasksPerDpmt?project_id={0}" .format( Project.objects.get(name="pro1").id))
         self.assertEquals(response.status_code, 403)
 
     def test_access_denied_low_role_tasksperdmtp(self):
@@ -291,7 +291,7 @@ class ProjectMetricsTestCase(TestCase):
         c = Client()
         c.login(username="emp1", password="123456")
 
-        response = c.get("/project/ajaxTasksPerDpmt?project_id=%d" % Project.objects.get(name="pro1").id)
+        response = c.get("/project/ajaxTasksPerDpmt?project_id={0}" .format( Project.objects.get(name="pro1").id))
         self.assertEquals(response.status_code, 403)
 
     def test_access_ok_executive_tasksperdmtp(self):
@@ -301,7 +301,7 @@ class ProjectMetricsTestCase(TestCase):
         c = Client()
         c.login(username="emp2", password="123456")
 
-        response = c.get("/project/ajaxTasksPerDpmt?project_id=%d" % Project.objects.get(name="pro1").id)
+        response = c.get("/project/ajaxTasksPerDpmt?project_id={0}" .format(Project.objects.get(name="pro1").id))
         self.assertEquals(response.status_code, 200)
 
     def test_access_other_company_executive_tasksperdmtp(self):
@@ -311,7 +311,7 @@ class ProjectMetricsTestCase(TestCase):
         c = Client()
         c.login(username="emp2", password="123456")
 
-        response = c.get("/project/ajaxTasksPerDpmt?project_id=%d" % Project.objects.get(name="pro2").id)
+        response = c.get("/project/ajaxTasksPerDpmt?project_id={0}" .format( Project.objects.get(name="pro2").id))
         self.assertEquals(response.status_code, 403)
 
     def test_bad_request_tasksperdmtp(self):
@@ -370,7 +370,7 @@ class ProjectMetricsTestCase(TestCase):
 
             # Check that the data returned by the AJAX query matches the generated data
 
-            response = c.get("/project/ajaxTasksPerDpmt?project_id=%d" % project.id)
+            response = c.get("/project/ajaxTasksPerDpmt?project_id={0}" .format( project.id))
             self.assertEquals(response.status_code, 200)
             checkJsonMetricsAreEqual(self, str(response.content, encoding='utf8'), true_data)
 
@@ -380,7 +380,7 @@ class ProjectMetricsTestCase(TestCase):
         """
         c = Client()
 
-        response = c.get("/project/ajaxTimePerDpmt?project_id=%d" % Project.objects.get(name="pro1").id)
+        response = c.get("/project/ajaxTimePerDpmt?project_id={0}" .format( Project.objects.get(name="pro1").id))
         self.assertEquals(response.status_code, 403)
 
     def test_access_denied_low_role_timeperdpmt(self):
@@ -390,7 +390,7 @@ class ProjectMetricsTestCase(TestCase):
         c = Client()
         c.login(username="emp1", password="123456")
 
-        response = c.get("/project/ajaxTimePerDpmt?project_id=%d" % Project.objects.get(name="pro1").id)
+        response = c.get("/project/ajaxTimePerDpmt?project_id={0}" .format( Project.objects.get(name="pro1").id))
         self.assertEquals(response.status_code, 403)
 
     def test_access_ok_executive_timeperdpmt(self):
@@ -400,7 +400,7 @@ class ProjectMetricsTestCase(TestCase):
         c = Client()
         c.login(username="emp2", password="123456")
 
-        response = c.get("/project/ajaxTimePerDpmt?project_id=%d" % Project.objects.get(name="pro1").id)
+        response = c.get("/project/ajaxTimePerDpmt?project_id={0}" .format( Project.objects.get(name="pro1").id))
         self.assertEquals(response.status_code, 200)
 
     def test_access_other_company_executive_timeperdpmt(self):
@@ -411,7 +411,7 @@ class ProjectMetricsTestCase(TestCase):
         c = Client()
         c.login(username="emp2", password="123456")
 
-        response = c.get("/project/ajaxTimePerDpmt?project_id=%d" % Project.objects.get(name="pro2").id)
+        response = c.get("/project/ajaxTimePerDpmt?project_id={0}" .format( Project.objects.get(name="pro2").id))
         self.assertEquals(response.status_code, 403)
 
     def test_bad_request_timeperdpmt(self):
@@ -500,7 +500,7 @@ class ProjectMetricsTestCase(TestCase):
 
             # Check that the data returned by the AJAX query matches the generated data
 
-            response = c.get("/project/ajaxTimePerDpmt?project_id=%d&start_date=2016-01-01&end_date=2017-01-01" % project.id)
+            response = c.get("/project/ajaxTimePerDpmt?project_id={0}&start_date=2016-01-01&end_date=2017-01-01" .format( project.id))
             self.assertEquals(response.status_code, 200)
             checkJsonMetricsAreEqual(self, str(response.content, encoding='utf8'), true_data)
 

@@ -94,6 +94,9 @@ def password_reset(request,
                    extra_context=None,
                    html_email_template_name=None,
                    extra_email_context=None):
+    """
+    Deprecated. Request for new password
+    """
     if post_reset_redirect is None:
         post_reset_redirect = reverse('password_reset_done')
     else:

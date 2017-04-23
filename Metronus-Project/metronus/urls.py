@@ -55,7 +55,7 @@ urlpatterns += [#i18n_patterns(
     url(r'^department/delete/(?P<department_id>\w{0,50})/$', departmentController.delete, name='department_delete'),
     url(r'^department/ajaxEmployeesPerTask$', departmentController.ajax_employees_per_task, name='department_employees_per_task'),
     url(r'^department/ajaxTimePerTask$', departmentController.ajax_time_per_task, name='department_time_per_task'),
-
+    url(r'^department/ajaxProfit/(?P<department_id>\w{0,50})/$', departmentController.ajax_profit_per_date, name='department_profit_per_date'),
     #Task
     url(r'^task/create$', taskController.create, name='task_create'),
     url(r'^task/createAsync$', taskController.createAsync),
@@ -76,6 +76,7 @@ urlpatterns += [#i18n_patterns(
     url(r'^project/ajaxEmployeesPerDpmt$', projectController.ajax_employees_per_department, name='project_employees_per_department'),
     url(r'^project/ajaxTasksPerDpmt$', projectController.ajax_tasks_per_department, name='project_tasks_per_department'),
     url(r'^project/ajaxTimePerDpmt$', projectController.ajax_time_per_department, name='project_time_per_department'),
+    url(r'^project/ajaxProfit/(?P<project_id>\w{0,50})/$', projectController.ajax_profit_per_date, name='project_profit_per_date'),
 
     #Project-Department relationship
     url(r'^projectdepartment/create$', projectDepartmentController.create, name='projectdepartment_create'),
@@ -92,6 +93,7 @@ urlpatterns += [#i18n_patterns(
     url(r'^employee/delete/(?P<username>\w{0,50})/$', employeeController.delete, name='employee_delete'),
     url(r'^employee/ajax_productivity_per_task/(?P<username>\w{0,50})$', employeeController.ajax_productivity_per_task, name='employee_ajax_productivity_per_task'),
     url(r'^employee/ajax_productivity_per_task_and_date/(?P<username>\w{0,50})$', employeeController.ajax_productivity_per_task_and_date, name='employee_ajax_productivity_per_task_and_date'),
+    url(r'^employee/ajaxProfit/(?P<employee_id>\w{0,50})$', employeeController.ajax_profit_per_date, name='employee_profit_per_date'),
 
     # TimeLogs
     url(r'^timeLog/list_all/$', timeLogController.list_all, name='timeLog_list_all'),

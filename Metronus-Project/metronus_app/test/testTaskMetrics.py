@@ -270,7 +270,7 @@ class TaskMetricsTestCase(TestCase):
         """
         c = Client()
 
-        response = c.get("/task/ajaxProdPerTask?task_id=%d" % Task.objects.all().first().id)
+        response = c.get("/task/ajaxProdPerTask?task_id={0}".format( Task.objects.all().first().id))
         
         #redirected to login
         self.assertEquals(response.status_code, 302)
@@ -282,7 +282,7 @@ class TaskMetricsTestCase(TestCase):
         c = Client()
         c.login(username="emp2", password="123456")
 
-        response = c.get("/task/ajaxProdPerTask?task_id=%d" % Task.objects.all().first().id)
+        response = c.get("/task/ajaxProdPerTask?task_id={0}".format( Task.objects.all().first().id))
         self.assertEquals(response.status_code, 200)
 
     def test_bad_request_prod_per_task(self):

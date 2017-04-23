@@ -102,8 +102,11 @@ def list_all(request):
         "form":form,"valid_production_units":valid_production_units,"over_day_limit":over_day_limit,'has_permissions':has_permissions})
 
 
-#Método para eliminar un registro siempre que la fecha del registro sea la misma que cuando se llama al método
+
 def delete(request, timeLog_id):
+    """
+    Método para eliminar un registro siempre que la fecha del registro sea la misma que cuando se llama al método
+    """
     employee = get_current_employee_or_403(request)
     timeLog = findTimeLog(timeLog_id)
     task = timeLog.task_id
@@ -117,13 +120,19 @@ def delete(request, timeLog_id):
         raise PermissionDenied
     return redirect('timeLog_list_all')
 
-#Método auxiliar para encontrar una tarea
+
 def findTask(task_id):
+    """
+    Método auxiliar para encontrar una tarea
+    """
     task = get_object_or_404(Task,pk=task_id.id)
     return task
 
-#Método auxiliar para la creación de registros
+
 def createTimeLog(form, employee):
+    """
+    Método auxiliar para la creación de registros
+    """
     fdescription = form.cleaned_data['description']
     fwork_date = form.cleaned_data['workDate']
     if (fwork_date.date() > date.today()):
@@ -154,16 +163,20 @@ def checkProducedUnits(form):
     # both null or empty OR both not null or empty
     return (prod_units is not None and prod_units!="" and task.production_goal is not None and task.production_goal!="" ) or ((prod_units is None or prod_units=="") and (task.production_goal is None or task.production_goal==""))
 
-#Comprobación para saber si el empleado puede imputar horas
+
 def checkPermissionForTask(employee, task):
+    """
+    Comprobación para saber si el empleado puede imputar horas
+    """
     if employee is not None and task is not None:
         res = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee, projectDepartment_id=task.projectDepartment_id)
         return res.count()>0
     return False
     
 
-#Comprobacion para saber si el empleado es un mando superior y tiene acceso a todas las imputaciones de una tarea
+
 def checkRoleForTask(employee, task):
+    """Comprobacion para saber si el empleado es un mando superior y tiene acceso a todas las imputaciones de una tarea"""
     is_team_manager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee,
                                                                         role_id__tier=30)
     res = is_team_manager.count() > 0
@@ -180,6 +193,9 @@ def findTimeLog(timeLog_id):
     return timeLog
 
 class MyTask():
+    """
+    This class holds data for timelogs from an employee
+    """
     id = 0
     name = ""
     durations = []
@@ -200,13 +216,16 @@ class MyTask():
         self.durations.append((total_duration,0))
 
 def findTimeLogByDateAndTask(tDate,task,employee):
-    #Vaya churro para comprobar que el dia, el mes y el año sean iguales
+    """Vaya churro para comprobar que el dia, el mes y el año sean iguales"""
     timeLog = TimeLog.objects.filter(workDate__year=tDate.date().year,
                                      workDate__month=tDate.date().month,
                                      workDate__day=tDate.date().day,task_id=task,employee_id=employee).first()
     return timeLog
 
 def checkTimeLogOvertime(timeLog):
+    """
+    Checks we can edit the timelog, which happens if the last edit for that timelog was today
+    """
     today = datetime.today()
     result = False
     if(timeLog.registryDate.date().day==today.day and timeLog.registryDate.date().month==today.month and timeLog.registryDate.date().year==today.year):
