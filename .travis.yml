@@ -1,8 +1,16 @@
+dist: trusty
+sudo: required
 language: python
 python: 3.5.2
 
 services:
   - postgresql
+
+addons:
+  sonarqube:
+    organization: "metronus-github"
+    token:
+      secure: "P023utt30zGR0kRhwE/R1bnymMZ+hirvCzbG8MjifFfp5D+CRqEW02ascCFNL/lPRnewynIseUw6UJWeKswRRhdVDteAtHAeDh1iMK37z/JeTM7jOYR9Rufmw4ub9nb8ifzYp0dBc49TcSuwTmfqQo+/bXhjLTF+N81ZoPUibXRvAD9MaBmD5eV9CGl3MNlKtpH+uQpQVofXBIajUBQD1tIQ5CeHaCobKg+xaW3igpoP8fyCDRWU6zMGvfe9XI0naH2gYAl+8jthMU4cL5X1DwMHUE1qRU/5OZxePkAHXmxms6MXQ6Lyn0bnBKgRdgrzhGds+N+ymRBFrqU7KsLs67p34U1mtIoNrTvy9K5d/EPwpa/Pglitx/6ZA4AxD98vbILy/hKlEBfQOy8YZPIcWYFY0V5MdGtMgyvIV9oiE9aJ8j+d3PpLK9oGqYIakJK2AEZJ8tjEJiYcfceMaSsrGvZPCfhVKei4JYNiCfI5IY/I8mr8qBRud/4SFfgGvZiwoEIeY31U4B0c9LIUWNltL3NJJ8G4EZFq0Doo7VSqf9C+HZUE0yOoiAY+QLtjmeL6q9meXFUpX1/pXVDNV9OYx2ktGKRVLJV/cVENYxZoV9Dvn64edCZDtS382bgSCjtPQnpqFBoiCDzS4LFl1HNYslB9Kbqsm7+FPqmywGX/BB4="
 
 env:
   global:
@@ -38,3 +46,9 @@ script:
   - python3 manage.py compilemessages
   - python3 manage.py populate
   - python3 manage.py test
+  - cd $TRAVIS_BUILD_DIR/
+  - sonar-scanner
+
+cache:
+  directories:
+    '$HOME/.sonar/cache'
