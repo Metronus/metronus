@@ -164,6 +164,40 @@
    {#  by clicking on the tasks above, a graphic is displayed with the diary productivities #}
     <div id="task" style="height:350px;"></div>
   </div>
+
+
+    <h3> {% trans 'Profit' %}</h3>
+{#here goes the date picker#}
+     <div class="row x_title">
+                        <div class="col-md-6">
+                            <h2>{% trans 'datePicker' %}</h2>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="pull-right">
+                                <fieldset>
+                                    <div class="control-group">
+                                        <div class="controls">
+                                            <div class="input-prepend input-group">
+                                                <span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
+                                                <input type="text" style="width: 200px" name="task_chart" id="task_chart" class="form-control" value="" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+ <div id="task_space">
+  {#   here go the tasks, with their total productivities, loads on document ready with an ajax call#}
+
+ </div>
+
+  <div class="x_content row">
+   {#  by clicking on the tasks above, a graphic is displayed with the diary productivities #}
+    <div id="task" style="height:350px;"></div>
+  </div>
+
 {% endblock %}
 {% block javascript %}
 
@@ -347,6 +381,189 @@ $(document).ready(function() {
     }
 });
 });
+
+
+
+
+<!-- Por favor, una persona AMABLE que me diga como funciona esto -->
+
+ function fromData (backendData) {
+  dates=backendData["dates"];
+  task=backendData["task"]
+  //en xAxis data pones lo que va en el eje X (en este caso las fechas)
+  //cada dato necesita una serie
+  //expected y real profit, dos series, cada una con un campo data
+
+    return {
+        title : {
+            text: '{% trans 'profitGraphic' %}',
+            subtext: task["name"]
+        },
+        tooltip : {
+            trigger: 'axis'
+        },
+        legend: {
+            data:['Invested time']
+        },
+        toolbox: {
+            show : true,
+            feature : {
+                saveAsImage : {show: true}
+            }
+        },
+        calculable : true,
+        xAxis : [
+            {
+                type : 'category',
+                show : false,
+                data : dates
+            }
+        ],
+        yAxis : [
+            {
+                type : 'value'
+            }
+        ],
+        series : [
+            {
+                name:'{% trans 'expectedProfit' %}',
+                type:'bar',
+                data: task["expected_profit"],
+                markPoint : {
+                    data : [
+                        {type : 'max', name: 'Max'},
+                        {type : 'min', name: 'Min'}
+                    ]
+                },
+                markLine : {
+                    data : [
+                        {type : 'average', name: 'Avg'}
+                    ]
+                }
+            },
+            {
+                name:'{% trans 'realProfit' %}',
+                type:'bar',
+                data: task["real_profit"],
+                markPoint : {
+                    data : [
+                        {type : 'max', name: 'Max'},
+                        {type : 'min', name: 'Min'}
+                    ]
+                },
+                markLine : {
+                    data : [
+                        {type : 'average', name: 'Avg'}
+                    ]
+                }
+            }
+        ]
+    }
+
+}
+//here we save the current task id for reloading purposes
+var t_id=0
+function ajax_productivity(id) {
+  //loads diary productivities for the specified task
+  //find the date picker
+  picker=$('input[name="task_chart"]').data('daterangepicker');
+   // $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+
+  $.get({
+    url: '/employee/ajax_profit_per_task_and_date/{{employee.user.username}}',
+    data:{
+        task_id:id,
+        start_date:picker.startDate.format('YYYY-MM-DD'),
+        end_date:picker.endDate.format('YYYY-MM-DD')
+     },
+    success: function ( backendData )  {
+     // console.log(JSON.stringify( backendData ))
+      var echartLine = echarts.init(document.getElementById('task'), theme);
+      echartLine.setOption( fromData( backendData ) );
+      t_id=id;
+
+    /**
+     * Esto se encarga de hacer responsivo (más o menos) el chart
+     * */
+    $(window).on('resize', function(){
+        if(echartLine != null && echartLine != undefined){
+            echartLine.resize();
+        }
+    });
+    }
+  }).fail(function () {
+      // Error
+  })
+
+}
+$(document).ready(function() {
+    //loads all tasks for the employee, with total producitivity
+      $.get({
+        url: "/employee/ajax_profit_per_task/{{employee.user.username}}",
+
+        success: function ( backendData )  {
+          space=document.getElementById('task_space')
+          all=""
+
+          for (var task in backendData ){
+              all+="<div>";
+              all+="<input type='button' class='btn btn-success submit-button' value='" +
+              backendData[task]["name"] + "' onclick='ajax_productivity("+task+");' />";
+              all+="Expected:"+backendData[task]["expected_profit"]+";Total:"+
+              backendData[task]["total_profit"]+"";
+              all+="</div>";
+           }
+            space.innerHTML =all
+
+
+        defaultRange = moment().startOf('month').format('MM/DD/YYYY') +' - '+ moment().endOf('month').format('MM/DD/YYYY')
+        $('input[name="task_chart"]').val(defaultRange)
+
+        $('input[name="task_chart"]').daterangepicker({
+            autoUpdateInput: false,
+            locale: {
+                cancelLabel: '{% trans 'default' %}',
+                applyLabel: '{% trans 'apply' %}'
+            }
+        });
+  $('input[name="task_chart"]').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+
+      $.get({
+        url: '/employee/ajax_productivity_per_task_and_date/{{employee.user.username}}',
+        data:{
+            task_id:t_id,
+            start_date:picker.startDate.format('YYYY-MM-DD'),
+            end_date:picker.endDate.format('YYYY-MM-DD')
+         },
+        success: function ( backendData )  {
+         // console.log(JSON.stringify( backendData ))
+          var echartLine = echarts.init(document.getElementById('task'), theme);
+          echartLine.setOption( fromData( backendData ) );
+
+        /**
+         * Esto se encarga de hacer responsivo (más o menos) el chart
+         * */
+        $(window).on('resize', function(){
+            if(echartLine != null && echartLine != undefined){
+                echartLine.resize();
+            }
+        });
+        }
+      }).fail(function () {
+          // Error
+      });
+        $('input[name="task_chart"]').on('cancel.daterangepicker', function(ev, picker) {
+            $(this).val(defaultRange);
+        });
+
+      })
+    }
+});
+});
+
+
+
 
     </script>
 

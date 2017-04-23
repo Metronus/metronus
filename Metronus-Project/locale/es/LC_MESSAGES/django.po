@@ -396,6 +396,14 @@ msgid "expectedProductivity"
 msgstr "Productividad esperada"
 msgid "employeeConfirm"
 msgstr "¿Está seguro de eliminar el empleado? Se eliminará también todo lo relacionado con el mismo"
+msgid "profit"
+msgstr "Ganancia"
+msgid "profitGraphic"
+msgstr "Gráfico de ganancias"
+msgid "realProfit"
+msgstr "Ganancia real"
+msgid "expectedProfit"
+msgstr "Ganancia esperada"
 
 
 #: Project
