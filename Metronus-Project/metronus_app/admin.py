@@ -39,11 +39,9 @@ class MyAdminSite(AdminSite):
             users.append(u.id)
         #logged users
         context["users"]=users
-        print(users)
 
         #task by company
         context["tasks"]=list(Company.objects.all().annotate(num_task=Count("project__projectdepartment__task")).values_list("id","num_task"))
-        print(context["tasks"])
         return JsonResponse(context)#(request, "dashboard.html", context)
 
 

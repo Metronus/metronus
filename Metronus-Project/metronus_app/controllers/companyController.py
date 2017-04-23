@@ -123,7 +123,6 @@ def edit(request):
         if form.is_valid():
             if checkImage(form, 'logo'):
                 # Company data
-                print(form.cleaned_data["company_email"])
                 company.visible_short_name = form.cleaned_data["visible_short_name"]
                 company.email = form.cleaned_data["company_email"]
                 company.phone = form.cleaned_data["company_phone"]
