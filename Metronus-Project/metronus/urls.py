@@ -94,6 +94,7 @@ urlpatterns += [#i18n_patterns(
     url(r'^employee/ajax_productivity_per_task/(?P<username>\w{0,50})$', employeeController.ajax_productivity_per_task, name='employee_ajax_productivity_per_task'),
     url(r'^employee/ajax_productivity_per_task_and_date/(?P<username>\w{0,50})$', employeeController.ajax_productivity_per_task_and_date, name='employee_ajax_productivity_per_task_and_date'),
     url(r'^employee/ajaxProfit/(?P<employee_id>\w{0,50})$', employeeController.ajax_profit_per_date, name='employee_profit_per_date'),
+    url(r'^employee/ajaxProfit/(?P<employee_id>\w{0,50})/(?P<project_id>\w{0,50})/$', employeeController.ajax_profit_per_date_in_project, name='employee_profit_per_date_in_project'),
 
     # TimeLogs
     url(r'^timeLog/list_all/$', timeLogController.list_all, name='timeLog_list_all'),
