@@ -29,13 +29,13 @@
 
   <body class="nav-md">
 
-  {% isAdmin user.actor as actor_is_admin %}
-  {% isExecutive user.actor as actor_is_executive %}
-  {% isProjectManager user.actor as actor_is_projectManager %}
-  {% isCoordinator user.actor as actor_is_coordinator %}
-  {% isTeamManager user.actor as actor_is_teamManager %}
-  {% isEmployee user.actor as actor_is_employee %}
-  {% hasRole user.actor as actor_has_role %}
+  {% is_admin user.actor as actor_is_admin %}
+  {% is_executive user.actor as actor_is_executive %}
+  {% is_project_manager user.actor as actor_is_projectManager %}
+  {% is_coordinator user.actor as actor_is_coordinator %}
+  {% is_team_manager user.actor as actor_is_teamManager %}
+  {% is_employee user.actor as actor_is_employee %}
+  {% has_role user.actor as actor_has_role %}
 
 
 
