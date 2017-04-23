@@ -1,6 +1,6 @@
 from django import forms
-from django.utils.translation import ugettext_lazy as _
 from metronus_app.model.projectDepartment import Project, Department
+
 
 class ProjectDepartmentForm(forms.Form):
     """
@@ -10,5 +10,7 @@ class ProjectDepartmentForm(forms.Form):
 
     def __init__(self, user, *args, **kwargs):
         super(ProjectDepartmentForm, self).__init__(*args, **kwargs)
-        self.fields['project_id'] = forms.ModelChoiceField(queryset=Project.objects.filter(company_id=user.company_id, deleted=False))
-        self.fields['department_id'] = forms.ModelChoiceField(queryset=Department.objects.filter(company_id=user.company_id ,active=True))
+        self.fields['project_id'] = forms.ModelChoiceField(queryset=Project.objects.filter(
+            company_id=user.company_id, deleted=False))
+        self.fields['department_id'] = forms.ModelChoiceField(queryset=Department.objects.filter(
+            company_id=user.company_id, active=True))
