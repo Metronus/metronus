@@ -150,9 +150,9 @@ urlpatterns += [#i18n_patterns(
     url(r'^contact-done/$', appController.contact_done, name='contact_done'),
 
     url(r'^register$', companyController.create),
-    url(r'^ajax/validate_cif/$', companyController.validateCIF, name='validate_cif'),
-    url(r'^ajax/validate_admin/$', companyController.validateAdmin, name='validate_admin'),
-    url(r'^ajax/validate_short_name/$', companyController.validateShortName, name='validate_short_name'),
+    url(r'^ajax/validate_cif/$', companyController.validate_cif, name='validate_cif'),
+    url(r'^ajax/validate_admin/$', companyController.validate_admin, name='validate_admin'),
+    url(r'^ajax/validate_short_name/$', companyController.validate_short_name, name='validate_short_name'),
 
 #)
 ]
