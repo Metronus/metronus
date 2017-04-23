@@ -140,10 +140,11 @@ def view(request, department_id):
 
     coordinator = get_coordinator(department)
     tasks = Task.objects.filter(active=True, projectDepartment_id__department_id__id=department_id)
-    employees = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__department_id=department).distinct()
+    employees = Employee.objects.filter(
+        projectdepartmentemployeerole__projectDepartment_id__department_id=department).distinct()
     
     return render(request, 'department/department_view.html', {'department': department, 'employees': employees,
-                                                               'tasks': tasks, 'coordinator':coordinator})
+                                                               'tasks': tasks, 'coordinator': coordinator})
 
 
 def edit(request, department_id):
@@ -288,8 +289,9 @@ def ajax_time_per_task(request):
     }
 
     for task in dpmt_tasks:
-        time_total = TimeLog.objects.filter(task_id=task,
-                                            workDate__range=[start_date, end_date]).aggregate(Sum('duration'))["duration__sum"]
+        time_total = TimeLog.objects.filter(
+            task_id=task,
+            workDate__range=[start_date, end_date]).aggregate(Sum('duration'))["duration__sum"]
 
         if time_total is None: 
             time_total = 0
@@ -358,7 +360,7 @@ def ajax_profit_per_date(request, department_id):
         str_dates.append((d1 + timedelta(days=i)).date().strftime("%Y-%m-%d"))
         dates.append(d1 + timedelta(days=i))
 
-    data = {'dates': str_dates, 'expenses': [], 'income': [], 'acumExpenses': [], 'acumIncome':[]}
+    data = {'dates': str_dates, 'expenses': [], 'income': [], 'acumExpenses': [], 'acumIncome': []}
 
     # Profit
     # for each date, we will find all logs, calculate the sum and acumulate it
@@ -517,8 +519,9 @@ def get_list_for_role(request):
             if not res:
                 raise PermissionDenied
             else:
-                departments = Department.objects.filter(projectdepartment__projectdepartmentemployeerole__employee_id=actor,
-                                                        company_id=actor.company_id, active=True)
+                departments = Department.objects.filter(
+                    projectdepartment__projectdepartmentemployeerole__employee_id=actor,
+                    company_id=actor.company_id, active=True)
         else:
             departments = Department.objects.filter(company_id=actor.company_id, active=True)
     else:
