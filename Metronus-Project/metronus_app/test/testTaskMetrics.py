@@ -222,6 +222,7 @@ class TaskMetricsTestCase(TestCase):
 
         pd = ProjectDepartment.objects.create(project_id=pro1, department_id=dep2)
         pd2 = ProjectDepartment.objects.create(project_id=pro1, department_id=dep_rand)
+        pd3 = ProjectDepartment.objects.create(project_id=pro2, department_id=dep5)
 
         pdrole1 = ProjectDepartmentEmployeeRole.objects.create(
             projectDepartment_id=pd,
@@ -258,7 +259,7 @@ class TaskMetricsTestCase(TestCase):
             name  ="Hacer cosas de front",
             description  = "nada",
             actor_id = employee2,
-            projectDepartment_id = pd2,
+            projectDepartment_id = pd3,
             production_goal="2.0",
             goal_description="kgs"
         )
@@ -294,3 +295,52 @@ class TaskMetricsTestCase(TestCase):
 
         response = c.get("/task/ajaxProdPerTask")
         self.assertEquals(response.status_code, 400)
+
+    def test_access_denied_not_logged_profit(self):
+        """
+        Without authentication, try getting the profit JSON
+        """
+        c = Client()
+
+        response = c.get("/task/ajaxProfit/%d/" % Task.objects.get(name="Hacer cosas").id)
+        self.assertEquals(response.status_code, 403)
+
+    def test_access_denied_low_role_profit(self):
+        """
+        Without proper roles, try getting the profit JSON
+        """
+        c = Client()
+        c.login(username="emp1", password="123456")
+
+        response = c.get("/task/ajaxProfit/%d/" % Task.objects.get(name="Hacer cosas").id)
+        self.assertEquals(response.status_code, 403)
+
+    def test_access_ok_executive_profit(self):
+        """
+        As an executive, try getting the profit JSON
+        """
+        c = Client()
+        c.login(username="emp2", password="123456")
+
+        response = c.get("/task/ajaxProfit/%d/" % Task.objects.get(name="Hacer cosas").id)
+        self.assertEquals(response.status_code, 200)
+
+    def test_access_other_company_executive_profit(self):
+        """
+        As an executive, try getting the profit JSON from other company
+        """
+        c = Client()
+        c.login(username="emp2", password="123456")
+
+        response = c.get("/task/ajaxProfit/%d/" % Task.objects.get(name="Hacer cosas de front").id)
+        self.assertEquals(response.status_code, 403)
+
+    def test_bad_request_profit(self):
+        """
+        Try getting the profit JSON without providing a task
+        """
+        c = Client()
+        c.login(username="emp2", password="123456")
+
+        response = c.get("/task/ajaxProfit")
+        self.assertEquals(response.status_code, 404)
