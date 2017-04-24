@@ -12,7 +12,7 @@ from metronus_app.model.goalEvolution             import GoalEvolution
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 from django.db                                        import transaction
 @transaction.atomic
-def basicLoad():
+def basic_load():
     """
     Loads a lot of data from scratch
     """
@@ -304,9 +304,8 @@ def populate_roles():
 #############################################################################
 #############################################################################
 #############################################################################
-
 def populate_database():
     """
     This is called by python3 manage.py populate
     """
-    basicLoad()
+    basic_load()

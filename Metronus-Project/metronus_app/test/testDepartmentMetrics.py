@@ -37,7 +37,7 @@ def check_json_metrics_are_equal(self, response_string, data):
     self.assertEquals(len(response['names']), len(data['names']))
     self.assertEquals(len(response['values']), len(data['values']))
 
-    for (name, val) in zip(data['names'], data['values']):
+    for name, val in zip(data['names'], data['values']):
         self.assertTrue(name in response['names'])
         self.assertTrue(val in response['values'])
 
