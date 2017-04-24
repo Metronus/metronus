@@ -67,12 +67,11 @@ def create(request):
                     errors.append('task_creation_repeated_name')
 
             if not errors:
-                if pro is not None:
-                    if not pro.active:
-                        check_task(pro, request)
-                        pro.active = True
-                        pro.save()
-                        return HttpResponseRedirect('/task/list')
+                if pro and not pro.active:
+                    check_task(pro, request)
+                    pro.active = True
+                    pro.save()
+                    return HttpResponseRedirect('/task/list')
                 else:
                     actor = check_task(pro, request)
                     create_task(form, pdtuple, actor)
@@ -131,17 +130,16 @@ def create_async(request):
             if pdtuple is None:
                 errors.append('task_creation_project_department_not_related')
             else:
-                pro = find_name(pname,pdtuple)
+                pro = find_name(pname, pdtuple)
                 if pro is not None and pro.active:
                     errors.append('task_creation_repeated_name')
 
             if not errors:
-                if pro is not None:
-                    if not pro.active:
-                        check_task(pro, request)
-                        pro.active = True
-                        pro.save()
-                        return JsonResponse(data)
+                if pro and not pro.active:
+                    check_task(pro, request)
+                    pro.active = True
+                    pro.save()
+                    return JsonResponse(data)
                 else:
                     actor = check_task(pro, request)
                     create_task(form, pdtuple, actor)
@@ -190,7 +188,7 @@ def list_tasks(request):
     return render(request, "task_list.html", {"tasks": tasks})
 
 
-def view(request,task_id):
+def view(request, task_id):
     """
     parameters:
     task_id: the task id to delete
@@ -248,7 +246,8 @@ def edit(request, task_id):
             task = get_object_or_404(Task, pk=form.cleaned_data['task_id'])
             check_task(task, request)
             # find tasks with the same name
-            pro = Task.objects.filter(name=form.cleaned_data['name'], projectDepartment_id=task.projectDepartment_id).first()
+            pro = Task.objects.filter(name=form.cleaned_data['name'],
+                                      projectDepartment_id=task.projectDepartment_id).first()
 
             # pro does not exists or it's the same
             if pro is not None and pro.id != task.id and pro.active:
@@ -260,22 +259,22 @@ def edit(request, task_id):
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        task=get_object_or_404(Task,pk=task_id)
-        form = TaskForm(initial={"name":task.name,"description":task.description,
-                "task_id":task.id,
-                "production_goal":task.production_goal if task.production_goal is not None else "",
-                "goal_description":task.goal_description if task.goal_description is not None else "",
-                "project_id":task.projectDepartment_id.project_id,
-                "department_id":task.projectDepartment_id.department_id,
-                "price_per_unit":task.price_per_unit if task.price_per_unit is not None else "",
-                "price_per_hour":task.price_per_hour if task.price_per_hour is not None else ""})
+        task = get_object_or_404(Task, pk=task_id)
+        form = TaskForm(initial={"name": task.name, "description": task.description,
+                                 "task_id": task.id,
+                                 "production_goal": task.production_goal if task.production_goal is not None else "",
+                                 "goal_description": task.goal_description if task.goal_description is not None else "",
+                                 "project_id": task.projectDepartment_id.project_id,
+                                 "department_id": task.projectDepartment_id.department_id,
+                                 "price_per_unit": task.price_per_unit if task.price_per_unit is not None else "",
+                                 "price_per_hour": task.price_per_hour if task.price_per_hour is not None else ""})
     # The project
     coll = find_collections(request)
     return render(request, 'task_form.html', {'form': form, "errors": errors,
                                               "departments": coll["departments"], "projects": coll["projects"]})
 
 
-def delete(request,task_id):
+def delete(request, task_id):
     """
     parameters:
     task_id: the task id to delete
@@ -326,7 +325,7 @@ def ajax_productivity_per_task(request):
     task_id = request.GET["task_id"]
 
     # Get and parse the dates and the offset
-    start_date = request.GET.get("start_date", str(date.today()- timedelta(days=30)))
+    start_date = request.GET.get("start_date", str(date.today() - timedelta(days=30)))
     end_date = request.GET.get("end_date", str(date.today()))
     date_regex = re.compile("^\d{4}-\d{2}-\d{2}$")
 
@@ -347,7 +346,7 @@ def ajax_productivity_per_task(request):
     data = {
         'production': [],
         'goal_evolution': [],
-        'days':[]
+        'days': []
     }
     production = TimeLog.objects.filter(task_id_id=task_id, workDate__range=[start_date, end_date]).order_by('workDate')
     task = get_object_or_404(Task, pk=task_id, active=True)
@@ -427,10 +426,10 @@ def ajax_profit_per_date(request, task_id):
     # Profit
     # for each date, we will find all logs, calculate the sum and acumulate it
     index = 0
-    for logDate in dates:
+    for log_date in dates:
         logs = TimeLog.objects.filter(task_id__id=task_id,
-                                      workDate__year=logDate.year, workDate__month=logDate.month,
-                                      workDate__day=logDate.day).distinct()
+                                      workDate__year=log_date.year, workDate__month=log_date.month,
+                                      workDate__day=log_date.day).distinct()
         expenses = logs.aggregate(
             total_expenses=Sum(F("duration") / 60.0 * F("employee_id__price_per_hour"), output_field=FloatField()))["total_expenses"]
         expenses = expenses if expenses is not None else 0
@@ -477,8 +476,8 @@ def update_task(task, form, actor):
     task.description = form.cleaned_data['description']
     task.production_goal = form.cleaned_data['production_goal']
     task.goal_description = form.cleaned_data['goal_description']
-    task.price_per_unit=form.cleaned_data['price_per_unit']
-    task.price_per_hour=form.cleaned_data['price_per_hour']
+    task.price_per_unit = form.cleaned_data['price_per_unit']
+    task.price_per_hour = form.cleaned_data['price_per_hour']
     task.save()
 
 
@@ -514,7 +513,6 @@ def check_price(form):
     This means only per_unit or per_hour must be filled
     and only if there is a valid goal description for the first field, or no goal for the second
     """
-    # fgoal = form.cleaned_data['production_goal']
     fgoaldescription = form.cleaned_data['goal_description']
     fperunit = form.cleaned_data['price_per_unit']
     fperhour = form.cleaned_data['price_per_hour']
@@ -541,7 +539,7 @@ def check_role_for_list(request):
 
     if actor.user_type != 'A':
         # not an admin
-        is_team_manager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier= 30)
+        is_team_manager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=30)
         res = is_team_manager.count() > 0
 
         if res:
@@ -620,7 +618,7 @@ def find_collections(request):
     if actor.user_type != 'A':
         # not an admin
         is_team_manager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=30)
-        res = is_team_manager.count()>0
+        res = is_team_manager.count() > 0
 
         if res:
             # is manager
@@ -631,18 +629,14 @@ def find_collections(request):
             roles_pro = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=40)
             roles_dep = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=20)
 
-            if roles_pro.count() > 0:
+            if roles_pro.count() > 0 or roles_dep.count() > 0:
                 # you're a project manager. Loading your projects
-                proyectos = Project.objects.filter(company_id=actor.company_id, deleted=False,
-                                                   projectdepartment__projectdepartmentemployeerole__employee_id=actor).distinct()
-                departamentos = Department.objects.filter(company_id=actor.company_id, active=True,
-                                                          projectdepartment__projectdepartmentemployeerole__employee_id=actor).distinct()
-            elif roles_dep.count() > 0:
-                # you're a department coordinator. loading your departments
-                proyectos = Project.objects.filter(company_id=actor.company_id, deleted=False,
-                                                   projectdepartment__projectdepartmentemployeerole__employee_id=actor).distinct()
-                departamentos=Department.objects.filter(company_id=actor.company_id, active=True,
-                                                        projectdepartment__projectdepartmentemployeerole__employee_id=actor).distinct()
+                proyectos = Project.objects.filter(
+                    company_id=actor.company_id, deleted=False,
+                    projectdepartment__projectdepartmentemployeerole__employee_id=actor).distinct()
+                departamentos = Department.objects.filter(
+                    company_id=actor.company_id, active=True,
+                    projectdepartment__projectdepartmentemployeerole__employee_id=actor).distinct()
             else:
                 # not any of this? get outta here!!
                 raise PermissionDenied
@@ -672,7 +666,7 @@ def find_departments(request):
 
         if res:
             # is manager
-            departamentos=Department.objects.filter(company_id=actor.company_id, active=True)
+            departamentos = Department.objects.filter(company_id=actor.company_id, active=True)
         else:
             # not a manager
             roles_pro = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=40)
@@ -680,12 +674,16 @@ def find_departments(request):
 
             if roles_pro.count() > 0:
                 # you're a project manager. Loading your projects
-                departamentos = Department.objects.filter(company_id=actor.company_id, active=True,
-                                                          projectdepartment__projectdepartmentemployeerole__employee_id=actor, projectdepartment__project_id_id=project_id).distinct()
+                departamentos = Department.objects.filter(
+                    company_id=actor.company_id, active=True,
+                    projectdepartment__projectdepartmentemployeerole__employee_id=actor,
+                    projectdepartment__project_id_id=project_id).distinct()
             elif roles_dep.count() > 0:
                 # you're a department coordinator. loading your departments
-                departamentos = Department.objects.filter(company_id=actor.company_id, active=True,
-                                                          projectdepartment__projectdepartmentemployeerole__employee_id=actor, projectdepartment__project_id_id=project_id).distinct()
+                departamentos = Department.objects.filter(
+                    company_id=actor.company_id, active=True,
+                    projectdepartment__projectdepartmentemployeerole__employee_id=actor,
+                    projectdepartment__project_id_id=project_id).distinct()
             else:
                 # not any of this? get outta here!!
                 raise PermissionDenied
@@ -716,16 +714,16 @@ def find_projects(request):
 
         if res:
             # is manager
-            proyectos = Project.objects.filter(company_id=actor.company_id,deleted=False)
+            proyectos = Project.objects.filter(company_id=actor.company_id, deleted=False)
 
         else:
             # not a manager
             roles_pro = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=40)
             roles_dep = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=20)
 
-            if roles_pro.count()>0:
+            if roles_pro.count() > 0:
                 # you're a project manager. Loading your projects
-                proyectos = Project.objects.filter(company_id=actor.company_id,deleted=False,
+                proyectos = Project.objects.filter(company_id=actor.company_id, deleted=False,
                                                    projectdepartment__projectdepartmentemployeerole__employee_id=actor,
                                                    projectdepartment__department_id_id=department_id).distinct()
 
@@ -760,6 +758,7 @@ def check_metrics_authorized_for_task(user, task_id):
     if logged.user_type == 'E':
         # If it's not an admin, check that it has role EXECUTIVE (50) or higher for the projdept tuple
         try:
-            ProjectDepartmentEmployeeRole.objects.get(employee_id=logged, role_id__tier__gte=50, projectDepartment_id=task.projectDepartment_id)
+            ProjectDepartmentEmployeeRole.objects.get(employee_id=logged, role_id__tier__gte=50,
+                                                      projectDepartment_id=task.projectDepartment_id)
         except ObjectDoesNotExist:
             raise PermissionDenied
