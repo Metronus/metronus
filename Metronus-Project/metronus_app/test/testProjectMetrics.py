@@ -11,35 +11,8 @@ from metronus_app.model.company import Company
 from metronus_app.model.role import Role
 from metronus_app.model.administrator import Administrator
 from metronus_app.model.department import Department
-import string
+from metronus_app.common_utils import check_json_metrics_are_equal, ranstr
 import random
-import json
-
-
-def check_json_metrics_are_equal(self, response_string, data):
-    """
-    Checks the data provided by the JSON equals the real data
-    """
-    response = json.loads(response_string)
-
-    self.assertTrue('names' in response)
-    self.assertTrue('values' in response)
-
-    self.assertEquals(len(response['names']), len(data['names']))
-    self.assertEquals(len(response['values']), len(data['values']))
-
-    for name, val in zip(data['names'], data['values']):
-        self.assertTrue(name in response['names'])
-        self.assertTrue(val in response['values'])
-
-        ind = response['names'].index(name)
-
-        self.assertEquals(val, response['values'][ind])
-
-
-def ranstr():
-    """Returns a 10-character random string"""
-    return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
 
 
 class ProjectMetricsTestCase(TestCase):

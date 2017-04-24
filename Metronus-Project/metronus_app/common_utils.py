@@ -1,16 +1,24 @@
 from django.core.exceptions import PermissionDenied
 from metronus_app.model.administrator import Administrator
 from metronus_app.model.employee import Employee
-from django.core.exceptions import ObjectDoesNotExist
 from metronus.settings import DEFAULT_FROM_EMAIL
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 from django.template import loader
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth.models import User
+from metronus_app.model.timeLog import TimeLog
+from django.core.exceptions import ObjectDoesNotExist
+from metronus_app.model.company import Company
+from metronus_app.model.role import Role
+from metronus_app.model.projectDepartment import ProjectDepartment
+from metronus_app.model.task import Task
 
 from PIL import Image
 
 import sys
+import string
+import random
+import json
 
 
 # Image limit parameters
@@ -148,3 +156,91 @@ def is_email_unique(email):
     Checks the email is unique and does not exists in the database
     """
     return User.objects.filter(email=email).count() == 0
+
+def ranstr():
+    """ Returns a 10-character random string"""
+    return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
+
+
+# Son herramientas sorpresa que nos ayudarán más tarde
+
+def check_json_metrics_are_equal(self, response_string, data):
+    """
+    Checks the data provided by the JSON equals the real data
+    """
+    response = json.loads(response_string)
+
+    self.assertTrue('names' in response)
+    self.assertTrue('values' in response)
+
+    self.assertEquals(len(response['names']), len(data['names']))
+    self.assertEquals(len(response['values']), len(data['values']))
+
+    for name, val in zip(data['names'], data['values']):
+        self.assertTrue(name in response['names'])
+        self.assertTrue(val in response['values'])
+
+        ind = response['names'].index(name)
+
+        self.assertEquals(val, response['values'][ind])
+
+
+def create_employee_in_projdept(project, department):
+    """
+    creates an employee and assigns him/her a new role
+    """
+    user = User.objects.create_user(
+        username=ranstr(),
+        password=ranstr(),
+        email=ranstr() + "@metronus.es",
+        first_name=ranstr(),
+        last_name=ranstr()
+    )
+
+    employee = Employee.objects.create(
+        user=user,
+        user_type="E",
+        identifier=ranstr(),
+        phone="123123123",
+        company_id=Company.objects.get(company_name="company1")
+    )
+
+    try:
+        pd = ProjectDepartment.objects.get(project_id=project, department_id=department)
+    except ObjectDoesNotExist:
+        pd = ProjectDepartment.objects.create(project_id=project, department_id=department)
+
+    role = Role.objects.get(tier=random.choice([10, 20, 30, 40, 50]))
+    ProjectDepartmentEmployeeRole.objects.create(projectDepartment_id=pd, role_id=role, employee_id=employee)
+
+    return employee
+
+
+def create_task_in_projdept(project, department):
+    """
+    creates a task for a given project and department, either with production goal or not
+    """
+    try:
+        pd = ProjectDepartment.objects.get(project_id=project, department_id=department)
+    except ObjectDoesNotExist:
+        pd = ProjectDepartment.objects.create(project_id=project, department_id=department)
+
+    Task.objects.create(
+        name=ranstr(),
+        description=ranstr(),
+        actor_id=Administrator.objects.get(identifier="adm01"),
+        projectDepartment_id=pd
+    )
+
+
+def create_timelog_in_task(task, duration, date, employee=None):
+    """
+    creates a timelog for an employee involving a task during a specific date
+    """
+    TimeLog.objects.create(
+        description=ranstr(),
+        workDate=date,
+        duration=duration,
+        task_id=task,
+        employee_id=Employee.objects.get(identifier="emp01") if employee is None else employee
+    )
