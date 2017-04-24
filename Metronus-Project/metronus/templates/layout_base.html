@@ -44,7 +44,7 @@
         <div class="col-md-3 left_col">
           <div class="left_col scroll-view">
             <div class="navbar nav_title" style="border: 0;">
-              <a href="/app" class="site_title">
+              <a href="/dashboard/view" class="site_title">
                 {% if user.actor.company_id.logo == "" %}
                   <img src="/static/landing/img/favicon/android-icon-192x192.png" class="img-circle" width="40" height="40">
                 {% else %}
@@ -80,7 +80,7 @@
               <div class="menu_section">
                 <h3>{% trans 'dashControlPanel' %}</h3>
                 <ul class="nav side-menu">
-                  <li><a href="/app"><i class="fa fa-home"></i>{% trans 'dashIndex' %}</span></a>
+                  <li><a href="/dashboard/view"><i class="fa fa-home"></i>{% trans 'dashIndex' %}</span></a>
                   </li>
                   {% if actor_is_admin or actor_is_executive or actor_is_projectManager %}
                   <li>

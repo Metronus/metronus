@@ -564,6 +564,8 @@ msgid "roleCreation_editingHigherRole"
 msgstr "El rol que se intenta editar es superior al suyo y no se puede editar"
 msgid "roleCreation_formNotValid"
 msgstr "La información enviada no es correcta"
+msgid "photo"
+msgstr "Foto"
 
 #: Company
 msgid "registerCompany"
