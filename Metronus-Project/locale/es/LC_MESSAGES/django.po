@@ -658,6 +658,7 @@ msgstr "El objetivo de producción no es correcto. Especifique unidades o deje a
 msgid "task_creation_invalid_price"
 msgstr "Debe rellenar sólo uno de los campos de precio, y solo puede especificar el precio por unidad si existe objetivo de producción"
 
+
 msgid "taskError"
 msgstr "La tarea no se pudo guardar correctamente"
 msgid "taskAdd"
