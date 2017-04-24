@@ -13,7 +13,8 @@ class LoginTestCase(TestCase):
         """
         Loads the data to the database for tests to be done
         """
-        Company.objects.create(cif="123", company_name="company1", short_name="company1", email="company1@gmail.com", phone="123456789")
+        Company.objects.create(cif="123", company_name="company1",
+                               short_name="company1", email="company1@gmail.com", phone="123456789")
         company = Company.objects.get(cif="123")
 
         User.objects.create_user(

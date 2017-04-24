@@ -1,10 +1,11 @@
-from django.test                                 import TestCase, Client
+from django.test import TestCase, Client
 
-from metronus_app.model.company                  import Company
-from metronus_app.model.employee                 import Employee
-from metronus_app.model.administrator            import Administrator
-from django.contrib.auth.models                  import User
-from metronus_app.model.employeeLog              import EmployeeLog
+from metronus_app.model.company import Company
+from metronus_app.model.employee import Employee
+from metronus_app.model.administrator import Administrator
+from django.contrib.auth.models import User
+from metronus_app.model.employeeLog import EmployeeLog
+
 
 class EmployeeTestCase(TestCase):
     """This class provides a test case for employee management"""
@@ -14,18 +15,18 @@ class EmployeeTestCase(TestCase):
         """
         company1 = Company.objects.create(
             cif="123",
-            company_name = "company1",
+            company_name="company1",
             short_name="mplp",
-            email= "company1@gmail.com",
-            phone= "123456789"
+            email="company1@gmail.com",
+            phone="123456789"
         )
 
         company2 = Company.objects.create(
             cif="456",
-            company_name = "company2",
+            company_name="company2",
             short_name="lmao",
-            email= "company2@gmail.com",
-            phone= "1987654321"
+            email="company2@gmail.com",
+            phone="1987654321"
         )
 
         admin_user = User.objects.create_user(
@@ -36,7 +37,8 @@ class EmployeeTestCase(TestCase):
             last_name="Pérez"
         )
 
-        admin = Administrator.objects.create(
+        # Admin
+        Administrator.objects.create(
             user=admin_user,
             user_type="A",
             identifier="adm01",
@@ -60,7 +62,8 @@ class EmployeeTestCase(TestCase):
             last_name="Berto"
         )
 
-        employee1 = Employee.objects.create(
+        # Employee 1
+        Employee.objects.create(
             user=employee1_user,
             user_type="E",
             identifier="emp01",
@@ -68,7 +71,8 @@ class EmployeeTestCase(TestCase):
             company_id=company1
         )
 
-        employee2 = Employee.objects.create(
+        # Employee 2
+        Employee.objects.create(
             user=employee2_user,
             user_type="E",
             identifier="emp02",
@@ -203,8 +207,6 @@ class EmployeeTestCase(TestCase):
         logs_after = EmployeeLog.objects.all().count()
         self.assertEquals(logs_before, logs_after)
 
-
-
     def test_create_employee_username_taken_negative(self):
         """ Logged in as an administrator, try to create an employee"""
         c = Client()
@@ -257,7 +259,6 @@ class EmployeeTestCase(TestCase):
 
         logs_after = EmployeeLog.objects.all().count()
         self.assertEquals(logs_before, logs_after)
-
 
     def test_list_employees_positive(self):
         """
@@ -361,10 +362,9 @@ class EmployeeTestCase(TestCase):
         self.assertEquals(final.user.password, initialpass)
         self.assertEquals(final.price_per_hour, 4.0)
 
-        #Assert a new log was created with the price change
+        # Assert a new log was created with the price change
         logs_after = EmployeeLog.objects.all().count()
         self.assertEquals(logs_before + 1, logs_after)
-
 
     def test_edit_employee_pass_positive(self):
         """
@@ -375,7 +375,7 @@ class EmployeeTestCase(TestCase):
 
         initialpass = User.objects.get(username="emp1").password
 
-        response = c.post("/employee/updatePassword/emp1/", {
+        c.post("/employee/updatePassword/emp1/", {
             "password1": "nuevapassword",
             "password2": "nuevapassword",
         })
@@ -392,7 +392,7 @@ class EmployeeTestCase(TestCase):
 
         initialpass = User.objects.get(username="emp1").password
 
-        response = c.post("/employee/updatePassword/emp1/", {
+        c.post("/employee/updatePassword/emp1/", {
             "password1": "mequiero",
             "password2": "morirmucho",
         })
@@ -429,7 +429,7 @@ class EmployeeTestCase(TestCase):
         self.assertTrue(User.objects.get(username="emp1").is_active)
 
         response = c.get("/employee/delete/emp1/")
-        self.assertRedirects(response, "/employee/list/", fetch_redirect_response=False)
+        self.assertRedirects(response, "/employee/list", fetch_redirect_response=False)
 
         self.assertFalse(User.objects.get(username="emp1").is_active)
         logs_after = EmployeeLog.objects.all().count()

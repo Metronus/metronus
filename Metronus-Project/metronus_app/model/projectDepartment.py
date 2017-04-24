@@ -1,6 +1,5 @@
 from django.db import models
 
-from metronus_app.model.company import Company
 from metronus_app.model.department import Department
 from metronus_app.model.project import Project
 

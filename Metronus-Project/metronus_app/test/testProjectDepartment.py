@@ -41,7 +41,7 @@ class ProjectDepartmentTestCase(TestCase):
             first_name="Nimad",
             last_name="Rotartis")
 
-        admin1 = Administrator.objects.create(
+        Administrator.objects.create(
             user=admin_user1,
             user_type="A",
             identifier="adm01",

@@ -1,6 +1,4 @@
 from django.db import models
-from metronus_app.model.company import Company
-
 
 class CompanyLog(models.Model):
     cif = models.CharField(max_length=9, unique=True)

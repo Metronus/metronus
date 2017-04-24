@@ -1,6 +1,6 @@
 from django.contrib.auth.models                       import User
 from django.test                                      import TestCase, Client
-from django.core.exceptions                           import ObjectDoesNotExist, PermissionDenied
+from django.core.exceptions                           import ObjectDoesNotExist
 
 from metronus_app.model.employee                      import Employee
 from metronus_app.model.projectDepartment             import ProjectDepartment
@@ -216,12 +216,13 @@ class TaskMetricsTestCase(TestCase):
 
         pro1 = Project.objects.create(name="pro1", deleted=False, company_id=company1)
         pro2 = Project.objects.create(name="pro2", deleted=False, company_id=company2)
-        pro3 = Project.objects.create(name="pro3", deleted=False, company_id=company1)
+        Project.objects.create(name="pro3", deleted=False, company_id=company1)
         pro4 = Project.objects.create(name="pro4", deleted=False, company_id=company1)
         pro_random = Project.objects.create(name="pro_random", deleted=False, company_id=company1)
 
         pd = ProjectDepartment.objects.create(project_id=pro1, department_id=dep2)
         pd2 = ProjectDepartment.objects.create(project_id=pro1, department_id=dep_rand)
+        pd3 = ProjectDepartment.objects.create(project_id=pro2, department_id=dep5)
 
         pdrole1 = ProjectDepartmentEmployeeRole.objects.create(
             projectDepartment_id=pd,
@@ -229,7 +230,7 @@ class TaskMetricsTestCase(TestCase):
             employee_id=employee1
         )
 
-        pdrole2 = ProjectDepartmentEmployeeRole.objects.create(
+        ProjectDepartmentEmployeeRole.objects.create(
             projectDepartment_id=pd,
             role_id=role_ex,
             employee_id=employee2
@@ -254,16 +255,16 @@ class TaskMetricsTestCase(TestCase):
             projectDepartment_id = pd
         )
 
-        task3 = Task.objects.create(
+        Task.objects.create(
             name  ="Hacer cosas de front",
             description  = "nada",
             actor_id = employee2,
-            projectDepartment_id = pd2,
+            projectDepartment_id = pd3,
             production_goal="2.0",
             goal_description="kgs"
         )
 
-     
+
     def test_access_denied_not_logged_prod_task(self):
         """
         Without authentication, try getting the prod_per_task JSON
@@ -271,10 +272,10 @@ class TaskMetricsTestCase(TestCase):
         c = Client()
 
         response = c.get("/task/ajaxProdPerTask?task_id={0}".format( Task.objects.all().first().id))
-        
+
         #redirected to login
         self.assertEquals(response.status_code, 302)
-        
+
     def test_access_ok_logged_prod_task(self):
         """
         With proper roles, get the prod_per_task JSON
@@ -294,3 +295,52 @@ class TaskMetricsTestCase(TestCase):
 
         response = c.get("/task/ajaxProdPerTask")
         self.assertEquals(response.status_code, 400)
+
+    def test_access_denied_not_logged_profit(self):
+        """
+        Without authentication, try getting the profit JSON
+        """
+        c = Client()
+
+        response = c.get("/task/ajaxProfit/%d/" % Task.objects.get(name="Hacer cosas").id)
+        self.assertEquals(response.status_code, 403)
+
+    def test_access_denied_low_role_profit(self):
+        """
+        Without proper roles, try getting the profit JSON
+        """
+        c = Client()
+        c.login(username="emp1", password="123456")
+
+        response = c.get("/task/ajaxProfit/%d/" % Task.objects.get(name="Hacer cosas").id)
+        self.assertEquals(response.status_code, 403)
+
+    def test_access_ok_executive_profit(self):
+        """
+        As an executive, try getting the profit JSON
+        """
+        c = Client()
+        c.login(username="emp2", password="123456")
+
+        response = c.get("/task/ajaxProfit/%d/" % Task.objects.get(name="Hacer cosas").id)
+        self.assertEquals(response.status_code, 200)
+
+    def test_access_other_company_executive_profit(self):
+        """
+        As an executive, try getting the profit JSON from other company
+        """
+        c = Client()
+        c.login(username="emp2", password="123456")
+
+        response = c.get("/task/ajaxProfit/%d/" % Task.objects.get(name="Hacer cosas de front").id)
+        self.assertEquals(response.status_code, 403)
+
+    def test_bad_request_profit(self):
+        """
+        Try getting the profit JSON without providing a task
+        """
+        c = Client()
+        c.login(username="emp2", password="123456")
+
+        response = c.get("/task/ajaxProfit")
+        self.assertEquals(response.status_code, 404)

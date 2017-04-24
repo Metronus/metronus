@@ -31,10 +31,10 @@
                         {% for employee in employees %}
                             <tr>
                                 <td>
-                                    {% if user.actor.picture == "/static/avatar.png" %}
-                                        <img src="{{user.actor.picture}}" alt="{{user.get_username}}" class="avatar" alt="IMG">
+                                    {% if employee.picture %}
+                                        <img src="{{ MEDIA_URL }}{{employee.picture}}" alt="{{user.get_username}}" class="avatar" alt="IMG">
                                     {% else %}
-                                        <img src="{{ MEDIA_URL }}{{user.actor.picture}}" alt="{{user.get_username}}" class="avatar" alt="IMG">
+                                        <img src="/static/avatar.png" alt="{{user.get_username}}" class="avatar" alt="IMG">
                                     {% endif %}
                                     {{employee.user}}
                                 </td>
@@ -52,7 +52,7 @@
                                         {% trans 'update' %}</a>
                                 </td>
                                 <td class="hidden-xs">
-                                    <a href="#" class="btn btn-default" data-href="{% url 'employee_delete' employee.id %}"
+                                    <a href="#" class="btn btn-default" data-href="{% url 'employee_delete' employee.user.username %}"
                                        data-toggle="modal" data-target="#confirm-delete">{% trans 'fire' %}</a>
                                 </td>
                             </tr>

@@ -1,13 +1,11 @@
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
-from django.core.exceptions import  PermissionDenied
+from django.core.exceptions import PermissionDenied
 from metronus_app.forms.administratorForm import AdministratorForm
 from metronus_app.model.administrator import Administrator
-from metronus_app.model.company import Company
-from metronus_app.common_utils import get_current_admin_or_403
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from metronus_app.common_utils import checkImage
+from metronus_app.common_utils import check_image
 
 
 @login_required
@@ -34,11 +32,11 @@ def edit(request, username):
         })
     elif request.method == "POST":
         # Process the received form
-        
+
         form = AdministratorForm(request.POST)
-        if form.is_valid() and checkPasswords(form):
-            if checkImage(form, 'photo'):
-            
+        if form.is_valid() and check_passwords(form):
+            if check_image(form, 'photo'):
+
                 # Update employee data
                 administrator.identifier = form.cleaned_data["identifier"]
                 administrator.phone = form.cleaned_data["phone"]
@@ -60,36 +58,36 @@ def edit(request, username):
 
                 return HttpResponseRedirect('/company/view/')
             else:
-                return render(request, 'company/administrator_edit.html', {'form': form, 'errors': ['error.imageNotValid']})
-
+                return render(request, 'company/administrator_edit.html',
+                              {'form': form, 'errors': ['error.imageNotValid']})
 
     else:
         raise PermissionDenied
 
     return render(request, 'company/administrator_edit.html', {'form': form})
 
-'''
-def view(request, username):
-    """
-    url = administrator/view/<username>
+#
+# def view(request, username):
+#    """
+#    url = administrator/view/<username>
+#
+#    parameters/returns:
+#    administrator: datos del administrador
+#
+#    template: company_view.html
+#    """
+#
+#    # Check that the user is logged in and it's an administrator
+#    admin = get_current_admin_or_403(request)
+#
+#    admin2 = get_object_or_404(Administrator, username=username)
+#
+#   # Check that the admin has permission to view that company
+#    if admin2.company_id != admin.company_id:
+#        raise PermissionDenied
 
-    parameters/returns:
-    administrator: datos del administrador
+#    return render(request, 'administrator_view.html', {'admin': admin2})
 
-    template: company_view.html
-    """
-
-    # Check that the user is logged in and it's an administrator
-    admin = get_current_admin_or_403(request)
-
-    admin2 = get_object_or_404(Administrator, username=username)
-
-    # Check that the admin has permission to view that company
-    if admin2.company_id != admin.company_id:
-        raise PermissionDenied
-
-    return render(request, 'administrator_view.html', {'admin': admin2})
-'''
 
 def delete(request, username):
     """
@@ -103,7 +101,7 @@ def delete(request, username):
     pass  # TODO
 
 
-def checkPasswords(form):
+def check_passwords(form):
     """
     Check the passwords in the form match
     """
@@ -121,5 +119,4 @@ def notify_password_change(email):
 
     template: ..
     """
-
-    pass # TODO
+    pass  # TODO

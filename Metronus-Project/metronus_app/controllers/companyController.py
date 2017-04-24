@@ -12,8 +12,8 @@ from django.contrib.auth.decorators import login_required
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
-from metronus_app.common_utils import (get_current_admin_or_403, checkImage, send_mail, is_email_unique
-, get_or_none, is_username_unique)
+from metronus_app.common_utils import (get_current_admin_or_403, check_image, send_mail, is_email_unique,
+                                       get_or_none, is_username_unique)
 from django.core.exceptions import PermissionDenied
 
 
@@ -39,7 +39,7 @@ def create(request,
             errors = []
 
             # Check that the passwords match
-            if not checkPasswords(form):
+            if not check_passwords(form):
                 errors.append('companyRegister_passwordsDontMatch')
 
             # Check that the username is unique
@@ -51,15 +51,15 @@ def create(request,
                 errors.append('companyRegister_adminEmailNotUnique')
 
             # Check that the image is OK
-            if not checkImage(form, 'photo'):
+            if not check_image(form, 'photo'):
                 errors.append('companyRegister_imageNotValid')
 
             if not errors:
                 # process the data in form.cleaned_data as required
                 # ...
                 # redirect to a new URL:
-                company = createCompany(form)
-                administrator = registerAdministrator(form, company)
+                company = create_company(form)
+                administrator = register_administrator(form, company)
 
                 # This sends an information email to the company and to the admin
 
@@ -86,7 +86,6 @@ def create(request,
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        # form = DepartmentForm(initial={"department_id":0})
         form = RegistrationForm()
     return render(request, 'company/company_register.html', {'form': form})
 
@@ -121,9 +120,8 @@ def edit(request):
 
         form = CompanyForm(request.POST)
         if form.is_valid():
-            if checkImage(form, 'logo'):
+            if check_image(form, 'logo'):
                 # Company data
-                print(form.cleaned_data["company_email"])
                 company.visible_short_name = form.cleaned_data["visible_short_name"]
                 company.email = form.cleaned_data["company_email"]
                 company.phone = form.cleaned_data["company_phone"]
@@ -186,24 +184,24 @@ def delete(request):
     return HttpResponseRedirect('')
 
 
-#Auxiliar methods, containing the operation logic
-
-def createCompany(form):
+# Auxiliar methods, containing the operation logic
+def create_company(form):
     """
     Creates a company, supposing the data provided by the form is OK
     """
-    cif=form.cleaned_data['cif']
+    cif = form.cleaned_data['cif']
     company_name = form.cleaned_data['company_name']
     short_name = form.cleaned_data['short_name']
     email = form.cleaned_data['company_email']
     phone = form.cleaned_data['company_phone']
     logo = form.cleaned_data['logo']
 
-    company = Company.objects.create(cif=cif, company_name=company_name, short_name=short_name, email=email, phone=phone, logo=logo)
+    company = Company.objects.create(cif=cif, company_name=company_name, short_name=short_name,
+                                     email=email, phone=phone, logo=logo)
     return company
 
 
-def registerAdministrator(form, company):
+def register_administrator(form, company):
     """
     Tegisters an administrator for a company, supposing the data provided by the form is OK
     """
@@ -213,23 +211,25 @@ def registerAdministrator(form, company):
     last_name = form.cleaned_data['last_name']
     user_email = form.cleaned_data['admin_email']
 
-    admin = User.objects.create_user(username=username, password=password, email=user_email, first_name=first_name, last_name=last_name)
+    admin = User.objects.create_user(username=username, password=password, email=user_email,
+                                     first_name=first_name, last_name=last_name)
 
     identifier = form.cleaned_data['admin_identifier']
     phone = form.cleaned_data['admin_phone']
 
-    administrator = Administrator.objects.create(user=admin, user_type="A", identifier=identifier, phone=phone, company_id=company)
-
+    administrator = Administrator.objects.create(user=admin, user_type="A", identifier=identifier,
+                                                 phone=phone, company_id=company)
     return administrator
 
-def checkPasswords(form):
+
+def check_passwords(form):
     """
     checks if two passwords are the same
     """
     return form.cleaned_data['password'] == form.cleaned_data['repeatPassword']
 
 
-def validateCIF(request):
+def validate_cif(request):
     """
     checks if the company cif already exist
     """
@@ -247,7 +247,7 @@ def validateCIF(request):
     return JsonResponse(data)
 
 
-def validateAdmin(request):
+def validate_admin(request):
     """
     checks if the company administrator is registered
     """
@@ -264,7 +264,8 @@ def validateAdmin(request):
         data['error_message'] = 'ERROR'
     return JsonResponse(data)
 
-def validateShortName(request):
+
+def validate_short_name(request):
     """
     checks if the company short name already exist
     """

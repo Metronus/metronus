@@ -1,7 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import User
 from metronus_app.model.actor import Actor
 from metronus_app.model.projectDepartment import ProjectDepartment
+
 class Task(models.Model):
     name  = models.CharField(max_length=30)
     description  = models.CharField(max_length=200)

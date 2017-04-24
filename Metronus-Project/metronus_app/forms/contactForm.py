@@ -11,4 +11,3 @@ class ContactForm(Form):
     body = forms.CharField(label=_("body"))
 
     copy_to_user = forms.BooleanField(label=_("copy_to_user"), required=False)
-

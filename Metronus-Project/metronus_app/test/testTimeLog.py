@@ -97,7 +97,7 @@ class TimeLogTestCase(TestCase):
 
         self.assertEquals(logs_before + 1, logs_after)
 
-        
+
 
     def test_create_timelog_positive_3(self):
         """ Creates a timelog twice with the same description, causing the log to be update"""

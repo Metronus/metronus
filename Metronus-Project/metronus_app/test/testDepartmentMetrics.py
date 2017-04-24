@@ -1,25 +1,29 @@
-from django.contrib.auth.models                       import User
-from django.test                                      import TestCase, Client
-from django.core.exceptions                           import ObjectDoesNotExist, PermissionDenied
+from django.contrib.auth.models import User
+from django.test import TestCase, Client
+from django.core.exceptions import ObjectDoesNotExist
 
-from metronus_app.model.employee                      import Employee
-from metronus_app.model.projectDepartment             import ProjectDepartment
+from metronus_app.model.employee import Employee
+from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
-from metronus_app.model.task                          import Task
-from metronus_app.model.timeLog                       import TimeLog
-from metronus_app.model.project                       import Project
-from metronus_app.model.company                       import Company
-from metronus_app.model.role                          import Role
-from metronus_app.model.administrator                 import Administrator
-from metronus_app.model.department                    import Department
+from metronus_app.model.task import Task
+from metronus_app.model.timeLog import TimeLog
+from metronus_app.model.project import Project
+from metronus_app.model.company import Company
+from metronus_app.model.role import Role
+from metronus_app.model.administrator import Administrator
+from metronus_app.model.department import Department
 
-import string, random, json
+import string
+import random
+import json
+
 
 def ranstr():
     """Returns a 10-character random string"""
     return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
 
-### Son herramientas sorpresa que nos ayudarán más tarde
+
+# Son herramientas sorpresa que nos ayudarán más tarde
 
 def checkJsonMetricsAreEqual(self, response_string, data):
     """
@@ -99,15 +103,15 @@ def createTimelogInTask(task, duration, date, employee = None):
         employee_id = Employee.objects.get(identifier="emp01") if employee is None else employee
     )
 
-################################## Party hard a partir de aquí ##################################
 
+# ################################# Party hard a partir de aquí ##################################
 class DepartmentMetricsTestCase(TestCase):
     """This class provides a test case for accessing department-related metrics"""
     def setUp(self):
         """
         Loads the data to the database for tests to be done
         """
-        company1 = Company.objects.create(          
+        company1 = Company.objects.create(
             cif="123",
             company_name="company1",
             short_name="mplp",
@@ -131,7 +135,8 @@ class DepartmentMetricsTestCase(TestCase):
             last_name="Pérez"
         )
 
-        admin = Administrator.objects.create(
+        # Admin
+        Administrator.objects.create(
             user=admin_user,
             user_type="A",
             identifier="adm01",
@@ -171,7 +176,8 @@ class DepartmentMetricsTestCase(TestCase):
             company_id=company1
         )
 
-        dep1 = Department.objects.create(
+        # Department 1
+        Department.objects.create(
             name="Departamento1",
             active=True,
             company_id=company1
@@ -208,16 +214,16 @@ class DepartmentMetricsTestCase(TestCase):
         )
 
         role_ex = Role.objects.create(name="EXECUTIVE", tier=50)
-        role_pm = Role.objects.create(name="PROJECT_MANAGER", tier=40)
+        Role.objects.create(name="PROJECT_MANAGER", tier=40)
         role_tm = Role.objects.create(name="TEAM_MANAGER", tier=30)
         role_co = Role.objects.create(name="COORDINATOR", tier=20)
-        role_em = Role.objects.create(name="EMPLOYEE", tier=10)
+        Role.objects.create(name="EMPLOYEE", tier=10)
 
         pro1 = Project.objects.create(name="pro1", deleted=False, company_id=company1)
-        pro2 = Project.objects.create(name="pro2", deleted=False, company_id=company2)
+        Project.objects.create(name="pro2", deleted=False, company_id=company2)
         pro3 = Project.objects.create(name="pro3", deleted=False, company_id=company1)
         pro4 = Project.objects.create(name="pro4", deleted=False, company_id=company1)
-        pro_random = Project.objects.create(name="pro_random", deleted=False, company_id=company1)
+        Project.objects.create(name="pro_random", deleted=False, company_id=company1)
 
         pd = ProjectDepartment.objects.create(project_id=pro1, department_id=dep2)
         pd2 = ProjectDepartment.objects.create(project_id=pro1, department_id=dep_rand)
@@ -288,7 +294,7 @@ class DepartmentMetricsTestCase(TestCase):
 
         response = c.get("/department/ajaxEmployeesPerTask")
         self.assertEquals(response.status_code, 400)
-    
+
     def test_random_data_emppertask(self):
         """
         Does a lot of random test and checks the data generate matches the emppertask JSON
@@ -329,7 +335,7 @@ class DepartmentMetricsTestCase(TestCase):
         response = c.get("/department/ajaxEmployeesPerTask?department_id={0}" .format( Department.objects.get(name="Dep_rand").id))
         self.assertEquals(response.status_code, 200)
         checkJsonMetricsAreEqual(self, str(response.content, encoding='utf8'), true_data)
-    
+
     def test_access_denied_not_logged_timepertask(self):
         """
         Try getting the timepertask JSON without authentication
@@ -478,4 +484,3 @@ class DepartmentMetricsTestCase(TestCase):
 
         response = c.get("/department/ajaxProfit")
         self.assertEquals(response.status_code, 404)
-    
