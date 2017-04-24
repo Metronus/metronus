@@ -13,11 +13,15 @@
         </div>
 
         <div class="clearfix"></div><br>
-{% if project_manager != null %}
-        <div class="">
-            <div class="col-md-12 col-sm-12 col-xs-12">
+
+        <!-- INI: Project Manager -->
+        {% if project_manager != null %}
+            <div class="col-xs-12">
                 <div class="x_panel">
-                    <div class="x_title">{% trans 'projectManager' %}</div>
+                    <div class="x_title">
+                        <h2>{% trans 'projectManager' %}</h2>
+                        <div class="clearfix"></div>
+                    </div>
 
                     <div class="clearfix"></div>
 
@@ -49,38 +53,39 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <!-- FIN: Project Manager -->
 
+        <div class="clearfix"></div>
 
+        <!-- INI: gráficas departamentos -->
+        <div class="col-xs-12">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2>{% trans 'departmentGraphs' %}</h2>
+                    <div class="clearfix"></div>
+                </div>
 
+                <div class="clearfix"></div>
 
+                <div class="x_content row">
+                    <div class="col-md-6 col-xs-12">
+                        <div id="donut_department" style="height:200px;"></div>
+                    </div>
+                    <div class="col-md-6 col-xs-12">
+                        <div id="donut_task" style="height:200px;"></div>
                     </div>
                 </div>
             </div>
         </div>
-{% endif %}
-          <!-- MISILES -->
+        <!-- FIN: gráficas departamentos -->
 
-<div class="clearfix"></div>
+        <div class="clearfix"></div>
 
-        <div class="">
-            <div class="col-md-12 col-sm-12 col-xs-12">
-                <div class="x_panel">
-                    <div class="x_title">{% trans 'departmentGraphs' %}</div>
-
-                    <div class="clearfix"></div>
-                    <div class="col-md-6">
-                        <div class="x_content">
-                            <div id="donut_department" style="height:200px;"></div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="x_content">
-                            <div id="donut_task" style="height:200px;"></div>
-                        </div>
-                    </div>
-            </div>
-            </div>
-        </div>
+        <!-- INI: gráfica tiempo/departamento -->
 
 
   <div class="">
@@ -285,7 +290,17 @@ $(document).ready(function() {
           defaultBackendData = backendData
           echartDonut2.setOption(fromData(backendData, 0));
         }
-      })
+      });
+
+        //Esto se encarga de hacer responsivo (más o menos) el chart
+        $(window).on('resize', function(){
+            if(echartDonut != null && echartDonut != undefined){
+                echartDonut.resize();
+            }
+            if(echartDonut2 != null && echartDonut2 != undefined){
+                echartDonut2.resize();
+            }
+        });
 
       //BARRAS
 
