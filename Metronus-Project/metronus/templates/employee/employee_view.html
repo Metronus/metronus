@@ -47,19 +47,19 @@
       <div>
         <ul class="list-inline widget_tally">
         <li>
-          <b>{% trans 'name' %}</b> <span class="pull-right">{{employee.user.first_name}}</span>
+          <strong>{% trans 'name' %}</strong> <span class="pull-right">{{employee.user.first_name}}</span>
         </li>
         <li>
-          <b>{% trans 'surname' %}</b> <span class="pull-right">{{employee.user.last_name}}</span>
+          <strong>{% trans 'surname' %}</strong> <span class="pull-right">{{employee.user.last_name}}</span>
         </li>
         <li>
-          <b>{% trans 'email' %}</b> <span class="pull-right">{{employee.user.email}}</span>
+          <strong>{% trans 'email' %}</strong> <span class="pull-right">{{employee.user.email}}</span>
         </li>
         <li>
-          <b>{% trans 'phone' %}</b> <span class="pull-right">{{employee.phone}}</span>
+          <strong>{% trans 'phone' %}</strong> <span class="pull-right">{{employee.phone}}</span>
         </li>
         <li>
-          <b>{% trans 'roles' %}</b> <span class="pull-right">
+          <strong>{% trans 'roles' %}</strong> <span class="pull-right">
         {% if employee_roles %}
            {{ employee_roles|length }}
       {% else %}
@@ -68,10 +68,10 @@
           </span>
         </li>
         <li>
-          <b>{% trans 'projects' %}</b> <span class="pull-right">0</span>
+          <strong>{% trans 'projects' %}</strong> <span class="pull-right">0</span>
         </li>
         <li>
-          <b>{% trans 'departments' %}</b> <span class="pull-right">0</span>
+          <strong>{% trans 'departments' %}</strong> <span class="pull-right">0</span>
         </li>
         <li style="text-align: center">
 

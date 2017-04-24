@@ -28,10 +28,7 @@ def create(request,
     company_form.html
     """
     # If it's a GET request, return an empty form
-    if request.method == "GET":
-        form = RegistrationForm()
-    # if this is a POST request we need to process the form data
-    elif request.method == 'POST':
+    if  request.method == 'POST':
         # create a form instance and populate it with data from the request:
         form = RegistrationForm(request.POST, request.FILES)
         # check whether it's valid:

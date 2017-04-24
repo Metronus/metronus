@@ -672,14 +672,8 @@ def find_departments(request):
             roles_pro = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=40)
             roles_dep = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=20)
 
-            if roles_pro.count() > 0:
-                # you're a project manager. Loading your projects
-                departamentos = Department.objects.filter(
-                    company_id=actor.company_id, active=True,
-                    projectdepartment__projectdepartmentemployeerole__employee_id=actor,
-                    projectdepartment__project_id_id=project_id).distinct()
-            elif roles_dep.count() > 0:
-                # you're a department coordinator. loading your departments
+            if roles_pro.count() > 0 or roles_dep.count() > 0:
+                # you're a project manager or a coordinator. Loading your projects
                 departamentos = Department.objects.filter(
                     company_id=actor.company_id, active=True,
                     projectdepartment__projectdepartmentemployeerole__employee_id=actor,
@@ -721,18 +715,11 @@ def find_projects(request):
             roles_pro = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=40)
             roles_dep = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=20)
 
-            if roles_pro.count() > 0:
-                # you're a project manager. Loading your projects
+            if roles_pro.count() > 0 or roles_dep.count() > 0:
+                # you're a project manager or a coordinator. Loading your projects
                 proyectos = Project.objects.filter(company_id=actor.company_id, deleted=False,
                                                    projectdepartment__projectdepartmentemployeerole__employee_id=actor,
                                                    projectdepartment__department_id_id=department_id).distinct()
-
-            elif roles_dep.count() > 0:
-                # you're a department coordinator. loading your departments
-                proyectos = Project.objects.filter(company_id=actor.company_id, deleted=False,
-                                                   projectdepartment__projectdepartmentemployeerole__employee_id=actor,
-                                                   projectdepartment__department_id_id=department_id).distinct()
-
             else:
                 # not any of this? get outta here!!
                 raise PermissionDenied
