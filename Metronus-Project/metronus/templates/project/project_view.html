@@ -34,7 +34,11 @@
                                     </div>
 
                                     <div class="right col-xs-5 text-center">
-                                        <img src="{{ project_manager.picture }}" alt="" class="img-circle img-responsive" width="150px">
+                                        {% if project_manager.picture %}
+                                            <img src="{{ MEDIA_URL }}{{ project_manager.picture }}" alt="" class="img-circle img-responsive" width="150px">
+                                        {% else %}
+                                            <img src="/static/avatar.png" alt="" class="img-circle img-responsive" width="150px">
+                                        {% endif %}
                                     </div>
                                 </div>
 
@@ -227,7 +231,11 @@
                             <tbody>
                                 {% for employee in employees %}
                                     <tr data-href="{% url 'employee_view' employee.user %}" style="cursor: pointer;">
-                                        <td><img src="{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
+                                        {% if employee.picture %}
+                                            <td><img src="{{ MEDIA_URL }}{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
+                                        {% else %}
+                                            <td><img src="/static/avatar.png" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
+                                        {% endif %}
                                         <td>{{employee.identifier}}</td>
                                         <td>{{employee.phone}}</td>
                                         <td class="hidden-xs">{{employee.registryDate}}</td>

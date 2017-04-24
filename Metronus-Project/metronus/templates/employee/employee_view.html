@@ -21,7 +21,11 @@
               </a>
             </li>
             <li>
-              <img src="{{ MEDIA_URL }}{{employee.picture}}" class="img-circle profile_img" alt="employee">
+                {% if employee.picture %}
+                    <img src="{{ MEDIA_URL }}{{employee.picture}}" class="img-circle profile_img" alt="employee">
+                {% else %}
+                    <img src="/static/avatar.png" class="img-circle profile_img" alt="employee">
+                {% endif %}
             </li>
             <li>
               <a>
@@ -70,7 +74,8 @@
           <b>{% trans 'departments' %}</b> <span class="pull-right">0</span>
         </li>
         <li style="text-align: center">
-          <span>{{employee.registryDate}}</span>
+
+          <span>{% trans 'registryDate' %}: {{employee.registryDate}}</span>
         </li>        
         <li style="text-align: center">
         <span>
