@@ -27,6 +27,3 @@ class Actor(models.Model):
 
     def __unicode__(self):
         return self.identifier
-
-    def role(self):
-        return self.type_choices(self.user_type)
