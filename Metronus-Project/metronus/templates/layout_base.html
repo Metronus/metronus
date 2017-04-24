@@ -82,6 +82,12 @@
                 <ul class="nav side-menu">
                   <li><a href="/dashboard/view"><i class="fa fa-home"></i>{% trans 'dashIndex' %}</span></a>
                   </li>
+
+                   {% if actor_is_admin %}
+                  <li><a href="/company/view"><i class="fa fa-briefcase"></i>{% trans 'dashCompany' %}</span></a>
+                  </li>
+                  {% endif %}
+
                   {% if actor_is_admin or actor_is_executive or actor_is_projectManager %}
                   <li>
                   <a><i class="fa fa-desktop"></i>{% trans 'dashProjects' %}<span class="fa fa-chevron-down"></span></a>
@@ -93,6 +99,8 @@
                     </ul>
                   </li>
                   {% endif %}
+
+
 
                   {% if actor_is_admin or actor_is_executive or actor_is_projectManager or actor_is_coordinator or actor_is_teamManager %}
                   <li><a><i class="fa fa-group"></i>{% trans 'dashDepartments' %}<span class="fa fa-chevron-down"></span></a>
