@@ -21,7 +21,7 @@
               </a>
             </li>
             <li>
-              <img src="/static/avatar.png" class="img-circle profile_img" alt="IMG">
+              <img src="{{ MEDIA_URL }}{{employee.picture}}" class="img-circle profile_img" alt="employee">
             </li>
             <li>
               <a>
@@ -36,11 +36,6 @@
           <p>{{employee.identifier}}</p>
         </div>
 
-        <div class="divider"></div>
-
-        <p>
-          Some random self description or about section.
-        </p>
 
         <div class="divider"></div>
       </div>
