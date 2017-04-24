@@ -91,32 +91,6 @@ def list_project_department(request):
     return render(request, "projectDepartment/projectdepartment_list.html", {"projectDepartments": lista})
 
 
-def edit(request):
-    """
-    Will not be used
-    """
-    admin = get_current_admin_or_403(request)
-    if request.method == 'POST':
-        form = ProjectDepartmentForm(data=request.POST, user=admin)
-
-        if form.is_valid():
-            project_department = ProjectDepartment.objects.get(pk=form.cleaned_data['projectDepartment_id'])
-
-            update_project_department(project_department, form, admin)
-
-            return HttpResponseRedirect('/projectdepartment/list')
-
-    # GET -> Create an empty form
-    else:
-        project_department = request.GET.get('projectDepartment_id')
-        project_department = get_object_or_404(ProjectDepartment, id=project_department)
-        form = ProjectDepartmentForm(
-            initial={"department_id": project_department.department_id,
-                     "project_id": project_department.project_id}, user=admin)
-
-    return render(request, 'projectDepartment/projectdepartment_form.html', {'form': form})
-
-
 # Auxiliar methods, containing the operation logic
 
 def create_project_department(form, admin):
@@ -129,17 +103,6 @@ def create_project_department(form, admin):
         raise PermissionDenied
 
     return ProjectDepartment.objects.create(project_id=project, department_id=department)
-
-
-def update_project_department(project_department, form, admin):
-    """Se permitirán los updates de projectDepartment? -> Nope"""
-    project_department.project_id = form.cleaned_data['project_id']
-    project_department.department_id = form.cleaned_data['department_id']
-
-    if not check_company_project_department_session(project_department, admin):
-        raise PermissionDenied
-
-    return project_department.save()
 
 
 def delete_project_department(project_department, admin):
