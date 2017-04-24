@@ -63,7 +63,7 @@ def create(request):
 def create_async(request):
     """
     parameters:
-    form: el formulario con los datos del departamento
+    form: el formulario con los datos del proyecto
 
     returns:
     data: JSON con un mensaje de respuesta. Es un dict que contiene lo siguiente
@@ -99,6 +99,7 @@ def create_async(request):
                 else:
                     data['repeated_name'] = True
             else:
+                project = create_project(form, admin)
                 return JsonResponse(data)
 
     # if a GET (or any other method) we'll create a blank form
