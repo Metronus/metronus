@@ -429,9 +429,9 @@ def ajax_productivity_per_task_and_date(request, username):
 
     # Save productivity for each  date
     # for each date, we will find the asociated timelog
-    for logDate in dates:
-        log = TimeLog.objects.filter(task_id=task.id, workDate__year=logDate.year, workDate__month=logDate.month,
-                                     workDate__day=logDate.day, employee_id=employee).first()
+    for log_date in dates:
+        log = TimeLog.objects.filter(task_id=task.id, workDate__year=log_date.year, workDate__month=log_date.month,
+                                     workDate__day=log_date.day, employee_id=employee).first()
         if log is None:
             # He did not work that day
             total_productivity = 0
@@ -446,10 +446,10 @@ def ajax_productivity_per_task_and_date(request, username):
 
         # Find the registry date of production goal evolution which is closest to the date
         expected_productivity = GoalEvolution.objects.filter(task_id_id=task.id,
-                                                           registryDate__gte=logDate).first()
+                                                             registryDate__gte=log_date).first()
 
         # If we do not find the goal or if the date is after the last task update, it may be the current task goal
-        if expected_productivity is None or task.registryDate <= logDate:
+        if expected_productivity is None or task.registryDate <= log_date:
             expected_productivity = task.production_goal
         else:
             expected_productivity = expected_productivity.production_goal
@@ -522,10 +522,10 @@ def ajax_profit_per_date(request, employee_id):
     # Profit
     # for each date, we will find all logs, calculate the sum and acumulate it
     index = 0
-    for logDate in dates:
+    for log_date in dates:
         logs = TimeLog.objects.filter(employee_id=employee_id,
-                                      workDate__year=logDate.year, workDate__month=logDate.month,
-                                      workDate__day=logDate.day).distinct()
+                                      workDate__year=log_date.year, workDate__month=log_date.month,
+                                      workDate__day=log_date.day).distinct()
         expenses = logs.aggregate(
             total_expenses=Sum(F("duration") / 60.0 * F("employee_id__price_per_hour"), output_field=FloatField()))[
             "total_expenses"]
@@ -608,11 +608,11 @@ def ajax_profit_per_date_in_project(request, employee_id, project_id):
     # Profit
     # for each date, we will find all logs, calculate the sum and acumulate it
     index = 0
-    for logDate in dates:
+    for log_date in dates:
         logs = TimeLog.objects.filter(employee_id=employee_id,
                                       employee_id__projectdepartmentemployeerole__projectDepartment_id__project_id=project_id,
-                                      workDate__year=logDate.year, workDate__month=logDate.month,
-                                      workDate__day=logDate.day).distinct()
+                                      workDate__year=log_date.year, workDate__month=log_date.month,
+                                      workDate__day=log_date.day).distinct()
         expenses = logs.aggregate(
             total_expenses=Sum(F("duration") / 60.0 * F("employee_id__price_per_hour"), output_field=FloatField()))[
             "total_expenses"]

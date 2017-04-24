@@ -76,7 +76,6 @@ def login(request, template_name='registration/login.html',
                 return HttpResponseRedirect("/timeLog/list_all")
             else:
                 return HttpResponseRedirect("/app/")
-            # return HttpResponseRedirect(_get_login_redirect_url(request, redirect_to))
     else:
         form = authentication_form(request)
 

@@ -365,10 +365,10 @@ def ajax_profit_per_date(request, department_id):
     # Profit
     # for each date, we will find all logs, calculate the sum and acumulate it
     index = 0
-    for logDate in dates:
+    for log_date in dates:
         logs = TimeLog.objects.filter(task_id__projectDepartment_id__department_id_id=department_id,
-                                      workDate__year=logDate.year, workDate__month=logDate.month,
-                                      workDate__day=logDate.day).distinct()
+                                      workDate__year=log_date.year, workDate__month=log_date.month,
+                                      workDate__day=log_date.day).distinct()
         expenses = logs.aggregate(total_expenses=Sum(F("duration")/60.0*F("employee_id__price_per_hour"), output_field=FloatField()))["total_expenses"]
         expenses = expenses if expenses is not None else 0
         income = logs.aggregate(total_income=Sum(F("task_id__price_per_unit")*F("produced_units")))["total_income"]
