@@ -1,6 +1,6 @@
 from django.contrib.auth.models                       import User
 from django.test                                      import TestCase, Client
-from django.core.exceptions                           import ObjectDoesNotExist, PermissionDenied
+from django.core.exceptions                           import ObjectDoesNotExist
 
 from metronus_app.model.employee                      import Employee
 from metronus_app.model.projectDepartment             import ProjectDepartment
@@ -12,7 +12,7 @@ from metronus_app.model.company                       import Company
 from metronus_app.model.role                          import Role
 from metronus_app.model.administrator                 import Administrator
 from metronus_app.model.department                    import Department
-        
+
 import string, random, json
 
 def checkJsonMetricsAreEqual(self, response_string, data):
@@ -45,7 +45,7 @@ class ProjectMetricsTestCase(TestCase):
         """
         Loads the data to the database for tests to be done
         """
-        company1 = Company.objects.create(          
+        company1 = Company.objects.create(
             cif="123",
             company_name="company1",
             short_name="mplp",
@@ -121,7 +121,7 @@ class ProjectMetricsTestCase(TestCase):
             company_id=company1
         )
 
-        dep3 = Department.objects.create(
+        Department.objects.create(
             name="Departamento3",
             active=True,
             company_id=company1
@@ -151,7 +151,7 @@ class ProjectMetricsTestCase(TestCase):
 
         pd = ProjectDepartment.objects.create(project_id=pro1, department_id=dep2)
 
-        pdrole1 = ProjectDepartmentEmployeeRole.objects.create(
+        ProjectDepartmentEmployeeRole.objects.create(
             projectDepartment_id = pd,
             role_id = role_tm,
             employee_id = employee1
@@ -211,7 +211,7 @@ class ProjectMetricsTestCase(TestCase):
 
         response = c.get("/project/ajaxEmployeesPerDpmt")
         self.assertEquals(response.status_code, 400)
-    
+
     def test_random_data_empperdmtp(self):
         """
         Does a lot of random test and checks the data generate matches the empperdmtp JSON
@@ -255,7 +255,7 @@ class ProjectMetricsTestCase(TestCase):
         # Do the random test 5 times
         for k in range(5):
             ProjectDepartmentEmployeeRole.objects.all().delete()
-            
+
             employees_per_dpmt = [random.choice(range(11)) for _ in range(n_dep)]
             true_data = {'names': [], 'values': []}
 
@@ -354,7 +354,7 @@ class ProjectMetricsTestCase(TestCase):
         # Do the random test 5 times
         for k in range(5):
             Task.objects.all().delete()
-            
+
             tasks_per_dpmt = [random.choice(range(11)) for _ in range(n_dep)]
             true_data = {'names': [], 'values': []}
 
@@ -407,7 +407,7 @@ class ProjectMetricsTestCase(TestCase):
         """
         Try getting the timeperdpmt JSON without as an executive from other company
         """
-        
+
         c = Client()
         c.login(username="emp2", password="123456")
 
@@ -461,7 +461,7 @@ class ProjectMetricsTestCase(TestCase):
 
         departments = Department.objects.filter(company_id__company_name="company1")
         project = Project.objects.get(name="pro_random")
-        
+
         n_dep=len(departments)
         # Do the random test 5 times
 
@@ -472,7 +472,7 @@ class ProjectMetricsTestCase(TestCase):
             Task.objects.all().delete()
 
             true_data = {'names': [], 'values': []}
-            
+
             for i in range(n_dep):
                 dpmt = departments[i]
 
@@ -503,4 +503,3 @@ class ProjectMetricsTestCase(TestCase):
             response = c.get("/project/ajaxTimePerDpmt?project_id={0}&start_date=2016-01-01&end_date=2017-01-01" .format( project.id))
             self.assertEquals(response.status_code, 200)
             checkJsonMetricsAreEqual(self, str(response.content, encoding='utf8'), true_data)
-

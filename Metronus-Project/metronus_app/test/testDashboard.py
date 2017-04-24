@@ -8,7 +8,7 @@ from metronus_app.model.timeLog import TimeLog
 from metronus_app.model.project import Project
 from metronus_app.model.administrator import Administrator
 from metronus_app.model.department import Department
-        
+
 import string
 import random
 from populate_database import populate_database
@@ -71,7 +71,7 @@ class DashboardTestCase(TestCase):
         n_pro = len(projects)
         # Do the random test 5 times
 
-        for k in range(5):
+        for _ in range(5):
 
             # Remove all tasks and time logs
             TimeLog.objects.all().delete()

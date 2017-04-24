@@ -3,21 +3,21 @@ from django.test                                      import TestCase, Client
 from django.core.exceptions                           import ObjectDoesNotExist, PermissionDenied
 
 
-from metronus_app.model.role                          import Role
-from metronus_app.model.company                       import Company
-from metronus_app.model.employee                      import Employee
-from metronus_app.model.project                       import Project
-from metronus_app.model.department                    import Department
-from metronus_app.model.administrator                 import Administrator
-from metronus_app.model.task                          import Task
-from metronus_app.model.timeLog                       import TimeLog
-from metronus_app.model.projectDepartment             import ProjectDepartment
-from metronus_app.model.goalEvolution             import GoalEvolution
-from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
-from django.db                                        import transaction
-import string, random, json
+from metronus_app.model.role                            import Role
+from metronus_app.model.company                         import Company
+from metronus_app.model.employee                        import Employee
+from metronus_app.model.project                         import Project
+from metronus_app.model.department                      import Department
+from metronus_app.model.administrator                   import Administrator
+from metronus_app.model.task                            import Task
+from metronus_app.model.timeLog                         import TimeLog
+from metronus_app.model.projectDepartment               import ProjectDepartment
+from metronus_app.model.goalEvolution                   import GoalEvolution
+from metronus_app.model.projectDepartmentEmployeeRole   import ProjectDepartmentEmployeeRole
+from django.db                                          import transaction
 from datetime                                           import date, timedelta,datetime
-from django.utils import timezone
+from django.utils                                       import timezone
+import string, random
 
 def ranstr():
     """ Returns a 10-character random string"""
@@ -102,9 +102,9 @@ def createTaskInProjDept(project, department,admin,rDate):
         price_per_unit=pprice_units
     )
     Task.objects.filter(pk=task.id).update(registryDate = rDate.strftime('%Y-%m-%d')+" 10:00+00:00")
-    
+
     #Generate random number of previous goals
-    
+
     for _ in range(random.randint(3,7)):
         createGoalEvolution(task,admin,rDate,measure)
     return task.id
@@ -135,7 +135,7 @@ def createGoalEvolution(task,actor,rDate,measure):
     date = rDate - timedelta(days=random.randint(2,30))
 
     GoalEvolution.objects.filter(pk=ge1.id).update(registryDate = date.strftime('%Y-%m-%d')+" 10:00+00:00")
-    
+
 def createTimelogInTask(task, duration, date, employee):
     """
     creates a timelog for an employee involving a task during a specific date
@@ -169,7 +169,7 @@ def randomLoad():
         email="admin2@gmail.com",
         first_name="admin2",
         last_name="admin2")
-    
+
     admin=Administrator.objects.create(
         user=adminuser,
         user_type="A",
@@ -190,10 +190,10 @@ def randomLoad():
     #Get all dates between in a month
     dates=[]
     d1 = timezone.now()
-    
+
     for i in range(30):
         dates.append((d1 - timedelta(days=i)))
- 
+
     for i in range(len(departments)-1):
         dpmt = departments[i]
         for j in range(len(projects)-1):
@@ -211,7 +211,7 @@ def randomLoad():
                 for employee in employees:
                     for _ in range(random.randint(10,25)):
                         duration = random.randint(40,480)
-                        
+
                         date = random.choice(dates)
                         createTimelogInTask(task, duration, date,employee)
 
@@ -225,7 +225,7 @@ def populate_roles():
     Role.objects.create(name="EXECUTIVE", tier=50)
     # El jefe de proyecto
     Role.objects.create(name="PROJECT_MANAGER", tier=40)
-    # El jefe de equipo 
+    # El jefe de equipo
     Role.objects.create(name="TEAM_MANAGER", tier=30)
     # El coordinador del departamento
     Role.objects.create(name="COORDINATOR", tier=20)

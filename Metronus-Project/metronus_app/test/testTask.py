@@ -1,14 +1,13 @@
-from metronus_app.model.department import Department
-from metronus_app.model.company import Company
-from metronus_app.model.task import Task
-from django.contrib.auth.models                  import User
-from django.test import TestCase, Client
-from metronus_app.model.employee         import Employee
-from metronus_app.model.project import Project
-from metronus_app.model.goalEvolution import GoalEvolution
-from django.core.exceptions                      import ObjectDoesNotExist, PermissionDenied
-from populate_database import populate_database
+from metronus_app.model.department      import Department
+from metronus_app.model.task            import Task
+from django.contrib.auth.models         import User
+from django.test                        import TestCase, Client
+from metronus_app.model.project         import Project
+from metronus_app.model.goalEvolution   import GoalEvolution
+from django.core.exceptions             import PermissionDenied
+from populate_database                  import populate_database
 import json
+
 class TaskTestCase(TestCase):
     """This class provides a test case for using and managing tasks"""
     @classmethod
@@ -74,7 +73,7 @@ class TaskTestCase(TestCase):
         dep = Task.objects.all().last()
         self.assertEquals(dep.name, "hacer memes")
         self.assertEquals(dep.active,True)
-        
+
         #response in bytes must be decode to string
         data=response.content.decode("utf-8")
         #string to dict
@@ -115,7 +114,7 @@ class TaskTestCase(TestCase):
 
 
     def test_create_task_duplicate(self):
-        """ 
+        """
         Logged in as an administrator, try to create an task with the name of an existing company
         """
         c = Client()
@@ -152,7 +151,7 @@ class TaskTestCase(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertNotIn("task_creation_repeated_name",response.context["errors"])
         self.assertIn("task_creation_project_department_not_related",response.context["errors"])
-    
+
 
     def test_create_task_not_logged(self):
         """
@@ -269,7 +268,7 @@ class TaskTestCase(TestCase):
         self.assertEquals(response.status_code, 404)
 
     def test_edit_task_positive(self):
-        """ 
+        """
         Logged in as an administrator, try to edit a task
         """
         c = Client()
@@ -309,7 +308,7 @@ class TaskTestCase(TestCase):
 
         dep_id=Department.objects.get(name="Frontend").id
 
-      
+
         task_id=Task.objects.filter(name="Hacer cosas de front").first().id
 
         logs_before = GoalEvolution.objects.all().count()
@@ -342,7 +341,7 @@ class TaskTestCase(TestCase):
 
         dep_id=Department.objects.get(name="Frontend").id
 
-      
+
         task_id=Task.objects.filter(name="Hacer cosas de front").first().id
 
         logs_before = GoalEvolution.objects.all().count()
@@ -375,7 +374,7 @@ class TaskTestCase(TestCase):
 
         dep_id=Department.objects.get(name="Frontend").id
 
-      
+
         task_id=Task.objects.filter(name="Hacer cosas de front").first().id
 
         logs_before = GoalEvolution.objects.all().count()
@@ -394,7 +393,7 @@ class TaskTestCase(TestCase):
         self.assertEquals(response.status_code, 200)
         logs_after = GoalEvolution.objects.all().count()
         self.assertEquals(logs_before, logs_after)
-     
+
         self.assertNotIn("task_creation_invalid_goal",response.context["errors"])
         self.assertIn("task_creation_invalid_price",response.context["errors"])
 
@@ -410,7 +409,7 @@ class TaskTestCase(TestCase):
 
         dep_id=Department.objects.get(name="Frontend").id
 
-      
+
         task_id=Task.objects.filter(name="Hacer cosas de front").first().id
 
         logs_before = GoalEvolution.objects.all().count()
@@ -515,7 +514,7 @@ class TaskTestCase(TestCase):
 
     def test_delete_task_not_active(self):
         """
-        Try deleting an already deleted task 
+        Try deleting an already deleted task
         """
         c = Client()
         c.login(username="ddlsb", password="123456")

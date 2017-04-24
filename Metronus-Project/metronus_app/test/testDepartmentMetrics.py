@@ -111,7 +111,7 @@ class DepartmentMetricsTestCase(TestCase):
         """
         Loads the data to the database for tests to be done
         """
-        company1 = Company.objects.create(          
+        company1 = Company.objects.create(
             cif="123",
             company_name="company1",
             short_name="mplp",
@@ -176,7 +176,8 @@ class DepartmentMetricsTestCase(TestCase):
             company_id=company1
         )
 
-        dep1 = Department.objects.create(
+        # Department 1
+        Department.objects.create(
             name="Departamento1",
             active=True,
             company_id=company1
@@ -213,16 +214,16 @@ class DepartmentMetricsTestCase(TestCase):
         )
 
         role_ex = Role.objects.create(name="EXECUTIVE", tier=50)
-        role_pm = Role.objects.create(name="PROJECT_MANAGER", tier=40)
+        Role.objects.create(name="PROJECT_MANAGER", tier=40)
         role_tm = Role.objects.create(name="TEAM_MANAGER", tier=30)
         role_co = Role.objects.create(name="COORDINATOR", tier=20)
-        role_em = Role.objects.create(name="EMPLOYEE", tier=10)
+        Role.objects.create(name="EMPLOYEE", tier=10)
 
         pro1 = Project.objects.create(name="pro1", deleted=False, company_id=company1)
-        pro2 = Project.objects.create(name="pro2", deleted=False, company_id=company2)
+        Project.objects.create(name="pro2", deleted=False, company_id=company2)
         pro3 = Project.objects.create(name="pro3", deleted=False, company_id=company1)
         pro4 = Project.objects.create(name="pro4", deleted=False, company_id=company1)
-        pro_random = Project.objects.create(name="pro_random", deleted=False, company_id=company1)
+        Project.objects.create(name="pro_random", deleted=False, company_id=company1)
 
         pd = ProjectDepartment.objects.create(project_id=pro1, department_id=dep2)
         pd2 = ProjectDepartment.objects.create(project_id=pro1, department_id=dep_rand)
@@ -293,7 +294,7 @@ class DepartmentMetricsTestCase(TestCase):
 
         response = c.get("/department/ajaxEmployeesPerTask")
         self.assertEquals(response.status_code, 400)
-    
+
     def test_random_data_emppertask(self):
         """
         Does a lot of random test and checks the data generate matches the emppertask JSON
@@ -334,7 +335,7 @@ class DepartmentMetricsTestCase(TestCase):
         response = c.get("/department/ajaxEmployeesPerTask?department_id={0}" .format( Department.objects.get(name="Dep_rand").id))
         self.assertEquals(response.status_code, 200)
         checkJsonMetricsAreEqual(self, str(response.content, encoding='utf8'), true_data)
-    
+
     def test_access_denied_not_logged_timepertask(self):
         """
         Try getting the timepertask JSON without authentication
@@ -483,4 +484,3 @@ class DepartmentMetricsTestCase(TestCase):
 
         response = c.get("/department/ajaxProfit")
         self.assertEquals(response.status_code, 404)
-    

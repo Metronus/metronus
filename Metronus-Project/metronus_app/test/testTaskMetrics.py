@@ -1,6 +1,6 @@
 from django.contrib.auth.models                       import User
 from django.test                                      import TestCase, Client
-from django.core.exceptions                           import ObjectDoesNotExist, PermissionDenied
+from django.core.exceptions                           import ObjectDoesNotExist
 
 from metronus_app.model.employee                      import Employee
 from metronus_app.model.projectDepartment             import ProjectDepartment
@@ -216,7 +216,7 @@ class TaskMetricsTestCase(TestCase):
 
         pro1 = Project.objects.create(name="pro1", deleted=False, company_id=company1)
         pro2 = Project.objects.create(name="pro2", deleted=False, company_id=company2)
-        pro3 = Project.objects.create(name="pro3", deleted=False, company_id=company1)
+        Project.objects.create(name="pro3", deleted=False, company_id=company1)
         pro4 = Project.objects.create(name="pro4", deleted=False, company_id=company1)
         pro_random = Project.objects.create(name="pro_random", deleted=False, company_id=company1)
 
@@ -230,7 +230,7 @@ class TaskMetricsTestCase(TestCase):
             employee_id=employee1
         )
 
-        pdrole2 = ProjectDepartmentEmployeeRole.objects.create(
+        ProjectDepartmentEmployeeRole.objects.create(
             projectDepartment_id=pd,
             role_id=role_ex,
             employee_id=employee2
@@ -255,7 +255,7 @@ class TaskMetricsTestCase(TestCase):
             projectDepartment_id = pd
         )
 
-        task3 = Task.objects.create(
+        Task.objects.create(
             name  ="Hacer cosas de front",
             description  = "nada",
             actor_id = employee2,
@@ -264,7 +264,7 @@ class TaskMetricsTestCase(TestCase):
             goal_description="kgs"
         )
 
-     
+
     def test_access_denied_not_logged_prod_task(self):
         """
         Without authentication, try getting the prod_per_task JSON
@@ -272,10 +272,10 @@ class TaskMetricsTestCase(TestCase):
         c = Client()
 
         response = c.get("/task/ajaxProdPerTask?task_id={0}".format( Task.objects.all().first().id))
-        
+
         #redirected to login
         self.assertEquals(response.status_code, 302)
-        
+
     def test_access_ok_logged_prod_task(self):
         """
         With proper roles, get the prod_per_task JSON
