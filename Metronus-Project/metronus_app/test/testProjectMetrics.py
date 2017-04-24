@@ -503,7 +503,6 @@ class ProjectMetricsTestCase(TestCase):
             response = c.get("/project/ajaxTimePerDpmt?project_id={0}&start_date=2016-01-01&end_date=2017-01-01" .format( project.id))
             self.assertEquals(response.status_code, 200)
             checkJsonMetricsAreEqual(self, str(response.content, encoding='utf8'), true_data)
-<<<<<<< HEAD
 
     def test_access_denied_not_logged_profit(self):
         """
@@ -553,5 +552,4 @@ class ProjectMetricsTestCase(TestCase):
 
         response = c.get("/project/ajaxProfit")
         self.assertEquals(response.status_code, 404)
-=======
->>>>>>> 09bc6f951af2d77b2d8651f7c1aa05a2905798d1
+

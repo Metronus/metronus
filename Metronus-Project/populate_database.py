@@ -11,7 +11,6 @@ from metronus_app.model.projectDepartment             import ProjectDepartment
 from metronus_app.model.goalEvolution             import GoalEvolution
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 from django.db                                        import transaction
-from populate_database2 import randomLoad
 @transaction.atomic
 def basicLoad():
     """
