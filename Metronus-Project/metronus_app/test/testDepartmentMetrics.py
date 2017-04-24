@@ -333,7 +333,7 @@ class DepartmentMetricsTestCase(TestCase):
             for project in projects:
 
                 # Create between 1 and 5 tasks for the current project and the department
-                for x in range(random.randint(1, 5)):
+                for _ in range(random.randint(1, 5)):
                     create_task_in_projdept(project, department)
 
                 for task in Task.objects.filter(projectDepartment_id__department_id=department,
@@ -343,11 +343,11 @@ class DepartmentMetricsTestCase(TestCase):
                     true_data['names'].append(task.name)
                     true_data['values'].append(num_employees)
 
-                    for y in range(num_employees):
+                    for _ in range(num_employees):
                         employee = create_employee_in_projdept(project, department)
 
                         # Make them create time logs
-                        for z in range(random.randint(1, 3)):
+                        for _ in range(random.randint(1, 3)):
                             create_timelog_in_task(task, 100, "2016-01-01 10:00+00:00", employee)
 
         response = c.get("/department/ajaxEmployeesPerTask?department_id={0}" .format(
@@ -429,7 +429,7 @@ class DepartmentMetricsTestCase(TestCase):
             for project in projects:
 
                 # Create between 1 and 5 tasks for the current project and the department
-                for x in range(random.randint(1, 5)):
+                for _ in range(random.randint(1, 5)):
                     create_task_in_projdept(project, department)
 
                 for task in Task.objects.filter(projectDepartment_id__department_id=department,
@@ -438,11 +438,11 @@ class DepartmentMetricsTestCase(TestCase):
                     num_employees = random.randint(2, 10)
                     used_time = 0
 
-                    for y in range(num_employees):
+                    for _ in range(num_employees):
                         employee = create_employee_in_projdept(project, department)
 
                         # Make them create time logs (between 1 and 3)
-                        for z in range(random.randint(1, 3)):
+                        for _ in range(random.randint(1, 3)):
                             # 25% chance of being outside of the requested time margin
                             count = random.choice([True, True, True, False])
                             date_worked = "2016-06-01 10:00+01:00" if count else "2014-01-01 10:00+00:00"

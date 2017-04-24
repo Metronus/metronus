@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Role(models.Model):
     """
     A role, depending on the tier you can or not access some parts of Metronus

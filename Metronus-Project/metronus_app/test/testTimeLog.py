@@ -1,10 +1,10 @@
 from metronus_app.model.task import Task
-from django.contrib.auth.models                  import User
 from metronus_app.model.timeLog import TimeLog
 from django.test import TestCase, Client
-from django.core.exceptions                      import ObjectDoesNotExist, PermissionDenied
 from populate_database import populate_database
-from datetime import date,datetime
+from datetime import datetime
+
+
 class TimeLogTestCase(TestCase):
     """This class provides a test case for using and managing employee timelogs"""
     @classmethod

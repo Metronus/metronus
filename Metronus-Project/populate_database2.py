@@ -220,7 +220,7 @@ def random_load():
                     projectdepartmentemployeerole__projectDepartment_id__department_id=dpmt))
                 # Create between 10 and 25 timelogs for each task and employee
                 for employee in employees:
-                    for z in range(random.randint(10, 25)):
+                    for _ in range(random.randint(10, 25)):
                         duration = random.randint(40, 480)
 
                         date = random.choice(dates)

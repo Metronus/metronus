@@ -81,7 +81,7 @@ def basic_load():
         deleted=False,
         company_id=company2)
 
-    proj2 = Project.objects.create(
+    Project.objects.create(
         name="Proust-Ligeti",
         deleted=False,
         company_id=company)
@@ -172,7 +172,7 @@ def basic_load():
         price_per_hour=1.0
     )
 
-    task2 = Task.objects.create(
+    Task.objects.create(
         name  ="Hacer cosas de back",
         description  = "hola",
         actor_id = emp5,
@@ -190,7 +190,7 @@ def basic_load():
         price_per_unit=7.0
     )
 
-    task4 = Task.objects.create(
+    Task.objects.create(
         name  ="Hacer cosas de cua",
         description  = "nada",
         actor_id = emp8,

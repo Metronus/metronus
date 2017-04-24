@@ -1,12 +1,11 @@
 from metronus_app.model.department      import Department
 from metronus_app.model.task            import Task
-from django.contrib.auth.models         import User
 from django.test                        import TestCase, Client
 from metronus_app.model.project         import Project
 from metronus_app.model.goalEvolution   import GoalEvolution
-from django.core.exceptions             import PermissionDenied
 from populate_database                  import populate_database
 import json
+
 
 class TaskTestCase(TestCase):
     """This class provides a test case for using and managing tasks"""

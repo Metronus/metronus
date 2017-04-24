@@ -99,7 +99,7 @@ def create_async(request):
                 else:
                     data['repeated_name'] = True
             else:
-                project = create_project(form, admin)
+                create_project(form, admin)
                 return JsonResponse(data)
 
     # if a GET (or any other method) we'll create a blank form

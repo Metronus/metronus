@@ -3,7 +3,7 @@ from metronus_app.model.company import Company
 from metronus_app.model.department import Department
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.administrator import Administrator
-from django.contrib.auth.models	import User
+from django.contrib.auth.models import User
 from django.test import TestCase, Client
 
 
@@ -41,6 +41,7 @@ class ProjectDepartmentTestCase(TestCase):
             first_name="Nimad",
             last_name="Rotartis")
 
+        # Admin
         Administrator.objects.create(
             user=admin_user1,
             user_type="A",
@@ -48,7 +49,8 @@ class ProjectDepartmentTestCase(TestCase):
             phone="999999999",
             company_id=company124)
 
-        admin2 = Administrator.objects.create(
+        # Admin2
+        Administrator.objects.create(
             user=admin_user2,
             user_type="A",
             identifier="adm02",
@@ -60,17 +62,17 @@ class ProjectDepartmentTestCase(TestCase):
             deleted=False,
             company_id=company124)
 
-        proj2 = Project.objects.create(
+        Project.objects.create(
             name="TestProject2",
             deleted=False,
             company_id=company124)
 
-        proj3 = Project.objects.create(
+        Project.objects.create(
             name="TestProjectC2",
             deleted=False,
             company_id=company123)
 
-        proj4 = Project.objects.create(
+        Project.objects.create(
             name="TestProjectDeleted",
             deleted=True,
             company_id=company124)
@@ -84,21 +86,21 @@ class ProjectDepartmentTestCase(TestCase):
             active=True,
             company_id=company124)
 
-        dep3 = Department.objects.create(
+        Department.objects.create(
             name="DepartamentoC2",
             active=True,
             company_id=company123)
 
-        dep3 = Department.objects.create(
+        Department.objects.create(
             name="DepartamentoInactivo",
             active=False,
             company_id=company124)
 
-        pd = ProjectDepartment.objects.create(
+        ProjectDepartment.objects.create(
             project_id = proj1,
             department_id = dep2)
 
-        pd = ProjectDepartment.objects.create(
+        ProjectDepartment.objects.create(
             project_id = proj1,
             department_id = dep1)
 

@@ -658,7 +658,17 @@ def check_metrics_authorized_for_employee(user, employee_id):
 
 
 def check_metrics_authorized_for_employee_in_project(user, employee_id, project_id):
-    """Raises 403 if the current actor is not allowed to obtain metrics for the department"""
+    """
+    Raises 403 if the current actor is not allowed to obtain metrics for the department
+
+    Optional at the end:
+    if logged.user_type == 'E'
+        If it's not an admin, check that it has role EXECUTIVE (50) or higher for any project in the department
+        try
+            ProjectDepartmentEmployeeRole.objects.get(employee_id=logged, role_id__tier__gte=50, projectDepartment_id__project_id=project)
+        except ObjectDoesNotExist:
+            raise PermissionDenied
+    """
     if not user.is_authenticated():
         raise PermissionDenied
 
@@ -675,14 +685,6 @@ def check_metrics_authorized_for_employee_in_project(user, employee_id, project_
 
     if employee.company_id != project.company_id:
         raise PermissionDenied
-    """
-    if logged.user_type == 'E':
-        # If it's not an admin, check that it has role EXECUTIVE (50) or higher for any project in the department
-        try:
-            ProjectDepartmentEmployeeRole.objects.get(employee_id=logged, role_id__tier__gte=50, projectDepartment_id__project_id=project)
-        except ObjectDoesNotExist:
-            raise PermissionDenied
-    """
 
 
 def create_employee_user(form):
