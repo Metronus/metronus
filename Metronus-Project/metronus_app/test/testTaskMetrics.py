@@ -1,7 +1,9 @@
+import string
+import random
+import json
 from django.contrib.auth.models import User
 from django.test import TestCase, Client
 from django.core.exceptions import ObjectDoesNotExist
-
 from metronus_app.model.employee import Employee
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
@@ -13,9 +15,6 @@ from metronus_app.model.role import Role
 from metronus_app.model.administrator import Administrator
 from metronus_app.model.department import Department
 
-import string
-import random
-import json
 
 
 def ranstr():
