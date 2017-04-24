@@ -367,7 +367,7 @@ class ProjectMetricsTestCase(TestCase):
 
         n_dep = len(departments)
         # Do the random test 5 times
-        for k in range(5):
+        for _ in range(5):
             Task.objects.all().delete()
 
             tasks_per_dpmt = [random.choice(range(11)) for _ in range(n_dep)]

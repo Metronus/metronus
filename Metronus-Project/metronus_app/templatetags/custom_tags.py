@@ -56,20 +56,14 @@ def is_weekend(day, month, year):
 
 @register.assignment_tag
 def is_admin(actor):
-    if actor.user_type == 'A':
-        return True
-    else:
-        return False
+    return actor.user_type == 'A'
 
 
 @register.assignment_tag
 def has_role(actor):
     if actor.user_type == 'E' or actor.user_type == 'A':
         try:
-            if ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor.id).count() > 0:
-                return True
-            else:
-                return False
+            return ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor.id).count() > 0
         except:
             return False
     else:
