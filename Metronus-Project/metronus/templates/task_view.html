@@ -23,10 +23,11 @@
                             <div class="pull-right">
                                 <!-- DataPicker para cambiar de fecha la gráfica -->
                                 <fieldset>
+                                    <legend>{% trans 'datePicker' %}</legend>
                                     <div class="control-group">
                                         <div class="controls">
                                             <div class="input-prepend input-group">
-                                                <span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
+                                                <span class="add-on input-group-addon"><em class="glyphicon glyphicon-calendar fa fa-calendar"></em></span>
                                                 <input type="text" style="width: 200px" name="task_chart" id="task_chart" class="form-control" value="" />
                                             </div>
                                         </div>
@@ -57,12 +58,12 @@
 
             <div style="display: flex;/*!  */justify-content: space-around;">
               <form class="form-horizontal">
-                <label for"datepickerlabel">{% trans 'datePicker' %}</label>
                 <fieldset>
+                  <legend>{% trans 'datePicker' %}</legend>
                   <div class="control-group">
                     <div class="controls">
                       <div class="input-prepend input-group">
-                        <span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
+                        <span class="add-on input-group-addon"><em class="glyphicon glyphicon-calendar fa fa-calendar"></em></span>
                         <input type="text" style="width: 200px" name="task_profit_chart" id="task_profit_chart" class="form-control" value=""/>
                       </div>
                     </div>
@@ -70,13 +71,13 @@
                 </fieldset>
               </form>
               <form class="form-horizontal">
-                <label for"datepickerlabel">{% trans 'data_output_to' %}</label>
                 <fieldset>
+                  <legend>{% trans 'data_output_to' %}</legend>
                   <div class="control-group">
                     <div class="controls">
                       <div class="input-prepend input-group">
-                        <span class="add-on input-group-addon"><i class="glyphicon glyphicon-refresh fa fa-refresh"></i></span>
-                        
+                        <span class="add-on input-group-addon"><em class="glyphicon glyphicon-refresh fa fa-refresh"></em></span>
+
                         <div style="display: table-cell;border-radius: 0px 3px 3px 0px; min-width: 197px" id="switch-acum-button" type="text" class="btn btn-success">{% trans 'cumulative_values' %}</div>
                       </div>
                     </div>

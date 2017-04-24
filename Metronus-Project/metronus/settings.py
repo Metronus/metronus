@@ -29,7 +29,7 @@ SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = not production
 
-ALLOWED_HOSTS = [".metronus.es", "metronus.herokuapp.com", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = [".metronus.es", "metronus.herokuapp.com", "localhost"]
 
 LANGUAGES = (
     ('en', _('English')),
@@ -134,7 +134,7 @@ DATABASES = {
 		'NAME': os.environ["METRONUS_DB_NAME"],
 		'USER': os.environ["METRONUS_DB_USER"],
 		'PASSWORD': os.environ["METRONUS_DB_PASS"],
-		'HOST': os.environ["METRONUS_DB_HOST"] if heroku else '127.0.0.1',
+		'HOST': os.environ["METRONUS_DB_HOST"] if heroku else 'localhost',
 		'PORT': os.environ["METRONUS_DB_PORT"] if heroku else '5432',
     }
 }
