@@ -26,10 +26,11 @@
                     <div class="col-md-6 col-xs-12">
                         <div class="pull-right">
                             <fieldset>
+                              <legend>{% trans 'datePicker' %}</legend>
                                 <div class="control-group">
                                     <div class="controls">
                                         <div class="input-prepend input-group">
-                                            <span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
+                                            <span class="add-on input-group-addon"><em class="glyphicon glyphicon-calendar fa fa-calendar"></em></span>
                                             <input type="text" style="width: 200px" class="form-control" name="date_field" id="date_field" value="" />
                                         </div>
                                     </div>
@@ -246,7 +247,7 @@
     });
 
     $(document).ready(function() {
-        
+
         $("#id_department_id").change(function(){
             $.ajax({
                 type: 'POST',

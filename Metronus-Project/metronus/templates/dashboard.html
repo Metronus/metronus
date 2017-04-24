@@ -30,12 +30,12 @@
 
 				<div style="display:flex; justify-content: center;">
 					<form class="form-horizontal">
-						<label for"datepickerlabel">{% trans 'datePicker' %}</label>
 						<fieldset>
+							<legend>{% trans 'datePicker' %}</legend>
 							<div class="control-group">
 								<div class="controls">
 									<div class="input-prepend input-group">
-										<span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
+										<span class="add-on input-group-addon"><em class="glyphicon glyphicon-calendar fa fa-calendar"></em></span>
 										<input type="text" style="width: 200px" name="date_filter" id="date_filter" class="form-control" value=""/>
 									</div>
 								</div>
@@ -88,7 +88,7 @@
 			})
 		}
 		return res
-	}   
+	}
 	function formatTimePerProject(backendData) {
 		var names = [],
 			values = []
@@ -97,7 +97,7 @@
 			values.push(backendData[p].time)
 		}
 		return { names, values }
-	} 
+	}
 	function pieChart(backendData, formatter, title, subtitle) {
 		return {
 			title : {
@@ -179,7 +179,7 @@
 			}
 			]
 		}
-	} 
+	}
 
 	$(document).ready(function() {
 
@@ -194,7 +194,7 @@
 											'{% trans 'employeesPerProjectSubtitle' %}'))
 			}
 		})
-		
+
 
 		var chart2 = echarts.init(document.getElementById('chart2'), theme);
 
@@ -208,7 +208,7 @@
 			}
 		})
 
-		
+
 
 		var chart3 = echarts.init(document.getElementById('chart3'), theme);
 

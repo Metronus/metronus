@@ -17,7 +17,7 @@
           <ul class="list-inline widget_profile_box">
             <li>
               <a>
-                <i class="fa fa-linkedin"></i>
+                <em class="fa fa-linkedin"></em>
               </a>
             </li>
             <li>
@@ -29,7 +29,7 @@
             </li>
             <li>
               <a>
-                <i class="fa fa-github"></i>
+                <em class="fa fa-github"></em>
               </a>
             </li>
           </ul>
@@ -76,7 +76,7 @@
         <li style="text-align: center">
 
           <span>{% trans 'registryDate' %}: {{employee.registryDate}}</span>
-        </li>        
+        </li>
         <li style="text-align: center">
         <span>
             <a href="{% url 'employee_edit' employee.user.username %}" type="button" class="btn btn-primary">
@@ -154,10 +154,11 @@
                         <div class="col-md-6">
                             <div class="pull-right">
                                 <fieldset>
+                                  <legend>{% trans 'datePicker' %}</legend>
                                     <div class="control-group">
                                         <div class="controls">
                                             <div class="input-prepend input-group">
-                                                <span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
+                                                <span class="add-on input-group-addon"><em class="glyphicon glyphicon-calendar fa fa-calendar"></em></span>
                                                 <input type="text" style="width: 200px" name="task_chart" id="task_chart" class="form-control" value="" />
                                             </div>
                                         </div>
@@ -187,12 +188,12 @@
 
         <div style="display: flex;/*!  */justify-content: space-around;">
           <form class="form-horizontal">
-            <label for"datepickerlabel">{% trans 'datePicker' %}</label>
             <fieldset>
+              <legend>{% trans 'datePicker' %}</legend>
               <div class="control-group">
                 <div class="controls">
                   <div class="input-prepend input-group">
-                    <span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
+                    <span class="add-on input-group-addon"><em class="glyphicon glyphicon-calendar fa fa-calendar"></em></span>
                     <input type="text" style="width: 200px" name="employee_profit_chart" id="employee_profit_chart" class="form-control" value=""/>
                   </div>
                 </div>
@@ -200,13 +201,13 @@
             </fieldset>
           </form>
           <form class="form-horizontal">
-            <label for"datepickerlabel">{% trans 'data_output_to' %}</label>
             <fieldset>
+              <legend>{% trans 'data_output_to' %}</legend>
               <div class="control-group">
                 <div class="controls">
                   <div class="input-prepend input-group">
-                    <span class="add-on input-group-addon"><i class="glyphicon glyphicon-refresh fa fa-refresh"></i></span>
-                    
+                    <span class="add-on input-group-addon"><em class="glyphicon glyphicon-refresh fa fa-refresh"></em></span>
+
                     <div style="display: table-cell;border-radius: 0px 3px 3px 0px; min-width: 197px" id="switch-acum-button" type="text" class="btn btn-success">{% trans 'cumulative_values' %}</div>
                   </div>
                 </div>
@@ -227,7 +228,7 @@ $('#confirm-delete').on('show.bs.modal', function(e) {
     $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
 });
 
-       
+
  function fromData (backendData) {
   dates=backendData["dates"];
   task=backendData["task"]
@@ -393,7 +394,7 @@ function ajax_productivity(id) {
   //find the date picker
   picker=$('input[name="task_chart"]').data('daterangepicker');
    // $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
-  
+
   $.get({
     url: '/employee/ajax_productivity_per_task_and_date/{{employee.user.username}}',
     data:{
@@ -423,25 +424,25 @@ function ajax_productivity(id) {
       // Error
   })
 
-}    
+}
 $(document).ready(function() {
     //loads all tasks for the employee, with total producitivity
       $.get({
         url: "/employee/ajax_productivity_per_task/{{employee.user.username}}",
-        
+
         success: function ( backendData )  {
           space=document.getElementById('task_space')
           all=""
-          
+
           for (var task in backendData ){
               all+="<div>";
-              all+="<input type='button' class='btn btn-success submit-button' value='" + 
+              all+="<input type='button' class='btn btn-success submit-button' value='" +
               backendData[task]["name"] + "' onclick='ajax_productivity("+task+");' />";
               all+="Expected:"+backendData[task]["expected_productivity"]+";Total:"+
               backendData[task]["total_productivity"]+"";
               all+="</div>";
            }
-            space.innerHTML =all 
+            space.innerHTML =all
 
 
         defaultRange = moment().startOf('month').format('MM/DD/YYYY') +' - '+ moment().endOf('month').format('MM/DD/YYYY')
@@ -456,7 +457,7 @@ $(document).ready(function() {
         });
   $('input[name="task_chart"]').on('apply.daterangepicker', function(ev, picker) {
             $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
-      
+
       $.get({
         url: '/employee/ajax_productivity_per_task_and_date/{{employee.user.username}}',
         data:{
@@ -469,15 +470,15 @@ $(document).ready(function() {
           var echartLine = echarts.init(document.getElementById('task'), theme);
           echartLine.setOption( fromData( backendData ) );
 
-      
+
         }
       }).fail(function () {
           // Error
-      });  
+      });
         $('input[name="task_chart"]').on('cancel.daterangepicker', function(ev, picker) {
             $(this).val(defaultRange);
-        });    
-        
+        });
+
       })
     }
 });
@@ -558,4 +559,3 @@ $(document).ready(function() {
 
 
 {% endblock %}
-
