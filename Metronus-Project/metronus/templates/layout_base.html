@@ -164,6 +164,9 @@
                     <span class=" fa fa-angle-down"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-usermenu pull-right">
+                    {% if user.actor.user_type == "E" %}
+                      <li><a href="/employee/view/{{user.get_username}}/"><i class="fa fa-user pull-right"></i>{% trans 'profile' %}</a></li>
+                    {% endif %}
                     <li><a href="/logout/"><i class="fa fa-sign-out pull-right"></i>{% trans 'dashLogout' %}</a></li>
                   </ul>
                 </li>

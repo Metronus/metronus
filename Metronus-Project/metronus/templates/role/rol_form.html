@@ -105,6 +105,7 @@
 	    	{% if  editing == False %}
 		    	<input type="button" class="btn btn-info submit-button" value="{% trans 'roleAdd' %}" onclick="ajax();" />
 		    {% endif %}
+            <a class="btn btn-warning" href="/employee/view/{{employee.user.username}}/">{% trans 'cancel' %}</a>
 
             </div>
           
