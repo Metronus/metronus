@@ -28,7 +28,7 @@ def create(request):
 
         if form.is_valid():
             create_project_department(form, admin)
-            return render(request, 'projectdepartment_create.html',
+            return render(request, 'projectDepartment/projectdepartment_create.html',
                           {'form': ProjectDepartmentForm(user=admin), 'success': True})
 
     # GET -> Create an empty form
@@ -37,7 +37,7 @@ def create(request):
                                               "department_id": 0,
                                               "projectDepartment_id": 0}, user=admin)
 
-    return render(request, 'projectdepartment_form.html', {'form': form})
+    return render(request, 'projectDepartment/projectdepartment_form.html', {'form': form})
 
 
 def delete(request):
@@ -88,7 +88,7 @@ def list_project_department(request):
     else:
         lista = ProjectDepartment.objects.filter(project_id__company_id=admin.company_id)
 
-    return render(request, "projectdepartment_list.html", {"projectDepartments": lista})
+    return render(request, "projectDepartment/projectdepartment_list.html", {"projectDepartments": lista})
 
 
 def edit(request):
@@ -114,7 +114,7 @@ def edit(request):
             initial={"department_id": project_department.department_id,
                      "project_id": project_department.project_id}, user=admin)
 
-    return render(request, 'projectdepartment_form.html', {'form': form})
+    return render(request, 'projectDepartment/projectdepartment_form.html', {'form': form})
 
 
 # Auxiliar methods, containing the operation logic
