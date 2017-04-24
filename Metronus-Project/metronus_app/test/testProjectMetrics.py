@@ -451,7 +451,7 @@ class ProjectMetricsTestCase(TestCase):
         n_dep = len(departments)
         # Do the random test 5 times
 
-        for k in range(5):
+        for _ in range(5):
 
             # Remove all tasks and time logs
             TimeLog.objects.all().delete()

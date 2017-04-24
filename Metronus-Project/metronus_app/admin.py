@@ -25,6 +25,7 @@ class MyAdminSite(AdminSite):
         ]
         return my_urls + urls
 
+    @classmethod
     def dashboard(self):
         """
         Returns a JSON which contains the number of tasks per company,

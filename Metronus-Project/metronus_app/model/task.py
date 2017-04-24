@@ -4,6 +4,8 @@ from metronus_app.model.projectDepartment import ProjectDepartment
 
 
 class Task(models.Model):
+    """ Esto es una clase del modelo. Totalmente inesperado"""
+
     name = models.CharField(max_length=30)
     description = models.CharField(max_length=200)
     registryDate = models.DateTimeField(auto_now=True)

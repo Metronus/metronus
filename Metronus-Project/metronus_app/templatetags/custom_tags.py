@@ -36,6 +36,7 @@ def show_ajax_errors():
 
 @register.simple_tag
 def converto_to_hours(amount):
+    """ ¿converto o con berto? XD"""
     hours = amount//60
     minutes = amount % 60
     if minutes < 10:

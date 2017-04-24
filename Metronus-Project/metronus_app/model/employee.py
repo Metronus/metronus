@@ -3,6 +3,8 @@ from django.db import models
 
 
 class Employee(Actor):
+    """ XD """
+
     price_per_hour = models.FloatField(default=1.0)
 
     def __unicode__(self):
