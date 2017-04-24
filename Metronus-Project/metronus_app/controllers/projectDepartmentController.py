@@ -57,7 +57,7 @@ def delete(request):
     return HttpResponseRedirect('/projectdepartment/list/')
 
 
-def list(request):
+def list_project_department(request):
     """
     parameters: project_id or department_id, both optional.
     If it receives project_id, it will return all projectDepartments from that project
@@ -65,7 +65,7 @@ def list(request):
     If it receives none, it will return all projectDeparments from the logged company
 
     returns:
-    projectDepartments: lista de relaciones proyecto-departamento de la compañía logeada, según el parámetro pasado. 
+    projectDepartments: lista de relaciones proyecto-departamento de la compañía logeada, según el parámetro pasado.
 
     template:
     projectdepartment_list.html

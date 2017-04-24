@@ -41,7 +41,7 @@ def create(request):
         formNotValid: el formulario contiene errores
         priceNotValid: el precio debe ser mayor que 0
         emailNotUnique:si el correo no es úinco
-    
+
     template:
         employee_register.html
     """
@@ -106,7 +106,7 @@ def create(request):
         raise PermissionDenied
 
 
-def list(request):
+def list_employees(request):
     """
     parameters/returns:
     employees: lista de objetos employee a los que tiene acceso el administrador (los que están en su empresa)
@@ -184,7 +184,7 @@ def edit(request, username):
 
     elif request.method == "POST":
         # Process the received form
-        
+
         form = EmployeeEditForm(request.POST)
         if form.is_valid():
             errors = []
@@ -197,7 +197,7 @@ def edit(request, username):
                 employee.phone = form.cleaned_data["phone"]
                 # New log if the salary has changed
                 new_log = employee.price_per_hour != form.cleaned_data["price_per_hour"]
-                    
+
                 employee.price_per_hour = form.cleaned_data["price_per_hour"]
 
                 # Update user data
@@ -208,7 +208,7 @@ def edit(request, username):
 
                 user.save()
                 employee.save()
-                
+
                 # New log if the salary has changed
                 if new_log:
                     EmployeeLog.objects.create(employee_id=employee, event="C",
@@ -272,7 +272,7 @@ def update_password(request, username):
         else:
             # Invalid form
             return JsonResponse({'success': False, 'errors': ['employeeCreation_formNotValid']})
-    
+
 
 def delete(request, username):
     """
@@ -303,12 +303,12 @@ def delete(request, username):
 def ajax_productivity_per_task(request, username):
     """
     # url = employee/ajax_productivity_per_task/<username>
-    # Devuelve un objeto cuyas claves son las ID de los proyectos y sus valores un objeto 
+    # Devuelve un objeto cuyas claves son las ID de los proyectos y sus valores un objeto
     #{'name': ..., 'total_productivity': X,'expected_productivity':Y} (X e Y en unidades goal_description/hora)
-    
+
     #Ejemplo:
     #/employee/ajax_productivity_per_task/JoseGavilan
-    
+
     #devuelve lo siguiente
     #{"3": {"total_productivity": 0.7125, "expected_productivity": 2.0, "name": "Hacer cosas de front"}}
     """
@@ -329,7 +329,7 @@ def ajax_productivity_per_task(request, username):
     data = {}
     # Save productivity for each task
     for task in tasks:
-        
+
         total_produced_units = task.total_produced_units
         total_duration = task.total_duration
         if total_duration is None or total_produced_units is None or total_duration == 0:
@@ -356,7 +356,7 @@ def ajax_productivity_per_task_and_date(request, username):
     # Parámetro obligatorio:
     # task_id: el id de la tarea en cuestión
 
-    # Parámetros opcionales: 
+    # Parámetros opcionales:
     # start_date - fecha en formato YYYY-MM-DD que indica el inicio de la medición. Por defecto, 30 días antes de la fecha actual.
     # end_date - fecha en formato YYYY-MM-DD que indica el final de la medición. Por defecto, fecha actual.
     # offset - desplazamiento (huso) horario en formato +/-HH:MM - Por defecto +00:00
@@ -365,13 +365,13 @@ def ajax_productivity_per_task_and_date(request, username):
 
     #Ejemplo
     #/employee/ajax_productivity_per_task_and_date/JoseGavilan?task_id=3&start_date=2017-02-05&end_date=2017-02-16
-    
+
     #devuelve lo siguiente
-    #{"dates": 
-    #   ["2017-02-05", "2017-02-06", "2017-02-07", "2017-02-08", "2017-02-09", "2017-02-10", "2017-02-11", "2017-02-12", "2017-02-13", "2017-02-14", "2017-02-15", "2017-02-16"], 
-    #"task": {"name": "Hacer cosas de front", 
-    #   "real_productivity": [0, 0, 0, 0, 0, 0, 0, 1.2, 0, 0.225, 0, 0], 
-    #   "task_id": 3, 
+    #{"dates":
+    #   ["2017-02-05", "2017-02-06", "2017-02-07", "2017-02-08", "2017-02-09", "2017-02-10", "2017-02-11", "2017-02-12", "2017-02-13", "2017-02-14", "2017-02-15", "2017-02-16"],
+    #"task": {"name": "Hacer cosas de front",
+    #   "real_productivity": [0, 0, 0, 0, 0, 0, 0, 1.2, 0, 0.225, 0, 0],
+    #   "task_id": 3,
     #   "expected_productivity": [9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 4.0, 4.0, 2.0, 2.0, 2.0]}}
     """
 
@@ -443,7 +443,7 @@ def ajax_productivity_per_task_and_date(request, username):
             else:
                 # Duration is in minutes, so we multiply by 60 (duration is in the denominator)
                 total_productivity = 60*total_produced_units/total_duration
-        
+
         # Find the registry date of production goal evolution which is closest to the date
         expected_productivity = GoalEvolution.objects.filter(task_id_id=task.id,
                                                            registryDate__gte=logDate).first()

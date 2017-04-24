@@ -54,7 +54,7 @@ def create(request):
                 errors.append('task_creation_invalid_goal')
             if not check_price(form):
                 errors.append('task_creation_invalid_price')
-            
+
             pname = form.cleaned_data['name']
             ppro = form.cleaned_data['project_id']
             pdep = form.cleaned_data['department_id']
@@ -77,7 +77,7 @@ def create(request):
                     actor = check_task(pro, request)
                     create_task(form, pdtuple, actor)
                     return HttpResponseRedirect('/task/list')
-                
+
     # if a GET (or any other method) we'll create a blank form
     else:
         form = TaskForm()
@@ -98,7 +98,7 @@ def create_async(request):
     invalid_goal:si el objetivo es incorrecto(está uno en blanco y otro no)
     project_department_not_related: si no están relacionados projectdepartment
     invalid_price: si el precio no esta puesto acorde al objetivo de producción (o no es positivo)
-    
+
     success:si tuvo éxito la operación
 
     template:
@@ -106,7 +106,7 @@ def create_async(request):
     """
     # Check that the user is logged in
     actor = check_task(None, request)
-    
+
     errors = []
     data = {
         'success': True
@@ -123,7 +123,7 @@ def create_async(request):
                 errors.append('task_creation_invalid_goal')
             if not check_price(form):
                 errors.append('task_creation_invalid_price')
-            
+
             pname = form.cleaned_data['name']
             ppro = form.cleaned_data['project_id']
             pdep = form.cleaned_data['department_id']
@@ -177,7 +177,7 @@ def form_departments(request):
     return HttpResponse(response, content_type='application/json')
 
 
-def list(request):
+def list_tasks(request):
     """
     returns:
     tasks: lista de tareas del actor logeado
@@ -208,7 +208,7 @@ def view(request,task_id):
     check_task(task, request)
     goal_evolution = GoalEvolution.objects.filter(task_id=task.id)
     employees = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__task=task.id).distinct()
-  
+
     return render(request, "task_view.html", {"task": task, "goal_evolution": goal_evolution, "employees": employees})
 
 
@@ -218,13 +218,13 @@ def edit(request, task_id):
     form: el formulario con los datos de la tarea
     departments:eso
     projects:eso
-    
+
     errors: ver create
     repeated_name: si el nombre es repetido
     invalid_goal:si el objetivo es incorrecto(está uno en blanco y otro no)
     project_department_not_related: si no están relacionados projectdepartment
     invalid_price: si el precio no esta puesto acorde al objetivo de producción (o no es positivo)
-   
+
     template:
     task_form.html
     """
@@ -232,7 +232,7 @@ def edit(request, task_id):
     actor = check_task(None, request)
 
     errors = []
-    
+
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -253,7 +253,7 @@ def edit(request, task_id):
             # pro does not exists or it's the same
             if pro is not None and pro.id != task.id and pro.active:
                 errors.append('task_creation_repeated_name')
-            
+
             if not errors:
                 update_task(task, form, actor)
                 return HttpResponseRedirect('/task/list')
@@ -303,7 +303,7 @@ def ajax_productivity_per_task(request):
     # Parámetros obligatorios:
     # task_id - ID del task
 
-    # Parámetros opcionales: 
+    # Parámetros opcionales:
     # start_date - fecha en formato YYYY-MM-DD que indica el inicio de la medición. Por defecto, 30 días antes de la fecha actual.
     # end_date - fecha en formato YYYY-MM-DD que indica el final de la medición. Por defecto, fecha actual.
     # offset - desplazamiento (huso) horario en formato +/-HH:MM - Por defecto +00:00
@@ -319,7 +319,7 @@ def ajax_productivity_per_task(request):
         Actor.objects.get(user=request.user)
     except ObjectDoesNotExist:
         raise PermissionDenied
-        
+
     if "task_id" not in request.GET:
         return HttpResponseBadRequest()
 
@@ -511,7 +511,7 @@ def check_goal(form):
 def check_price(form):
     """
     This returns true if the price field is valid
-    This means only per_unit or per_hour must be filled 
+    This means only per_unit or per_hour must be filled
     and only if there is a valid goal description for the first field, or no goal for the second
     """
     # fgoal = form.cleaned_data['production_goal']

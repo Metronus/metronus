@@ -42,11 +42,11 @@ urlpatterns += [  # i18n_patterns(
     url(r'^$', views.index),
     url(r'^index.html/$', views.index, name='home'),
     url(r'^app/$', appController.index, name='app_index'),
- 
+
     # Department
     url(r'^department/create$', departmentController.create, name='department_create'),
     url(r'^department/createAsync$', departmentController.create_async),
-    url(r'^department/list$', departmentController.list, name='department_list'),
+    url(r'^department/list$', departmentController.list_departments, name='department_list'),
     url(r'^department/edit/(?P<department_id>\w{0,50})/$', departmentController.edit, name='department_edit'),
     url(r'^department/view/(?P<department_id>\w{0,50})/$', departmentController.view, name='department_view'),
     url(r'^department/delete/(?P<department_id>\w{0,50})/$', departmentController.delete, name='department_delete'),
@@ -59,7 +59,7 @@ urlpatterns += [  # i18n_patterns(
     # Task
     url(r'^task/create$', taskController.create, name='task_create'),
     url(r'^task/createAsync$', taskController.create_async),
-    url(r'^task/list$', taskController.list, name='task_list'),
+    url(r'^task/list$', taskController.list_tasks, name='task_list'),
     url(r'^task/view/(?P<task_id>\w{0,50})/$', taskController.view, name='task_view'),
     url(r'^task/edit/(?P<task_id>\w{0,50})/$', taskController.edit, name='task_edit'),
     url(r'^task/delete/(?P<task_id>\w{0,50})/$', taskController.delete, name='task_delete'),
@@ -68,7 +68,7 @@ urlpatterns += [  # i18n_patterns(
     url(r'^task/ajaxProfit/(?P<task_id>\w{0,50})/$', taskController.ajax_profit_per_date, name='task_profit_per_date'),
 
     # Project
-    url(r'^project/list$', projectController.list, name='project_list'),
+    url(r'^project/list$', projectController.list_projects, name='project_list'),
     url(r'^project/edit/(?P<project_id>\w{0,50})/$', projectController.edit, name='project_edit'),
     url(r'^project/view/(?P<project_id>\w{0,50})/$', projectController.show, name='project_view'),
     url(r'^project/delete/(?P<project_id>\w{0,50})/$', projectController.delete, name='project_delete'),
@@ -84,12 +84,12 @@ urlpatterns += [  # i18n_patterns(
 
     # Project-Department relationship
     url(r'^projectdepartment/create$', projectDepartmentController.create, name='projectdepartment_create'),
-    url(r'^projectdepartment/list$', projectDepartmentController.list, name='projectdepartment_list'),
+    url(r'^projectdepartment/list$', projectDepartmentController.list_project_department, name='projectdepartment_list'),
     url(r'^projectdepartment/delete$', projectDepartmentController.delete, name='projectdepartment_delete'),
 
     # Employee
     url(r'^employee/create$', employeeController.create, name='employee_create'),
-    url(r'^employee/list$', employeeController.list, name='employee_list'),
+    url(r'^employee/list$', employeeController.list_employees, name='employee_list'),
     url(r'^employee/view/(?P<username>\w{0,50})/$', employeeController.view, name='employee_view'),
     url(r'^employee/edit/(?P<username>\w{0,50})/$', employeeController.edit, name='employee_edit'),
     url(r'^employee/updatePassword/(?P<username>\w{0,50})/$', employeeController.update_password,
@@ -132,7 +132,7 @@ urlpatterns += [  # i18n_patterns(
         name='dashboard_departments_per_project'),
     url(r'^dashboard/ajaxTasksPerProject$', dashboardController.ajax_tasks_per_project,
         name='dashboard_tasks_per_project'),
-    
+
     # Login
     url(r'^login/$', loginController.login, {'template_name': 'login.html', }, name="login"),
     url(r'^logout/$', loginController.logout, {'next_page': '/', }, name="logout"),
