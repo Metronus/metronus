@@ -640,7 +640,7 @@ msgstr "Formato inválido"
 
 #: Task
 msgid "taskList"
-msgstr "List de tareas"
+msgstr "Lista de tareas"
 msgid "task"
 msgstr "Tarea"
 msgid "createTask"
