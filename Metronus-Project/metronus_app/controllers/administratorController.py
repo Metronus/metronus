@@ -32,11 +32,11 @@ def edit(request, username):
         })
     elif request.method == "POST":
         # Process the received form
-        
+
         form = AdministratorForm(request.POST)
         if form.is_valid() and check_passwords(form):
             if check_image(form, 'photo'):
-            
+
                 # Update employee data
                 administrator.identifier = form.cleaned_data["identifier"]
                 administrator.phone = form.cleaned_data["phone"]

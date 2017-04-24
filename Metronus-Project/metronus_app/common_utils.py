@@ -46,7 +46,7 @@ def get_current_employee_or_403(request):
 
 
 def get_authorized_or_403(request):
-    """ 
+    """
     Returns the current administrator,
     or the logged user if they have at least a role higher than Employee on any department/project
     """

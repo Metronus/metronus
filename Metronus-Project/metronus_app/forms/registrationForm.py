@@ -12,7 +12,7 @@ class RegistrationForm(Form):
     company_email = forms.EmailField(label=_("company_email"))
     company_phone = forms.CharField(label=_("company_phone"), max_length=15)
     logo = forms.ImageField(label=_("logo"), required=False)
-    
+
     # User (Account data)
     username = forms.CharField()
     admin_email = forms.EmailField(label=_("admin_email"))

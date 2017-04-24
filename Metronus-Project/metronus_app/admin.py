@@ -27,7 +27,7 @@ class MyAdminSite(AdminSite):
 
     def dashboard(self):
         """
-        Returns a JSON which contains the number of tasks per company, 
+        Returns a JSON which contains the number of tasks per company,
         as well as the number of users currently logged
         """
         employees = list(Company.objects.all().annotate(num_emp=Count("actor")).values_list("id", "num_emp"))

@@ -84,9 +84,9 @@ def is_employee(actor):
     for role in ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor.id):
         if role.role_id.name == 'EMPLOYEE':
             return True
-            
+
     return False
-    
+
 
 @register.assignment_tag
 def is_project_manager(actor):
@@ -96,7 +96,7 @@ def is_project_manager(actor):
     for role in ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor.id):
         if role.role_id.name == 'PROJECT_MANAGER':
             return True
-    
+
     return False
 
 
@@ -132,5 +132,5 @@ def is_team_manager(actor):
     for role in ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor.id):
         if role.role_id.name == 'TEAM_MANAGER':
             return True
-            
+
     return False

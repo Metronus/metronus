@@ -252,16 +252,16 @@ def basicLoad():
     )
     ge1=GoalEvolution.objects.create(
         task_id=task3,
-        
+
         actor_id = emp8,
         production_goal=9.0,
         goal_description="kgs",
         price_per_unit=3.0
         )
-    
+
     ge2=GoalEvolution.objects.create(
         task_id=task3,
-        
+
         actor_id = emp8,
         production_goal=4.0,
         goal_description="kgs",
@@ -295,7 +295,7 @@ def populate_roles():
     Role.objects.create(name="EXECUTIVE", tier=50)
     # El jefe de proyecto
     Role.objects.create(name="PROJECT_MANAGER", tier=40)
-    # El jefe de equipo 
+    # El jefe de equipo
     Role.objects.create(name="TEAM_MANAGER", tier=30)
     # El coordinador del departamento
     Role.objects.create(name="COORDINATOR", tier=20)

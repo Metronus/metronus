@@ -19,10 +19,10 @@ if __name__ == "__main__":
                 "forget to activate a virtual environment?"
             )
         raise
-    
+
     import django
     django.setup()
-    
+
     argv = sys.argv[1]
 
     if argv == 'populate':

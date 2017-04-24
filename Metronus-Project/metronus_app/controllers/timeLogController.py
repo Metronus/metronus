@@ -168,7 +168,7 @@ def check_permission_for_task(employee, task):
                                                            projectDepartment_id=task.projectDepartment_id)
         return res.count() > 0
     return False
-    
+
 
 def check_role_for_task(employee, task):
     """Comprobacion para saber si el empleado es un mando superior y

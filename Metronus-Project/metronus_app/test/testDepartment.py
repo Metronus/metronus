@@ -89,7 +89,7 @@ class DepartmentTestCase(TestCase):
         Department.objects.create(name="dep2", active=True, company_id=company1)
         Department.objects.create(name="dep3", active=False, company_id=company1)
         Department.objects.create(name="dep3", active=True, company_id=company2)
-        
+
         proj1 = Project.objects.create(name="TestProject", deleted=False, company_id=company1)
         Project.objects.create(name="TestProject2", deleted=False, company_id=company1)
         pd1 = ProjectDepartment.objects.create(

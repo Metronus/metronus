@@ -23,7 +23,7 @@ def view(request):
 def ajax_time_per_project(request):
     """ Devuelve un objeto cuyas claves son las ID de los proyectos y sus valores un objeto {'name': ..., 'time': X} (X en minutos)
 
-    # Parámetros opcionales: 
+    # Parámetros opcionales:
     # start_date - fecha en formato YYYY-MM-DD que indica el inicio de la medición. Por defecto, 30 días antes de la fecha actual.
     # end_date - fecha en formato YYYY-MM-DD que indica el final de la medición. Por defecto, fecha actual.
     # offset - desplazamiento (huso) horario en formato +/-HH:MM - Por defecto +00:00
@@ -31,7 +31,7 @@ def ajax_time_per_project(request):
     # Si se proporcionan pero no tienen el formato correcto se lanzará un error HTTP 400 Bad Request
     """
     get_current_admin_or_403(request)
-   
+
     # Get and parse the dates
     start_date = request.GET.get("start_date", str(date.today() - timedelta(days=30)))
     end_date = request.GET.get("end_date", str(date.today()))
@@ -60,7 +60,7 @@ def ajax_time_per_project(request):
             task_id__active=True,
             task_id__projectDepartment_id__project_id=project,
             workDate__range=[start_date, end_date]).aggregate(Sum('duration'))["duration__sum"]
-        if time_total is None: 
+        if time_total is None:
             time_total = 0
 
         data[project.id] = {

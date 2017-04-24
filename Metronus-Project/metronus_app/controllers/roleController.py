@@ -10,7 +10,7 @@ from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
- 
+
 from metronus_app.common_utils import get_authorized_or_403
 
 
@@ -29,7 +29,7 @@ def manage(request):
         form: formulario RoleManagementForm con los valores iniciales adecuados
 
         errors: array de códigos de error si los hay
-    
+
     template:
         rol_form.html
 
@@ -60,7 +60,7 @@ def manage(request):
 
         form = RoleManagementForm(request.POST)
         if form.is_valid():
-            
+
             result = process_post_form(logged, form)
             if result["ok"]:
                 return HttpResponseRedirect('/employee/view/' + Employee.objects.get(id=form.cleaned_data["employee_id"]).user.username + '/')
@@ -90,7 +90,7 @@ def manage_async(request):
     logged = get_authorized_or_403(request)
 
     if request.method == 'POST':
-        
+
         form = RoleManagementForm(request.POST)
         if form.is_valid():
             result = process_post_form(logged, form)
@@ -180,7 +180,7 @@ def delete(request, role_id):
                 raise PermissionDenied
 
         except ObjectDoesNotExist:
-            raise PermissionDenied    
+            raise PermissionDenied
 
     employee_username = role.employee_id.user.username
     role.delete()

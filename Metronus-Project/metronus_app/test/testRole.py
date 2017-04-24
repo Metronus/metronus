@@ -234,7 +234,7 @@ class RoleTestCase(TestCase):
         self.assertTrue("department_id" not in form.initial)
         self.assertTrue("project_id" not in form.initial)
         self.assertTrue("role_id" not in form.initial)
-    
+
     def test_get_form_existing_role_positive(self):
         """
         With proper roles, edit the role of an employee
@@ -419,7 +419,7 @@ class RoleTestCase(TestCase):
         """
         Try adding a duplicate role for an user
         """
-        
+
         c = Client()
         c.login(username="admin1", password="123456")
 
