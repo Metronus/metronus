@@ -25,8 +25,8 @@ class MyAdminSite(AdminSite):
         ]
         return my_urls + urls
 
-    @classmethod
-    def dashboard(self):
+    @staticmethod
+    def dashboard():
         """
         Returns a JSON which contains the number of tasks per company,
         as well as the number of users currently logged
