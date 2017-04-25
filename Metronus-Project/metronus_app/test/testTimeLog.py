@@ -272,7 +272,7 @@ class TimeLogTestCase(TestCase):
 
     def test_delete_timelog(self):
         """
-        delete a timelog 
+        delete a timelog
         """
         c = Client()
         c.login(username="ddlsb", password="123456")

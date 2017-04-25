@@ -230,7 +230,7 @@ class TaskMetricsTestCase(TestCase):
         """
         c = Client()
 
-        response = c.get("/task/ajaxProfit/%d/" % Task.objects.get(name="Hacer cosas").id)
+        response = c.get("/task/ajaxProfit/{0}/".format( Task.objects.get(name="Hacer cosas").id))
         self.assertEquals(response.status_code, 403)
 
     def test_access_denied_low_role_profit(self):
@@ -240,7 +240,7 @@ class TaskMetricsTestCase(TestCase):
         c = Client()
         c.login(username="emp1", password="123456")
 
-        response = c.get("/task/ajaxProfit/%d/" % Task.objects.get(name="Hacer cosas").id)
+        response = c.get("/task/ajaxProfit/{0}/" .format( Task.objects.get(name="Hacer cosas").id))
         self.assertEquals(response.status_code, 403)
 
     def test_access_ok_executive_profit(self):
@@ -250,7 +250,7 @@ class TaskMetricsTestCase(TestCase):
         c = Client()
         c.login(username="emp2", password="123456")
 
-        response = c.get("/task/ajaxProfit/%d/" % Task.objects.get(name="Hacer cosas").id)
+        response = c.get("/task/ajaxProfit/{0}/".format( Task.objects.get(name="Hacer cosas").id))
         self.assertEquals(response.status_code, 200)
 
     def test_access_other_company_executive_profit(self):
@@ -260,7 +260,7 @@ class TaskMetricsTestCase(TestCase):
         c = Client()
         c.login(username="emp2", password="123456")
 
-        response = c.get("/task/ajaxProfit/%d/" % Task.objects.get(name="Hacer cosas de front").id)
+        response = c.get("/task/ajaxProfit/{0}/" .format( Task.objects.get(name="Hacer cosas de front").id))
         self.assertEquals(response.status_code, 403)
 
     def test_bad_request_profit(self):

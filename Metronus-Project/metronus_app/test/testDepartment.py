@@ -261,7 +261,7 @@ class DepartmentTestCase(TestCase):
 
         response = c.get("/department/edit?department_id=9000")
         self.assertEquals(response.status_code, 404)
-    
+
     def test_edit_department_positive(self):
             """
             Logged in as an administrator, try to edit a deapartment

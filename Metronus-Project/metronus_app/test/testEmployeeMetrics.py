@@ -1,18 +1,14 @@
 from django.contrib.auth.models import User
 from django.test import TestCase, Client
-from django.core.exceptions import ObjectDoesNotExist
 from metronus_app.model.employee import Employee
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
-from metronus_app.model.task import Task
-from metronus_app.model.timeLog import TimeLog
 from metronus_app.model.project import Project
 from metronus_app.model.company import Company
 from metronus_app.model.role import Role
 from metronus_app.model.administrator import Administrator
 from metronus_app.model.department import Department
-from metronus_app.common_utils import check_json_metrics_are_equal, ranstr
-import random
+
 
 
 class EmployeeMetricsTestCase(TestCase):
@@ -246,7 +242,7 @@ class EmployeeMetricsTestCase(TestCase):
         response = c.get("/employee/ajax_productivity_per_task_and_date/{0}?start_date=20101-01&end_date=2017-01-01"
             .format(Employee.objects.get(identifier="emp01").user.username))
         self.assertEquals(response.status_code, 400)
-           
+
     def test_prod_per_task_date_bad_end_date(self):
         """
         Request the prod_per_task_date with a wrong end date
