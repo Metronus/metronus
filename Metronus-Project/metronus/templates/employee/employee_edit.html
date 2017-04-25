@@ -9,6 +9,16 @@
     {% trans 'editEmployee' %}
 {% endblock %}
 
+{% block javascript %}
+<script>
+$(function() {
+    $(':input[type="number"]').each(function(i) {
+        $(this).val($(this).attr("value").replace(",", "."));
+    });
+});
+</script>
+{% endblock %}
+
 {% load static }
 
 {% block content %}
@@ -77,7 +87,7 @@
           
           <label class="control-label col-sm-4" for="id_{{ form.price_per_hour.name }}">{{ form.price_per_hour.label }}</label>
             <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.price_per_hour.name }}" id="id_{{ form.price_per_hour.name }}" value="{{ form.price_per_hour.value |unlocalize}}" required />
+              <input type="number" min="0" step="0.01" class="form-control col-md-6" name="{{ form.price_per_hour.name }}" id="id_{{ form.price_per_hour.name }}" value="{{ form.price_per_hour.value |unlocalize}}" required />
             </div>
         </div>
 
