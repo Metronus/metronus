@@ -22,4 +22,4 @@ class TimeLog(models.Model):
     employee_id = models.ForeignKey(Employee)
 
     def __unicode__(self):
-        return self.task_id + " - " + self.workDate + " - " + self.description
+        return self.task_id.__unicode__() + " - " + self.workDate.strftime("%Y-%m-%d %H:%M") + " - " + self.description

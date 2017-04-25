@@ -15,7 +15,7 @@ class ProjectDepartmentEmployeeRole(models.Model):
     roleDate = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
-        return self.projectDepartment_id
+        return self.projectDepartment_id.__unicode__()
 
     class Meta:
         unique_together = ('projectDepartment_id', 'employee_id','role_id')

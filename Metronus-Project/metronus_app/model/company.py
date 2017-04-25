@@ -15,4 +15,4 @@ class Company(models.Model):
     logo = models.ImageField(upload_to="company", blank=True, null=True)
 
     def __unicode__(self):
-        return self.name
+        return self.company_name
