@@ -149,7 +149,7 @@ class DashboardTestCase(TestCase):
         response = c.get("/dashboard/ajaxTimePerProject?start_date=2016-01-01&end_date=20101-01")
         self.assertEquals(response.status_code, 400)
            
-    def test_timeperproject_bad_end_date(self):
+    def test_timeperproject_bad_end_offset(self):
         """
         Request the timeperproject with a wrong offset
         """

@@ -2,7 +2,7 @@ from metronus_app.model.task import Task
 from metronus_app.model.timeLog import TimeLog
 from django.test import TestCase, Client
 from populate_database import populate_database
-from datetime import datetime
+from datetime import datetime,timedelta
 
 
 class TimeLogTestCase(TestCase):
@@ -269,3 +269,27 @@ class TimeLogTestCase(TestCase):
 
         self.assertEquals(response.status_code, 200)
         self.assertEquals(response.context['over_day_limit'], True)
+
+    def test_list_timelog(self):
+        """
+        delete a timelog 
+        """
+        c = Client()
+        c.login(username="ddlsb", password="123456")
+
+        logs_before=TimeLog.objects.all().count()
+        response = c.get("/timeLog/delete/{0}/".format(TimeLog.objects.filter(employee_id__user__username="ddlsb").first().id))
+        self.assertEquals(response.status_code, 302)
+
+        logs_after=TimeLog.objects.all().count()
+
+        self.assertEquals(logs_before,logs_after+1)
+
+    def test_list_timelog_negative(self):
+        """
+        try deleting a timelog whose date has passed
+        """
+        c = Client()
+        c.login(username="ddlsb", password="123456")
+        response = c.get("/timeLog/delete/{0}/".format(TimeLog.objects.filter(employee_id__user__username="ddlsb",registryDate__lt=datetime.today()-timedelta(days=1)).first().id))
+        self.assertEquals(response.status_code, 403)
