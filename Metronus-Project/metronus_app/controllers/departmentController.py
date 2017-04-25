@@ -406,7 +406,7 @@ def check_metrics_authorized_for_department(user, dpmt_id):
     if logged.user_type == 'E':
         # If it's not an admin, check that it has role EXECUTIVE (50) or higher for any project in the department
         try:
-            ProjectDepartmentEmployeeRole.objects.get(employee_id=logged, role_id__tier__gte=50,
+            ProjectDepartmentEmployeeRole.objects.get(employee_id=logged, role_id__tier__gte=30,
                                                       projectDepartment_id__department_id=department)
         except ObjectDoesNotExist:
             raise PermissionDenied

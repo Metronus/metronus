@@ -742,7 +742,7 @@ def check_metrics_authorized_for_task(user, task_id):
     if logged.user_type == 'E':
         # If it's not an admin, check that it has role EXECUTIVE (50) or higher for the projdept tuple
         try:
-            ProjectDepartmentEmployeeRole.objects.get(employee_id=logged, role_id__tier__gte=50,
+            ProjectDepartmentEmployeeRole.objects.get(employee_id=logged, role_id__tier__gte=30,
                                                       projectDepartment_id=task.projectDepartment_id)
         except ObjectDoesNotExist:
             raise PermissionDenied

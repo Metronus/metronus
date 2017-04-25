@@ -59,7 +59,6 @@ def list_all(request):
 
                 return HttpResponse(data)
             else:
-                print(department)
                 tasks = Task.objects.filter(projectDepartment_id__department_id=department,
                                             projectDepartment_id__project_id=project, active=True).distinct()
                 data = serializers.serialize('json', tasks, fields=('id', 'name', 'goal_description'))

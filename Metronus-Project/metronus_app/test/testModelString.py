@@ -89,7 +89,6 @@ class ModelStringTestCase(TestCase):
             """
             Searches the first and checks equals
             """
-            print(model.objects.first())
             self.assertEquals(model.objects.first().__unicode__(),string)
 
         do_test(Administrator,"12345")
