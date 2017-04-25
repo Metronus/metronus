@@ -5,14 +5,14 @@
 
 {% block content %}
 <div class="row">
-    <div class="page-title">
+  <div class="page-title">
     <div class="title_left">
-<h1><strong>{% trans 'department' %}: </strong>{{department.name}}</h1>
-</div>
+      <h1><strong>{% trans 'department' %}: </strong>{{department.name}}</h1>
+    </div>
+  </div>
 
-<div class="clearfix"></div><br>
-{% if coordinator != null %}
-<div class="">
+  <div class="clearfix"></div>
+  {% if coordinator != null %}
             <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="x_panel">
                     <div class="x_title">{% trans 'projectManager' %}</div>
@@ -50,21 +50,24 @@
                     </div>
                 </div>
             </div>
-        </div>
-{% endif %}
-<div class="clearfix"></div>
-<div class="row">
+  {% endif %}
+  <div class="clearfix"></div>
+
   <div class="col-md-12 col-sm-12 col-xs-12">
     <div class="x_panel">
       <div class="x_content">
 
         <div id="welp2" style="height:350px;"></div>
-        <br/>
-        <br/>
-        <br/>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-12 col-sm-12 col-xs-12">
+    <div class="x_panel">
+      <div class="x_content">
 
         <div id="welp" style="height:350px;"></div>
-
 
         <div style="display: flex;/*!  */justify-content: space-around;">
           <form class="form-horizontal">
@@ -82,9 +85,15 @@
           </form>
         </div>
         <br/>
+
       </div>
     </div>
   </div>
+
+
+  <div class="clearfix"></div>
+
+
   <!-- Here comes profit graphics-->
   <div class="col-md-12 col-sm-12 col-xs-12">
     <div class="x_panel">
@@ -92,7 +101,7 @@
 
         <div id="welp3" style="height:350px;"></div>
 
-        <div style="display: flex;/*!  */justify-content: space-around;">
+        <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
           <form class="form-horizontal">
             <fieldset>
               <legend>{% trans 'datePicker' %}</legend>
@@ -125,6 +134,11 @@
       </div>
     </div>
   </div>
+
+
+  <div class="clearfix"></div>
+
+
  <!-- Here ends profit graphics-->
   <div class="col-md-12 col-sm-12 col-xs-12">
     <div class="x_panel">
@@ -187,7 +201,13 @@
             <tbody>
                 {% for employee in employees %}
                     <tr data-href="{% url 'employee_view' employee.user %}" style="cursor: pointer;">
-                        <td><img src="{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
+                    
+                                        {% if employee.picture %}
+                                            <td><img src="{{ MEDIA_URL }}{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
+                                        {% else %}
+                                            <td><img src="{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
+                                        {% endif %}
+
                         <td>{{employee.identifier}}</td>
                         <td>{{employee.phone}}</td>
                         <td class="hidden-xs">{{employee.registryDate}}</td>
@@ -198,8 +218,7 @@
       </div>
     </div>
   </div>
-</div>
-</div>
+
 </div>
 {% endblock %}
 
@@ -341,7 +360,17 @@
 
     }
 
-    $(document).ready(function() {
+    $(document).ready(function() {   
+
+      // Para que <legend> se vea como <label>
+      $("legend").css({
+          "padding": "inherit",
+          "display": "inline-block",
+          "margin-bottom": "5px",
+          "font-weight": "700",
+          "font-size": "inherit",
+          "border": "inherit"
+      })
 
       /////////////////////////////////
       // Gráfico de Tiempo Por Tarea //
@@ -501,6 +530,14 @@
         success: function ( backendData )  {
           echartLine3.setOption( pieFromData(backendData) );
         }
+      })
+
+
+      //Responsiveness para todos
+      $(window).on('resize', () => {
+          [echartLine, echartLine2, echartLine3].forEach( e => {
+              e.resize()
+          })
       })
     })
 </script>

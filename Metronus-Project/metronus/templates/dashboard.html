@@ -182,6 +182,18 @@
 	}
 
 	$(document).ready(function() {
+		
+
+	    // Para que <legend> se vea como <label>
+	    $("legend").css({
+	        "padding": "inherit",
+	        "display": "inline-block",
+	        "margin-bottom": "5px",
+	        "font-weight": "700",
+	        "font-size": "inherit",
+	        "border": "inherit"
+	    })
+
 
 		var chart1 = echarts.init(document.getElementById('chart1'), theme);
 
@@ -261,6 +273,15 @@
 			$(this).val(defaultRange);
 			chart4.setOption(histogramChart(defaultBackendData))
 		});
+
+
+
+        //Responsiveness para todos
+        $(window).on('resize', () => {
+            [chart1, chart2, chart3, chart4].forEach( c => {
+                c.resize()
+            })
+        })
 
 	})
 
