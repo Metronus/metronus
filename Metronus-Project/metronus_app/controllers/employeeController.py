@@ -198,12 +198,17 @@ def edit(request, username):
     elif request.method == "POST":
         # Process the received form
 
-        form = EmployeeEditForm(request.POST)
+        form = EmployeeEditForm(request.POST, request.FILES)
         if form.is_valid():
             errors = []
             # Check that the price is OK
             if form.cleaned_data['price_per_hour'] <= 0:
                 errors.append('employeeCreation_priceNotValid')
+
+            # Check that the image is OK
+            if not check_image(form, 'photo'):
+                errors.append('employeeCreation_imageNotValid')
+
             if not errors:
                 # Update employee data
                 employee.identifier = form.cleaned_data["identifier"]
@@ -212,6 +217,9 @@ def edit(request, username):
                 new_log = employee.price_per_hour != form.cleaned_data["price_per_hour"]
 
                 employee.price_per_hour = form.cleaned_data["price_per_hour"]
+                print(form.cleaned_data["photo"])
+                if form.cleaned_data["photo"]:
+                    employee.picture = form.cleaned_data["photo"]
 
                 # Update user data
                 user = employee.user
