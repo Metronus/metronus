@@ -40,7 +40,7 @@ def _get_login_redirect_url(request, redirect_to):
 def login(request, template_name='registration/login.html',
           redirect_field_name=REDIRECT_FIELD_NAME,
           authentication_form=AuthenticationForm,
-          extra_context=None, redirect_authenticated_user=False, **kwargs):
+          extra_context=None, redirect_authenticated_user=True, **kwargs):
     """
     Displays the login form and handles the login action.
     """
