@@ -81,7 +81,7 @@ def create(request):
     else:
         form = TaskForm()
     coll = find_collections(request)
-    return render(request, 'task_form.html', {'form': form, 'errors': errors,
+    return render(request, 'task/task_form.html', {'form': form, 'errors': errors,
                                               "departments": coll["departments"], "projects": coll["projects"]})
 
 
@@ -185,7 +185,7 @@ def list_tasks(request):
     """
     # Check that the user is logged in
     tasks = check_role_for_list(request)
-    return render(request, "task_list.html", {"tasks": tasks})
+    return render(request, "task/task_list.html", {"tasks": tasks})
 
 
 def view(request, task_id):
@@ -207,7 +207,7 @@ def view(request, task_id):
     goal_evolution = GoalEvolution.objects.filter(task_id=task.id)
     employees = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__task=task.id).distinct()
 
-    return render(request, "task_view.html", {"task": task, "goal_evolution": goal_evolution, "employees": employees})
+    return render(request, "task/task_view.html", {"task": task, "goal_evolution": goal_evolution, "employees": employees})
 
 
 def edit(request, task_id):
@@ -270,7 +270,7 @@ def edit(request, task_id):
                                  "price_per_hour": task.price_per_hour if task.price_per_hour is not None else ""})
     # The project
     coll = find_collections(request)
-    return render(request, 'task_form.html', {'form': form, "errors": errors,
+    return render(request, 'task/task_form.html', {'form': form, "errors": errors,
                                               "departments": coll["departments"], "projects": coll["projects"]})
 
 

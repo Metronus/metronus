@@ -68,7 +68,7 @@ def contact(request):
     else:
         form = ContactForm()
 
-    return render(request, 'contact_form.html', {'form': form})
+    return render(request, 'contact/contact_form.html', {'form': form})
 
 
 def contact_done(request):
@@ -79,7 +79,7 @@ def contact_done(request):
     template:
     contact_done.html
     """
-    return render(request, "contact_done.html")
+    return render(request, "contact/contact_done.html")
 
 
 @deprecate_current_app
