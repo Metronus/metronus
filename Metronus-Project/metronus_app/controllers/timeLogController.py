@@ -66,7 +66,7 @@ def list_all(request):
                 return HttpResponse(data)
 
     if request.method == 'POST':
-        form = TimeLog2Form(request, request.POST)
+        form = TimeLog2Form(employee, request.POST)
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
@@ -80,7 +80,7 @@ def list_all(request):
                 create_time_log(form, employee)
                 return redirect('timeLog_list_all')
     else:
-        form = TimeLog2Form(request, initial={"timeLog_id": 0, "workDate": today})
+        form = TimeLog2Form(employee, initial={"timeLog_id": 0, "workDate": today})
 
     tareas = Task.objects.filter(actor_id__company_id=employee.company_id,
                                  projectDepartment_id__projectdepartmentemployeerole__employee_id=employee,

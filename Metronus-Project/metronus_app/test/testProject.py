@@ -6,7 +6,7 @@ from django.test import TestCase, Client
 from metronus_app.model.employee import Employee
 from django.core.exceptions import PermissionDenied
 from metronus_app.controllers.projectController import check_company_project
-
+import json
 
 class ProjectTestCase(TestCase):
     """This class provides a test case for project management"""
@@ -111,6 +111,37 @@ class ProjectTestCase(TestCase):
         logs_after = Project.objects.all().count()
 
         self.assertEquals(logs_before + 1, logs_after)
+    def test_create_async_project_positive(self):
+        """
+        Logged in as an administrator, try to create a project
+        """
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        logs_before = Project.objects.all().count()
+
+        response = c.post("/project/createAsync", {
+            "project_id": "0",
+            "name": "pro4",
+        })
+
+        self.assertEquals(response.status_code, 200)
+
+        # Check that the project has been successfully created
+
+        dep = Project.objects.all().last()
+        self.assertEquals(dep.name, "pro4")
+        self.assertEquals(dep.deleted,False)
+
+        #response in bytes must be decode to string
+        data=response.content.decode("utf-8")
+        #string to dict
+        data=json.loads(data)
+        self.assertEquals(data["success"],True)
+        logs_after = Project.objects.all().count()
+
+        self.assertEquals(logs_before + 1, logs_after)
+
 
     def test_create_project_duplicate(self):
         """ Logged in as an administrator, try to create a project with the name of an existing company """
@@ -224,6 +255,40 @@ class ProjectTestCase(TestCase):
         pro_id = Project.objects.get(deleted=True).id
         response = c.get("/project/delete/" + str(pro_id) + "/")
         self.assertEquals(response.status_code, 403)
+
+    def test_view_project_positive(self):
+        """
+        View project details with proper roles (Backend department)
+        """
+        c = Client()
+        c.login(username="admin1", password="123456")
+        response = c.get("/project/list")
+        pro_id=response.context["projects"][0].id
+        response = c.get("/project/view/"+str(pro_id)+"/")
+        self.assertEquals(response.status_code, 200)
+        form = response.context["project"]
+
+        self.assertEquals(form.id, pro_id)
+        
+    def test_edit_project_positive(self):
+        """
+        Logged in as an administrator, try to edit a project
+        """
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        pro=Project.objects.get(name="pro1")
+
+        response = c.post("/project/edit/"+str(pro.id)+"/", {
+            "project_id": pro.id,
+            "name": "Metronosa"
+              })
+
+        self.assertEquals(response.status_code, 302)
+        
+        pro_up=Project.objects.get(pk=pro.id)
+
+        self.assertEquals(pro_up.name, "Metronosa")
 
     def test_check_valid_company_project(self):
         """
