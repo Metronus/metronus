@@ -3,9 +3,9 @@ branch = True
 source = gog_russian_prices
 omit =
     # Omitimos los ficheros que solo se ejecutan en web de forma interna en Django o al popular
-    populate_database2.py
-    wsgi.py
-    apps.py
+    */populate_database2.py
+    */wsgi.py
+    */apps.py
 
 [report]
 exclude_lines =
