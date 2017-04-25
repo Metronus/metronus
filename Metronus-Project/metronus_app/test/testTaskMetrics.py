@@ -129,7 +129,7 @@ class TaskMetricsTestCase(TestCase):
         Role.objects.create(name="PROJECT_MANAGER", tier=40)
         role_tm = Role.objects.create(name="TEAM_MANAGER", tier=30)
         # role_co
-        Role.objects.create(name="COORDINATOR", tier=20)
+        role_co = Role.objects.create(name="COORDINATOR", tier=20)
         # role_em
         Role.objects.create(name="EMPLOYEE", tier=10)
 
@@ -149,7 +149,7 @@ class TaskMetricsTestCase(TestCase):
         # pdrole1
         ProjectDepartmentEmployeeRole.objects.create(
             projectDepartment_id=pd,
-            role_id=role_tm,
+            role_id=role_co,
             employee_id=employee1
         )
 
