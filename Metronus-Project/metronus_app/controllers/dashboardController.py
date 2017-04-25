@@ -17,6 +17,8 @@ def view(request):
     """
     Standard view for dashboard, is empty as all data will be requested through AJAX
     """
+    get_current_admin_or_403(request)
+
     return render(request, 'dashboard.html')
 
 
