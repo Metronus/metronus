@@ -13,7 +13,38 @@ class TimeLogTestCase(TestCase):
         Loads the data to the database for tests to be done
         """
         populate_database()
+    def test_list_timelog(self):
+        """
+        Common access to timelog list
+        """
+        c = Client()
+        c.login(username="anddonram", password="123456")
+        response = c.get("/timeLog/list_all/")
+        self.assertEquals(response.status_code, 200)
 
+        today=datetime.today()
+        #Check the tasks belong to me!
+        self.assertEquals(response.context["currentDay"], today.day)
+        self.assertEquals(response.context["currentMonth"], today.month)
+        self.assertEquals(response.context["currentYear"], today.year)
+        self.assertEquals(response.context["valid_production_units"], True)
+
+        self.assertEquals(response.context["form"] is not None, True)
+    def test_list_timelog_with_dates(self):
+        """
+        Common access to timelog list with specific dates
+        """
+        c = Client()
+        c.login(username="anddonram", password="123456")
+        response = c.get("/timeLog/list_all/?currentDay=1&currentMonth=2&currentYear=2017")
+        self.assertEquals(response.status_code, 200)
+
+        self.assertEquals(response.context["currentDay"], 1)
+        self.assertEquals(response.context["currentMonth"], 2)
+        self.assertEquals(response.context["currentYear"], 2017)
+        self.assertEquals(response.context["valid_production_units"], True)
+
+        self.assertEquals(response.context["form"] is not None, True)
     def test_create_timelog_positive(self):
         """ Creates a timelog"""
         c = Client()
