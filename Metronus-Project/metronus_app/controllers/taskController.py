@@ -147,16 +147,6 @@ def create_async(request):
     return JsonResponse(data)
 
 
-def form_projects(request):
-    """
-    parameters:
-    department_id: el departamento asociado
-    returns:
-    projects: lista de proyectos del actor logeada
-    """
-    response = serializers.serialize("json", find_projects(request))
-    return HttpResponse(response, content_type='application/json')
-
 
 def form_departments(request):
     """
@@ -501,7 +491,7 @@ def check_goal(form):
     """
     fgoal = form.cleaned_data['production_goal']
     fgoaldescription = form.cleaned_data['goal_description']
-    return (fgoal != "" and fgoaldescription != "") or (not fgoal and not fgoaldescription)
+    return (fgoal != "" and fgoaldescription != "" and fgoal is not None and fgoaldescription is not None) or (not fgoal and not fgoaldescription)
 
 
 def check_price(form):
@@ -683,48 +673,6 @@ def find_departments(request):
 
         departamentos = Department.objects.filter(company_id=actor.company_id, active=True)
     return departamentos
-
-
-def find_projects(request):
-    """
-    Gets the projects and departments the logged user can create tasks for a department, depending to their roles
-    """
-    department_id = request.GET.get("department_id")
-
-    if not request.user.is_authenticated():
-        raise PermissionDenied
-    try:
-        actor = Actor.objects.get(user=request.user)
-    except ObjectDoesNotExist:
-        raise PermissionDenied
-
-    if actor.user_type != 'A':
-        # not an admin
-        is_team_manager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=30)
-        res = is_team_manager.count() > 0
-
-        if res:
-            # is manager
-            proyectos = Project.objects.filter(company_id=actor.company_id, deleted=False)
-
-        else:
-            # not a manager
-            roles_pro = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=40)
-            roles_dep = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=20)
-
-            if roles_pro.count() > 0 or roles_dep.count() > 0:
-                # you're a project manager or a coordinator. Loading your projects
-                proyectos = Project.objects.filter(company_id=actor.company_id, deleted=False,
-                                                   projectdepartment__projectdepartmentemployeerole__employee_id=actor,
-                                                   projectdepartment__department_id_id=department_id).distinct()
-            else:
-                # not any of this? get outta here!!
-                raise PermissionDenied
-    else:
-        # is admin
-        proyectos = Project.objects.filter(company_id=actor.company_id, deleted=False)
-
-    return proyectos
 
 
 def check_metrics_authorized_for_task(user, task_id):

@@ -418,6 +418,7 @@ class RoleTestCase(TestCase):
         self.assertEquals(employeeroles_before, employeeroles_after)
 
         # Check that the proper error is passed
+        self.assertTrue(response.status_code == 200)
         self.assertTrue('roleCreation_formNotValid' in response.context["errors"])
 
     def test_post_new_role_user_emp_not_existent(self):
@@ -451,7 +452,8 @@ class RoleTestCase(TestCase):
         self.assertEquals(employeeroles_before, employeeroles_after)
 
         # Check that the proper error is passed
-        self.assertTrue('roleCreation_employeeDoesNotExist' in response.context["errors"])
+        self.assertTrue(response.status_code == 404)
+
 
     def test_post_new_role_user_projdept_not_allowed(self):
         """

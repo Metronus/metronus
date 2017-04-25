@@ -129,13 +129,15 @@ class TaskTestCase(TestCase):
             "department_id":dep_id,
             "price_per_unit":4.0,
             "production_goal":"2.0",
+            "description":"alguno",
+            "goal_description":""
               })
 
         self.assertEquals(response.status_code, 200)
         logs_after = GoalEvolution.objects.all().count()
         self.assertEquals(logs_before, logs_after)
         self.assertIn("task_creation_invalid_goal",response.context["errors"])
-        self.assertNotIn("task_creation_invalid_price",response.context["errors"])
+        self.assertIn("task_creation_invalid_price",response.context["errors"])
 
 
     def test_create_task_duplicate(self):
@@ -235,11 +237,30 @@ class TaskTestCase(TestCase):
             c.login(username="agubelu", password="123456")
             
             
-            response = c.get("/task/create/")
+            response = c.get("/task/create")
             self.assertEquals(response.status_code, 200)
             form = response.context["form"]
+            
+            self.assertTrue(form is not None)
+            self.assertTrue(response.context["projects"].count()>0)
+    def test_form_task_find_departments(self):
+            """
+            Get task creation form task  with proper roles (Backend department)
+            """
+            c = Client()
+            c.login(username="agubelu", password="123456")
+            
+            
+            response = c.get("/task/getdepartments?project_id={0}".format(Project.objects.get(name="Metronus").id))
+            self.assertEquals(response.status_code, 200)
+            #response in bytes must be decode to string
+            data=response.content.decode("utf-8")
+            #string to dict
+            data=json.loads(data)
+            self.assertTrue(len(data)>0)
+            self.assertTrue(data[0]['model'],'metronus_app_department')
+            
 
-            self.assertEquals(form.id, 0)
 
     def test_view_task_positive(self):
         """
