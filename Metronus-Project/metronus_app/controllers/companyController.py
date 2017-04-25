@@ -114,19 +114,22 @@ def edit(request):
             'visible_short_name': company.visible_short_name,
             'company_email': company.email,
             'company_phone': company.phone,
-            'logo': company.logo,
         })
     elif request.method == "POST":
         # Process the received form
 
-        form = CompanyForm(request.POST)
+        form = CompanyForm(request.POST, request.FILES)
         if form.is_valid():
             if check_image(form, 'logo'):
                 # Company data
                 company.visible_short_name = form.cleaned_data["visible_short_name"]
                 company.email = form.cleaned_data["company_email"]
                 company.phone = form.cleaned_data["company_phone"]
-                company.logo = form.cleaned_data["logo"]
+
+                if form.cleaned_data["logo"]:
+                    # Don't overwrite the current logo with an empty one
+                    # if the administrator hasn't uploaded one in the form
+                    company.logo = form.cleaned_data["logo"]
 
                 company.save()
 

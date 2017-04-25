@@ -618,6 +618,8 @@ msgid "company_duplicate"
 msgstr "La compañía ya esta registrada"
 msgid "errorUsernameNotUnique"
 msgstr "Ese nombre de usuario ya está registrado"
+msgid "company_imageNotValid"
+msgstr "La imagen no es válida."
 
 #: Admin
 msgid "admin_email"

@@ -25,7 +25,11 @@
         <div id="errorDiv2" class="alert alert-error alert-dismissible" role="alert">
         <a class="close" data-dismiss="alert">x</a>
         {% for error in errors %}
-          {% trans error %}
+            {% if error == "error.imageNotValid" %}
+                {% trans 'company_imageNotValid' %}
+            {% else %}
+                {% trans error %}
+            {% endif %}
         {% endfor %}
         </div>
     {% endif %}
@@ -61,7 +65,8 @@
          <div class="form-group company_class form-class">
           <label class="control-label col-sm-3" for="id_{{ form.visible_short_name.name }}">{% trans 'visible_short_name' %}</label>
             <div class="col-sm-6">
-              <input id="id_{{ form.visible_short_name.label }}" name="{{ form.visible_short_name.name }}" type="checkbox" class="form-control col-md-6" >
+              <input id="id_{{ form.visible_short_name.label }}" name="{{ form.visible_short_name.name }}" type="checkbox" class="form-control col-md-6 checkbox-inline"
+                     style="width:auto; box-shadow:none;" {% if form.visible_short_name.value %} checked {% endif %}>
             </div>
         </div>
 

@@ -618,6 +618,8 @@ msgid "company_phone_error#2"
 msgstr "Invalid format"
 msgid "company_duplicate"
 msgstr "The company is already registered"
+msgid "company_imageNotValid"
+msgstr "The image is not valid."
 
 #: Admin
 msgid "admin_email"
