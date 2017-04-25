@@ -115,6 +115,7 @@ urlpatterns += [  # i18n_patterns(
 
     # Administrator
     url(r'^administrator/edit/(?P<username>\w{0,50})/$', administratorController.edit, name='administrator_edit'),
+    url(r'^administrator/updatePassword$', administratorController.update_password, name='administrator_updatepass'),
     # url(r'^administrator/view/(?P<username>\w{0,50})/$', administratorController.view, name='administrator_edit'),
 
     # Company

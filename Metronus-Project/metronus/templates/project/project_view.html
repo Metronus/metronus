@@ -11,6 +11,7 @@
         <div class="title_left">
             <h3><strong>{% trans 'project' %}: </strong> {{ project.name }}</h3>
         </div>
+    </div>
 
         <div class="clearfix"></div><br>
 
@@ -88,12 +89,11 @@
         <!-- INI: gráfica tiempo/departamento -->
         <div class="col-xs-12">
             <div class="x_panel">
-                <div class="row x_title">
-                    <div class="col-md-6 col-xs-12">
-                        <h2>{% trans 'datePicker' %}</h2>
-                    </div>
-                    <div class="col-md-6 col-xs-12">
-                        <div class="pull-right">
+                <div class="x_content">
+                    <div id="timePerDepartment" style="min-height: 400px"></div>
+
+                    <div style="display: flex; justify-content: center;">
+                        <form class="form-horizontal">
                             <fieldset>
                               <legend>{% trans 'datePicker' %}</legend>
                                 <div class="control-group">
@@ -105,17 +105,9 @@
                                     </div>
                                 </div>
                             </fieldset>
-                        </div>
-                        <div class="clearfix"></div>
+                        </form>
                     </div>
-                </div>
-
-                <div class="clearfix"></div>
-
-                <div class="x_content row">
-                    <div class="col-xs-12">
-                        <div id="timePerDepartment" style="width: 100%; min-height: 400px"></div>
-                    </div>
+                    <br/>
                 </div>
             </div>
         </div>
@@ -130,7 +122,7 @@
 
             <div id="welp3" style="height:350px;"></div>
 
-            <div style="display: flex;/*!  */justify-content: space-around;">
+            <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
               <form class="form-horizontal">
                 <fieldset>
                   <legend>{% trans 'datePicker' %}</legend>
@@ -169,7 +161,6 @@
 
         <div class="clearfix"></div>
 
-        <div class="">
             <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="x_panel">
                     <div class="x_title">{% trans 'departments' %}</div>
@@ -216,8 +207,7 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="">
+
             <div class="col-xs-12">
                 <div class="x_panel">
                     <div class="x_title">{% trans 'employeeList' %}</div>
@@ -240,7 +230,7 @@
                                         {% if employee.picture %}
                                             <td><img src="{{ MEDIA_URL }}{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
                                         {% else %}
-                                            <td><img src="/static/avatar.png" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
+                                            <td><img src="{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
                                         {% endif %}
                                         <td>{{employee.identifier}}</td>
                                         <td>{{employee.phone}}</td>
@@ -252,7 +242,6 @@
                     </div>
                 </div>
             </div>
-        </div>
 
         <div class="clearfix"></div>
     </div>
@@ -268,6 +257,17 @@
 <script>
 
 $(document).ready(function() {
+
+    // Para que <legend> se vea como <label>
+    $("legend").css({
+        "padding": "inherit",
+        "display": "inline-block",
+        "margin-bottom": "5px",
+        "font-weight": "700",
+        "font-size": "inherit",
+        "border": "inherit"
+    })
+
       var echartDonut = echarts.init(document.getElementById('donut_department'), theme);
 
       var defaultBackendData = { 'names': [''], 'values': [0] };
@@ -293,16 +293,6 @@ $(document).ready(function() {
         }
       });
 
-        //Esto se encarga de hacer responsivo (más o menos) el chart
-        $(window).on('resize', function(){
-            if(echartDonut != null && echartDonut != undefined){
-                echartDonut.resize();
-            }
-            if(echartDonut2 != null && echartDonut2 != undefined){
-                echartDonut2.resize();
-            }
-        });
-
       //BARRAS
 
       names = ["{% trans 'imputedTime' %}"];
@@ -310,8 +300,6 @@ $(document).ready(function() {
       echartLine = echarts.init(document.getElementById('timePerDepartment'), theme);
 
       defaultRange = moment().startOf('month').format('MM/DD/YYYY') +' - '+ moment().endOf('month').format('MM/DD/YYYY')
-
-      console.log(defaultRange)
 
       $.get({
         url: "{% url 'project_time_per_department' %}",
@@ -326,16 +314,8 @@ $(document).ready(function() {
         }
       });
 
-        /**
-         * Esto se encarga de hacer responsivo (más o menos) el chart
-         */
-        $(window).on('resize', function(){
-            if(echartLine != null && echartLine != undefined){
-                echartLine.resize();
-            }
-        });
 
-        $('input[name="timeDep_chart"]').val(defaultRange)
+    $('input[name="timeDep_chart"]').val(defaultRange)
 
       $('input[name="timeDep_chart"]').daterangepicker({
             autoUpdateInput: false,
@@ -422,6 +402,15 @@ $(document).ready(function() {
           echartLine2.setOption( fromProfitData( defaultProfitBackendData ,useAcum) );
         }
       })
+
+
+
+        //Responsive para todos
+        $(window).on('resize', () => {
+            [echartDonut, echartDonut2, echartLine, echartLine2].forEach( e => {
+                e.resize()
+            })
+        })
 
 
     });
@@ -596,12 +585,7 @@ function fromData (backendData, type) {
     }
 
 
-</script>
-
- <!-- AQUI COMIENZA LA GRÁFICA DE BARRAS -->
-
-
-<script>
+ // AQUI COMIENZA LA GRÁFICA DE BARRAS
     function fromDataBarChart(backendData) {
         return {
             title: {

@@ -270,8 +270,8 @@ def update_password(request, username):
         form = EmployeePasswordForm(request.POST)
 
         if form.is_valid():
-            pass1 = form.cleaned_data["password1"]
-            pass2 = form.cleaned_data["password2"]
+            pass1 = form.cleaned_data["newpass1"]
+            pass2 = form.cleaned_data["newpass2"]
 
             if pass1 != pass2:
                 return JsonResponse({'success': False, 'errors': ['employeeCreation_passwordsDontMatch']})
