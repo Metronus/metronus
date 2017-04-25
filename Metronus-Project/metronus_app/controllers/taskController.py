@@ -434,6 +434,9 @@ def ajax_profit_per_date(request, task_id):
 # Auxiliar methods, containing the operation logic
 # #########################################################################################################################################
 def process_task_form(form):
+    """
+    adds errors if exists and returns a list with then
+    """
     errors=[]
     if not check_goal(form):
         errors.append('task_creation_invalid_goal')

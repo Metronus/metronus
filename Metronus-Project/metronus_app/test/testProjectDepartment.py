@@ -128,6 +128,21 @@ class ProjectDepartmentTestCase(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertEquals(count + 1, count2)
 
+    def test_create_form_project_department_positive(self):
+        """
+        #gets the form
+        """
+        c = Client()
+        c.login(username="admin", password="1234")
+
+
+        response = c.get("/projectdepartment/create")
+
+        form=response.context["form"]
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(form.initial["project_id"], 0)
+        self.assertEquals(form.initial["department_id"], 0)
+        self.assertEquals(form.initial["projectDepartment_id"], 0)
 
     def test_create_project_department_negative_project(self):
         """
