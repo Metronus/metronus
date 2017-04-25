@@ -8,15 +8,9 @@ from metronus_app.model.timeLog import TimeLog
 from metronus_app.model.project import Project
 from metronus_app.model.administrator import Administrator
 from metronus_app.model.department import Department
-
-import string
+from metronus_app.common_utils import  ranstr,create_timelog_in_task,create_task_in_projdept
 import random
 from populate_database import populate_database
-
-
-def ranstr():
-    # Returns a 10-character random string
-    return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
 
 
 class DashboardTestCase(TestCase):
@@ -50,34 +44,8 @@ class DashboardTestCase(TestCase):
         Does a lot of random test,thus ensuring the dashboard provides the correct data every time
         """
 
-        def create_timelog_in_task(task, duration, date):
-            """
-            creates a timelog for an employee involving a task during a specific date
-            """
-            TimeLog.objects.create(
-                description=ranstr(),
-                workDate=date,
-                duration=duration,
-                task_id=task,
-                employee_id=Employee.objects.get(user__username="anddonram")
-            )
-
-        def create_task_in_projdept(project, department):
-            """
-            creates a task for a given project and department, either with production goal or not
-            """
-            try:
-                pd = ProjectDepartment.objects.get(project_id=project, department_id=department)
-            except ObjectDoesNotExist:
-                pd = ProjectDepartment.objects.create(project_id=project, department_id=department)
-
-            Task.objects.create(
-                name=ranstr(),
-                description=ranstr(),
-                actor_id=Administrator.objects.get(user__username="metronus"),
-                projectDepartment_id=pd
-            )
-
+        admin=Administrator.objects.get(user__username="metronus")
+        emp=Employee.objects.get(user__username="anddonram")
         c = Client()
         c.login(username="metronus", password="metronus")
 
@@ -107,7 +75,7 @@ class DashboardTestCase(TestCase):
 
                     # Create between 1 and 4 tasks for each department
                     for _ in range(random.randint(1, 4)):
-                        create_task_in_projdept(project, dpmt)
+                        create_task_in_projdept(project, dpmt,admin)
 
                     # Create between 1 and 10 timelogs for each department
                     for _ in range(random.randint(1, 10)):
@@ -116,7 +84,7 @@ class DashboardTestCase(TestCase):
                         measure = random.choice([True, True, True, False])  # Make the timelogs have a 25% chance of not being counted towards the metric
                         date = "2016-06-01 10:00+00:00" if measure else "2014-05-01 21:00+00:00"
 
-                        create_timelog_in_task(task, duration, date)
+                        create_timelog_in_task(task, duration, date,emp)
 
                         if measure:
                             true_data[str(project.id)]["time"] += duration
