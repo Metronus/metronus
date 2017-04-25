@@ -152,7 +152,7 @@ def view(request, username):
         if authorized:
             for role in my_roles:
                 if ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee,
-                    projectDepartment_id=role.projectDepartment_id,role_id__tier__lt=role.tier).exists():
+                  projectDepartment_id=role.projectDepartment_id, role_id__tier__lt=role.role_id.tier).exists():
                     authorized=True
                     break
 
