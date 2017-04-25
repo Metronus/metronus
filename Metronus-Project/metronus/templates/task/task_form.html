@@ -20,7 +20,7 @@
   $(document).ready(function() {
     
     var dep_select = $("#id_{{ form.department_id.name }}")
-    {% if  form.department_id.value != '0' %}
+    {% if  form.department_id.value is not None %}
     var p_id=0
     {% if  form.project_id.value is not None %}
         p_id={{form.project_id.value }}
@@ -32,8 +32,10 @@
             success: function ( data )  {
                 console.log(JSON.stringify(data))
                 dep_select.empty()
+                dep_select.append($('<option value="" selected>{% trans "selectDepartment" %}</option>)'))
                 data.forEach(function (department) {
-                    dep_select.append($('<option value="'+department.pk+'"{% if form.department_id.value == department.id %}selected{% endif %}>'+department.fields.name+'</option>'))
+                    console.log(department.pk+", "+'{{form.department_id.value}}')
+                    dep_select.append($('<option value="'+department.pk+'"{% if form.department_id.value == '+department.pk+' %}selected{% endif %}>'+department.fields.name+'</option>'))
                 })                
             }
         })
