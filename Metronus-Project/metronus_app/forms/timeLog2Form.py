@@ -1,11 +1,9 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from metronus_app.model.project import Project
-from metronus_app.model.actor import Actor
 from metronus_app.model.department import Department
 from django.forms import ModelChoiceField
 from metronus_app.model.task import Task
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.validators import MinValueValidator
 
 

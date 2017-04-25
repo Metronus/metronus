@@ -21,7 +21,7 @@ class ModelStringTestCase(TestCase):
         Loads the data to the database for tests to be done
         """
         company2=Company.objects.create(cif="A00000002", company_name="metronus", short_name="metronus", email="info@metronus.es", phone="123456789")
-        
+
         #From second company:metronus
         User.objects.create_user(
             username="metronus",
@@ -76,7 +76,7 @@ class ModelStringTestCase(TestCase):
             task_id = task1,
             employee_id = emp1
         )
-        ge1=GoalEvolution.objects.create(
+        GoalEvolution.objects.create(
             task_id=task1,
 
             actor_id = emp1,
@@ -84,9 +84,8 @@ class ModelStringTestCase(TestCase):
             goal_description="kgs",
             price_per_unit=3.0
             )
-   
 
-    def test_strings_ok(self): 
+    def test_strings_ok(self):
         """
         Checks the models have a proper string representation
         """

@@ -176,7 +176,6 @@ class EmployeeTestCase(TestCase):
         logs_after = EmployeeLog.objects.all().count()
 
         self.assertEquals(logs_before + 1, logs_after)
- 
 
     def test_create_employee_password_not_match_negative(self):
         """ Logged in as an administrator, try to create an employee"""
@@ -401,7 +400,7 @@ class EmployeeTestCase(TestCase):
         c = Client()
         c.login(username="admin1", password="123456")
 
-        initialpass = User.objects.get(username="emp1").password
+        User.objects.get(username="emp1").password
         response = c.post("/employee/edit/emp1/", {
             "first_name": "NuevoNombre",
             "last_name": "NuevoApellido",
