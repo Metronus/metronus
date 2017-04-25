@@ -9,6 +9,7 @@ from django.http import JsonResponse
 from django.contrib.sites.shortcuts import get_current_site
 
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -77,7 +78,10 @@ def create(request,
                 send_mail('Metronus Info.', email_template_name,
                           [company.email, administrator.user.email], html_email_template_name, context)
 
-                return HttpResponseRedirect('/' + company.short_name + '/login/')
+                # Login the administrator and send him to the dashboard
+                logged_user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password'])
+                login(request, logged_user)
+                return HttpResponseRedirect("/dashboard/view")
             else:
                 return render(request, 'company/company_register.html', {'form': form, 'errors': errors})
 
