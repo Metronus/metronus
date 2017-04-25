@@ -108,10 +108,10 @@
                                 {% for employee in employees %}
                                     <tr>
                                         <td>
-                                            {% if user.actor.picture == "/static/avatar.png" %}
-                                                <img src="{{user.actor.picture}}" alt="{{user.get_username}}" class="avatar" alt="IMG">
+                                            {% if employee.picture == "/static/avatar.png" %}
+                                                <img src="{{employee.picture}}" alt="{{user.get_username}}" class="avatar" alt="IMG">
                                             {% else %}
-                                                <img src="{{ MEDIA_URL }}{{user.actor.picture}}" alt="{{user.get_username}}" class="avatar" alt="IMG">
+                                                <img src="{{ MEDIA_URL }}{{employee.picture}}" alt="{{user.get_username}}" class="avatar" alt="IMG">
                                             {% endif %}
                                             {{employee.user}}
                                         </td>
