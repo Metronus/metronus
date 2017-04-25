@@ -216,7 +216,7 @@ def create_employee_in_projdept(project, department):
     return employee
 
 
-def create_task_in_projdept(project, department):
+def create_task_in_projdept(project, department,admin=None):
     """
     creates a task for a given project and department, either with production goal or not
     """
@@ -228,10 +228,9 @@ def create_task_in_projdept(project, department):
     Task.objects.create(
         name=ranstr(),
         description=ranstr(),
-        actor_id=Administrator.objects.get(identifier="adm01"),
+        actor_id=Administrator.objects.get(identifier="adm01") if admin is None else admin,
         projectDepartment_id=pd
     )
-
 
 def create_timelog_in_task(task, duration, date, employee=None):
     """

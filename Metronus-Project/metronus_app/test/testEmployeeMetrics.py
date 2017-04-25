@@ -266,3 +266,36 @@ class EmployeeMetricsTestCase(TestCase):
         response = c.get("/employee/ajax_productivity_per_task_and_date/{0}?offset=+53:20"
             .format(Employee.objects.get(identifier="emp01").user.username))
         self.assertEquals(response.status_code, 400)
+
+    def test_profit_date_bad_start_date(self):
+        """
+        Request the profit with a wrong start date
+        """
+
+        c = Client()
+        c.login(username="admin1", password="123456")
+        response = c.get("/employee/ajaxProfit/{0}/?start_date=20101-01&end_date=2017-01-01" .format(Employee.objects.get(identifier="emp01").id))
+        
+        self.assertEquals(response.status_code, 400)
+
+    def test_profit_bad_end_date(self):
+        """
+        Request the profit with a wrong end date
+        """
+
+        c = Client()
+        c.login(username="admin1", password="123456")
+        response = c.get("/employee/ajaxProfit/{0}/?start_date=2016-01-01&end_date=20101-01" .format(Employee.objects.get(identifier="emp01").id))
+        
+        self.assertEquals(response.status_code, 400)
+           
+    def test_profit_bad_end_offset(self):
+        """
+        Request the profit with a wrong offset
+        """
+
+        c = Client()
+        c.login(username="admin1", password="123456")
+        response = c.get("/employee/ajaxProfit/{0}/?offset=+53:20" .format(Employee.objects.get(identifier="emp01").id))
+
+        self.assertEquals(response.status_code, 400)

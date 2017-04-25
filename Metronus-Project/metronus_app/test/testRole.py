@@ -350,6 +350,110 @@ class RoleTestCase(TestCase):
                                                       projectDepartment_id__department_id=department)
         except ObjectDoesNotExist:
             self.fail("The role was not successfully created")
+    def test_post_new_role_user_async_positive(self):
+        """
+        With proper roles, add a new role to an employee
+        """
+        c = Client()
+        c.login(username="emp1", password="123456")
+
+        employee = Employee.objects.get(identifier="emp02")
+        department = Department.objects.get(name="departamento 1")
+        project = Project.objects.get(name="proyecto 1")
+        role = Role.objects.get(name="COORDINATOR")
+
+        projdepts_before = ProjectDepartment.objects.all().count()
+        employeeroles_before = ProjectDepartmentEmployeeRole.objects.all().count()
+
+        response = c.post("/roles/manageAsync", {
+            'employee_id': employee.id,
+            'department_id': department.id,
+            'project_id': project.id,
+            'employeeRole_id': 0,
+            'role_id': role.id,
+        })
+
+        self.assertEquals(response.status_code,200)
+        
+        projdepts_after = ProjectDepartment.objects.all().count()
+        employeeroles_after = ProjectDepartmentEmployeeRole.objects.all().count()
+
+        self.assertEquals(projdepts_before, projdepts_after)
+        self.assertEquals(employeeroles_before + 1, employeeroles_after)
+
+        # Check that the role has been successfully created
+        try:
+            ProjectDepartmentEmployeeRole.objects.get(employee_id=employee, role_id=role,
+                                                      projectDepartment_id__project_id=project,
+                                                      projectDepartment_id__department_id=department)
+        except ObjectDoesNotExist:
+            self.fail("The role was not successfully created")
+
+    def test_post_new_role_user_form_not_valid(self):
+        """
+        Try adding a role to an employee when missing params
+        """
+        c = Client()
+        c.login(username="emp1", password="123456")
+
+        employee = Employee.objects.get(identifier="emp02")
+        department = Department.objects.get(name="departamento 1")
+        project = Project.objects.get(name="proyecto 1")
+        role = Role.objects.get(name="COORDINATOR")
+
+        projdepts_before = ProjectDepartment.objects.all().count()
+        employeeroles_before = ProjectDepartmentEmployeeRole.objects.all().count()
+        #falta el employeeRole_id
+        response = c.post("/roles/manage", {
+            'employee_id': employee.id,
+            'department_id': department.id,
+            'project_id': project.id,
+            'role_id': role.id,
+        })
+
+        projdepts_after = ProjectDepartment.objects.all().count()
+        employeeroles_after = ProjectDepartmentEmployeeRole.objects.all().count()
+
+        self.assertEquals(projdepts_before, projdepts_after)
+        self.assertEquals(employeeroles_before, employeeroles_after)
+
+        # Check that the proper error is passed
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue('roleCreation_formNotValid' in response.context["errors"])
+
+    def test_post_new_role_user_emp_not_existent(self):
+        """
+        Try adding a role to an employee when you do not have permissions for that project-department pair
+        """
+        c = Client()
+        c.login(username="emp1", password="123456")
+
+        employee = Employee.objects.get(identifier="emp02")
+        department = Department.objects.get(name="departamento 1")
+        project = Project.objects.get(name="proyecto 1")
+        role = Role.objects.get(name="COORDINATOR")
+
+        projdepts_before = ProjectDepartment.objects.all().count()
+        employeeroles_before = ProjectDepartmentEmployeeRole.objects.all().count()
+
+        response = c.post("/roles/manage", {
+            'employee_id': 0,
+            'department_id': department.id,
+            'project_id': project.id,
+            'employeeRole_id': 0,
+            'role_id': role.id,
+
+        })
+
+        projdepts_after = ProjectDepartment.objects.all().count()
+        employeeroles_after = ProjectDepartmentEmployeeRole.objects.all().count()
+
+        self.assertEquals(projdepts_before, projdepts_after)
+        self.assertEquals(employeeroles_before, employeeroles_after)
+
+        # Check that the proper error is passed
+        self.assertTrue(response.status_code == 404)
+
 
     def test_post_new_role_user_projdept_not_allowed(self):
         """

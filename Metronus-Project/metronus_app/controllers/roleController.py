@@ -290,7 +290,7 @@ def return_invalid_form(request, form, logged, errors=None):
                                                   'form': form,
                                                   'employee': employee,
                                                   'errors': errors,
-                                                  'editing': form.cleaned_data["employeeRole_id"] != 0})
+                                                  'editing': "employeeRole_id" in form.cleaned_data and form.cleaned_data["employeeRole_id"] != 0})
 
 
 def get_form(request, logged):

@@ -11,7 +11,7 @@ from metronus_app.model.company import Company
 from metronus_app.model.role import Role
 from metronus_app.model.administrator import Administrator
 from metronus_app.model.department import Department
-from metronus_app.common_utils import check_json_metrics_are_equal, ranstr
+from metronus_app.common_utils import check_json_metrics_are_equal, ranstr,create_employee_in_projdept,create_task_in_projdept,create_timelog_in_task
 import random
 
 
@@ -201,34 +201,6 @@ class ProjectMetricsTestCase(TestCase):
         """
         Does a lot of random test and checks the data generate matches the empperdmtp JSON
         """
-        def create_employee_in_projdept(project, department):
-            """
-            creates an employee and assigns him/her a new role
-            """
-            user = User.objects.create_user(
-                username=ranstr(),
-                password=ranstr(),
-                email=ranstr() + "@metronus.es",
-                first_name=ranstr(),
-                last_name=ranstr()
-            )
-
-            employee = Employee.objects.create(
-                user=user,
-                user_type="E",
-                identifier=ranstr(),
-                phone="123123123",
-                company_id=Company.objects.get(company_name="company1")
-            )
-
-            try:
-                pd = ProjectDepartment.objects.get(project_id=project, department_id=department)
-            except ObjectDoesNotExist:
-                pd = ProjectDepartment.objects.create(project_id=project, department_id=department)
-
-            role = Role.objects.get(tier=random.choice([10, 20, 30, 40, 50]))
-            ProjectDepartmentEmployeeRole.objects.create(projectDepartment_id=pd, role_id=role, employee_id=employee)
-
         c = Client()
         c.login(username="admin1", password="123456")
 
@@ -313,21 +285,6 @@ class ProjectMetricsTestCase(TestCase):
         """
         Does a lot of random test and checks the data generate matches the tasksperdmtp JSON
         """
-        def create_task_in_projdept(project, department):
-            """
-            creates a task for a given project and department
-            """
-            try:
-                pd = ProjectDepartment.objects.get(project_id=project, department_id=department)
-            except ObjectDoesNotExist:
-                pd = ProjectDepartment.objects.create(project_id=project, department_id=department)
-
-            Task.objects.create(
-                name=ranstr(),
-                description=ranstr(),
-                actor_id=Administrator.objects.get(identifier="adm01"),
-                projectDepartment_id=pd
-            )
 
         c = Client()
         c.login(username="admin1", password="123456")
@@ -413,34 +370,6 @@ class ProjectMetricsTestCase(TestCase):
         """
         Does a lot of test and checks the data matches the timeperdpmt JSON
         """
-        def create_timelog_in_task(task, duration, date):
-            """
-            creates a timelog for an employee involving a task during a specific date
-            """
-            TimeLog.objects.create(
-                description=ranstr(),
-                workDate=date,
-                duration=duration,
-                task_id=task,
-                employee_id=Employee.objects.get(identifier="emp01")
-            )
-
-        def create_task_in_projdept(project, department):
-            """
-            creates a task for a given project and department
-            """
-            try:
-                pd = ProjectDepartment.objects.get(project_id=project, department_id=department)
-            except ObjectDoesNotExist:
-                pd = ProjectDepartment.objects.create(project_id=project, department_id=department)
-
-            Task.objects.create(
-                name=ranstr(),
-                description=ranstr(),
-                actor_id=Administrator.objects.get(identifier="adm01"),
-                projectDepartment_id=pd
-            )
-
         c = Client()
         c.login(username="admin1", password="123456")
 

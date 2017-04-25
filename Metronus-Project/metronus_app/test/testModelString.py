@@ -38,17 +38,13 @@ class ModelStringTestCase(TestCase):
             company_id=company2)
 
         emp1=create_user("anddonram",company2)
-        
         proj1 = Project.objects.create(
             name="Metronus",
             deleted=False,
             company_id=company2)
-
-
         dep1 = Department.objects.create(
             name="Backend",
             active=True,company_id=company2)
-
         #Frontend
         pd1 = ProjectDepartment.objects.create(
             project_id = proj1,
@@ -89,20 +85,20 @@ class ModelStringTestCase(TestCase):
         """
         Checks the models have a proper string representation
         """
-        def doTest(model,string):
+        def do_test(model,string):
             """
             Searches the first and checks equals
             """
             self.assertEquals(model.objects.first().__unicode__(),string)
 
-        doTest(Administrator,"12345")
-        doTest(Company,"metronus")
-        doTest(Department,"Backend")
-        doTest(Employee,"12345")
-        doTest(GoalEvolution,9.0)
-        doTest(Project,"Metronus")
-        doTest(ProjectDepartment,"Backend - Metronus")
-        doTest(ProjectDepartmentEmployeeRole,"Backend - Metronus")
-        doTest(Role,"EMPLOYEE")
-        doTest(Task,"Hacer cosas")
-        doTest(TimeLog,"Hacer cosas - 2017-01-02 10:00 - he currado mucho")
+        do_test(Administrator,"12345")
+        do_test(Company,"metronus")
+        do_test(Department,"Backend")
+        do_test(Employee,"12345")
+        do_test(GoalEvolution,9.0)
+        do_test(Project,"Metronus")
+        do_test(ProjectDepartment,"Backend - Metronus")
+        do_test(ProjectDepartmentEmployeeRole,"Backend - Metronus")
+        do_test(Role,"EMPLOYEE")
+        do_test(Task,"Hacer cosas")
+        do_test(TimeLog,"Hacer cosas - 2017-01-02 10:00 - he currado mucho")

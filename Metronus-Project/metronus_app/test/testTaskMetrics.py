@@ -272,3 +272,69 @@ class TaskMetricsTestCase(TestCase):
 
         response = c.get("/task/ajaxProfit")
         self.assertEquals(response.status_code, 404)
+
+    def test_prod_per_task_date_bad_start_date(self):
+        """
+        Request the prod_per_task_and_date with a wrong start date
+        """
+
+        c = Client()
+        c.login(username="emp2", password="123456")
+
+        response = c.get("/task/ajaxProdPerTask?task_id={0}&start_date=20101-01&end_date=2017-01-01".format(Task.objects.all().first().id))
+        self.assertEquals(response.status_code, 400)
+
+    def test_prod_per_task_date_bad_end_date(self):
+        """
+        Request the prod_per_task_date with a wrong end date
+        """
+
+        c = Client()
+        c.login(username="emp2", password="123456")
+
+        response = c.get("/task/ajaxProdPerTask?task_id={0}&start_date=2016-01-01&end_date=20101-01".format(Task.objects.all().first().id))     
+        self.assertEquals(response.status_code, 400)
+           
+    def test_prod_per_task_date_bad_end_offset(self):
+        """
+        Request the prod_per_task_date with a wrong offset
+        """
+
+        c = Client()
+        c.login(username="emp2", password="123456")
+
+        response = c.get("/task/ajaxProdPerTask?task_id={0}&offset=+53:20".format(Task.objects.all().first().id))
+        self.assertEquals(response.status_code, 400)
+
+    def test_profit_date_bad_start_date(self):
+        """
+        Request the profit with a wrong start date
+        """
+
+        c = Client()
+        c.login(username="emp2", password="123456")
+
+        response = c.get("/task/ajaxProfit/{0}/?start_date=20101-01&end_date=2017-01-01".format( Task.objects.get(name="Hacer cosas").id))        
+        self.assertEquals(response.status_code, 400)
+
+    def test_profit_bad_end_date(self):
+        """
+        Request the profit with a wrong end date
+        """
+
+        c = Client()
+        c.login(username="emp2", password="123456")
+
+        response = c.get("/task/ajaxProfit/{0}/?start_date=20101-01&end_date=2017-01-01".format( Task.objects.get(name="Hacer cosas").id))
+        self.assertEquals(response.status_code, 400)
+           
+    def test_profit_bad_end_offset(self):
+        """
+        Request the profit with a wrong offset
+        """
+
+        c = Client()
+        c.login(username="emp2", password="123456")
+
+        response = c.get("/task/ajaxProfit/{0}/?offset=+53:20".format( Task.objects.get(name="Hacer cosas").id))
+        self.assertEquals(response.status_code, 400)

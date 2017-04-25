@@ -400,7 +400,6 @@ class EmployeeTestCase(TestCase):
         c = Client()
         c.login(username="admin1", password="123456")
 
-        User.objects.get(username="emp1").password
         response = c.post("/employee/edit/emp1/", {
             "first_name": "NuevoNombre",
             "last_name": "NuevoApellido",
