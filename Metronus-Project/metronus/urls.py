@@ -104,7 +104,7 @@ urlpatterns += [  # i18n_patterns(
 
     # TimeLogs
     url(r'^timeLog/list_all/$', timeLogController.list_all, name='timeLog_list_all'),
-    url(r'^timeLog/delete/(?P<timeLog_id>\w{0,50})/$', timeLogController.delete, name='timeLog_delete'),
+    url(r'^timeLog/delete/(?P<time_log_id>\w{0,50})/$', timeLogController.delete, name='timeLog_delete'),
 
     # Roles
     url(r'^roles/manage$', roleController.manage, name='roles_manage'),

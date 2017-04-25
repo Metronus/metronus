@@ -27,6 +27,23 @@ class DashboardTestCase(TestCase):
         Loads the data to the database for tests to be done
         """
         populate_database()
+    def test_view(self):
+        """
+        Shows the main view
+        """
+        c = Client()
+        c.login(username="metronus", password="metronus")
+        response = c.get("/dashboard/view")
+        self.assertEquals(response.status_code, 200)
+
+    def test_view_negative(self):
+            """
+            Shows the main view... or not because it is not an admin
+            """
+            c = Client()
+            c.login(username="ddlsb", password="123456")
+            response = c.get("/dashboard/view")
+            self.assertEquals(response.status_code, 403)
 
     def test_random_data_timeperproject(self):
         """
@@ -109,3 +126,66 @@ class DashboardTestCase(TestCase):
             response = c.get("/dashboard/ajaxTimePerProject?start_date=2016-01-01&end_date=2017-01-01")
             self.assertEquals(response.status_code, 200)
             self.assertJSONEqual(str(response.content, encoding='utf8'), true_data)
+
+    def test_timeperproject_bad_start_date(self):
+        """
+        Request the timeperproject with a wrong start date
+        """
+
+        c = Client()
+        c.login(username="metronus", password="metronus")
+
+        response = c.get("/dashboard/ajaxTimePerProject?start_date=20101-01&end_date=2017-01-01")
+        self.assertEquals(response.status_code, 400)
+           
+    def test_timeperproject_bad_end_date(self):
+        """
+        Request the timeperproject with a wrong end date
+        """
+
+        c = Client()
+        c.login(username="metronus", password="metronus")
+
+        response = c.get("/dashboard/ajaxTimePerProject?start_date=2016-01-01&end_date=20101-01")
+        self.assertEquals(response.status_code, 400)
+           
+    def test_timeperproject_bad_end_offset(self):
+        """
+        Request the timeperproject with a wrong offset
+        """
+
+        c = Client()
+        c.login(username="metronus", password="metronus")
+
+        response = c.get("/dashboard/ajaxTimePerProject?offset=+53:20")
+        self.assertEquals(response.status_code, 400)
+          
+    def test_access_ok_employees_per_project(self):
+        """
+        Get the ajaxEmployeesPerProject metric as an admin
+        """
+        c = Client()
+        c.login(username="metronus", password="metronus")
+
+        response = c.get("/dashboard/ajaxEmployeesPerProject")
+        self.assertEquals(response.status_code, 200)
+
+    def test_access_ok_departments_per_project(self):
+        """
+        Get the ajaxDepartmentsPerProject metric as an admin
+        """
+        c = Client()
+        c.login(username="metronus", password="metronus")
+
+        response = c.get("/dashboard/ajaxDepartmentsPerProject")
+        self.assertEquals(response.status_code, 200)
+
+    def test_access_ok_tasks_per_project(self):
+        """
+        Get the ajaxTasksPerProject metric as an admin
+        """
+        c = Client()
+        c.login(username="metronus", password="metronus")
+
+        response = c.get("/dashboard/ajaxTasksPerProject")
+        self.assertEquals(response.status_code, 200)
