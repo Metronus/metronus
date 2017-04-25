@@ -35,10 +35,12 @@
                 dep_select.append($('<option value="" selected>{% trans "selectDepartment" %}</option>)'))
                 data.forEach(function (department) {
                     console.log(department.pk+", "+'{{form.department_id.value}}')
-                    dep_select.append($('<option value="'+department.pk+'"{% if form.department_id.value == '+department.pk+' %}selected{% endif %}>'+department.fields.name+'</option>'))
-                })                
+                    dep_select.append($('<option value="'+department.pk+'">'+department.fields.name+'</option>'))
+
+                })
+                dep_select.val("{{ form.department_id.value }}").attr('selected','selected')
             }
-        })
+        });
     {% endif %}
 
     // Carga el select de departamentos con los correspondientes al proyecto seleccionado
