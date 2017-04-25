@@ -650,6 +650,22 @@ msgstr "Invalid format"
 msgid "admin_duplicate"
 msgstr "This admin is already registered"
 
+msgid "formNotValid"
+msgstr "The form does not contain valid values."
+msgid "passwordsDontMatch"
+msgstr "New passwords do not match."
+msgid "currentPasswordInvalid"
+msgstr "The current password is not correct."
+msgid "editPasswordTitle"
+msgstr "Change administrator password"
+
+msgid "curPass"
+msgstr "Current password"
+msgid "newPass1"
+msgstr "New password"
+msgid "newPass2"
+msgstr "Repeat new password"
+
 #: Task
 msgid "taskList"
 msgstr "Task list"

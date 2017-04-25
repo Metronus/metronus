@@ -11,6 +11,132 @@
 
 {% load static }
 
+{% block javascript %}
+
+<script>
+
+  //Esto es para validar en cliente de forma bonita con bootstrap :)
+
+  $(function() {
+    $('#form_editar_admin').bootstrapValidator({
+        feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+          	first_name: {
+                validators: {
+                    notEmpty: {
+                        message: "{% trans 'name_not_empty'%}"
+                    },
+                },
+            },
+          	last_name: {
+                validators: {
+                    notEmpty: {
+                        message: "{% trans 'surname_not_empty'%}"
+                    },
+                },
+            },
+            email: {
+                validators: {
+                    notEmpty: {
+                        message: "{% trans 'email_not_empty' %}"
+                    },
+                    emailAddress: {
+                        message: "{% trans 'email_valid' %}"
+                    }
+                }
+            },
+            phone: {
+                validators: {
+                    notEmpty: {
+                        message: "{% trans 'phone_not_empty' %}"
+                    },
+                }
+            },
+            identifier: {
+                validators: {
+                    notEmpty: {
+                        message: "{% trans 'identifier_not_empty' %}"
+                    }
+                }
+            }
+        }
+    });
+
+    $('#form_cambiar_pass').bootstrapValidator({
+        feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+            currentpass: {
+                validators: {
+                    notEmpty: {
+                        message: "{% trans 'password_not_empty' %}"
+                    }
+                }
+            },
+          	newpass1: {
+                validators: {
+                    notEmpty: {
+                        message: "{% trans 'password_not_empty' %}"
+                    }
+                }
+            },
+            newpass2: {
+                validators: {
+                    notEmpty: {
+                        message: "{% trans 'password_not_empty' %}"
+                    },
+                    callback: {
+                    	message: "{% trans 'passwords_must_match'%}",
+                    	callback: function(value, validator, $field) {
+                    		return value == $("#id_{{ form.newpass1.label }}").val()
+                    	}
+                    }
+                }
+            },
+        }
+    });
+
+    // Esta mierda no funciona pero bueh
+    $("#form_cambiar_pass").on("invalid.bs.validator", function(e) {
+        $("#enviar_pass").attr("disabled", true);
+    });
+
+    $("#form_cambiar_pass").on("valid.bs.validator", function(e) {
+        $("#enviar_pass").attr("disabled", false);
+    });
+
+    // Esto pa enviar el form de contraseñas con ajax
+    $("#enviar_pass").click(function(e) {
+        $.ajax({
+           type: "POST",
+           url: "/administrator/updatePassword",
+           data: $("#form_cambiar_pass").serialize(),
+           success: function(data) {
+               $("#res_passchange").empty();
+               if(data.success) {
+                    $("#res_passchange").append('<div class="alert alert-success alert-dismissable"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>{% trans "success" %}</strong> {% trans "changepw_mail_subject" %}</div>');
+               } else if(data.errors[0] == "currentPasswordInvalid") {
+                    $("#res_passchange").append('<div class="alert alert-danger alert-dismissable"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>{% trans "fail" %}</strong> {% trans "currentPasswordInvalid" %}</div>');
+               } else if(data.errors[0] == "passwordsDontMatch") {
+                    $("#res_passchange").append('<div class="alert alert-danger alert-dismissable"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>{% trans "fail" %}</strong> {% trans "passwordsDontMatch" %}</div>');
+               } else if(data.errors[0] == "formNotValid") {
+                    $("#res_passchange").append('<div class="alert alert-danger alert-dismissable"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>{% trans "fail" %}</strong> {% trans "formNotValid" %}</div>');
+               }
+           }
+         });
+    });
+
+});
+</script>
+{% endblock %}
+
 {% block content %}
   <div class="row">
 
@@ -21,8 +147,20 @@
       <div class="clearfix"></div>
     </div>
     <div class="x_content">
+    {% if  errors %}
+        <div id="errorDiv2" class="alert alert-error alert-dismissible" role="alert">
+        <a class="close" data-dismiss="alert">x</a>
+        {% for error in errors %}
+            {% if error == "error.imageNotValid" %}
+                {% trans 'company_imageNotValid' %}
+            {% else %}
+                {% trans error %}
+            {% endif %}
+        {% endfor %}
+        </div>
+    {% endif %}
 	
-    <form id="form" method="POST"  class="form-horizontal" data-toggle="validator" role="form" action="" enctype="multipart/form-data">
+    <form id="form_editar_admin" method="POST"  class="form-horizontal" data-toggle="validator" role="form" action="" enctype="multipart/form-data">
     {% csrf_token %}
 
     	  <div class="form-group required form-class">
@@ -34,30 +172,11 @@
                         </div>
 
                     </div>
-             
-                    <div class="form-group required form-class" id="div_pass_1">
-                      <label class="control-label col-sm-3" for="id_{{ form.password.name }}">{% trans 'password' %}</label>
-                        <div class="col-sm-6">
-                        <input type="password" class="form-control col-md-6" name="{{ form.password.name }}" id="id_{{ form.password.label }}" placeholder="********">
-                        <div class="help-block with-errors" id="id_unique_message" style="color:#a94442;">{{ form.password.errors }}</div>
 
-                        </div>
-                    </div>
-             
-                    <div class="form-group required form-class" id="div_pass_2">
-                      <label class="control-label col-sm-3" for="id_{{ form.repeatPassword.name }}">{% trans 'repeatPassword' %}</label>
-                        <div class="col-sm-6">
-                          <input type="password" class="form-control col-md-6" name="{{ form.repeatPassword.name }}" id="id_{{ form.repeatPassword.label }}" placeholder="********">
-                          <div class="help-block with-errors" id="id_unique_message" style="color:#a94442;">{{ form.repeatPassword.errors }}</div>
-
-                        </div>
-
-                    </div>
-             
                     <div class="form-group required form-class">
                       <label class="control-label col-sm-3" for="id_{{ form.first_name.label }}">{% trans 'first_name' %}</label>
                         <div class="col-sm-6">
-                          <input type="text" class="form-control col-md-6" name="{{ form.first_name.name }}" id="id_{{ form.first_name.name }}" value="{{form.first_name.value|default_if_none:""}}" placeholder="Jhon">
+                          <input required type="text" class="form-control col-md-6" name="{{ form.first_name.name }}" id="id_{{ form.first_name.name }}" value="{{form.first_name.value|default_if_none:""}}" placeholder="Jhon">
                           <div class="help-block with-errors" id="id_unique_message" style="color:#a94442;">{{ form.first_name.errors }}</div>
 
                         </div>
@@ -67,7 +186,7 @@
                     <div class="form-group required form-class">
                       <label class="control-label col-sm-3" for="id_{{ form.last_name.label }}">{% trans 'last_name'%}</label>
                         <div class="col-sm-6">
-                          <input type="text" class="form-control col-md-6" name="{{ form.last_name.name }}" id="id_{{ form.last_name.label }}" value="{{form.last_name.value|default_if_none:""}}" placeholder="Doe">
+                          <input required type="text" class="form-control col-md-6" name="{{ form.last_name.name }}" id="id_{{ form.last_name.label }}" value="{{form.last_name.value|default_if_none:""}}" placeholder="Doe">
                           <div class="help-block with-errors" id="id_unique_message" style="color:#a94442;">{{ form.last_name.errors }}</div>
 
                         </div>
@@ -77,7 +196,7 @@
                     <div class="form-group required form-class">
                       <label class="control-label col-sm-3" for="id_{{ form.admin_identifier.label }}">{% trans 'admin_identifier' %}</label>
                         <div class="col-sm-6">
-                          <input type="text" class="form-control col-md-6" name="{{ form.admin_identifier.name }}" id="id_{{ form.admin_identifier.label }}" value="{{form.admin_identifier.value|default_if_none:""}}" placeholder="admn_mtn">
+                          <input required type="text" class="form-control col-md-6" name="{{ form.identifier.name }}" id="id_{{ form.identifier.label }}" value="{{form.identifier.value|default_if_none:""}}" placeholder="admn_mtn">
                           <div class="help-block with-errors" id="id_unique_message" style="color:#a94442;">{{ form.admin_identifier.errors }}</div>
                         </div>
 
@@ -86,7 +205,7 @@
                     <div class="form-group required form-class">
                       <label class="control-label col-sm-3" for="id_{{ form.admin_phone.label }}">{% trans 'admin_phone'%}</label>
                         <div class="col-sm-6">
-                          <input type="text" class="form-control col-md-6" name="{{ form.admin_phone.name }}" id="id_{{ form.admin_phone.label }}" value="{{form.admin_phone.value|default_if_none:""}}" placeholder="666775899">
+                          <input required type="text" class="form-control col-md-6" name="{{ form.phone.name }}" id="id_{{ form.phone.label }}" value="{{form.phone.value|default_if_none:""}}" placeholder="666775899">
                           <div class="help-block with-errors" id="id_unique_message" style="color:#a94442;">{{ form.admin_phone.errors }}</div>
 
                         </div>
@@ -95,7 +214,7 @@
 					<div class="form-group form-class">
 			          <label class="control-label col-sm-3" for="id_{{ form.photo.name }}">{% trans 'photo' %}</label>
 			            <div class="col-sm-6">
-			              <input id="id_{{ form.photo.label }}" name="{{ form.photo.name }}" multiple type="file" value="{{form.photo.value}}" >
+			              <input id="id_{{ form.photo.label }}" name="{{ form.photo.name }}" multiple type="file" >
 			            </div>
 			        </div>
 
@@ -107,7 +226,51 @@
             </div>
         </div>
     </form>
- </div>
+
+
+        <hr>
+        <h1 align="center"> {% trans 'editPasswordTitle' %} </h1></br>
+
+        <form id="form_cambiar_pass" method="POST"  class="form-horizontal" data-toggle="validator" role="form">
+            {% csrf_token %}
+            <div class="form-group required form-class">
+
+                <div class="form-group required form-class" id="div_pass_current">
+                    <label class="control-label col-sm-3" for="id_{{ form.currentpass.name }}">{% trans 'curPass' %}</label>
+                    <div class="col-sm-6">
+                        <input type="password" class="form-control col-md-6" name="currentpass" id="id_{{ form.currentpass.label }}">
+                        <div class="help-block with-errors" id="id_unique_message" style="color:#a94442;">{{ form.currentpass.errors }}</div>
+                    </div>
+                </div>
+
+                 <div class="form-group required form-class" id="div_pass_1">
+                      <label class="control-label col-sm-3" for="id_{{ form.newpass1.name }}">{% trans 'newPass1' %}</label>
+                        <div class="col-sm-6">
+                            <input type="password" class="form-control col-md-6" name="newpass1" id="id_{{ form.newpass1.label }}">
+                            <div class="help-block with-errors" id="id_unique_message" style="color:#a94442;">{{ form.newpass1.errors }}</div>
+                        </div>
+                </div>
+
+                <div class="form-group required form-class" id="div_pass_2">
+                  <label class="control-label col-sm-3" for="id_{{ form.newpass2.name }}">{% trans 'newPass2' %}</label>
+                    <div class="col-sm-6">
+                      <input type="password" class="form-control col-md-6" name="newpass2" id="id_{{ form.newpass2.label }}">
+                      <div class="help-block with-errors" id="id_unique_message" style="color:#a94442;">{{ form.newpass2.errors }}</div>
+                    </div>
+                </div>
+            </div>
+
+       <div class="form-group">
+            <div class="col-sm-offset-4 col-sm-10">
+
+            <button type="button" id="enviar_pass" class="btn btn-success" >{% trans 'confirm' %}</button>
+
+            </div>
+        </div>
+      </form>
+        <div id="res_passchange"></div>
+  </div>
+    <br>
  </div>
  </div>
  </div>

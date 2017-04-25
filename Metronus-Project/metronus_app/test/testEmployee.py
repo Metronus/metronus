@@ -376,8 +376,9 @@ class EmployeeTestCase(TestCase):
         initialpass = User.objects.get(username="emp1").password
 
         c.post("/employee/updatePassword/emp1/", {
-            "password1": "nuevapassword",
-            "password2": "nuevapassword",
+            "newpass1": "nuevapassword",
+            "newpass2": "nuevapassword",
+            "currentpass": "123456",
         })
 
         final = Employee.objects.get(user__username="emp1")
@@ -393,8 +394,9 @@ class EmployeeTestCase(TestCase):
         initialpass = User.objects.get(username="emp1").password
 
         c.post("/employee/updatePassword/emp1/", {
-            "password1": "mequiero",
-            "password2": "morirmucho",
+            "newpass1": "nuevapassword",
+            "newpass2": "ojala morir",
+            "currentpass": "123456",
         })
 
         final = Employee.objects.get(user__username="emp1")

@@ -649,6 +649,22 @@ msgstr "El teléfono no puede ser vacio"
 msgid "admin_phone_error#2"
 msgstr "Formato inválido"
 
+msgid "formNotValid"
+msgstr "El formulario no contiene valores válidos"
+msgid "passwordsDontMatch"
+msgstr "Las nuevas contraseñas no coinciden"
+msgid "currentPasswordInvalid"
+msgstr "La contraseña actual no es correcta."
+msgid "editPasswordTitle"
+msgstr "Cambiar contraseña del administrador"
+
+msgid "curPass"
+msgstr "Contraseña actual"
+msgid "newPass1"
+msgstr "Nueva contraseña"
+msgid "newPass2"
+msgstr "Repetir nueva contraseña"
+
 #: Task
 msgid "taskList"
 msgstr "Lista de tareas"

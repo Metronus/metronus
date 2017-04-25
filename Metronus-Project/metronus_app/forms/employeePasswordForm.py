@@ -4,5 +4,6 @@ from django.forms import Form
 
 class EmployeePasswordForm(Form):
     """Form for Employee password change"""
-    password1 = forms.CharField(label="password1", widget=forms.PasswordInput)
-    password2 = forms.CharField(label="password2", widget=forms.PasswordInput)
+    newpass1 = forms.CharField(label="newpass1", widget=forms.PasswordInput)
+    newpass2 = forms.CharField(label="newpass2", widget=forms.PasswordInput)
+    currentpass = forms.CharField(label="currentpass", widget=forms.PasswordInput)
