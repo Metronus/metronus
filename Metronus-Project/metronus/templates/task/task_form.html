@@ -82,6 +82,30 @@
                         message: "{% trans 'description_not_empty' %}"
                     }
                 }
+            },
+            price_per_hour: {
+                validators: {
+                    numeric: {
+                        thousandsSeparator: '',
+                        decimalSeparator: '.'
+                    }
+                }
+            },
+            price_per_unit: {
+                validators: {
+                    numeric: {
+                        thousandsSeparator: '',
+                        decimalSeparator: '.'
+                    }
+                }
+            },
+            production_goal: {
+                validators: {
+                    numeric: {
+                        thousandsSeparator: '',
+                        decimalSeparator: '.'
+                    }
+                }
             }
         }
     })
@@ -121,7 +145,7 @@
 };
 
 $(function() {
-    $(':input[type="number"]').each(function(i) {
+    $('.precio').each(function(i) {
           $(this).val($(this).attr("value").replace(",", "."));
       });
 });
@@ -205,7 +229,7 @@ $(function() {
     <div class="form-group" >
         <label class="control-label col-sm-4" for="id_{{ form.production_goal.name }}">{% trans 'production_goal' %}</label>
         <div class="col-sm-6">
-            <input type="number" min="0" step="1" class="form-control col-md-6" name="{{ form.production_goal.name }}" id="id_{{ form.production_goal.name }}" value="{{ form.production_goal.value }}">
+            <input type="text" class="form-control col-md-6 precio" name="{{ form.production_goal.name }}" id="id_{{ form.production_goal.name }}" value="{{ form.production_goal.value }}">
         </div>
     </div>
 
@@ -218,13 +242,13 @@ $(function() {
     <div class="form-group" >
         <label class="control-label col-sm-4" for="id_{{ form.price_per_unit.name }}">{% trans 'price_per_unit' %}</label>
         <div class="col-sm-6">
-            <input type="number" min="0" step="1" class="form-control col-md-6" name="{{ form.price_per_unit.name }}" id="id_{{ form.price_per_unit.name }}" value="{{ form.price_per_unit.value }}">
+            <input type="text" class="form-control col-md-6 precio" name="{{ form.price_per_unit.name }}" id="id_{{ form.price_per_unit.name }}" value="{{ form.price_per_unit.value }}">
         </div>
     </div>
   <div class="form-group" >
         <label class="control-label col-sm-4" for="id_{{ form.price_per_hour.name }}">{% trans 'price_per_hour' %}</label>
         <div class="col-sm-6">
-            <input type="number" min="0" step="1" class="form-control col-md-6" name="{{ form.price_per_hour.name }}" id="id_{{ form.price_per_hour.name }}" value="{{ form.price_per_hour.value }}">
+            <input type="text" class="form-control col-md-6 precio" name="{{ form.price_per_hour.name }}" id="id_{{ form.price_per_hour.name }}" value="{{ form.price_per_hour.value }}">
         </div>
     </div>
     <!--this is the hidden input for task id, do not remove!!! -->

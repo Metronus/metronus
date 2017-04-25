@@ -93,6 +93,14 @@
                         message: "{% trans 'identifier_not_empty' %}"
                     }
                 }
+            },
+            price_per_hour: {
+                validators: {
+                    numeric: {
+                        thousandsSeparator: '',
+                        decimalSeparator: '.'
+                    }
+                }
             }
         }
     })
@@ -107,7 +115,11 @@
 
   });
 
-
+$(function() {
+    $('.precio').each(function(i) {
+        $(this).val($(this).attr("value").replace(",", "."));
+    });
+});
 </script>
 {% endblock %}
 
@@ -203,7 +215,7 @@
        <div class="form-group required form-class">
           <label class="control-label col-sm-4" for="id_{{ form.price_per_hour.name }}">{% trans 'price_per_hour' %}</label>
             <div class="col-sm-6">
-            <input type="number" min="0" step="1" class="form-control col-md-6" name="{{ form.price_per_hour.name }}" id="id_{{ form.price_per_hour.label }}" value="{{ form.price_per_hour.value }}" required>
+            <input type="text" class="form-control col-md-6 precio" name="{{ form.price_per_hour.name }}" id="id_{{ form.price_per_hour.label }}" value="{{ form.price_per_hour.value }}" required />
             </div>
         </div>
 
