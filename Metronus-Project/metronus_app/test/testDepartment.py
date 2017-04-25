@@ -261,6 +261,26 @@ class DepartmentTestCase(TestCase):
 
         response = c.get("/department/edit?department_id=9000")
         self.assertEquals(response.status_code, 404)
+    
+    def test_edit_department_positive(self):
+            """
+            Logged in as an administrator, try to edit a deapartment
+            """
+            c = Client()
+            c.login(username="admin1", password="123456")
+
+            pro=Department.objects.get(name="dep1")
+
+            response = c.post("/department/edit/"+str(pro.id)+"/", {
+                "department_id": pro.id,
+                "name": "Metronosa"
+                  })
+
+            self.assertEquals(response.status_code, 302)
+            
+            pro_up=Department.objects.get(pk=pro.id)
+
+            self.assertEquals(pro_up.name, "Metronosa")
 
     def test_delete_department_positive(self):
         """As an admin, try to delete a department"""

@@ -46,15 +46,9 @@ class TimeLog2Form(forms.Form):
                                       required=False, initial="", validators=[MinValueValidator(0)],
                                       widget=forms.NumberInput(attrs={'class': 'form-control'}))
 
-    def __init__(self, request, *args, **kwargs):
+    def __init__(self, actor, *args, **kwargs):
         super(TimeLog2Form, self).__init__(*args, **kwargs)
 
-        if not request.user.is_authenticated():
-            raise PermissionDenied
-        try:
-            actor = Actor.objects.get(user=request.user)
-        except ObjectDoesNotExist:
-            raise PermissionDenied
         projects = Project.objects.filter(company_id=actor.company_id, deleted=False)
 
         self.fields['project_id'].queryset = projects

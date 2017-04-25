@@ -270,7 +270,7 @@ class TimeLogTestCase(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertEquals(response.context['over_day_limit'], True)
 
-    def test_list_timelog(self):
+    def test_delete_timelog(self):
         """
         delete a timelog 
         """
@@ -285,7 +285,7 @@ class TimeLogTestCase(TestCase):
 
         self.assertEquals(logs_before,logs_after+1)
 
-    def test_list_timelog_negative(self):
+    def test_delete_timelog_negative(self):
         """
         try deleting a timelog whose date has passed
         """
