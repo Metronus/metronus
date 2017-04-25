@@ -217,7 +217,6 @@ def edit(request, username):
                 new_log = employee.price_per_hour != form.cleaned_data["price_per_hour"]
 
                 employee.price_per_hour = form.cleaned_data["price_per_hour"]
-                print(form.cleaned_data["photo"])
                 if form.cleaned_data["photo"]:
                     employee.picture = form.cleaned_data["photo"]
 
@@ -444,7 +443,6 @@ def ajax_productivity_per_task_and_date(request, username):
     for i in range(delta.days + 1):
         str_dates.append((d1 + timedelta(days=i)).date().strftime("%Y-%m-%d"))
         dates.append(d1 + timedelta(days=i))
-    print(len(dates))
 
     data = {'dates': str_dates, 'task': {'task_id': task.id, 'name': task.name,
                                          'real_productivity': [], 'expected_productivity': []}}
