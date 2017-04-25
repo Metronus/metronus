@@ -21,7 +21,7 @@ from django.core import serializers
 from django.http import HttpResponse
 
 from metronus_app.common_utils import (get_current_admin_or_403, check_image, get_current_employee_or_403, send_mail,
-                                       is_email_unique, is_username_unique)
+                                       is_email_unique, is_username_unique, get_authorized_or_403)
 from datetime import date, timedelta, datetime
 import re
 
@@ -48,7 +48,7 @@ def create(request):
     """
 
     # Check that the user is logged in and it's an administrator
-    admin = get_current_admin_or_403(request)
+    admin = get_authorized_or_403(request)
 
     # If it's a GET request, return an empty form
     if request.method == "GET":
@@ -116,7 +116,7 @@ def list_employees(request):
     """
 
     # Check that the user is logged in and it's an administrator
-    admin = get_current_admin_or_403(request)
+    admin = get_authorized_or_403(request)
     employees = Employee.objects.filter(company_id=admin.company_id, user__is_active=True)
     return render(request, 'employee/employee_list.html', {'employees': employees})
 
@@ -175,7 +175,7 @@ def edit(request, username):
     """
 
     # Check that the user is logged in and it's an administrator
-    admin = get_current_admin_or_403(request)
+    admin = get_authorized_or_403(request)
     employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
 
     # Check that the admin has permission to view that employee
@@ -265,7 +265,7 @@ def update_password(request, username):
     """
 
     # Check that the user is logged in and it's an administrator
-    admin = get_current_admin_or_403(request)
+    admin = get_authorized_or_403(request)
     employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
 
     # Check that the admin has permission to view that employee
@@ -304,7 +304,7 @@ def delete(request, username):
     template: ninguna
     """
 
-    admin = get_current_admin_or_403(request)
+    admin = get_authorized_or_403(request)
     employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
 
     # Check that the admin has permission to edit that employee
@@ -335,7 +335,7 @@ def ajax_productivity_per_task(request, username):
     """
     # Check that the user is logged in and it's an administrator or with permissions
     try:
-        logged = get_current_admin_or_403(request)
+        logged = get_authorized_or_403(request)
     except PermissionDenied:
         logged = get_current_employee_or_403(request)
     employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
@@ -416,7 +416,7 @@ def ajax_productivity_per_task_and_date(request, username):
 
     # Check that the user is logged in and it's an administrator or with permissions
     try:
-        logged = get_current_admin_or_403(request)
+        logged = get_authorized_or_403(request)
     except PermissionDenied:
         logged = get_current_employee_or_403(request)
     employee = get_object_or_404(Employee, user__username=username, user__is_active=True)

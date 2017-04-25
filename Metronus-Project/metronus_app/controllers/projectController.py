@@ -5,7 +5,7 @@ from django.db.models import Sum, F, FloatField
 
 from metronus_app.forms.projectForm import ProjectForm
 from metronus_app.model.project import Project
-from metronus_app.common_utils import get_current_admin_or_403
+from metronus_app.common_utils import get_current_admin_or_403, get_authorized_or_403
 from metronus_app.model.employee import Employee
 from metronus_app.model.task import Task
 from metronus_app.model.timeLog import TimeLog
@@ -26,7 +26,7 @@ def create(request):
     project_form.html
     """
     # Check that the user is logged in
-    admin = get_current_admin_or_403(request)
+    admin = get_authorized_or_403(request)
     repeated_name = False
     error = False
     # if this is a POST request we need to process the form data
@@ -73,7 +73,7 @@ def create_async(request):
     """
 
     # Check that the current user is an administrator
-    admin = get_current_admin_or_403(request)
+    admin = get_authorized_or_403(request)
 
     data = {
         'repeated_name': False,
@@ -162,7 +162,7 @@ def edit(request, project_id):
     project_form.html
     """
     # Check that the user is logged in
-    admin = get_current_admin_or_403(request)
+    admin = get_authorized_or_403(request)
     repeated_name = False
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -204,7 +204,7 @@ def delete(request, project_id):
     project_list.html
     """
     # Check that the user is logged in
-    admin = get_current_admin_or_403(request)
+    admin = get_authorized_or_403(request)
     project = get_object_or_404(Project, pk=project_id)
     if check_company_project(project, admin.company_id):
         delete_project(project)
