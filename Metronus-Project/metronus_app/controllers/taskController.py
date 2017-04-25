@@ -50,10 +50,7 @@ def create(request):
 
         if form.is_valid():
             # process the data in form.cleaned_data as required
-            if not check_goal(form):
-                errors.append('task_creation_invalid_goal')
-            if not check_price(form):
-                errors.append('task_creation_invalid_price')
+            errors=process_task_form(form)
 
             pname = form.cleaned_data['name']
             ppro = form.cleaned_data['project_id']
@@ -65,7 +62,7 @@ def create(request):
                 pro = find_name(pname,pdtuple)
                 if pro is not None and pro.active:
                     errors.append('task_creation_repeated_name')
-
+            
             if not errors:
                 if pro and not pro.active:
                     check_task(pro, request)
@@ -118,10 +115,7 @@ def create_async(request):
 
         if form.is_valid():
             # process the data in form.cleaned_data as required
-            if not check_goal(form):
-                errors.append('task_creation_invalid_goal')
-            if not check_price(form):
-                errors.append('task_creation_invalid_price')
+            errors=process_task_form(form)
 
             pname = form.cleaned_data['name']
             ppro = form.cleaned_data['project_id']
@@ -238,11 +232,7 @@ def edit(request, task_id):
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
-            if not check_goal(form):
-                errors.append('task_creation_invalid_goal')
-            if not check_price(form):
-                errors.append('task_creation_invalid_price')
-
+            errors=process_task_form(form)
             task = get_object_or_404(Task, pk=form.cleaned_data['task_id'])
             check_task(task, request)
             # find tasks with the same name
@@ -453,7 +443,14 @@ def ajax_profit_per_date(request, task_id):
 # #########################################################################################################################################
 # Auxiliar methods, containing the operation logic
 # #########################################################################################################################################
+def process_task_form(form):
+    errors=[]
+    if not check_goal(form):
+        errors.append('task_creation_invalid_goal')
+    if not check_price(form):
+        errors.append('task_creation_invalid_price')
 
+    return errors
 def create_task(form, project_department, actor):
     """Creates a task supposing the data in the form is ok"""
     fname = form.cleaned_data['name']

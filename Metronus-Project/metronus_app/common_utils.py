@@ -232,7 +232,6 @@ def create_task_in_projdept(project, department):
         projectDepartment_id=pd
     )
 
-
 def create_timelog_in_task(task, duration, date, employee=None):
     """
     creates a timelog for an employee involving a task during a specific date
