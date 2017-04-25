@@ -21,7 +21,7 @@ import random
 
 
 def ranstr():
-    """ Returns a 10-character random string"""
+    """ Returns a 8-character random string"""
     return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8))
 
 
