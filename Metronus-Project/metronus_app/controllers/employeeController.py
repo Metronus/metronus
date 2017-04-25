@@ -5,6 +5,7 @@ from django.http import HttpResponseBadRequest, HttpResponseRedirect, JsonRespon
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import ugettext_lazy
 from django.db.models import Sum, F, FloatField
+from django.contrib.auth.decorators import login_required
 
 from metronus_app.forms.employeeRegisterForm import EmployeeRegisterForm
 from metronus_app.forms.employeeEditForm import EmployeeEditForm
@@ -127,7 +128,6 @@ def view(request, username):
     parameters/returns:
     employee: datos del empleado
     employee_roles: objetos ProjectDepartmentEmployeeRole (bibah) con todos los roles del empleado
-    producti
 
     template: employee_view.html
     """
@@ -145,6 +145,19 @@ def view(request, username):
 
     employee_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee)
 
+    #Check the logged's roles are greater than this for at least one project
+    if logged.user_type=="E":
+        my_roles=ProjectDepartmentEmployeeRole.objects.filter(employee_id=logged)
+        authorized=my_roles.exists()
+        if authorized:
+            for role in my_roles: 
+                if ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee,
+                    projectDepartment_id=role.projectDepartment_id,tier__lt=role.tier).exists():
+                    authorized=True
+                    break
+
+        if not authorized:
+            raise PermissionDenied
     return render(request, 'employee/employee_view.html', {'employee': employee, 'employee_roles': employee_roles})
 
 
@@ -300,6 +313,7 @@ def delete(request, username):
 
 
 # AJAX methods
+@login_required
 def ajax_productivity_per_task(request, username):
     """
     # url = employee/ajax_productivity_per_task/<username>
@@ -346,7 +360,7 @@ def ajax_productivity_per_task(request, username):
 
     return JsonResponse(data)
 
-
+@login_required
 def ajax_productivity_per_task_and_date(request, username):
     """
     # url = employee/ajax_productivity_per_task/<username>
@@ -459,7 +473,7 @@ def ajax_productivity_per_task_and_date(request, username):
 
     return JsonResponse(data)
 
-
+@login_required
 def ajax_profit_per_date(request, employee_id):
     """
     # url = employee/ajax_profit_per_date/<employee_id>

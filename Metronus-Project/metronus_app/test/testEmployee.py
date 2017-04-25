@@ -61,6 +61,13 @@ class EmployeeTestCase(TestCase):
             first_name="Alberto",
             last_name="Berto"
         )
+        employee3_user = User.objects.create_user(
+            username="emp3",
+            password="123456",
+            email="emp3@metronus.es",
+            first_name="Alberto",
+            last_name="Bertoa"
+        )
 
         # Employee 1
         Employee.objects.create(
@@ -68,6 +75,14 @@ class EmployeeTestCase(TestCase):
             user_type="E",
             identifier="emp01",
             phone="666555444",
+            company_id=company1
+        )
+        # Employee 3
+        Employee.objects.create(
+            user=employee3_user,
+            user_type="E",
+            identifier="emp03",
+            phone="666553444",
             company_id=company1
         )
 
@@ -79,6 +94,15 @@ class EmployeeTestCase(TestCase):
             phone="666555444",
             company_id=company2
         )
+    def test_create_form_view(self):
+        """ Logged in as an administrator, get the form view"""
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        response = c.post("/employee/create")
+
+        self.assertEquals(response.status_code, 200)
+        self.assertTrue(response.context["form"] is not None)
 
     def test_create_employee_positive(self):
         """ Logged in as an administrator, try to create an employee"""
@@ -152,6 +176,7 @@ class EmployeeTestCase(TestCase):
         logs_after = EmployeeLog.objects.all().count()
 
         self.assertEquals(logs_before + 1, logs_after)
+ 
 
     def test_create_employee_password_not_match_negative(self):
         """ Logged in as an administrator, try to create an employee"""
@@ -174,6 +199,32 @@ class EmployeeTestCase(TestCase):
 
         self.assertEquals(response.status_code, 200)
         self.assertTrue('employeeCreation_passwordsDontMatch' in response.context["errors"])
+
+        # Check that the employee has not been created
+
+        logs_after = EmployeeLog.objects.all().count()
+        self.assertEquals(logs_before, logs_after)
+    def test_create_employee_email_not_unique_negative(self):
+        """ Logged in as an administrator, try to create an employee. email not unique"""
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        logs_before = EmployeeLog.objects.all().count()
+
+        response = c.post("/employee/create", {
+            "username": "employee_creating",
+            "password1": "dontmatch",
+            "password2": "dontmatch",
+            "first_name": "Francisco",
+            "last_name": "Romualdo",
+            "email": "admin1@metronus.es",
+            "identifier": "frc01",
+            "phone": "654321987",
+            "price_per_hour": "2.0",
+        })
+
+        self.assertEquals(response.status_code, 200)
+        self.assertTrue('employeeCreation_emailNotUnique' in response.context["errors"])
 
         # Check that the employee has not been created
 
@@ -270,8 +321,8 @@ class EmployeeTestCase(TestCase):
         response = c.get("/employee/list")
 
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(len(response.context["employees"]), 1)
-        self.assertEquals(response.context["employees"][0].identifier, "emp01")
+        self.assertEquals(len(response.context["employees"]), 2)
+        self.assertTrue(response.context["employees"][0].identifier== "emp01" or response.context["employees"][0].identifier== "emp03")
 
     def test_list_employees_not_logged(self):
         """
@@ -306,6 +357,16 @@ class EmployeeTestCase(TestCase):
         response = c.get("/employee/view/emp2/")
         self.assertEquals(response.status_code, 403)
 
+    def test_view_employee_not_allowed_2(self):
+            """
+            As an employee, try viewing other employee profile
+            """
+            c = Client()
+            c.login(username="emp1", password="123456")
+
+            response = c.get("/employee/view/emp3/")
+            self.assertEquals(response.status_code, 403)
+
     def test_view_employee_404(self):
         """
         Try getting an inexistent employee profile
@@ -332,6 +393,44 @@ class EmployeeTestCase(TestCase):
         self.assertEquals(form.initial["email"], "emp1@metronus.es")
         self.assertEquals(form.initial["identifier"], "emp01")
         self.assertEquals(form.initial["phone"], "666555444")
+
+    def test_edit_employee_negative_price(self):
+        """
+        As an admin, edit an employee profile, with negative price
+        """
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        initialpass = User.objects.get(username="emp1").password
+        response = c.post("/employee/edit/emp1/", {
+            "first_name": "NuevoNombre",
+            "last_name": "NuevoApellido",
+            "email": "nuevocorreo@empresa.com",
+            "identifier": "nuevoid",
+            "phone": "nuevotelefono",
+            "price_per_hour": "-4.0",
+        })
+        self.assertEquals(response.status_code, 200)
+        self.assertTrue('employeeCreation_priceNotValid' in response.context["errors"])
+    def test_edit_employee_negative_invalid_form(self):
+        """
+        As an admin, edit an employee profile, with blank fields
+        """
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        initialpass = User.objects.get(username="emp1").password
+        response = c.post("/employee/edit/emp1/", {
+            "first_name": "NuevoNombre",
+            "last_name": "NuevoApellido",
+            "email": "nuevocorreo@empresa.com",
+            "identifier": "",
+            "phone": "nuevotelefono",
+            "price_per_hour": "",
+        })
+        self.assertEquals(response.status_code, 200)
+        self.assertTrue('employeeCreation_formNotValid' in response.context["errors"])
+
 
     def test_edit_employee_positive_without_pass(self):
         """
