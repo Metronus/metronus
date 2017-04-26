@@ -439,6 +439,10 @@ msgid "realProfit"
 msgstr "Real profits"
 msgid "expectedProfit"
 msgstr "Expected profits"
+msgid "graphExpected"
+msgstr "Expected"
+msgid "graphReal"
+msgstr "Actual"
 
 #: Project
 msgid "project"
