@@ -3,7 +3,7 @@ from django.db import models
 
 
 class Employee(Actor):
-    """ Hace cosas """
+    """ Hace muchas cosas """
 
     price_per_hour = models.FloatField(default=1.0)
 
