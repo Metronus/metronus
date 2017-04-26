@@ -11,8 +11,18 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    {% if user.actor.company_id.logo %}
+      {% with logo=user.actor.company_id.logo %}
+      <link rel="apple-touch-icon" sizes="{{ logo.width }}x{{ logo.height }}" href="{{ MEDIA_URL }}{{ logo }}">
+      <link rel="icon" sizes="{{ logo.width }}x{{ logo.height }}" href="{{ MEDIA_URL }}{{ logo }}">
+      {% endwith %}
+    {% else %}
+      <link rel="apple-touch-icon" sizes="180x180" href="/static/landing/img/favicon/apple-icon-180x180.png">
+      <link rel="icon" type="image/png" sizes="192x192"  href="/static/landing/img/favicon/android-icon-192x192.png">
+    {% endif %}
 
-		<title> {% block title %}{% endblock %} </title>
+
+    <title> {% block title %}{% endblock %} </title>
 
     <!-- css -->
     {% compress css %}
