@@ -720,6 +720,8 @@ msgstr "Editar tarea"
 
 
 #: Dashboard
+msgid "dashboard"
+msgstr "Panel de control"
 msgid "employeesPerProjectTitle"
 msgstr "Empleados"
 msgid "employeesPerProjectSubtitle"

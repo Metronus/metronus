@@ -718,6 +718,8 @@ msgstr "Edit task"
 
 
 #: Dashboard
+msgid "dashboard"
+msgstr "Dashboard"
 msgid "employeesPerProjectTitle"
 msgstr "Employees"
 msgid "employeesPerProjectSubtitle"
