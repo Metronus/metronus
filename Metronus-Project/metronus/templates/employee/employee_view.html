@@ -441,8 +441,8 @@ $(document).ready(function() {
               all+="<div>";
               all+="<input type='button' class='btn btn-success submit-button' value='" +
               backendData[task]["name"] + "' onclick='ajax_productivity("+task+");' />";
-              all+="Expected:"+backendData[task]["expected_productivity"]+";Total:"+
-              backendData[task]["total_productivity"]+"";
+              all+="Expected:"+backendData[task]["expected_productivity"].toFixed(2)+";Total:"+
+              backendData[task]["total_productivity"].toFixed(2)+"";
               all+="</div>";
            }
             space.innerHTML =all
