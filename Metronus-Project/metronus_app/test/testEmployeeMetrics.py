@@ -6,6 +6,8 @@ from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEm
 from metronus_app.model.project import Project
 from metronus_app.model.company import Company
 from metronus_app.model.role import Role
+from metronus_app.model.task import Task
+from metronus_app.model.timeLog import TimeLog
 from metronus_app.model.administrator import Administrator
 from metronus_app.model.department import Department
 
@@ -160,6 +162,30 @@ class EmployeeMetricsTestCase(TestCase):
             role_id=role_ex,
             employee_id=employee2
         )
+
+        task1=Task.objects.create(
+        name  ="Hacer cosas",
+        description  = "meda",
+        actor_id = employee1,
+        projectDepartment_id = pd,
+        production_goal="2.0",
+        goal_description="kgs",
+        price_per_unit=7.0
+        )
+        Task.objects.create(
+        name  ="Hacer cosas 2",
+        description  = "meda",
+        actor_id = employee1,
+        projectDepartment_id = pd,
+        price_per_hour=1.0
+        )
+        TimeLog.objects.create(
+        description = "he currado mucho",
+        workDate = "2017-01-02 10:00+00:00",
+        duration = 240,
+        task_id = task1,
+        employee_id = employee1
+    )
     def test_access_denied_not_logged_prod_task(self):
         """
         Without authentication, try getting the prod_per_task JSON
@@ -200,6 +226,15 @@ class EmployeeMetricsTestCase(TestCase):
         response = c.get("/employee/ajaxProfit/{0}/" .format( Employee.objects.get(identifier="emp01").id))
         self.assertEquals(response.status_code, 302)
 
+    def test_access_ok_admin_profit(self):
+        """
+        As an admin, try getting the profit JSON
+        """
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        response = c.get("/employee/ajaxProfit/{0}/" .format(Employee.objects.get(identifier="emp01").id))
+        self.assertEquals(response.status_code, 200)
 
     def test_access_ok_executive_profit(self):
         """
@@ -230,6 +265,17 @@ class EmployeeMetricsTestCase(TestCase):
 
         response = c.get("/employee/ajaxProfit/")
         self.assertEquals(response.status_code, 404)
+    def test_prod_per_task_date_ok(self):
+        """
+        Request the prod_per_task_and_date 
+        """
+
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        response = c.get("/employee/ajax_productivity_per_task_and_date/{0}?task_id={1}"
+            .format(Employee.objects.get(identifier="emp01").user.username,Task.objects.get(name="Hacer cosas").id))
+        self.assertEquals(response.status_code, 200)
 
     def test_prod_per_task_date_bad_start_date(self):
         """
@@ -299,3 +345,4 @@ class EmployeeMetricsTestCase(TestCase):
         response = c.get("/employee/ajaxProfit/{0}/?offset=+53:20" .format(Employee.objects.get(identifier="emp01").id))
 
         self.assertEquals(response.status_code, 400)
+

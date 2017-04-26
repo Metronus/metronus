@@ -20,7 +20,7 @@ class IndexTestCase(TestCase):
         response = c.get("/")
         self.assertEquals(response.status_code, 200)
 
-    def test_login_admin(self):
+    def test_login_employee(self):
         """
         Logs in as an employee
         """

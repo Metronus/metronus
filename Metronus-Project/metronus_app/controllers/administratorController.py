@@ -9,9 +9,9 @@ from django.contrib.auth import update_session_auth_hash
 
 
 @login_required
-def edit(request, username):
+def edit(request):
     """
-    url = administrator/edit/<username>
+    url = administrator/edit/
 
     parameters/returns:
     form: formulario de edicion de datos de administrador

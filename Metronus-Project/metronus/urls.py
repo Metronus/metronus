@@ -114,7 +114,7 @@ urlpatterns += [  # i18n_patterns(
     url(r'^roles/availableRoles', roleController.ajax_roles_from_tuple, name='roles_role_ajax'),
 
     # Administrator
-    url(r'^administrator/edit/(?P<username>\w{0,50})/$', administratorController.edit, name='administrator_edit'),
+    url(r'^administrator/edit/$', administratorController.edit, name='administrator_edit'),
     url(r'^administrator/updatePassword$', administratorController.update_password, name='administrator_updatepass'),
     # url(r'^administrator/view/(?P<username>\w{0,50})/$', administratorController.view, name='administrator_edit'),
 
