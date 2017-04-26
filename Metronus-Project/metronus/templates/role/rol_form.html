@@ -49,7 +49,7 @@
           
           <label class="control-label col-md-4 col-sm-4 col-xs-12" for="id_{{ form.project_id.name }}">{% trans 'project' %}</label>
             <div class="col-sm-6">
-              <select class="form-control col-sm-6 col-md-6" name="{{ form.project_id.name }}" id="id_{{ form.project_id.name }}"{% if  editing == True %} disabled="true" {% endif %} required onchange="ajaxDepartment();">
+              <select class="form-control col-sm-6 col-md-6" name="{{ form.project_id.name }}" id="id_{{ form.project_id.name }}"{% if  editing == True %} readonly="true" {% endif %} required onchange="ajaxDepartment();">
 
 	              		<option value="" selected>{% trans 'selectProject' %}</option>
 	              		{% for dep in projects %}
@@ -63,7 +63,7 @@
           
           <label class="control-label col-md-4 col-sm-4 col-xs-12" for="id_{{ form.department_id.name }}">{% trans 'department' %}</label>
             <div class="col-sm-6">
-              <select class="form-control col-sm-6 col-md-6" name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}" required disabled="true"  onchange="ajaxRole();">
+              <select class="form-control col-sm-6 col-md-6" name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}" required readonly="true"  onchange="ajaxRole();">
 	              		<option value="" selected>{% trans 'selectDepartment' %}</option>
                         {% if  editing == True %}
                             {% for dep in departments %}
@@ -80,7 +80,7 @@
         <div class="form-group required form-class">
           <label class="control-label col-sm-4" for="id_{{ form.role_id.name }}">{% trans 'rol' %}</label>
             <div class="col-sm-6">
-              <select class="form-control col-sm-6 col-md-6" required name="{{ form.role_id.name }}" id="id_{{ form.role_id.name }}"  {% if  editing == False %}disabled="true" {% endif %} >
+              <select class="form-control col-sm-6 col-md-6" required name="{{ form.role_id.name }}" id="id_{{ form.role_id.name }}"  {% if  editing == False %}readonly="true" {% endif %} >
 		              <option value="" selected>{% trans 'selectRole' %}</option>
 		              {% if  editing == True %}
                             {% for dep in roles %}
@@ -167,8 +167,8 @@ $(document).ready(function() {
 function ajax(){
     $.post('/roles/manageAsync', $('#register_form').serialize(), function(data, status){
         document.getElementById('register_form').reset();
-        $('#id_{{ form.department_id.name }}').attr('disabled', true);
-        $('#id_{{ form.role_id.name }}').attr('disabled', true);
+        $('#id_{{ form.department_id.name }}').attr('readonly', true);
+        $('#id_{{ form.role_id.name }}').attr('readonly', true);
         $('#id_{{ form.department_id.name }}')
         .find('option')
         .remove()
@@ -215,7 +215,7 @@ function ajaxDepartment(){
                     }
                     
             });
-         $('#id_{{ form.department_id.name }}').attr('disabled', false);    
+         $('#id_{{ form.department_id.name }}').attr('readonly', false);
     });
 };
 function ajaxRole(){
@@ -268,7 +268,7 @@ function ajaxRole(){
                     }
                     
             });
-         $('#id_{{ form.role_id.name }}').attr('disabled', false);    
+         $('#id_{{ form.role_id.name }}').attr('readonly', false);
     });
 };
 
