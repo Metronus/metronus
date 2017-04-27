@@ -11,9 +11,21 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    {% if user.actor.company_id.logo %}
+      {% with logo=user.actor.company_id.logo %}
+      <link rel="apple-touch-icon" sizes="{{ logo.width }}x{{ logo.height }}" href="{{ MEDIA_URL }}{{ logo }}">
+      <link rel="icon" sizes="{{ logo.width }}x{{ logo.height }}" href="{{ MEDIA_URL }}{{ logo }}">
+      {% endwith %}
+    {% else %}
+      <link rel="apple-touch-icon" sizes="180x180" href="/static/landing/img/favicon/apple-icon-180x180.png">
+      <link rel="icon" type="image/png" sizes="192x192"  href="/static/landing/img/favicon/android-icon-192x192.png">
+    {% endif %}
 
-		<title> {% block title %}{% endblock %} </title>
 
+    <title> {% block title %}{% endblock %} </title>
+
+    <!-- css -->
+    {% compress css %}
 		<link href="/static/css/bootstrap.min.css" rel="stylesheet">
     <link href="/static/css/font-awesome.min.css" rel="stylesheet">
 		<link href="/static/css/nprogress.css" rel="stylesheet">
@@ -21,13 +33,20 @@
 		<link href="/static/css/jqvmap.min.css" rel="stylesheet">
 		<link href="/static/css/daterangepicker.css" rel="stylesheet">
 		<link href="/static/css/custom.min.css" rel="stylesheet">
-		<link href="/static/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+    <link href="/static/css/bootstrapvalidator.min.css" rel="stylesheet"/>
+    {% endcompress %}
   </head>
 
   <body class="nav-md">
 
-  {% isAdmin user.actor as _is_admin %}
-  {% isEmployee user.actor as _is_employee %}
+  {% is_admin user.actor as actor_is_admin %}
+  {% is_executive user.actor as actor_is_executive %}
+  {% is_project_manager user.actor as actor_is_projectManager %}
+  {% is_coordinator user.actor as actor_is_coordinator %}
+  {% is_team_manager user.actor as actor_is_teamManager %}
+  {% is_employee user.actor as actor_is_employee %}
+  {% has_role user.actor as actor_has_role %}
+
 
 
     <div class="container body">
@@ -35,11 +54,15 @@
         <div class="col-md-3 left_col">
           <div class="left_col scroll-view">
             <div class="navbar nav_title" style="border: 0;">
-              <a href="index.html" class="site_title">
+              {% if user.actor.user_type == "A" %}
+              <a href="/dashboard/view" class="site_title">
+              {% else %}
+              <a href="/timeLog/list_all" class="site_title">
+              {% endif %}
                 {% if user.actor.company_id.logo == "" %}
-                  <img src="/static/landing/img/favicon/android-icon-192x192.png" class="img-circle" width="40" height="40">
+                  <img src="/static/landing/img/favicon/android-icon-192x192.png" class="img-circle" alt="logo" width="40" height="40">
                 {% else %}
-                  <img src="{{ MEDIA_URL }}{{user.actor.company_id.logo}}" class="img-circle" width="40" height="40">
+                  <img src="{{ MEDIA_URL }}{{user.actor.company_id.logo}}" class="img-circle" alt="logo" width="40" height="40">
                 {% endif %}
 
 
@@ -71,38 +94,65 @@
               <div class="menu_section">
                 <h3>{% trans 'dashControlPanel' %}</h3>
                 <ul class="nav side-menu">
-                  <li><a><i class="fa fa-home"></i>{% trans 'dashIndex' %}</span></a>
+                  {% if actor_is_admin %}
+                  <li><a href="/dashboard/view"><em class="fa fa-home"></em>{% trans 'dashIndex' %}</span></a>
                   </li>
+                  <li><a href="/company/view"><em class="fa fa-briefcase"></em>{% trans 'dashCompany' %}</span></a>
+                  </li>
+                  {% endif %}
+
+                  {% if actor_is_admin or actor_is_executive or actor_is_projectManager %}
                   <li>
-                  <a><i class="fa fa-desktop"></i>{% trans 'dashProjects' %}<span class="fa fa-chevron-down"></span></a>
+                  <a><em class="fa fa-desktop"></em>{% trans 'dashProjects' %}<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/project/list">{% trans 'dashProjectsList' %}</a></li>
+                      {% if actor_is_admin or actor_is_executive %}
                       <li><a href="/project/create">{% trans 'dashProjectCreate' %}</a></li>
+                      {% endif %}
                     </ul>
                   </li>
-                  <li><a><i class="fa fa-group"></i>{% trans 'dashDepartments' %}<span class="fa fa-chevron-down"></span></a>
+                  {% endif %}
+
+
+
+                  {% if actor_is_admin or actor_is_executive or actor_is_projectManager or actor_is_coordinator or actor_is_teamManager %}
+                  <li><a><em class="fa fa-group"></em>{% trans 'dashDepartments' %}<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/department/list">{% trans 'dashDepartmentsList' %}</a></li>
+                      {% if actor_is_admin or actor_is_executive or actor_is_projectManager %}
                       <li><a href="/department/create">{% trans 'dashDepartmentCreate' %}</a></li>
+                      {% endif %}
                     </ul>
                   </li>
-                  <li><a><i class="fa fa-user"></i>{% trans 'dashEmployees' %}<span class="fa fa-chevron-down"></span></a>
+                  {% endif %}
+
+                  {% if actor_is_admin or actor_is_executive %}
+                  <li><a><em class="fa fa-user"></em>{% trans 'dashEmployees' %}<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/employee/list">{% trans 'dashEmployeesList' %}</a></li>
+                      {% if actor_is_admin or actor_is_executive %}
                       <li><a href="/employee/create">{% trans 'dashEmployeesCreate' %}</a></li>
+                      {% endif%}
                     </ul>
                   </li>
-                  <li><a><i class="fa fa-tasks"></i>{% trans 'dashTasks' %}<span class="fa fa-chevron-down"></span></a>
+                  {% endif %}
+
+                  {% if actor_is_admin or actor_is_executive or actor_is_projectManager or actor_is_teamManager or actor_is_coordinator %}
+                  <li><a><em class="fa fa-tasks"></em>{% trans 'dashTasks' %}<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/task/list">{% trans 'dashTasksList' %}</a></li>
                       <li><a href="/task/create">{% trans 'dashTasksCreate' %}</a></li>
                     </ul>
                   </li>
-                  <li><a><i class="fa fa-calendar"></i>{% trans 'dashTimeControl' %}<span class="fa fa-chevron-down"></span></a>
+                  {% endif %}
+
+                  {% if not actor_is_admin and actor_has_role %}
+                  <li><a><em class="fa fa-calendar"></em>{% trans 'dashTimeControl' %}<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/timeLog/list_all">{% trans 'dashTimeControlList' %}</a></li>
                     </ul>
                   </li>
+                  {% endif %}
                 </ul>
               </div>
             </div>
@@ -115,7 +165,7 @@
           <div class="nav_menu">
             <nav>
               <div class="nav toggle">
-                <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+                <a id="menu_toggle"><em class="fa fa-bars"></em></a>
               </div>
 
 
@@ -135,22 +185,10 @@
                     <span class=" fa fa-angle-down"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-usermenu pull-right">
-                    <li><a href="javascript:;">{% trans 'dashProfile' %}</a></li>
-                    <li>
-                      <a href="javascript:;">
-                        <span>{% trans 'dashSettings' %}</span>
-                      </a>
-                    </li>
-                    <li><a href="/logout/"><i class="fa fa-sign-out pull-right"></i>{% trans 'dashLogout' %}</a></li>
-                  </ul>
-                </li>
-
-                <li role="presentation" class="dropdown">
-                  <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
-                    <i class="fa fa-envelope-o"></i>
-                    <span class="badge bg-green">6</span>
-                  </a>
-                  <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
+                    {% if user.actor.user_type == "E" %}
+                      <li><a href="/employee/view/{{user.get_username}}/"><em class="fa fa-user pull-right"></em>{% trans 'profile' %}</a></li>
+                    {% endif %}
+                    <li><a href="/logout/"><em class="fa fa-sign-out pull-right"></em>{% trans 'dashLogout' %}</a></li>
                   </ul>
                 </li>
               </ul>
@@ -167,6 +205,7 @@
       </div>
     </div>
 
+    {% compress js %}
 		<script src="/static/js/jquery.min.js"></script>
 	  <script src="/static/js/bootstrap.min.js"></script>
     <script src="/static/js/fastclick.js"></script>
@@ -177,15 +216,12 @@
 		<script src="/static/js/icheck.min.js"></script>
 		<script src="/static/js/skycons.js"></script>
 		<script src="/static/js/validator.js"></script>
-		<script src="/static/js/bootstrap-datetimepicker.min.js"></script>
-        <script src="/static/js/echarts.min.js"></script>
-		<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/css/bootstrapvalidator.min.css"/>
-		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/js/bootstrapvalidator.min.js"></script>
-		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/4.3.8/js/fileinput.min.js"></script>
-
-        <!-- bootstrap-daterangepicker -->
-        <script src="/static/js/moment.min.js"></script>
-        <script src="/static/js/daterangepicker.js"></script>
+    <script src="/static/js/echarts.min.js"></script>
+		<script src="/static/js/fileinput.min.js"></script>
+    <script src="/static/js/moment.min.js"></script>
+    <script src="/static/js/daterangepicker.js"></script>
+    <script src="/static/js/bootstrapvalidator.min.js"></script>
+    {% endcompress %}
 
   <script>
       var theme = {
@@ -414,7 +450,7 @@
     <script src="/static/js/custom.min.js"></script>
 
     <!-- js -->
-    {% compress js %}    
+    {% compress js %}
     <script src="/static/landing/js/cookies.min.js"></script>
     <script src="/static/landing/js/wow.min.js"></script>
     {% endcompress %}

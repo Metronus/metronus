@@ -1,44 +1,42 @@
-from metronus_app.common_utils import get_current_admin_or_403,get_current_employee_or_403
+from metronus_app.common_utils import get_current_admin_or_403
+from django.http import HttpResponseBadRequest, JsonResponse
+from django.db.models import Sum
 from django.shortcuts import render
-from django.core.exceptions                             import ObjectDoesNotExist, PermissionDenied
-from django.http                                        import HttpResponseForbidden, HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
-from django.contrib.auth                                import authenticate,login
-from django.db.models                                   import Sum
 
-from metronus_app.forms.projectForm                     import ProjectForm
-from metronus_app.model.project                         import Project,Company
-from metronus_app.common_utils                          import get_current_admin_or_403
-from metronus_app.model.administrator                   import Administrator
-from metronus_app.model.employee                        import Employee
-from metronus_app.model.task                            import Task
-from metronus_app.model.timeLog                         import TimeLog
-from metronus_app.model.department                      import Department
-from metronus_app.model.projectDepartmentEmployeeRole   import ProjectDepartmentEmployeeRole
-from metronus_app.model.actor                           import Actor
-from django.shortcuts                                   import render_to_response, get_object_or_404, render,redirect
-from datetime                                           import date, timedelta
-from django.core import serializers
-from metronus_app.model.projectDepartment             import ProjectDepartment
+from metronus_app.model.project import Project
+from metronus_app.model.employee import Employee
+from metronus_app.model.task import Task
+from metronus_app.model.timeLog import TimeLog
+from metronus_app.model.department import Department
 
+from datetime import date, timedelta
 import re
+
+
 def view(request):
+    """
+    Standard view for dashboard, is empty as all data will be requested through AJAX
+    """
+    get_current_admin_or_403(request)
+
     return render(request, 'dashboard.html')
 
-def ajax_time_per_project(request):
-    # Devuelve un objeto cuyas claves son las ID de los proyectos y sus valores un objeto {'name': ..., 'time': X} (X en minutos)
 
-    # Parámetros opcionales: 
+def ajax_time_per_project(request):
+    """ Devuelve un objeto cuyas claves son las ID de los proyectos y sus valores un objeto {'name': ..., 'time': X} (X en minutos)
+
+    # Parámetros opcionales:
     # start_date - fecha en formato YYYY-MM-DD que indica el inicio de la medición. Por defecto, 30 días antes de la fecha actual.
     # end_date - fecha en formato YYYY-MM-DD que indica el final de la medición. Por defecto, fecha actual.
     # offset - desplazamiento (huso) horario en formato +/-HH:MM - Por defecto +00:00
 
     # Si se proporcionan pero no tienen el formato correcto se lanzará un error HTTP 400 Bad Request
-
+    """
     get_current_admin_or_403(request)
-   
+
     # Get and parse the dates
-    start_date = request.GET.get("start_date", str(date.today()))
-    end_date = request.GET.get("end_date", str(date.today() - timedelta(days=30)))
+    start_date = request.GET.get("start_date", str(date.today() - timedelta(days=30)))
+    end_date = request.GET.get("end_date", str(date.today()))
     date_regex = re.compile("^\d{4}-\d{2}-\d{2}$")
 
     if date_regex.match(start_date) is None or date_regex.match(end_date) is None:
@@ -54,16 +52,17 @@ def ajax_time_per_project(request):
     start_date += " 00:00" + offset
     end_date += " 00:00" + offset
 
-
     logged = request.user.actor
     company_projects = Project.objects.filter(deleted=False, company_id=logged.company_id)
 
     data = {}
-    #Sum timelogs for each project
+    # Sum timelogs for each project
     for project in company_projects:
-        time_total = TimeLog.objects.filter(task_id__active=True,task_id__projectDepartment_id__project_id=project,
-                                                           workDate__range=[start_date, end_date]).aggregate(Sum('duration'))["duration__sum"]
-        if time_total is None: 
+        time_total = TimeLog.objects.filter(
+            task_id__active=True,
+            task_id__projectDepartment_id__project_id=project,
+            workDate__range=[start_date, end_date]).aggregate(Sum('duration'))["duration__sum"]
+        if time_total is None:
             time_total = 0
 
         data[project.id] = {
@@ -73,7 +72,11 @@ def ajax_time_per_project(request):
 
     return JsonResponse(data)
 
+
 def ajax_employees_per_project(request):
+    """
+    Gets the number of employees per project
+    """
     get_current_admin_or_403(request)
     logged = request.user.actor
     company_projects = Project.objects.filter(deleted=False, company_id=logged.company_id)
@@ -81,11 +84,16 @@ def ajax_employees_per_project(request):
     for project in company_projects:
         data[project.id] = {
             'name': project.name,
-            'employees': list(Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__project_id = project).values('id','identifier','user__username','registryDate'))
+            'employees': list(Employee.objects.filter(
+                projectdepartmentemployeerole__projectDepartment_id__project_id=project).values('id', 'identifier', 'user__username', 'registryDate'))
         }
     return JsonResponse(data)
+
 
 def ajax_departments_per_project(request):
+    """
+    Gets the number of departments per project
+    """
     get_current_admin_or_403(request)
     logged = request.user.actor
     company_projects = Project.objects.filter(deleted=False, company_id=logged.company_id)
@@ -93,11 +101,15 @@ def ajax_departments_per_project(request):
     for project in company_projects:
         data[project.id] = {
             'name': project.name,
-            'departments': list(Department.objects.filter(projectdepartment__project_id=project).values('id','name'))
+            'departments': list(Department.objects.filter(projectdepartment__project_id=project).values('id', 'name'))
         }
     return JsonResponse(data)
 
+
 def ajax_tasks_per_project(request):
+    """
+    Gets the number of tasks per project
+    """
     get_current_admin_or_403(request)
     logged = request.user.actor
     company_projects = Project.objects.filter(deleted=False, company_id=logged.company_id)
@@ -105,6 +117,7 @@ def ajax_tasks_per_project(request):
     for project in company_projects:
         data[project.id] = {
             'name': project.name,
-            'tasks': list(Task.objects.filter(projectDepartment_id__project_id=project).values('id', 'name', 'description'))
+            'tasks': list(Task.objects.filter(
+                projectDepartment_id__project_id=project).values('id', 'name', 'description'))
         }
     return JsonResponse(data)

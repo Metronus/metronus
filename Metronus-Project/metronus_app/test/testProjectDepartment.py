@@ -3,15 +3,16 @@ from metronus_app.model.company import Company
 from metronus_app.model.department import Department
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.administrator import Administrator
-from metronus_app.controllers.projectDepartmentController import *
-from django.contrib.auth.models	import User
+from django.contrib.auth.models import User
 from django.test import TestCase, Client
 
 
 class ProjectDepartmentTestCase(TestCase):
-
+    """This class provides a test case for using and managing project-departement relationship"""
     def setUp(self):
-
+        """
+        Loads the data to the database for tests to be done
+        """
         company123 = Company.objects.create(
             cif="123",
             company_name="company1",
@@ -40,14 +41,16 @@ class ProjectDepartmentTestCase(TestCase):
             first_name="Nimad",
             last_name="Rotartis")
 
-        admin1 = Administrator.objects.create(
+        # Admin
+        Administrator.objects.create(
             user=admin_user1,
             user_type="A",
             identifier="adm01",
             phone="999999999",
             company_id=company124)
 
-        admin2 = Administrator.objects.create(
+        # Admin2
+        Administrator.objects.create(
             user=admin_user2,
             user_type="A",
             identifier="adm02",
@@ -59,17 +62,17 @@ class ProjectDepartmentTestCase(TestCase):
             deleted=False,
             company_id=company124)
 
-        proj2 = Project.objects.create(
+        Project.objects.create(
             name="TestProject2",
             deleted=False,
             company_id=company124)
 
-        proj3 = Project.objects.create(
+        Project.objects.create(
             name="TestProjectC2",
             deleted=False,
             company_id=company123)
 
-        proj4 = Project.objects.create(
+        Project.objects.create(
             name="TestProjectDeleted",
             deleted=True,
             company_id=company124)
@@ -83,27 +86,27 @@ class ProjectDepartmentTestCase(TestCase):
             active=True,
             company_id=company124)
 
-        dep3 = Department.objects.create(
+        Department.objects.create(
             name="DepartamentoC2",
             active=True,
             company_id=company123)
 
-        dep3 = Department.objects.create(
+        Department.objects.create(
             name="DepartamentoInactivo",
             active=False,
             company_id=company124)
 
-        pd = ProjectDepartment.objects.create(
+        ProjectDepartment.objects.create(
             project_id = proj1,
             department_id = dep2)
 
-        pd = ProjectDepartment.objects.create(
+        ProjectDepartment.objects.create(
             project_id = proj1,
             department_id = dep1)
 
     #---------------------- CREATE
 
-    def test_create_projectDepartment_positive(self):
+    def test_create_project_department_positive(self):
         """
 		#checks the number of projectDepartments increased
 		"""
@@ -125,10 +128,25 @@ class ProjectDepartmentTestCase(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertEquals(count + 1, count2)
 
-
-    def test_create_projectDepartment_negative_project(self):
+    def test_create_form_project_department_positive(self):
         """
-		#checks the number of projectDepartments didn't increase
+        #gets the form
+        """
+        c = Client()
+        c.login(username="admin", password="1234")
+
+
+        response = c.get("/projectdepartment/create")
+
+        form=response.context["form"]
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(form.initial["project_id"], 0)
+        self.assertEquals(form.initial["department_id"], 0)
+        self.assertEquals(form.initial["projectDepartment_id"], 0)
+
+    def test_create_project_department_negative_project(self):
+        """
+		checks the number of projectDepartments didn't increase
 		Admin is trying to create a projectDepartment using a project that's not from his Company
 		"""
         c = Client()
@@ -150,9 +168,9 @@ class ProjectDepartmentTestCase(TestCase):
         self.assertEquals(count, count2)
 
 
-    def test_create_projectDepartment_negative_project2(self):
+    def test_create_project_department_negative_project2(self):
         """
-		#checks the number of projectDepartments didn't increase
+		checks the number of projectDepartments didn't increase
 		Admin is trying to create a projectDepartment using a project that's deleted
 		"""
         c = Client()
@@ -174,9 +192,9 @@ class ProjectDepartmentTestCase(TestCase):
         self.assertEquals(count, count2)
 
 
-    def test_create_projectDepartment_negative_department1(self):
+    def test_create_project_department_negative_department1(self):
         """
-		#checks the number of projectDepartments didn't increase
+		checks the number of projectDepartments didn't increase
 		Admin is trying to create a projectDepartment using a department that's not from his Company
 		"""
         c = Client()
@@ -198,9 +216,9 @@ class ProjectDepartmentTestCase(TestCase):
         self.assertEquals(count, count2)
 
 
-    def test_create_projectDepartment_negative_department2(self):
+    def test_create_project_department_negative_department2(self):
         """
-		#checks the number of projectDepartments didn't increase
+		checks the number of projectDepartments didn't increase
 		Admin is trying to create a projectDepartment using a department that's not active
 		"""
         c = Client()
@@ -224,7 +242,7 @@ class ProjectDepartmentTestCase(TestCase):
     #---------------------- LIST
 
     def test_list_admin1_positive(self):
-        #Logged as admin1, his company has 2 projectDepartments
+        """Logged as admin1, his company has 2 projectDepartments"""
         c = Client()
         c.login(username="admin", password="1234")
 
@@ -235,7 +253,7 @@ class ProjectDepartmentTestCase(TestCase):
 
 
     def test_list_admin1_dep1_positive(self):
-        #Logged as admin1, list the projectDepartments of Departamento1
+        """Logged as admin1, list the projectDepartments of Departamento1"""
         c = Client()
         c.login(username="admin", password="1234")
 
@@ -247,7 +265,7 @@ class ProjectDepartmentTestCase(TestCase):
 
 
     def test_list_admin1_proj2_positive(self):
-        #Logged as admin1, list the projectDepartments of TestProject2
+        """Logged as admin1, list the projectDepartments of TestProject2"""
         c = Client()
         c.login(username="admin", password="1234")
 
@@ -259,7 +277,7 @@ class ProjectDepartmentTestCase(TestCase):
 
 
     def test_list_admin2_positive(self):
-        #Logged as admin2, his company has 0 projectDepartments
+        """Logged as admin2, his company has 0 projectDepartments"""
         c = Client()
         c.login(username="admin2", password="4321")
 
@@ -272,7 +290,7 @@ class ProjectDepartmentTestCase(TestCase):
     #---------------------- DELETE
 
     def test_delete_positive(self):
-        #Logged as admin, tries to delete a PD that belongs to his company
+        """Logged as admin, tries to delete a PD that belongs to his company"""
         c = Client()
         c.login(username="admin", password="1234")
 
@@ -289,7 +307,7 @@ class ProjectDepartmentTestCase(TestCase):
         self.assertEquals(count - 1, count2)
 
     def test_delete_negative(self):
-        #Logged as admin2, tries to delete a PD that's not from his company
+        """Logged as admin2, tries to delete a PD that's not from his company"""
         c = Client()
         c.login(username="admin2", password="4321")
 

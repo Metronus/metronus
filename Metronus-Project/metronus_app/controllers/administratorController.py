@@ -1,19 +1,17 @@
-from django.shortcuts import render_to_response, get_object_or_404
-from django.http import HttpResponseRedirect
-from django.core.exceptions import  PermissionDenied
+from django.http import HttpResponseRedirect, JsonResponse
+from django.core.exceptions import PermissionDenied
 from metronus_app.forms.administratorForm import AdministratorForm
-from metronus_app.model.administrator import Administrator
-from metronus_app.model.company import Company
-from metronus_app.common_utils import get_current_admin_or_403
+from metronus_app.forms.employeePasswordForm import EmployeePasswordForm
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from metronus_app.common_utils import checkImage
+from metronus_app.common_utils import check_image, get_current_admin_or_403
+from django.contrib.auth import update_session_auth_hash
 
 
 @login_required
-def edit(request, username):
+def edit(request):
     """
-    url = administrator/edit/<username>
+    url = administrator/edit/
 
     parameters/returns:
     form: formulario de edicion de datos de administrador
@@ -21,7 +19,7 @@ def edit(request, username):
     template: administrator_edit.html
     """
 
-    administrator = get_object_or_404(Administrator, user__username=username, user__is_active=True)
+    administrator = get_current_admin_or_403(request)
 
     if request.method == "GET":
         # Return a form filled with the administrator's data
@@ -34,15 +32,16 @@ def edit(request, username):
         })
     elif request.method == "POST":
         # Process the received form
-        
-        form = AdministratorForm(request.POST)
-        if form.is_valid() and checkPasswords(form):
-            if checkImage(form, 'photo'):
-            
+        form = AdministratorForm(request.POST, request.FILES)
+        if form.is_valid():
+            if check_image(form, 'photo'):
+
                 # Update employee data
                 administrator.identifier = form.cleaned_data["identifier"]
                 administrator.phone = form.cleaned_data["phone"]
-                administrator.picture = form.cleaned_data["photo"]
+
+                if form.cleaned_data["photo"]:
+                    administrator.picture = form.cleaned_data["photo"]
 
                 # Update user data
                 user = administrator.user
@@ -50,73 +49,64 @@ def edit(request, username):
                 user.last_name = form.cleaned_data["last_name"]
                 user.email = form.cleaned_data["admin_email"]
 
-                # If a new password has been specified, change the current one and notify the user
-                if form.cleaned_data["password"]:
-                    user.set_password(form.cleaned_data["password"])
-                    notify_password_change(user.email)
-
                 user.save()
                 administrator.save()
 
                 return HttpResponseRedirect('/company/view/')
             else:
-                return render(request, 'company/administrator_edit.html', {'form': form, 'errors': ['error.imageNotValid']})
-
+                return render(request, 'company/administrator_edit.html',
+                              {'form': form, 'errors': ['error.imageNotValid']})
 
     else:
         raise PermissionDenied
 
     return render(request, 'company/administrator_edit.html', {'form': form})
 
-'''
-def view(request, username):
+
+def update_password(request):
     """
-    url = administrator/view/<username>
+    url = administrator/updatePassword/
 
-    parameters/returns:
-    administrator: datos del administrador
+    parameters:
+        currentpass: contraseña actual
+        newpass1: contraseña a establecer
+        newpass2: repetición de la contraseña
 
-    template: company_view.html
+    returns:
+        {'success': true/false: 'errors': [...]}
+
+    errors:
+        'formNotValid': si el formulario no es válido
+        'passwordsDontMatch' : si las contraseñas no coinciden
+        'currentPasswordInvalid" : si la contraseña actual no escorrecta
+
+    template: ninguna (ajax)
     """
 
     # Check that the user is logged in and it's an administrator
     admin = get_current_admin_or_403(request)
 
-    admin2 = get_object_or_404(Administrator, username=username)
+    if request.method == 'POST':
+        # Process the form
+        form = EmployeePasswordForm(request.POST)
 
-    # Check that the admin has permission to view that company
-    if admin2.company_id != admin.company_id:
-        raise PermissionDenied
+        if form.is_valid():
 
-    return render(request, 'administrator_view.html', {'admin': admin2})
-'''
+            if not admin.user.check_password(form.cleaned_data["currentpass"]):
+                return JsonResponse({'success': False, 'errors': ['currentPasswordInvalid']})
 
-def delete(request, username):
-    """
-    url = administrator/delete/<username>
+            pass1 = form.cleaned_data["newpass1"]
+            pass2 = form.cleaned_data["newpass2"]
 
-    parameters/returns:
-    Nada, redirecciona a la vista de la compañía
+            if pass1 != pass2:
+                return JsonResponse({'success': False, 'errors': ['passwordsDontMatch']})
 
-    template: ninguna
-    """
-    pass  # TODO
+            user = admin.user
+            user.set_password(pass1)
+            user.save()
+            update_session_auth_hash(request, user)
 
-
-def checkPasswords(form):
-    return form.cleaned_data['password'] == form.cleaned_data['repeatPassword']
-
-
-def notify_password_change(email):
-    """
-
-    POR_DETERMINAR
-
-    url = ..
-
-    parameters/returns: ..
-
-    template: ..
-    """
-
-    pass # TODO
+            return JsonResponse({'success': True, 'errors': []})
+        else:
+            # Invalid form
+            return JsonResponse({'success': False, 'errors': ['formNotValid']})

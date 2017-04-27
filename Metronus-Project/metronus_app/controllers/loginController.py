@@ -23,12 +23,11 @@ from django.contrib.auth.views import deprecate_current_app
 from metronus_app.model.company import Company
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import render
-from metronus_app.common_utils import check_company_contains_actor
 
 
 def _get_login_redirect_url(request, redirect_to):
-    # Ensure the user-originating redirection URL is safe.
+    """ Ensure the user-originating redirection URL is safe.
+    """
     if not is_safe_url(url=redirect_to, host=request.get_host()):
         return resolve_url(settings.LOGIN_REDIRECT_URL)
     return redirect_to
@@ -41,7 +40,7 @@ def _get_login_redirect_url(request, redirect_to):
 def login(request, template_name='registration/login.html',
           redirect_field_name=REDIRECT_FIELD_NAME,
           authentication_form=AuthenticationForm,
-          extra_context=None, redirect_authenticated_user=False, **kwargs):
+          extra_context=None, redirect_authenticated_user=True, **kwargs):
     """
     Displays the login form and handles the login action.
     """
@@ -56,7 +55,6 @@ def login(request, template_name='registration/login.html',
     redirect_to = request.POST.get(redirect_field_name, request.GET.get(redirect_field_name, ''))
     if redirect_authenticated_user and request.user.is_authenticated:
         redirect_to = _get_login_redirect_url(request, redirect_to)
-        print(redirect_to)
         if redirect_to == request.path:
             raise ValueError(
                 "Redirection loop for authenticated user detected. Check that "
@@ -67,12 +65,17 @@ def login(request, template_name='registration/login.html',
         form = authentication_form(request, data=request.POST)
         if form.is_valid():
 
-            #if company is not None:
+            # if company is not None:
             #    check_company_contains_actor(company, form.get_user())
+            user = form.get_user()
 
-            auth_login(request, form.get_user())
-            return HttpResponseRedirect("/app/")
-            #return HttpResponseRedirect(_get_login_redirect_url(request, redirect_to))
+            auth_login(request, user)
+            if user.actor.user_type == 'A':
+                return HttpResponseRedirect("/dashboard/view")
+            elif user.actor.user_type == 'E':
+                return HttpResponseRedirect("/timeLog/list_all")
+            else:
+                return HttpResponseRedirect("/app/")
     else:
         form = authentication_form(request)
 

@@ -13,6 +13,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.views import deprecate_current_app
 from metronus_app.common_utils import check_user_email
 
+
 def index(request):
     """
     returns:
@@ -67,7 +68,7 @@ def contact(request):
     else:
         form = ContactForm()
 
-    return render(request, 'contact_form.html', {'form': form})
+    return render(request, 'contact/contact_form.html', {'form': form})
 
 
 def contact_done(request):
@@ -78,7 +79,7 @@ def contact_done(request):
     template:
     contact_done.html
     """
-    return render(request, "contact_done.html")
+    return render(request, "contact/contact_done.html")
 
 
 @deprecate_current_app
@@ -94,6 +95,9 @@ def password_reset(request,
                    extra_context=None,
                    html_email_template_name=None,
                    extra_email_context=None):
+    """
+    Deprecated. Request for new password
+    """
     if post_reset_redirect is None:
         post_reset_redirect = reverse('password_reset_done')
     else:

@@ -19,20 +19,20 @@ if __name__ == "__main__":
                 "forget to activate a virtual environment?"
             )
         raise
-    
+
     import django
     django.setup()
-    
+
     argv = sys.argv[1]
 
     if argv == 'populate':
-        #Load the data into the database
+        # Load the data into the database
         from populate_database import populate_database
         populate_database()
-    elif argv=='populaternd':
-        #Load the data into the database
-        from populate_database2 import randomLoad
-        randomLoad()
+    elif argv == 'populaternd':
+        # Load the data into the database
+        from populate_database2 import random_load
+        random_load()
 
     else:
         execute_from_command_line(sys.argv)

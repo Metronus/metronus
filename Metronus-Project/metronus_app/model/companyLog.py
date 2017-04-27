@@ -1,8 +1,9 @@
 from django.db import models
-from metronus_app.model.company import Company
 
 
 class CompanyLog(models.Model):
+    """ Esto es una clase del modelo. Totalmente inesperado"""
+
     cif = models.CharField(max_length=9, unique=True)
     company_name = models.CharField(max_length=100)
     registryDate = models.DateTimeField()

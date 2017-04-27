@@ -1,0 +1,85 @@
+{% extends "layout_base.html" %}
+
+{% load i18n %}
+{% load l10n %}
+
+{% block title %}{% trans 'taskList' %}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xs-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>{% trans 'taskList' %}</h2>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>{% trans 'task' %}</th>
+                            <th>{% trans 'projectDeparment' %}</th>
+                            <th>{% trans 'creator' %}</th>
+                            <th>{% trans 'creationDate' %}</th>
+                            <th>{% trans 'actions' %}</th>
+                            <th class="hidden-xs"></th>
+                            <th class="hidden-xs"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task in tasks %}
+                            <tr>
+                                <td>{{task.name}}</td>
+                                <td>{{task.projectDepartment_id.project_id.name}} / {{task.projectDepartment_id.department_id.name}}</td>
+                                <td>{{task.actor_id.user.first_name}} {{task.actor_id.user.last_name}}</td>
+                                <td>{{task.registryDate}}</td>
+
+
+                                <td>
+                                    <a href="{% url 'task_view' task.id %}" type="button" class="btn btn-success">
+                                        {% trans 'details' %}</a>
+                                </td>
+                                <td class="hidden-xs">
+                                    <a href="{% url 'task_edit' task.id %}" type="button" class="btn btn-dark">
+                                        {% trans 'edit' %}</a>
+                                </td>
+                                <td class="hidden-xs">
+                                    <a href="#" class="btn btn-default" data-href="{% url 'task_delete' task.id %}"
+                                       data-toggle="modal" data-target="#confirm-delete">{% trans 'delete' %}</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="text-center">
+                <a class="btn btn-dark" href="{% url 'task_create' %}">{% trans 'create' %}</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">{% trans 'delete' %}</div>
+            <div class="modal-body">{% trans 'taskConfirm' %}</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'cancel' %}</button>
+                <a class="btn btn-danger btn-ok">{% trans 'delete' %}</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+    $('#confirm-delete').on('show.bs.modal', function(e) {
+        $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+    });
+</script>
+{% endblock %}

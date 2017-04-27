@@ -1,0 +1,446 @@
+{% extends "layout_base.html" %}
+{% load i18n %}
+{% load l10n %}
+{% block title %}{% trans 'task' %}: {{ task.name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="page-title">
+        <div class="title_left">
+            <h3><strong>{% trans 'task' %}: </strong> {{ task.name }}</h3>
+        </div>
+    </div>
+
+        <div class="clearfix"></div>
+
+        <div class="col-xs-12">
+          <div class="x_panel">
+            <div class="x_content">
+              <!-- Gráfica: muy importante el Style para que sea responsivo -->
+              <div id="task" style="width: 100%; min-height: 400px"></div>
+
+              <div style="display: flex; justify-content: center;">
+                <form class="form-horizontal">
+                  <fieldset>
+                    <legend>{% trans 'datePicker' %}</legend>
+                    <div class="control-group">
+                      <div class="controls">
+                        <div class="input-prepend input-group">
+                          <span class="add-on input-group-addon"><em class="glyphicon glyphicon-calendar fa fa-calendar"></em></span>
+                          <input type="text" style="width: 200px" name="task_chart" id="task_chart" class="form-control" value="" />
+                        </div>
+                      </div>
+                    </div>
+                  </fieldset>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="clearfix"></div>
+
+    <!-- Here comes profit graphics-->
+      <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+          <div class="x_content">
+
+            <div id="welp3" style="height:350px;"></div>
+
+            <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
+              <form class="form-horizontal">
+                <fieldset>
+                  <legend>{% trans 'datePicker' %}</legend>
+                  <div class="control-group">
+                    <div class="controls">
+                      <div class="input-prepend input-group">
+                        <span class="add-on input-group-addon"><em class="glyphicon glyphicon-calendar fa fa-calendar"></em></span>
+                        <input type="text" style="width: 200px" name="task_profit_chart" id="task_profit_chart" class="form-control" value=""/>
+                      </div>
+                    </div>
+                  </div>
+                </fieldset>
+              </form>
+              <form class="form-horizontal">
+                <fieldset>
+                  <legend>{% trans 'data_output_to' %}</legend>
+                  <div class="control-group">
+                    <div class="controls">
+                      <div class="input-prepend input-group">
+                        <span class="add-on input-group-addon"><em class="glyphicon glyphicon-refresh fa fa-refresh"></em></span>
+
+                        <div style="display: table-cell;border-radius: 0px 3px 3px 0px; min-width: 197px" id="switch-acum-button" type="text" class="btn btn-success">{% trans 'cumulative_values' %}</div>
+                      </div>
+                    </div>
+                  </div>
+                </fieldset>
+              </form>
+            </div>
+            <br/>
+          </div>
+        </div>
+      </div>
+     <!-- Here ends profit graphics-->
+
+        <div class="clearfix"></div>
+
+            <div class="col-xs-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>{% trans 'employeeList' %}</h2>
+                        <div class="clearfix"></div>
+                    </div>
+
+                    <div class="clearfix"></div>
+
+                    <div class="x_content">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>{% trans 'username' %}</th>
+                                    <th>{% trans 'identifier' %}</th>
+                                    <th>{% trans 'phone' %}</th>
+                                    <th class="hidden-xs">{% trans 'registryDate' %}</th>
+                                    <th>{% trans 'actions' %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for employee in employees %}
+                                    <tr>
+                                        <td>
+                                            {% if employee.picture == "/static/avatar.png" %}
+                                                <img src="{{employee.picture}}" alt="{{user.get_username}}" class="avatar" alt="IMG">
+                                            {% else %}
+                                                <img src="{{ MEDIA_URL }}{{employee.picture}}" alt="{{user.get_username}}" class="avatar" alt="IMG">
+                                            {% endif %}
+                                            {{employee.user}}
+                                        </td>
+
+                                        <td>{{employee.identifier}}</td>
+                                        <td>{{employee.phone}}</td>
+                                        <td class="hidden-xs">{{employee.registryDate}}</td>
+
+
+                                        <td>
+                                            <a href="{% url 'employee_view' employee.user %}" type="button" class="btn btn-success">
+                                            {% trans 'details' %}</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        <div class="clearfix"></div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+    /**
+     * @fileoverview Funciones de la gráfica de Task
+     * @author andjimrio
+     * */
+
+    /**
+     * Con los datos que devuelve el Backend devuelve un JSON apto para editar la gráfica.
+     * @param {Array} names nombre de las gráficas
+     * @param {Array} data datos que se reciben de Backend
+     * @return {Array} el JSON para la gráfica
+     * */
+    function fromData(names, data) {
+        return {
+            title: {
+                text: '{% trans 'taskChartTitle' %}',
+                subtext: '{% trans 'taskChartSubtitle' %}'
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: names
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    magicType: {
+                        show: true,
+                        title: {
+                            line: '{% trans 'line' %}',
+                            bar: '{% trans 'bar' %}',
+                            stack: '{% trans  'stack' %}',
+                            tiled: '{% trans 'tiled' %}'
+                        },
+                        type: ['line', 'bar', 'stack', 'tiled']
+                    },
+                    restore: {
+                        show: false,
+                        title: '{% trans 'restore' %}'
+                    },
+                    saveAsImage: {
+                        show: true,
+                        title: '{% trans 'saveImage' %}'
+                    }
+                }
+            },
+            calculable: true,
+            xAxis: [{
+                type: 'category',
+                boundaryGap: false,
+                data: data.days
+            }],
+            yAxis: [{
+                type: 'value'
+            }],
+            series: [{
+                name: names[0],
+                type: 'line',
+                smooth: true,
+                itemStyle: {
+                    normal: {
+                        areaStyle: {
+                            type: 'default'
+                        }
+                    }
+                },
+
+                data: data.production
+            }, {
+                name: names[1],
+                type: 'line',
+                smooth: true,
+                itemStyle: {
+                    normal: {
+                        areaStyle: {
+                            type: 'default'
+                        }
+                    }
+                },
+                data: data.goal_evolution
+            }]
+        };
+    }
+    /**
+     * Con los datos que devuelve el Backend devuelve un JSON apto para editar la gráfica de profit.
+     * @param {Array} backendEnd datos con el diario y el acumulado y fechas
+     * @param {bool} acum si queremos el acumulado o el diario
+     * @return {Array} el JSON para la gráfica
+     * */
+   function fromProfitData (backendData,acum) {
+      dates=backendData["dates"];
+      expenses=backendData["expenses"]
+      income=backendData["income"]
+      subtext='{% trans 'notAcum' %}';
+      if(acum){
+        subtext='{% trans 'acum' %}';
+        expenses=backendData["acumExpenses"];
+        income=backendData["acumIncome"];
+      }
+      //en xAxis data pones lo que va en el eje X (en este caso las fechas)
+      //cada dato necesita una serie
+      //incomes y expenses, dos series, cada una con un campo data
+
+      return {
+        title : {
+          text: '{% trans 'task_profit' %}',
+          subtext: subtext
+        },
+        tooltip : {
+          trigger: 'axis'
+        },
+        legend: {
+          data:['Expenses and income']
+        },
+        toolbox: {
+          show : true,
+          feature : {
+            saveAsImage : {show: true}
+          }
+        },
+        calculable : true,
+        xAxis : [
+        {
+          type : 'category',
+          show : false,
+          data : dates
+        }
+        ],
+        yAxis : [
+        {
+          type : 'value'
+        }
+        ],
+        series : [
+        {
+          name:'{% trans 'expenses' %}',
+          type:'line',
+          data: expenses,
+          markPoint : {
+            data : [
+            {type : 'max', name: 'Max'},
+            {type : 'min', name: 'Min'}
+            ]
+          },
+          markLine : {
+            data : [
+            {type : 'average', name: 'Avg'}
+            ]
+          }
+        },
+        {
+          name:'{% trans 'income' %}',
+          type:'line',
+          data: income,
+          markPoint : {
+            data : [
+            {type : 'max', name: 'Max'},
+            {type : 'min', name: 'Min'}
+            ]
+          },
+          markLine : {
+            data : [
+            {type : 'average', name: 'Avg'}
+            ]
+          }
+        }
+        ]
+      }
+
+    }
+
+    $(document).ready(function() {
+
+
+      // Para que <legend> se vea como <label>
+      $("legend").css({
+          "padding": "inherit",
+          "display": "inline-block",
+          "margin-bottom": "5px",
+          "font-weight": "700",
+          "font-size": "inherit",
+          "border": "inherit"
+      })
+
+        //Nombres que se utilizarán en toda las gráficas
+        names = ["{% trans 'production' %}", "{% trans 'goal_evolution' %}"];
+
+        //Inicialización de la gráfica
+        echartLine = echarts.init(document.getElementById('task'), theme);
+
+        //Al principio, se piden los datos para una gráfica del mes actual
+        $.get({
+            url: "{% url 'productivity_per_task' %}",
+            data: {task_id: {{ task.id }}},
+            success: function ( backendData )  {
+                data = backendData
+                echartLine.setOption( fromData( names, backendData ) );
+            }
+        });
+
+
+        //Instanciación del DatePicker con el mes actual.
+        defaultRange = moment().startOf('month').format('MM/DD/YYYY') +' - '+ moment().endOf('month').format('MM/DD/YYYY')
+        $('input[name="task_chart"]').val(defaultRange)
+        $('input[name="task_chart"]').daterangepicker({
+            autoUpdateInput: false,
+            locale: {
+                cancelLabel: '{% trans 'default' %}',
+                applyLabel: '{% trans 'apply' %}'
+            }
+        });
+
+        //Al pulsar el botón aplicar, pide por AJAX la nueva gráfica con dicho rango de fechas.
+        $('input[name="task_chart"]').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+            $.get({
+                url: "{% url 'productivity_per_task' %}",
+                data: {
+                    task_id: {{ task.id }},
+                    start_date: picker.startDate.format('YYYY-MM-DD'),
+                    end_date: picker.endDate.format('YYYY-MM-DD')
+                },
+                success: function ( backendData )  {
+                    console.log(backendData)
+                    echartLine.setOption( fromData( names, backendData ) );
+                }
+            });
+        });
+
+        //Al pulsar el botón cancelar, se ponen valores por defecto.
+        $('input[name="task_chart"]').on('cancel.daterangepicker', function(ev, picker) {
+            $(this).val(defaultRange);
+            echartLine.setOption( fromData( names, data ) );
+        });
+
+
+      ///////////////////////////////////
+      // Gráfico de Gastos y Ganancias //
+      ///////////////////////////////////
+      var useAcum=false;
+      var echartLine2 = echarts.init(document.getElementById('welp3'), theme);
+      var  defaultProfitBackendData = {'dates':[],'expenses':[],'income':[],'acumExpenses':[],'acumIncome':[]};
+      $.get({
+        url: "/task/ajaxProfit/"+ {{task.id}} +"/",
+        success: function ( backendData )  {
+          defaultProfitBackendData = backendData
+          echartLine2.setOption( fromProfitData( backendData,useAcum ) );
+        }
+      })
+      //Date picker for profit
+      defaultRange = moment().startOf('month').format('MM/DD/YYYY') +' - '+ moment().endOf('month').format('MM/DD/YYYY')
+      $('input[name="task_profit_chart"]').val(defaultRange)
+
+      $('input[name="task_profit_chart"]').daterangepicker({
+        autoUpdateInput: false,
+        locale: {
+          cancelLabel: '{% trans 'default' %}',
+          applyLabel: '{% trans 'apply' %}'
+        }
+      });
+
+      $('input[name="task_profit_chart"]').on('apply.daterangepicker', function(ev, picker) {
+        $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+        $.get({
+          url:"/task/ajaxProfit/"+{{task.id}}+"/",
+          data: {
+            start_date: picker.startDate.format('YYYY-MM-DD'),
+            end_date: picker.endDate.format('YYYY-MM-DD')
+          },
+          success: function ( backendData )  {
+            defaultProfitBackendData = backendData
+            echartLine2.setOption( fromProfitData( backendData ,useAcum) );
+          }
+        })
+      });
+
+      $('input[name="task_profit_chart"]').on('cancel.daterangepicker', function(ev, picker) {
+        $(this).val(defaultRange);
+        echartLine2.setOption( fromProfitData( defaultProfitBackendData,useAcum ) );
+      });
+      var switcher= $('#switch-acum-button');
+      switcher.click(function(){
+        useAcum=!useAcum;
+        if(useAcum){
+          switcher.html("{% trans 'non_cumulative_values' %}")
+          echartLine2.setOption( fromProfitData( defaultProfitBackendData ,useAcum) );
+        } else {
+          switcher.html("{% trans 'cumulative_values' %}")
+          echartLine2.setOption( fromProfitData( defaultProfitBackendData ,useAcum) );
+        }
+      })
+
+
+      //Responsiveness para todos
+      $(window).on('resize', () => {
+          [echartLine, echartLine2].forEach( e => {
+              e.resize()
+          })
+      })
+
+    });
+</script>
+{% endblock %}
