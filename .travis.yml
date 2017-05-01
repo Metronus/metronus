@@ -50,9 +50,9 @@ script:
   - coverage run --source=. manage.py test
   - mv .coverage ../
   - cd $TRAVIS_BUILD_DIR/
-  - sonar-scanner
-after_success:
   - coveralls
+  - sonar-scanner
+
 cache:
   directories:
     '$HOME/.sonar/cache'
