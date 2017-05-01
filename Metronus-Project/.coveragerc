@@ -3,3 +3,5 @@ omit =
     */wsgi.py
     */apps.py
     */populate_database2.py
+    */custom_tags.py
+    */manage.py

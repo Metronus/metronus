@@ -12,6 +12,7 @@ from metronus_app.model.company import Company
 from metronus_app.model.role import Role
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.task import Task
+from django.test import Client
 
 from PIL import Image
 
@@ -243,3 +244,12 @@ def create_timelog_in_task(task, duration, date, employee=None):
         task_id=task,
         employee_id=Employee.objects.get(identifier="emp01") if employee is None else employee
     )
+
+
+def get_ajax(url, data = None):
+    """
+    Function to automatize the process of getting the ajax response from a source
+    """
+    c = Client()
+    response = c.get(url, data)
+    return json.loads(response.content.decode("utf-8"))
