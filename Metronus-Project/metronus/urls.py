@@ -90,16 +90,16 @@ urlpatterns += [  # i18n_patterns(
     # Employee
     url(r'^employee/create$', employeeController.create, name='employee_create'),
     url(r'^employee/list$', employeeController.list_employees, name='employee_list'),
-    url(r'^employee/view/(?P<username>\w{0,50})/$', employeeController.view, name='employee_view'),
-    url(r'^employee/edit/(?P<username>\w{0,50})/$', employeeController.edit, name='employee_edit'),
-    url(r'^employee/updatePassword/(?P<username>\w{0,50})/$', employeeController.update_password,
+    url(r'^employee/view/(?P<username>.{0,50})/$', employeeController.view, name='employee_view'),
+    url(r'^employee/edit/(?P<username>.{0,50})/$', employeeController.edit, name='employee_edit'),
+    url(r'^employee/updatePassword/(?P<username>.{0,50})/$', employeeController.update_password,
         name='employee_updatePassword'),
-    url(r'^employee/delete/(?P<username>\w{0,50})/$', employeeController.delete, name='employee_delete'),
-    url(r'^employee/ajax_productivity_per_task/(?P<username>\w{0,50})$', employeeController.ajax_productivity_per_task,
+    url(r'^employee/delete/(?P<username>.{0,50})/$', employeeController.delete, name='employee_delete'),
+    url(r'^employee/ajax_productivity_per_task/(?P<username>.{0,50})$', employeeController.ajax_productivity_per_task,
         name='employee_ajax_productivity_per_task'),
-    url(r'^employee/ajax_productivity_per_task_and_date/(?P<username>\w{0,50})$',
+    url(r'^employee/ajax_productivity_per_task_and_date/(?P<username>.{0,50})$',
         employeeController.ajax_productivity_per_task_and_date, name='employee_ajax_productivity_per_task_and_date'),
-    url(r'^employee/ajaxProfit/(?P<employee_id>\w{0,50})/$', employeeController.ajax_profit_per_date,
+    url(r'^employee/ajaxProfit/(?P<employee_id>.{0,50})/$', employeeController.ajax_profit_per_date,
         name='employee_profit_per_date'),
 
     # TimeLogs
