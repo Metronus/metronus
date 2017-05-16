@@ -183,9 +183,10 @@ LOGIN_REDIRECT_URL = "/"
 LOGIN_URL = '/login'
 LOGOUT_URL = '/'
 
-# Cookie domain
+# Cookie domain and admin mail setup
 if production:
     SESSION_COOKIE_DOMAIN=".metronus.es"
+    ADMINS = [("Metronus admin", os.environ["ADMIN_EMAIL"])]
 
 # File storage
 MEDIA_URL = '/media/'
