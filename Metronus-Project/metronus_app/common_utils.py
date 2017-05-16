@@ -142,7 +142,7 @@ def send_mail(subject, email_template_name, recipients, html_email_template_name
         html_email = loader.render_to_string(html_email_template_name, context)
         email_message.attach_alternative(html_email, 'text/html')
 
-    email_message.send(fail_silently=False)
+    email_message.send(fail_silently=True)
 
 
 def is_username_unique(username):
