@@ -137,12 +137,14 @@ msgstr "Metronus. El tiempo importa."
 
 
 #: Register
-msgid "registerCompanyMenu"
+msgid "companyRegister"
 msgstr "Registro de compañía"
+msgid "registerCompanyMenu"
+msgstr "Información de la compañía"
 msgid "registerCompanyMenuInfo"
 msgstr "¡Necesitamos detalles!"
 msgid "registerCompanyAdmin"
-msgstr "Información del Administrador"
+msgstr "Información del administrador"
 msgid "registerCompanyAdminInfo"
 msgstr "¡Alguien debe gestionar tu compañía!"
 msgid "browseFile"

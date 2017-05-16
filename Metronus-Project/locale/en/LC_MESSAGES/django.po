@@ -136,8 +136,10 @@ msgid "mailsignature"
 msgstr "Metronus. Time matters."
 
 #: Register
+msgid "companyRegister"
+msgstr "Company Registration"
 msgid "registerCompanyMenu"
-msgstr "Company register"
+msgstr "Company information"
 msgid "registerCompanyMenuInfo"
 msgstr "We need your details!"
 msgid "registerCompanyAdmin"

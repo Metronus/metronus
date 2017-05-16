@@ -6,13 +6,29 @@
 
 {% block title %}{% trans 'registerCompany' %}{% endblock %}
 {% block content %}
-<body>
+
   <!-- versión anterior: http://pastebin.com/cupm22xH -->
   <!-- page content -->
-  <div class="container body">
-  <div class="right_col" role="main">
-      <div class="clearfix"></div>
-
+<style type="text/css">
+  .register_company_container{
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    padding: 10px;
+    background: #F7F7F7; 
+  }
+  .register_company_form{
+    width: 100%;
+  }
+</style>
+<div class="register_company_container">
+  <div class="register_company_form">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>{% trans 'companyRegister' %}</h2>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
 
 {% if errors %}
     {% for err in errors%}
@@ -20,10 +36,6 @@
         <p class="alert alert-danger">{% trans err %}</p>
     {% endfor %}
 {% endif %}
-
-
-        <div class="col-md-12 col-sm-8 col-xs-8">
-          <div class="x_panel">
               <!-- Smart Wizard -->
               <form id="register_form" method="POST" class="form-horizontal" data-toggle="validator" role="form" action="" enctype="multipart/form-data">
                 {% csrf_token %}
@@ -52,26 +64,26 @@
                   <div id="form-step-0" role="form" data-toggle="validator">
 
             <div class="form-group required company_class form-class" id="div_cif">
-              <label class="control-label col-sm-3" for="id_{{ form.cif.name }}">{% trans 'cif' %}</label>
-              <div class="col-sm-6">
-                <input type="text" class="form-control col-md-6" name="{{ form.cif.name }}"  id="id_{{ form.cif.name }}" value="{{form.cif.value|default_if_none:""}}" placeholder="A12345678">
+              <label class="control-label  col-md-4 col-sm-4 col-xs-12" for="id_{{ form.cif.name }}">{% trans 'cif' %}</label>
+              <div class="col-md-4 col-sm-5 col-xs-12">
+                <input type="text" class="form-control" name="{{ form.cif.name }}"  id="id_{{ form.cif.name }}" value="{{form.cif.value|default_if_none:""}}" placeholder="A12345678">
                 <div class="help-block with-errors" id="id_unique_message" style="color:#a94442;">{{ form.cif.errors }}</div>
                 <div class="help-block with-errors" id="id_unique_message_cif" style="display: none;">{% trans 'company_duplicate' %}</div>
               </div>
             </div>
 
         <div class="form-group required company_class form-class">
-          <label class="control-label col-sm-3" for="id_{{ form.company_name.name }}">{% trans 'company_name' %}</label>
-            <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.company_name.name }}" id="id_{{ form.company_name.label }}" value="{{form.company_name.value|default_if_none:""}}" placeholder="Metronus">
+          <label class="control-label  col-md-4 col-sm-4 col-xs-12" for="id_{{ form.company_name.name }}">{% trans 'company_name' %}</label>
+            <div class="col-md-4 col-sm-5 col-xs-12">
+              <input type="text" class="form-control" name="{{ form.company_name.name }}" id="id_{{ form.company_name.label }}" value="{{form.company_name.value|default_if_none:""}}" placeholder="Metronus">
                 <div class="help-block with-errors" id="id_unique_message" style="color:#a94442;" >{{ form.company_name.errors }}</div>
 
             </div>
         </div>
                    <div class="form-group required company_class form-class" id="div_short_name">
-          <label class="control-label col-sm-3" for="id_{{ form.short_name.name }}">{% trans 'short_name'%}</label>
-            <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.short_name.name }}" id="id_{{ form.short_name.name }}" value="{{form.short_name.value|default_if_none:""}}" placeholder="mtrns">
+          <label class="control-label  col-md-4 col-sm-4 col-xs-12" for="id_{{ form.short_name.name }}">{% trans 'short_name'%}</label>
+            <div class="col-md-4 col-sm-5 col-xs-12">
+              <input type="text" class="form-control" name="{{ form.short_name.name }}" id="id_{{ form.short_name.name }}" value="{{form.short_name.value|default_if_none:""}}" placeholder="mtrns">
                 <div class="help-block with-errors" id="id_unique_message" style="color:#a94442;">{{ form.short_name.errors }}</div>
                 <div class="help-block with-errors" id="id_unique_message_short_name" style="display: none;">{% trans 'company_duplicate' %}</div>
 
@@ -79,26 +91,26 @@
         </div>
 
         <div class="form-group required company_class form-class">
-          <label class="control-label col-sm-3" for="id_{{ form.company_email.name }}">{% trans 'company_email' %}</label>
-            <div class="col-sm-6">
-              <input type="email" class="form-control col-md-6" name="{{ form.company_email.name }}" id="id_{{ form.company_email.label }}" value="{{form.company_email.value|default_if_none:""}}" placeholder="info@metronus.com">
+          <label class="control-label  col-md-4 col-sm-4 col-xs-12" for="id_{{ form.company_email.name }}">{% trans 'company_email' %}</label>
+            <div class="col-md-4 col-sm-5 col-xs-12">
+              <input type="email" class="form-control" name="{{ form.company_email.name }}" id="id_{{ form.company_email.label }}" value="{{form.company_email.value|default_if_none:""}}" placeholder="info@metronus.com">
               <div class="help-block with-errors" id="id_unique_message" style="color:#a94442;">{{ form.company_email.errors }}</div>
 
             </div>
         </div>
 
         <div class="form-group required company_class form-class">
-          <label class="control-label col-sm-3" for="id_{{ form.company_phone.name }}">{% trans 'company_phone' %}</label>
-            <div class="col-sm-6">
-            <input type="text" class="form-control col-md-6" name="{{ form.company_phone.name }}" id="id_{{ form.company_phone.label }}" value="{{form.company_phone.value|default_if_none:""}}" placeholder="954547639">
+          <label class="control-label  col-md-4 col-sm-4 col-xs-12" for="id_{{ form.company_phone.name }}">{% trans 'company_phone' %}</label>
+            <div class="col-md-4 col-sm-5 col-xs-12">
+            <input type="text" class="form-control" name="{{ form.company_phone.name }}" id="id_{{ form.company_phone.label }}" value="{{form.company_phone.value|default_if_none:""}}" placeholder="954547639">
             <div class="help-block with-errors" id="id_unique_message" style="color:#a94442;">{{ form.company_phone.errors }}</div>
 
             </div>
         </div>
 
         <div class="form-group">
-          <label class="control-label col-sm-3" for="id_{{ form.logo.name }}">{% trans 'logo' %}</label>
-            <div class="col-sm-6">
+          <label class="control-label  col-md-4 col-sm-4 col-xs-12" for="id_{{ form.logo.name }}">{% trans 'logo' %}</label>
+            <div class="col-md-4 col-sm-5 col-xs-12">
               <input id="id_{{ form.logo.label }}" name="{{ form.logo.name }}" multiple type="file" class="file file-loading" value="{{form.logo.value|default_if_none:""}}" data-show-preview="false" multiple data-show-upload="false" data-allowed-file-extensions='["jpeg", "jpg", "png"]' >
               <div class="help-block with-errors" id="id_unique_message" style="color:#a94442;">{{ form.logo.errors }}</div>
 
@@ -112,9 +124,9 @@
                   <div id="form-step-0" role="form" data-toggle="validator">
 
                     <div class="form-group required form-class" id="div_admin">
-                      <label class="control-label col-sm-3" for="id_{{ form.username.label }}">{% trans 'username' %}</label>
-                      <div class="col-sm-6">
-                        <input type="text" class="form-control col-md-6" name="{{ form.username.name }}" id="id_{{ form.username.name }}" value="{{form.username.value|default_if_none:""}}" placeholder="admin_metronus">
+                      <label class="control-label  col-md-4 col-sm-4 col-xs-12" for="id_{{ form.username.label }}">{% trans 'username' %}</label>
+                      <div class="col-md-4 col-sm-5 col-xs-12">
+                        <input type="text" class="form-control" name="{{ form.username.name }}" id="id_{{ form.username.name }}" value="{{form.username.value|default_if_none:""}}" placeholder="admin_metronus">
                         <div class="help-block with-errors" id="id_unique_message" style="color:#a94442;">{{ form.username.errors }}</div>
 
                         <div class="help-block with-errors" id="id_admin_unique_message" style="display: none;">{% trans 'admin_duplicate' %}
@@ -124,9 +136,9 @@
                     </div>
 
                     <div class="form-group required form-class">
-                      <label class="control-label col-sm-3" for="id_{{ form.admin_email.label }}">{% trans 'admin_email' %}</label>
-                        <div class="col-sm-6">
-                        <input type="email" class="form-control col-md-6" name="{{ form.admin_email.name }}" id="id_{{ form.admin_email.label }}" value="{{form.admin_email.value|default_if_none:""}}" placeholder="admin@metronus.com">
+                      <label class="control-label  col-md-4 col-sm-4 col-xs-12" for="id_{{ form.admin_email.label }}">{% trans 'admin_email' %}</label>
+                        <div class="col-md-4 col-sm-5 col-xs-12">
+                        <input type="email" class="form-control" name="{{ form.admin_email.name }}" id="id_{{ form.admin_email.label }}" value="{{form.admin_email.value|default_if_none:""}}" placeholder="admin@metronus.com">
                         <div class="help-block with-errors" id="id_unique_message" style="color:#a94442;">{{ form.admin_email.errors }}</div>
 
                         </div>
@@ -134,18 +146,18 @@
                     </div>
 
                     <div class="form-group required form-class" id="div_pass_1">
-                      <label class="control-label col-sm-3" for="id_{{ form.password.name }}">{% trans 'password' %}</label>
-                        <div class="col-sm-6">
-                        <input type="password" class="form-control col-md-6" name="{{ form.password.name }}" id="id_{{ form.password.label }}" placeholder="********">
+                      <label class="control-label  col-md-4 col-sm-4 col-xs-12" for="id_{{ form.password.name }}">{% trans 'password' %}</label>
+                        <div class="col-md-4 col-sm-5 col-xs-12">
+                        <input type="password" class="form-control" name="{{ form.password.name }}" id="id_{{ form.password.label }}" placeholder="********">
                         <div class="help-block with-errors" id="id_unique_message" style="color:#a94442;">{{ form.password.errors }}</div>
 
                         </div>
                     </div>
 
                     <div class="form-group required form-class" id="div_pass_2">
-                      <label class="control-label col-sm-3" for="id_{{ form.repeatPassword.name }}">{% trans 'repeatPassword' %}</label>
-                        <div class="col-sm-6">
-                          <input type="password" class="form-control col-md-6" name="{{ form.repeatPassword.name }}" id="id_{{ form.repeatPassword.label }}" placeholder="********">
+                      <label class="control-label  col-md-4 col-sm-4 col-xs-12" for="id_{{ form.repeatPassword.name }}">{% trans 'repeatPassword' %}</label>
+                        <div class="col-md-4 col-sm-5 col-xs-12">
+                          <input type="password" class="form-control" name="{{ form.repeatPassword.name }}" id="id_{{ form.repeatPassword.label }}" placeholder="********">
                           <div class="help-block with-errors" id="id_unique_message" style="color:#a94442;">{{ form.repeatPassword.errors }}</div>
 
                         </div>
@@ -153,9 +165,9 @@
                     </div>
 
                     <div class="form-group required form-class">
-                      <label class="control-label col-sm-3" for="id_{{ form.first_name.label }}">{% trans 'first_name' %}</label>
-                        <div class="col-sm-6">
-                          <input type="text" class="form-control col-md-6" name="{{ form.first_name.name }}" id="id_{{ form.first_name.name }}" value="{{form.first_name.value|default_if_none:""}}" placeholder="Jhon">
+                      <label class="control-label  col-md-4 col-sm-4 col-xs-12" for="id_{{ form.first_name.label }}">{% trans 'first_name' %}</label>
+                        <div class="col-md-4 col-sm-5 col-xs-12">
+                          <input type="text" class="form-control" name="{{ form.first_name.name }}" id="id_{{ form.first_name.name }}" value="{{form.first_name.value|default_if_none:""}}" placeholder="Jhon">
                           <div class="help-block with-errors" id="id_unique_message" style="color:#a94442;">{{ form.first_name.errors }}</div>
 
                         </div>
@@ -163,9 +175,9 @@
                     </div>
 
                     <div class="form-group required form-class">
-                      <label class="control-label col-sm-3" for="id_{{ form.last_name.label }}">{% trans 'last_name'%}</label>
-                        <div class="col-sm-6">
-                          <input type="text" class="form-control col-md-6" name="{{ form.last_name.name }}" id="id_{{ form.last_name.label }}" value="{{form.last_name.value|default_if_none:""}}" placeholder="Doe">
+                      <label class="control-label  col-md-4 col-sm-4 col-xs-12" for="id_{{ form.last_name.label }}">{% trans 'last_name'%}</label>
+                        <div class="col-md-4 col-sm-5 col-xs-12">
+                          <input type="text" class="form-control" name="{{ form.last_name.name }}" id="id_{{ form.last_name.label }}" value="{{form.last_name.value|default_if_none:""}}" placeholder="Doe">
                           <div class="help-block with-errors" id="id_unique_message" style="color:#a94442;">{{ form.last_name.errors }}</div>
 
                         </div>
@@ -173,18 +185,18 @@
                     </div>
 
                     <div class="form-group required form-class">
-                      <label class="control-label col-sm-3" for="id_{{ form.admin_identifier.label }}">{% trans 'admin_identifier' %}</label>
-                        <div class="col-sm-6">
-                          <input type="text" class="form-control col-md-6" name="{{ form.admin_identifier.name }}" id="id_{{ form.admin_identifier.label }}" value="{{form.admin_identifier.value|default_if_none:""}}" placeholder="admn_mtn">
+                      <label class="control-label  col-md-4 col-sm-4 col-xs-12" for="id_{{ form.admin_identifier.label }}">{% trans 'admin_identifier' %}</label>
+                        <div class="col-md-4 col-sm-5 col-xs-12">
+                          <input type="text" class="form-control" name="{{ form.admin_identifier.name }}" id="id_{{ form.admin_identifier.label }}" value="{{form.admin_identifier.value|default_if_none:""}}" placeholder="admn_mtn">
                           <div class="help-block with-errors" id="id_unique_message" style="color:#a94442;">{{ form.admin_identifier.errors }}</div>
                         </div>
 
                     </div>
 
                     <div class="form-group required form-class">
-                      <label class="control-label col-sm-3" for="id_{{ form.admin_phone.label }}">{% trans 'admin_phone'%}</label>
-                        <div class="col-sm-6">
-                          <input type="text" class="form-control col-md-6" name="{{ form.admin_phone.name }}" id="id_{{ form.admin_phone.label }}" value="{{form.admin_phone.value|default_if_none:""}}" placeholder="666775899">
+                      <label class="control-label  col-md-4 col-sm-4 col-xs-12" for="id_{{ form.admin_phone.label }}">{% trans 'admin_phone'%}</label>
+                        <div class="col-md-4 col-sm-5 col-xs-12">
+                          <input type="text" class="form-control" name="{{ form.admin_phone.name }}" id="id_{{ form.admin_phone.label }}" value="{{form.admin_phone.value|default_if_none:""}}" placeholder="666775899">
                           <div class="help-block with-errors" id="id_unique_message" style="color:#a94442;">{{ form.admin_phone.errors }}</div>
 
                         </div>
@@ -199,14 +211,9 @@
                 </div>
             </form>
               <!-- End SmartWizard Content -->
-          </div>
-        </div>
-      </div>
-  </div>
-</div>
-
-
-<body>
+                </div>
+                </div>
+                </div>
 
   <!-- js -->
 {% compress js %}
@@ -224,6 +231,9 @@
 
 <script type="text/javascript">
   $(document).ready(function(){
+    //Workaround
+    $('.stepContainer').css('height', 'inherit')
+    
       $('#wizard').smartWizard();
       $(".buttonNext").text("{% trans 'next' %}");
       $(".buttonPrevious").text("{% trans 'previous' %}");
