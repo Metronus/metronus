@@ -183,6 +183,10 @@ LOGIN_REDIRECT_URL = "/"
 LOGIN_URL = '/login'
 LOGOUT_URL = '/'
 
+# Cookie domain
+if production:
+    SESSION_COOKIE_DOMAIN=".metronus.es"
+
 # File storage
 MEDIA_URL = '/media/'
 MEDIA_ROOT = (

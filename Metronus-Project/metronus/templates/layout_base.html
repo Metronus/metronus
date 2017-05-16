@@ -460,13 +460,12 @@
         new WOW().init();
 
         $("#flag_es").click(function() {
-          console.log("joll");
-          Cookies.set('lang', 'es-es');
+          Cookies.set('lang', 'es-es', {domain: '.metronus.es'});
           location.reload(true);
         });
 
         $("#flag_en").click(function() {
-          Cookies.set('lang', 'en-us');
+          Cookies.set('lang', 'en-us', {domain: '.metronus.es'});
           location.reload(true);
         });
       });
