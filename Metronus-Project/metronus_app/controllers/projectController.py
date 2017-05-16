@@ -164,6 +164,7 @@ def edit(request, project_id):
     # Check that the user is logged in
     admin = get_authorized_or_403(request)
     repeated_name = False
+    error = False
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -181,15 +182,19 @@ def edit(request, project_id):
                     update_project(project, form)
                     return redirect('project_list')
                 else:
-                    if not pro.deleted:
-                        repeated_name = True
+                    repeated_name = True
+
+
+        else:
+            error = True
+
 
     # if a GET (or any other method) we'll create a blank form
     else:
         project = get_object_or_404(Project, pk=project_id)
         form = ProjectForm(initial={"name": project.name, "project_id": project.id})
 
-    return render(request, 'project/project_form.html', {'form': form, 'repeated_name': repeated_name})
+    return render(request, 'project/project_form.html', {'form': form, 'repeated_name': repeated_name,'error':error})
 
 
 def delete(request, project_id):

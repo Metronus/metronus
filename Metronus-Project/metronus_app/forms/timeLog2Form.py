@@ -47,7 +47,7 @@ class TimeLog2Form(forms.Form):
     def __init__(self, actor, *args, **kwargs):
         super(TimeLog2Form, self).__init__(*args, **kwargs)
 
-        projects = Project.objects.filter(company_id=actor.company_id, deleted=False)
+        projects = Project.objects.filter(company_id=actor.company_id, projectdepartment__projectdepartmentemployeerole__employee_id=actor, deleted=False).distinct()
 
         self.fields['project_id'].queryset = projects
         self.fields['task_id'].queryset = Task.objects.filter(actor_id__company_id=actor.company_id, active=True)

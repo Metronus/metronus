@@ -14,21 +14,19 @@
     <div class="clearfix"></div>
 
     <div id="successDiv" class="alert alert-success" hidden='true'></div>
-    <div id="errorDiv" class="alert alert-danger"  hidden='true'></div>
-
-    {% if error %}
-        <div id="error" class="alert alert-error alert-dismissible" role="alert">
-            <a class="close" data-dismiss="alert">x</a>
+    <div id="errorDiv" class="alert alert-danger" {% if not error and not repeated_name %} hidden='true'{% endif %} >
+    	
+   {% if error %}
             <span><strong>{% trans 'fail' %} |</strong> {% trans 'projectError' %}</span>
-        </div>
     {% endif %}
 
     {% if repeated_name %}
-        <div id="repeated_name" class="alert alert-error alert-dismissible" role="alert">
-            <a class="close" data-dismiss="alert">x</a>
-            <span><strong>{% trans 'fail' %} |</strong> {% trans 'projectName' %}</span>
-        </div>
+         <span><strong>{% trans 'fail' %} |</strong> {% trans 'projectName' %}</span>
     {% endif %}
+
+    </div>
+
+ 
 
     <div class="row">
         <div class="col-md-12 col-sm-12 col-xs-12">
@@ -79,10 +77,12 @@
  * */
 function createAndContinue() {
     $.post('{% url 'project_create_async' %}',$('#form').serialize(), function(data,status) {
-        document.getElementById('form').reset();
+        
+        if(JSON.stringify(data['success'])=="true"){
+        	//only reset if the form was successfully
+		document.getElementById('form').reset();
         $('#form').data('bootstrapValidator').resetForm();
 
-        if(JSON.stringify(data['success'])=="true"){
             $('#errorDiv').attr('hidden', true);
     		$('#successDiv').attr('hidden', false).html("<strong>{% trans 'success' %} | </strong>{% trans 'projectSaved' %}");
         } else if(JSON.stringify(data['repeated_name'])=="true") {
