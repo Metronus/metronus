@@ -603,7 +603,8 @@ msgstr "Administrator edit"
 msgid "visible_short_name"
 msgstr "Short name visible"
 
-
+msgid "companyRegister_cifNotUnique"
+msgstr "That CIF has already been registered."
 msgid "cif_error#1"
 msgstr "The CIF cannot be empty"
 msgid "cif_error#2"

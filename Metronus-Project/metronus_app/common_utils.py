@@ -158,6 +158,12 @@ def is_email_unique(email):
     """
     return User.objects.filter(email=email).count() == 0
 
+def is_cif_unique(cif):
+    """
+    Checks the CIF is unique and does not exists in the database
+    """
+    return Company.objects.filter(cif=cif).count() == 0
+
 def ranstr():
     """ Returns a 10-character random string"""
     return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))

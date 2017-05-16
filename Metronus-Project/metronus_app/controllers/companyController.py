@@ -14,7 +14,7 @@ from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from metronus_app.common_utils import (get_current_admin_or_403, check_image, send_mail, is_email_unique,
-                                       get_or_none, is_username_unique)
+                                       get_or_none, is_username_unique, is_cif_unique)
 from django.core.exceptions import PermissionDenied
 
 
@@ -47,6 +47,10 @@ def create(request,
             # Check that the admin email is unique
             if not is_email_unique(form.cleaned_data["admin_email"]):
                 errors.append('companyRegister_adminEmailNotUnique')
+
+            # Check that the CIF is unique
+            if not is_cif_unique(form.cleaned_data["cif"]):
+                errors.append('companyRegister_cifNotUnique')
 
             # Check that the image is OK
             if not check_image(form, 'logo'):
