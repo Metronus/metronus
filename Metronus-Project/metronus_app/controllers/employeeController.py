@@ -725,7 +725,10 @@ def create_employee(employee_user, admin, form):
     identifier = form.cleaned_data['identifier']
     phone = form.cleaned_data['phone']
     company = admin.company_id
-    picture = form.cleaned_data['photo']
+    if form.cleaned_data['photo']:
+        picture = form.cleaned_data['photo']
+    else:
+        picture = "/static/avatar.png"
     price_per_hour = form.cleaned_data['price_per_hour']
     return Employee.objects.create(user=user, user_type=user_type, identifier=identifier, phone=phone, company_id=company, picture=picture,price_per_hour=price_per_hour)
 
