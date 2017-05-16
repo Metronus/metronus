@@ -99,7 +99,7 @@ urlpatterns += [  # i18n_patterns(
         name='employee_ajax_productivity_per_task'),
     url(r'^employee/ajax_productivity_per_task_and_date/(?P<username>.{0,50})$',
         employeeController.ajax_productivity_per_task_and_date, name='employee_ajax_productivity_per_task_and_date'),
-    url(r'^employee/ajaxProfit/(?P<employee_id>.{0,50})/$', employeeController.ajax_profit_per_date,
+    url(r'^employee/ajaxProfit/(?P<employee_id>\w{0,50})/$', employeeController.ajax_profit_per_date,
         name='employee_profit_per_date'),
 
     # TimeLogs
