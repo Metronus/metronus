@@ -29,7 +29,7 @@ def create(request,
     company_form.html
     """
     # If it's a GET request, return an empty form
-    if  request.method == 'POST':
+    if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         form = RegistrationForm(request.POST, request.FILES)
         # check whether it's valid:
@@ -49,7 +49,7 @@ def create(request,
                 errors.append('companyRegister_adminEmailNotUnique')
 
             # Check that the image is OK
-            if not check_image(form, 'photo'):
+            if not check_image(form, 'logo'):
                 errors.append('companyRegister_imageNotValid')
 
             if not errors:
