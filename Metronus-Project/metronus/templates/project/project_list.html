@@ -27,9 +27,12 @@
                     <tbody>
                         {% for project in projects %}
                             <tr>
-                                <td>{{project.name}}</td>
-
-
+                                <td>  {% if project.deleted %}
+                                   <u> {{project.name}}</u>
+                                {% else %}
+                                    {{project.name}}
+                                {% endif %}
+                                </td>
                                 <td>
                                     <a href="{% url 'project_view' project.id %}" type="button" class="btn btn-success">
                                         {% trans 'details' %}</a>
@@ -47,9 +50,11 @@
                     </tbody>
                 </table>
             </div>
+             {% if actor_is_admin or actor_is_executive %}
             <div class="text-center">
                 <a class="btn btn-dark" href="{% url 'project_create' %}">{% trans 'create' %}</a>
             </div>
+            {% endif %}
         </div>
     </div>
 </div>

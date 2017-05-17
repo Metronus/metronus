@@ -71,6 +71,23 @@ def get_authorized_or_403(request):
             return cur_user
         else:
             raise PermissionDenied
+def get_admin_executive_or_403(request):
+    """
+    Returns the current administrator,
+    or the executive if it is logged
+    """
+    if not request.user.is_authenticated():
+        raise PermissionDenied
+
+    try:
+        return get_current_admin_or_403(request)
+    except PermissionDenied:
+        # The user is authenticated and it's not an admin
+        cur_user = Employee.objects.get(user=request.user)
+        if ProjectDepartmentEmployeeRole.objects.filter(employee_id=cur_user, role_id__tier__gte=50).count() > 0:
+            return cur_user
+        else:
+            raise PermissionDenied
 
 
 def get_or_none(model, *args, **kwargs):
