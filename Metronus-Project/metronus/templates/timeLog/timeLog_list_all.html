@@ -110,6 +110,11 @@
                 <strong>{% trans 'fail' %} | </strong>{% trans 'over_day_limit' %}
             </div>
         {% endif %}
+        {% if  invalid_date == True %}
+            <div id="error2Div" class="alert alert-danger">
+                <strong>{% trans 'fail' %} | </strong>{% trans 'invalid_date' %}
+            </div>
+        {% endif %}
         <div class="col-xs-12">
             <div class="x_panel">
                 <div class="x_title">

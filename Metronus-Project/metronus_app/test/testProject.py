@@ -180,7 +180,7 @@ class ProjectTestCase(TestCase):
         response = c.get("/project/list")
 
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(len(response.context["projects"]), 2)
+        self.assertEquals(len(response.context["projects"]), 3)
         self.assertEquals(response.context["projects"][0].name, "pro1")
 
     def test_list_projects_not_logged(self):
@@ -210,12 +210,33 @@ class ProjectTestCase(TestCase):
         self.assertEquals(form.initial["project_id"], pro_id)
 
     def test_edit_project_404(self):
-        """ Try getting the edit project form as an admin from other company """
+        """ Try getting the edit non existent project form"""
         c = Client()
         c.login(username="admin1", password="123456")
 
         response = c.get("/project/edit/9000/")
         self.assertEquals(response.status_code, 404)
+
+    def test_edit_project_negative_other_company(self):
+        """ Try getting the edit project form as an admin from other company """
+        c = Client()
+        c.login(username="admin1", password="123456")
+        response = c.get("/project/list")
+        pro_id = response.context["projects"][0].id
+        c.logout()
+        c.login(username="admin2", password="123456")
+        response = c.get("/project/edit/" + str(pro_id) + "/")
+        self.assertEquals(response.status_code, 403)
+    def test_edit_project_negative_not_allowed(self):
+        """ Try getting the edit project form as an employee without role """
+        c = Client()
+        c.login(username="admin1", password="123456")
+        response = c.get("/project/list")
+        pro_id = response.context["projects"][0].id
+        c.logout()
+        c.login(username="emp1", password="123456")
+        response = c.get("/project/edit/" + str(pro_id) + "/")
+        self.assertEquals(response.status_code, 403)
 
     def test_delete_project_positive(self):
         """
@@ -244,6 +265,19 @@ class ProjectTestCase(TestCase):
         c.login(username="admin2", password="123456")
         response = c.get("/project/delete/" + str(pro_id) + "/")
         self.assertEquals(response.status_code, 403)
+    def test_delete_project_not_allowed_2(self):
+            """
+            As an admin, delete a project as an employee
+            """
+            c = Client()
+            c.login(username="admin1", password="123456")
+
+            response = c.get("/project/list")
+            pro_id = response.context["projects"][0].id
+            c.logout()
+            c.login(username="emp1", password="123456")
+            response = c.get("/project/delete/" + str(pro_id) + "/")
+            self.assertEquals(response.status_code, 403)
 
     def test_delete_project_not_active(self):
         """
@@ -269,6 +303,34 @@ class ProjectTestCase(TestCase):
         form = response.context["project"]
 
         self.assertEquals(form.id, pro_id)
+    
+    def test_view_project_negative_other_company(self):
+        """
+        View project from other company (negative)
+        """
+        c = Client()
+        c.login(username="admin1", password="123456")
+        response = c.get("/project/list")
+        pro_id=response.context["projects"][0].id
+
+        c.logout()
+        c.login(username="admin2", password="123456")
+        response = c.get("/project/view/"+str(pro_id)+"/")
+        self.assertEquals(response.status_code, 403)
+
+    def test_view_project_negative_not_allowed(self):
+        """
+        View project as employee without roles (negative)
+        """
+        c = Client()
+        c.login(username="admin1", password="123456")
+        response = c.get("/project/list")
+        pro_id=response.context["projects"][0].id
+
+        c.logout()
+        c.login(username="emp1", password="123456")
+        response = c.get("/project/view/"+str(pro_id)+"/")
+        self.assertEquals(response.status_code, 403)
         
     def test_edit_project_positive(self):
         """

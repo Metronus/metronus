@@ -14,7 +14,7 @@ from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from metronus_app.common_utils import (get_current_admin_or_403, check_image, send_mail, is_email_unique,
-                                       get_or_none, is_username_unique)
+                                       get_or_none, is_username_unique, is_cif_unique)
 from django.core.exceptions import PermissionDenied
 
 
@@ -29,7 +29,7 @@ def create(request,
     company_form.html
     """
     # If it's a GET request, return an empty form
-    if  request.method == 'POST':
+    if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         form = RegistrationForm(request.POST, request.FILES)
         # check whether it's valid:
@@ -48,8 +48,12 @@ def create(request,
             if not is_email_unique(form.cleaned_data["admin_email"]):
                 errors.append('companyRegister_adminEmailNotUnique')
 
+            # Check that the CIF is unique
+            if not is_cif_unique(form.cleaned_data["cif"]):
+                errors.append('companyRegister_cifNotUnique')
+
             # Check that the image is OK
-            if not check_image(form, 'photo'):
+            if not check_image(form, 'logo'):
                 errors.append('companyRegister_imageNotValid')
 
             if not errors:

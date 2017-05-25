@@ -20,11 +20,14 @@ def list_all(request):
     valid_production_units: devuelve si se especificó production units y es necesario,
     o si no se especificó y no era necesario
     over_day_limit:True si se paso del límite de 1440 horas al día
-    hasPermissions:True si estas imputando una tarea que es tuya, False si no estas autorizado
+    has_permissions:True si estas imputando una tarea que es tuya, False si no estas autorizado
+    invalid_date: true si la fecha es a futuro
     """
+
     valid_production_units = True
     over_day_limit = False
     has_permissions = True
+    invalid_date=False
     today = datetime.today()
     employee = get_current_employee_or_403(request)
 
@@ -75,7 +78,10 @@ def list_all(request):
             has_permissions = check_permission_for_task(employee, find_task(form.cleaned_data['task_id']))
             valid_production_units = check_produced_units(form)
             over_day_limit = check_day_limit(form, employee)
-            if has_permissions and valid_production_units and not over_day_limit:
+            fwork_date = form.cleaned_data['workDate']
+            invalid_date=    fwork_date.date() > date.today()
+       
+            if has_permissions and valid_production_units and not over_day_limit and not invalid_date:
                 create_time_log(form, employee)
                 return redirect('timeLog_list_all')
     else:
@@ -93,7 +99,7 @@ def list_all(request):
     total.append(month_total)
 
     return render(request, "timeLog/timeLog_list_all.html", {"my_tasks": my_tasks, "month":month,"total":total, "currentMonth":current_month, "currentYear":current_year,  "currentDay":current_day,
-        "form":form,"valid_production_units":valid_production_units,"over_day_limit":over_day_limit,'has_permissions':has_permissions})
+        "form":form,"valid_production_units":valid_production_units,"over_day_limit":over_day_limit,'has_permissions':has_permissions,'invalid_date':invalid_date})
 
 
 def delete(request, time_log_id):
@@ -127,8 +133,7 @@ def create_time_log(form, employee):
     """
     fdescription = form.cleaned_data['description']
     fwork_date = form.cleaned_data['workDate']
-    if fwork_date.date() > date.today():
-        raise PermissionDenied
+
     fduration = form.cleaned_data['duration']
     funits = form.cleaned_data['produced_units']
     task = find_task(form.cleaned_data['task_id'])

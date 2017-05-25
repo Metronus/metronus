@@ -59,7 +59,7 @@ def contact(request):
             if copy_to_user:
                 recipients.append(email)
 
-            send_mail("Metronus Contact: "+subject+" - "+name, body, recipients, None, context, email)
+            send_mail("Metronus Contact: "+subject+" - "+name, body, recipients, None, context)
 
             # redirect to a new URL:
             return HttpResponseRedirect('/contact-done/')

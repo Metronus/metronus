@@ -12,6 +12,7 @@ from metronus_app.model.company import Company
 from metronus_app.model.role import Role
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.task import Task
+from django.test import Client
 
 from PIL import Image
 
@@ -67,6 +68,23 @@ def get_authorized_or_403(request):
         # The user is authenticated and it's not an admin
         cur_user = Employee.objects.get(user=request.user)
         if ProjectDepartmentEmployeeRole.objects.filter(employee_id=cur_user, role_id__tier__gt=10).count() > 0:
+            return cur_user
+        else:
+            raise PermissionDenied
+def get_admin_executive_or_403(request):
+    """
+    Returns the current administrator,
+    or the executive if it is logged
+    """
+    if not request.user.is_authenticated():
+        raise PermissionDenied
+
+    try:
+        return get_current_admin_or_403(request)
+    except PermissionDenied:
+        # The user is authenticated and it's not an admin
+        cur_user = Employee.objects.get(user=request.user)
+        if ProjectDepartmentEmployeeRole.objects.filter(employee_id=cur_user, role_id__tier__gte=50).count() > 0:
             return cur_user
         else:
             raise PermissionDenied
@@ -141,7 +159,7 @@ def send_mail(subject, email_template_name, recipients, html_email_template_name
         html_email = loader.render_to_string(html_email_template_name, context)
         email_message.attach_alternative(html_email, 'text/html')
 
-    email_message.send(fail_silently=False)
+    email_message.send(fail_silently=True)
 
 
 def is_username_unique(username):
@@ -156,6 +174,12 @@ def is_email_unique(email):
     Checks the email is unique and does not exists in the database
     """
     return User.objects.filter(email=email).count() == 0
+
+def is_cif_unique(cif):
+    """
+    Checks the CIF is unique and does not exists in the database
+    """
+    return Company.objects.filter(cif=cif).count() == 0
 
 def ranstr():
     """ Returns a 10-character random string"""
@@ -243,3 +267,12 @@ def create_timelog_in_task(task, duration, date, employee=None):
         task_id=task,
         employee_id=Employee.objects.get(identifier="emp01") if employee is None else employee
     )
+
+
+def get_ajax(url, data = None):
+    """
+    Function to automatize the process of getting the ajax response from a source
+    """
+    c = Client()
+    response = c.get(url, data)
+    return json.loads(response.content.decode("utf-8"))

@@ -52,6 +52,7 @@ script:
   - cd $TRAVIS_BUILD_DIR/
   - coveralls
   - sonar-scanner
+
 cache:
   directories:
     '$HOME/.sonar/cache'
