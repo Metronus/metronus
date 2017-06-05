@@ -33,6 +33,29 @@
 		<meta property="og:type" content="website" />
 		<meta property="og:url" content="https://metronus.es" />
 		<meta property="og:image" content="/static/landing/img/favicon/android-icon-192x192.png" />
+
+		<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" />
+		<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js"></script>
+		<script>
+			window.addEventListener("load", function(){
+			window.cookieconsent.initialise({
+			  "palette": {
+				"popup": {
+				  "background": "#383b75"
+				},
+				"button": {
+				  "background": "#f1d600"
+				}
+			  },
+			  "position": "bottom-left",
+			  "content": {
+				"message": "{% trans 'cookies_popup_msg' %}",
+				"dismiss": "{% trans 'cookies_popup_ok' %}",
+				"link": "{% trans 'cookies_popup_link' %}",
+				"href": "/cookie_policy"
+			  }
+			})});
+		</script>
 	</head>
 
 	<body>

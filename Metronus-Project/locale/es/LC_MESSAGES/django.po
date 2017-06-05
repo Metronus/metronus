@@ -84,6 +84,12 @@ msgid "Productivity"
 msgstr "Productividad"
 msgid "Profitability"
 msgstr "Rentabilidad"
+msgid "cookies_popup_msg"
+msgstr "Metronus usa cookies para asegurar a nuestros usuarios una experiencia web de calidad. Si sigue usando Metronus, entendemos que acepta nuestra política de cookies."
+msgid "cookies_popup_ok"
+msgstr "De acuerdo"
+msgid "cookies_popup_link"
+msgstr "Saber más."
 
 #: Index Login
 msgid "dashWelcome"
