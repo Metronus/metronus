@@ -25,3 +25,4 @@ class RegistrationForm(Form):
     admin_identifier = forms.CharField(label=_("admin_identifier"), max_length=15)
     admin_phone = forms.CharField(label=_("admin_phone"), max_length=15)
     photo = forms.ImageField(label=_("photo"), required=False)
+    terms_agree = forms.BooleanField(label=_("terms_agree"), required=False)

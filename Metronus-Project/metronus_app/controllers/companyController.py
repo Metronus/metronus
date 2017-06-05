@@ -56,6 +56,9 @@ def create(request,
             if not check_image(form, 'logo'):
                 errors.append('companyRegister_imageNotValid')
 
+            if not form.cleaned_data["terms_agree"]:
+                errors.append("agree_terms_error")
+
             if not errors:
                 # process the data in form.cleaned_data as required
                 # ...

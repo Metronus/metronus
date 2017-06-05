@@ -167,7 +167,7 @@
                     <div class="form-group required form-class">
                       <label class="control-label  col-md-4 col-sm-4 col-xs-12" for="id_{{ form.first_name.label }}">{% trans 'first_name' %}</label>
                         <div class="col-md-4 col-sm-5 col-xs-12">
-                          <input type="text" class="form-control" name="{{ form.first_name.name }}" id="id_{{ form.first_name.name }}" value="{{form.first_name.value|default_if_none:""}}" placeholder="Jhon">
+                          <input type="text" class="form-control" name="{{ form.first_name.name }}" id="id_{{ form.first_name.name }}" value="{{form.first_name.value|default_if_none:""}}" placeholder="John">
                           <div class="help-block with-errors" id="id_unique_message" style="color:#a94442;">{{ form.first_name.errors }}</div>
 
                         </div>
@@ -204,6 +204,16 @@
                     </div>
                     <div class="help-block with-errors"></div>
                   </div>
+
+                <div class="form-group required form-class">
+                  <label class="control-label  col-md-4 col-sm-4 col-xs-12" for="id_terms">{% trans 'agree_1'%} <u><a href="/legal_terms" target="_blank">{% trans 'terms_title'%}</a></u><br>
+                  {% trans 'agree_2'%} <u><a href="/cookie_policy" target="_blank">{% trans 'cookies_title'%}</a></u></label>
+                    <div class="col-md-4 col-sm-5 col-xs-12">
+                      <input type="checkbox" class="form-control" name="terms_agree" id="id_terms" {% if form.terms_agree.value %} checked{% endif %}>
+                    </div>
+                </div>
+                <div class="help-block with-errors"></div>
+              </div>
                 </div>
               </div>
                <div class="separator">
@@ -376,6 +386,13 @@
                     regexp:{
                       regexp: /^\d{9}$/ig,
                       message: '{% trans 'admin_phone_error#2' %}'
+                    },
+                }
+            },
+            terms_agree: {
+                validators: {
+                    notEmpty: {
+                        message: '{% trans 'agree_terms_error' %}'
                     },
                 }
             }
