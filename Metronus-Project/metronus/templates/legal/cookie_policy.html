@@ -1,0 +1,30 @@
+{% extends "anon_master.html" %}
+{% load i18n %}
+{% load l10n %}
+
+{% block title %}{% trans 'cookies_title' %}{% endblock %}
+
+{% block content %}
+
+<body class="login">
+  <div>
+      <a href="/"><img class="img-responsive center-block" src="/static/img/metronus_logo_horizontal.png" alt="Metronus" style="width:40%; height:auto; margin-top:2%;"></a>
+      <h1 class="center-block" style="text-align: center; padding-bottom: 50px;">{% trans 'cookies_title' %}</h1>
+
+      <div class="legaltext">{% trans 'cookies_text_1' %}</div>
+      <br>
+      <div class="legaltext">{% trans 'cookies_text_2' %}</div>
+      <br>
+      <p class="legaltext">- <strong>sessionid</strong> {% trans 'cookies_text_sessionid' %}</p>
+      <p class="legaltext">- <strong>lang</strong> {% trans 'cookies_text_lang' %}</p>
+      <p class="legaltext">- <strong>csrftoken</strong> {% trans 'cookies_text_csrftoken' %}</p>
+      <p class="legaltext">- <strong>cookieconsent_status</strong> {% trans 'cookies_text_consent' %}</p>
+
+      <br/>
+
+      <div>
+      <button style="margin-left: 50%;" type="button" class="btn btn-warning submit" onclick="window.location.href='/'">{% trans 'return_to_landingpage' %}</button>
+      </div>
+  </div>
+</body>
+{% endblock %}

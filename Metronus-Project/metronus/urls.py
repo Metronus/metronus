@@ -30,6 +30,7 @@ from metronus_app.controllers import taskController
 from metronus_app.controllers import timeLogController
 from metronus_app.controllers import loginController
 from metronus_app.controllers import dashboardController
+from metronus_app.controllers import legalController
 from metronus.settings import DEFAULT_FROM_EMAIL, MEDIA_ROOT, MEDIA_URL
 
 from django.conf.urls.static import static
@@ -161,6 +162,9 @@ urlpatterns += [  # i18n_patterns(
 
     url(r'^contact/$', appController.contact, name='contact'),
     url(r'^contact-done/$', appController.contact_done, name='contact_done'),
+
+    url(r'^cookie_policy/$', legalController.cookie_policy, name='cookie_policy'),
+    url(r'^legal_terms/$', legalController.legal_terms, name='legal_terms'),
 
     url(r'^register$', companyController.create),
     url(r'^ajax/validate_cif/$', companyController.validate_cif, name='validate_cif'),
