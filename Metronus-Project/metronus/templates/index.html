@@ -203,45 +203,46 @@
 		</section>
 		<!-- END OUR TEAM -->
 
-		<!-- Price-Table -->
-	    <section id="price_table">
-	    	<div class="container">
-	    		<div class="row text-center">
-	    			<div class="col-md-6 col-md-offset-3 wow animated zoomInDown" id="heading-text-pricing">
-	        			<h3>{% trans 'landingPriceTable' %}</h3>
-	                	<p>{% trans 'landingPriceTableDesc' %}</p>
-	                	<hr class="full">
-	                	<br/>
-	        		</div>
-	    		</div>	<!-- row -->
-	    		<div class="row main_content">
-	    			<ul class="price-table-chart">
-                        <li>
-		                    <a href="/register">
-		                        <strong>{% trans 'landingPriceFree' %}</strong>
-		                        <span class="price_table-description">{% trans 'landingPricingEmployees' %}</span>
-		                        <span class="price_table-description">{% trans 'landingPricingProductivity' %}</span>
-		                        <span class="price_table-description">{% trans 'landingPricingProfit' %}</span>
-		                        <span class="price_table-price">0 €</span>
-		                        <span class="price_table-button">{% trans 'landingPricingTryNow' %}</span>
-		                    </a>
-		                </li>
+		<!-- PRICING TABLE -->
+		<section id="price_table">
+			<div class="container">
+				<div class="row text-center">
+					<div class="col-md-6 col-md-offset-3 wow animated zoomInDown" id="heading-text-pricing">
+						<h3>{% trans 'landingPriceTable' %}</h3>
+						<p>{% trans 'landingPriceTableDesc' %}</p>
+						<hr class="full">
+						<br/>
+					</div>
+				</div>
 
-		                <li>
-		                    <a href="/register">
-		                        <strong>{% trans 'landingPricingBusiness' %}</strong>
-														<span class="price_table-description">{% trans 'landingPricingEmployeesBusiness' %}</span>
-		                        <span class="price_table-description">{% trans 'landingPricingProductivity' %}</span>
-		                        <span class="price_table-description">{% trans 'landingPricingProfit' %}</span>
-		                        <span class="price_table-price">3 €</span>
-		                        <span class="price_table-button">{% trans 'landingPricingBuyNow' %}</span>
-		                    </a>
-		                </li>
-		            </ul>
-	    		</div>	<!-- row main_content -->
-	    	</div>	<!-- container -->
-	    </section>	<!-- price_table -->
+				<div class="row main_content">
+					<ul class="price-table-chart">
+						<li>
+							<a href="/register">
+								<strong>{% trans 'landingPriceFree' %}</strong>
+								<span class="price_table-description">{% trans 'landingPricingEmployees' %}</span>
+                <span class="price_table-description">{% trans 'landingPricingProductivity' %}</span>
+                <span class="price_table-description">{% trans 'landingPricingProfit' %}</span>
+                <span class="price_table-price">0 €</span>
+                <span class="price_table-button">{% trans 'landingPricingTryNow' %}</span>
+							</a>
+						</li>
 
+						<li>
+							<a href="/register">
+								<strong>{% trans 'landingPricingBusiness' %}</strong>
+								<span class="price_table-description">{% trans 'landingPricingEmployeesBusiness' %}</span>
+                <span class="price_table-description">{% trans 'landingPricingProductivity' %}</span>
+                <span class="price_table-description">{% trans 'landingPricingProfit' %}</span>
+                <span class="price_table-price">3 €</span>
+                <span class="price_table-button">{% trans 'landingPricingBuyNow' %}</span>
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</section>
+		<!-- END PRICING TABLE -->
 
 		<!-- js -->
 		{% compress js %}
