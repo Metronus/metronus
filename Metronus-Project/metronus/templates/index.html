@@ -1,9 +1,10 @@
 {% load i18n %}
 {% load l10n %}
 {% load compress %}
+{% load custom_tags %}
 
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 	<head>
 		<title>Metronus</title>
 		<meta name="description" content="Metronus, a productivity and profit driven project, where time is the most important variable and the variable which leads you towards success">
@@ -34,59 +35,67 @@
 		<meta property="og:url" content="https://metronus.es" />
 		<meta property="og:image" content="/static/landing/img/favicon/android-icon-192x192.png" />
 
+		<!-- Cookie stuff -->
 		<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" />
 		<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js"></script>
 		<script>
 			window.addEventListener("load", function(){
-			window.cookieconsent.initialise({
-			  "palette": {
-				"popup": {
-				  "background": "#343434"
-				},
-				"button": {
-				  "background": "#16a0a4"
-				}
-			  },
-			  "position": "bottom-left",
-			  "content": {
-				"message": "{% trans 'cookies_popup_msg' %}",
-				"dismiss": "{% trans 'cookies_popup_ok' %}",
-				"link": "{% trans 'cookies_popup_link' %}",
-				"href": "/cookie_policy"
-			  }
-			})});
+				window.cookieconsent.initialise({
+				  "palette": {
+						"popup": {
+						  "background": "#343434"
+						},
+						"button": {
+						  "background": "#16a0a4"
+						}
+				  },
+				  "position": "bottom-left",
+				  "content": {
+						"message": "{% trans 'cookies_popup_msg' %}",
+						"dismiss": "{% trans 'cookies_popup_ok' %}",
+						"link": "{% trans 'cookies_popup_link' %}",
+						"href": "/cookie_policy"
+				  }
+				})
+			});
 		</script>
 	</head>
 
 	<body>
 		<div id="wrapper">
 			<div id="overlay-1">
+				<!-- NAVIGATION -->
 				<section id= "navigation">
 					<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
-	  					<div class="container-fluid">
-	    					<div class="navbar-header">
-	      						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-					        		<span class="ion-navicon"></span>
-					      		</button>
-					      		<a class="navbar-brand" href="#">Metronus</a>
-					    	</div>
-	    					<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-		      					<ul class="nav navbar-nav navbar-right">
-		      						<li><a href="#service">{% trans 'landingService' %}</a></li>
-		      						<li><a href="#team">{% trans 'landingTeam' %}</a></li>
-		        					<li><a href="#price_table">{% trans 'landingPricing' %}</a></li>
+						<div class="container-fluid">
+	    				<div class="navbar-header">
+	      				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+					     		<span class="ion-navicon"></span>
+					   		</button>
+					   		<a class="navbar-brand" href="#">Metronus</a>
+							</div>
+
+	    				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+		      			<ul class="nav navbar-nav navbar-right">
+		      				<li><a href="#service">{% trans 'landingService' %}</a></li>
+		      				<li><a href="#team">{% trans 'landingTeam' %}</a></li>
+		        			<li><a href="#price_table">{% trans 'landingPricing' %}</a></li>
 									<li><a href="/contact">{% trans 'landingContact' %}</a></li>
 									<li><a href="/cookie_policy">{% trans 'cookies_title' %}</a></li>
 									<li><a href="/legal_terms">{% trans 'terms_title' %}</a></li>
-		        					<li><a href="/register">{% trans 'landingRegister' %}</a></li>
-		        					<li><a href="/login">{% trans 'landingLogin' %}</a></li>
-											<li><a href="#"><img id="flag_es" alt="Spanish" class="img-responsive" src="/static/landing/img/flag_es.png"></a></li>
-											<li><a href="#"><img id="flag_en" alt="Spanish" class="img-responsive" src="/static/landing/img/flag_en.png"></a></li>
-							    </ul>
-	    					</div>	<!-- collapse navbar-collapse -->
-	  					</div>	<!-- container-fluid -->
-					</nav>	<!-- navbar -->
-				</section>	<!-- #navigation -->
+		        			<li><a href="/register">{% trans 'landingRegister' %}</a></li>
+		        			<li><a href="/login">{% trans 'landingLogin' %}</a></li>
+									<li><a href="#"><img id="flag_es" alt="Spanish" class="img-responsive" src="/static/landing/img/flag_es.png"></a></li>
+									<li><a href="#"><img id="flag_en" alt="Spanish" class="img-responsive" src="/static/landing/img/flag_en.png"></a></li>
+							  </ul>
+	    				</div>
+
+	  				</div>
+					</nav>
+				</section>
+				<!-- END NAVIGATION -->
+
+				<!-- LANDING TEXT -->
 				<section id="starting">
 					<div class="text-center starting-text">
 						<h1 class="rene">METRONUS</h1>
@@ -94,181 +103,105 @@
 						<h2>{% trans 'landingLeitmotivAuthor' %}</h2>
 					</div>
 				</section>
-				<div id="bottom" class="bottom text-center">
-			        <a href="#about"><em class="ion-ios7-arrow-down"></em></a>
-			    </div>
-			</div><!-- overlay-1 -->
-		</div>	<!-- wrapper -->
+				<!-- END LANDING TEXT -->
 
-		<!-- Our service -->
+				<!-- SCROLL INDICATOR -->
+				<div id="bottom" class="bottom text-center">
+					<a href="#about"><em class="ion-ios7-arrow-down"></em></a>
+		    </div>
+				<!-- END SCROLL INDICATOR -->
+			</div>
+		</div>
+
+		<!-- OUR SERVICE -->
 		<section id="service">
 			<div class="container">
 				<div class="row text-center">
-        		<div class="col-md-6 col-md-offset-3 wow animated zoomInDown" id= "heading-text-services">
-        			<h3>{% trans 'landingService' %}</h3>
-                	<p>{% trans 'landingServiceSub' %}</p>
-                	<hr class= "full">
-                	<br/>
-        		</div>
-	        </div>
-			    <div class="main_content">
-				    <div class="services">
-			        	<div class="row">
-			        		<div class="col-sm-4 service">
-			        			<div class="service-icon text-center">
-			        				<em class="fa fa-calendar fa-5x"></em>
-			        			</div>
-			        			<div class="about-service">
-			        				<h3 class="text-center">{% trans 'landingTimeControl' %}</h3>
-			        				<p class="text-center">
-												{% trans 'landingTimeControlDesc' %}
-			        				</p>
-			        			</div>
-			        		</div>	<!-- col-sm-4 -->
-			        		<div class="col-sm-4 service">
-			        			<div class="service-icon text-center">
-			        				<em class="fa fa-area-chart fa-5x"></em>
-			        			</div>
-			        			<div class="about-service">
-			        				<h3 class="text-center">{% trans 'landingProductivity' %}</h3>
-			        				<p class="text-center">
-												{% trans 'landingProductivityDesc' %}
-			        				</p>
-			        			</div>
-			        		</div>	<!-- col-sm-4 -->
-			        		<div class="col-sm-4 service">
-			        			<div class="service-icon text-center">
-			        				<em class="fa fa-dollar fa-5x"></em>
-			        			</div>
-			        			<div class="about-service">
-			        				<h3 class="text-center">{% trans 'landingProfit' %}</h3>
-			        				<p class="text-center">
-												{% trans 'landingProfitDesc' %}
-			        				</p>
-			        			</div>
-			        		</div>	<!-- col-sm-4 -->
-			        	</div>	<!-- row -->
-					</div>	<!-- services -->
-				</div>	<!-- main_content -->
-			</div>	<!-- container -->
-		</section>	<!-- our_service -->
+					<div class="col-md-6 col-md-offset-3 wow animated zoomInDown" id="heading-text-services">
+						<h3>{% trans 'landingService' %}</h3>
+						<p>{% trans 'landingServiceSub' %}</p>
+						<hr class="full">
+						<br/>
+					</div>
+				</div>
 
-		<!-- Our Team -->
-	    <section id="team">
-	    	<div class="container">
-		    	<div class="team-members">
-		    		<div class="row text-center">
-		    			<div class="col-md-6 col-md-offset-3 wow animated zoomInDown" id="heading-text-team">
-		        			<h3>{% trans 'landingTeam' %}</h3>
-		                	<p>{% trans 'landingTeamDesc' %}</p>
-		                	<hr class="full">
-		                	<br/>
-		        		</div>
-		    		</div>
-			    	<div class="row main_content">
-				    	<div class="col-md-4 col-sm-6 text-center">
-				    		<div class="row wow animated zoomIn" data-wow-delay="0.1s">
-				    			<div class="col-md-8 col-md-offset-2">
-				    				<img class="img-circle img-responsive center-block" src="/static/landing/img/team/davsanboi.png" alt="David de los Santos">
-				    			</div>
-				    		</div>
-			        	<h4 class="wow animated fadeInUp" data-wow-delay= "0.2s">David de los Santos</h4>
-			        	<p class= "member-title wow animated fadeIn" data-wow-delay= "0.3s">{% trans 'landingTeamProjectManager' %}</p>
-				    	</div>	<!-- col-md-4 -->
+				<div class="main_content">
+					<div class="services">
+						<div class="row">
 
-							<div class="col-md-4 col-sm-6 text-center">
-				    		<div class="row wow animated zoomIn" data-wow-delay="0.1s">
-				    			<div class="col-md-8 col-md-offset-2">
-				    				<img class="img-circle img-responsive center-block" src="/static/landing/img/team/agubordia.png" alt="Agustín Borrego">
-				    			</div>
-				    		</div>
-			        	<h4 class="wow animated fadeInUp" data-wow-delay= "0.2s">Agustín Borrego</h4>
-			        	<p class= "member-title wow animated fadeIn" data-wow-delay= "0.3s">{% trans 'landingTeamCoordBackend' %}</p>
-				    	</div>	<!-- col-md-4 -->
+							<!-- TIME CONTROL -->
+							<div class="col-sm-4 service">
+								<div class="service-icon text-center">
+									<em class="fa fa-calendar fa-5x"></em>
+								</div>
 
-							<div class="col-md-4 col-sm-6 text-center">
-				    		<div class="row wow animated zoomIn" data-wow-delay="0.1s">
-				    			<div class="col-md-8 col-md-offset-2">
-				    				<img class="img-circle img-responsive center-block" src="/static/landing/img/team/josrenram.png" alt="José Renato Ramos">
-				    			</div>
-				    		</div>
-			        	<h4 class="wow animated fadeInUp" data-wow-delay= "0.2s">José Renato Ramos</h4>
-			        	<p class= "member-title wow animated fadeIn" data-wow-delay= "0.3s">{% trans 'landingTeamCoordFrontend' %}</p>
-				    	</div>	<!-- col-md-4 -->
+								<div class="about-service">
+									<h3 class="text-center">{% trans 'landingTimeControl' %}</h3>
+									<p class="text-center">{% trans 'landingTimeControlDesc' %}</p>
+								</div>
+							</div>
 
-							<div class="col-md-4 col-sm-6 text-center">
-				    		<div class="row wow animated zoomIn" data-wow-delay="0.1s">
-				    			<div class="col-md-8 col-md-offset-2">
-				    				<img class="img-circle img-responsive center-block" src="/static/landing/img/team/anddonram.png" alt="Andrés Doncel">
-				    			</div>
-				    		</div>
-			        	<h4 class="wow animated fadeInUp" data-wow-delay= "0.2s">Andrés Doncel</h4>
-			        	<p class= "member-title wow animated fadeIn" data-wow-delay= "0.3s">{% trans 'landingTeamDevBackend' %}</p>
-				    	</div>	<!-- col-md-4 -->
+							<!-- PRODUCTIVITY -->
+							<div class="col-sm-4 service">
+								<div class="service-icon text-center">
+									<em class="fa fa-area-chart fa-5x"></em>
+								</div>
 
-							<div class="col-md-4 col-sm-6 text-center">
-				    		<div class="row wow animated zoomIn" data-wow-delay="0.1s">
-				    			<div class="col-md-8 col-md-offset-2">
-				    				<img class="img-circle img-responsive center-block" src="/static/landing/img/team/josgavrui.png" alt="José Gavilán">
-				    			</div>
-				    		</div>
-			        	<h4 class="wow animated fadeInUp" data-wow-delay= "0.2s">José Gavilán</h4>
-			        	<p class= "member-title wow animated fadeIn" data-wow-delay= "0.3s">{% trans 'landingTeamDevFrontend' %}</p>
-				    	</div>	<!-- col-md-4 -->
+								<div class="about-service">
+									<h3 class="text-center">{% trans 'landingProductivity' %}</h3>
+									<p class="text-center">{% trans 'landingProductivityDesc' %}</p>
+								</div>
+							</div>
 
-							<div class="col-md-4 col-sm-6 text-center">
-				    		<div class="row wow animated zoomIn" data-wow-delay="0.1s">
-				    			<div class="col-md-8 col-md-offset-2">
-				    				<img class="img-circle img-responsive center-block" src="/static/landing/img/team/alvgonsie.png" alt="Álvaro González">
-				    			</div>
-				    		</div>
-			        	<h4 class="wow animated fadeInUp" data-wow-delay= "0.2s">Álvaro González</h4>
-			        	<p class= "member-title wow animated fadeIn" data-wow-delay= "0.3s">{% trans 'landingTeamDevBackend' %}</p>
-				    	</div>	<!-- col-md-4 -->
+							<!-- PROFIT -->
+							<div class="col-sm-4 service">
+								<div class="service-icon text-center">
+									<em class="fa fa-dollar fa-5x"></em>
+								</div>
 
-							<div class="col-md-4 col-sm-6 text-center">
-				    		<div class="row wow animated zoomIn" data-wow-delay="0.1s">
-				    			<div class="col-md-8 col-md-offset-2">
-				    				<img class="img-circle img-responsive center-block" src="/static/landing/img/team/josjimjim.png" alt="José María Jiménez">
-				    			</div>
-				    		</div>
-			        	<h4 class="wow animated fadeInUp" data-wow-delay= "0.2s">José María Jiménez</h4>
-			        	<p class= "member-title wow animated fadeIn" data-wow-delay= "0.3s">{% trans 'landingTeamDevBackend' %}</p>
-				    	</div>	<!-- col-md-4 -->
+								<div class="about-service">
+									<h3 class="text-center">{% trans 'landingProfit' %}</h3>
+									<p class="text-center">{% trans 'landingProfitDesc' %}</p>
+								</div>
+							</div>
+						</div>
 
-							<div class="col-md-4 col-sm-6 text-center">
-				    		<div class="row wow animated zoomIn" data-wow-delay="0.1s">
-				    			<div class="col-md-8 col-md-offset-2">
-				    				<img class="img-circle img-responsive center-block" src="/static/landing/img/team/andjimrio.png" alt="Andrés Jiménez">
-				    			</div>
-				    		</div>
-			        	<h4 class="wow animated fadeInUp" data-wow-delay= "0.2s">Andrés Jiménez</h4>
-			        	<p class= "member-title wow animated fadeIn" data-wow-delay= "0.3s">{% trans 'landingTeamDevFrontend' %}</p>
-				    	</div>	<!-- col-md-4 -->
+					</div>
+				</div>
+			</div>
+		</section>
+		<!-- END OUR SERVICES -->
 
-							<div class="col-md-4 col-sm-6 text-center">
-				    		<div class="row wow animated zoomIn" data-wow-delay="0.1s">
-				    			<div class="col-md-8 col-md-offset-2">
-				    				<img class="img-circle img-responsive center-block" src="/static/landing/img/team/jualiefer.png" alt="Juan Carlos Liébana">
-				    			</div>
-				    		</div>
-			        	<h4 class="wow animated fadeInUp" data-wow-delay= "0.2s">Juan Carlos Liébana</h4>
-			        	<p class= "member-title wow animated fadeIn" data-wow-delay= "0.3s">{% trans 'landingTeamDevFrontend' %}</p>
-				    	</div>	<!-- col-md-4 -->
 
-							<div class="col-md-4 col-sm-6 text-center">
-				    		<div class="row wow animated zoomIn" data-wow-delay="0.1s">
-				    			<div class="col-md-8 col-md-offset-2">
-				    				<img class="img-circle img-responsive center-block" src="/static/landing/img/team/josrojvid.png" alt="José Antonio Rojo">
-				    			</div>
-				    		</div>
-			        	<h4 class="wow animated fadeInUp" data-wow-delay= "0.2s">José Antonio Rojo</h4>
-			        	<p class= "member-title wow animated fadeIn" data-wow-delay= "0.3s">{% trans 'landingTeamDevBackend' %}</p>
-				    	</div>	<!-- col-md-4 -->
-			    	</div> <!-- row main_content -->
-			    </div>	<!-- team-members -->
-			</div>	<!-- container -->
-	    </section>	<!-- team -->
+		<!-- OUR TEAM -->
+		<section id="team">
+			<div class="container">
+				<div class="team-members">
+					<div class="row text-center">
+						<div class="col-md-6 col-md-offset-3 wow animated zoomInDown" id="heading-text-team">
+							<h3>{% trans 'landingTeam' %}</h3>
+							<p>{% trans 'landingTeamDesc' %}</p>
+							<hr class="full">
+							<br/>
+						</div>
+					</div>
+
+					<div class="row main_content">
+						{% team_item "David de los Santos" "davsanboi" "landingTeamProjectManager" %}
+						{% team_item "Agustín Borrego" "agubordia" "landingTeamCoordBackend" %}
+						{% team_item "José Renato Ramos" "josrenram" "landingTeamCoordFrontend" %}
+						{% team_item "Andrés Doncel" "anddonram" "landingTeamDevBackend" %}
+						{% team_item "José Gavilán" "josgavrui" "landingTeamDevFrontend" %}
+						{% team_item "Álvaro González" "alvgonsie" "landingTeamDevBackend" %}
+						{% team_item "José María Jiménez" "josjimjim" "landingTeamDevBackend" %}
+						{% team_item "Andrés Jiménez" "andjimrio" "landingTeamDevFrontend" %}
+						{% team_item "Juan Carlos Liébana" "jualiefer" "landingTeamDevFrontend" %}
+						{% team_item "José Antonio Rojo" "josrojvid" "landingTeamDevBackend" %}
+					</div>
+				</div>
+			</div>
+		</section>
+		<!-- END OUR TEAM -->
 
 		<!-- Price-Table -->
 	    <section id="price_table">

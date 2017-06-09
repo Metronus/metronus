@@ -28,6 +28,9 @@ def show_form(form):
 def show_field(field, required=True):
     return {'field': field, 'required': "required" if required else "", 'type': get_form_type(get_type(field))}
 
+@register.inclusion_tag('tags/team_item.html')
+def team_item(name, img_name, role):
+    return {'name': name,'img_name': img_name,'role' : role}
 
 @register.inclusion_tag('tags/ajaxErrors.html')
 def show_ajax_errors():
