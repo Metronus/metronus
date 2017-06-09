@@ -27,7 +27,7 @@ heroku = os.environ["METRONUS_DB_NAME"] == 'dnuusjkalf041'
 SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = not production
+DEBUG = not (production or heroku)
 
 ALLOWED_HOSTS = [".metronus.es", "metronus.herokuapp.com", "localhost"]
 
@@ -119,7 +119,6 @@ else:
             },
         },
     ]
-
 
 
 WSGI_APPLICATION = 'metronus.wsgi.application'

@@ -13,7 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url, include
+from django.conf.urls import url, include, handler400, handler403, handler404, handler500
 from django.contrib.auth.views import password_reset_complete, password_reset_confirm, password_reset_done
 from metronus_app.admin import admin_site
 from metronus_app import views
@@ -35,6 +35,11 @@ from metronus.settings import DEFAULT_FROM_EMAIL, MEDIA_ROOT, MEDIA_URL
 
 from django.conf.urls.static import static
 
+# Error URLs
+handler400 = 'metronus_app.views.bad_request'
+handler403 = 'metronus_app.views.permission_denied'
+handler404 = 'metronus_app.views.page_not_found'
+handler500 = 'metronus_app.views.error'
 
 urlpatterns = [url(r'^i18n/', include('django.conf.urls.i18n')),
                url(r'^admin/', admin_site.urls), ]

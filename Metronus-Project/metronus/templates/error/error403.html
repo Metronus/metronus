@@ -1,0 +1,9 @@
+{% extends "error.html" %}
+{% load i18n %}
+
+{% block error_description %}
+<h1 class="error-number">403</h1>
+<h2>{% trans 'permission_denied' %}</h2>
+<img class="img-responsive center-block" src="{{img}}" alt="Image error"/>
+<p>{% trans 'permission_denied_description' %} </p>
+{% endblock %}

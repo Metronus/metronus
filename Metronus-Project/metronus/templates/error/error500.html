@@ -1,0 +1,9 @@
+{% extends "error/error.html" %}
+{% load i18n %}
+
+{% block error_description %}
+<h1 class="error-number">500</h1>
+<h2>{% trans 'error_500' %}</h2>
+<img class="img-responsive center-block" src="{{img}}" alt="Image error"/>
+<p>{% trans 'error_500_description' %} </p>
+{% endblock %}
