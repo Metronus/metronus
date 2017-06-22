@@ -208,7 +208,11 @@ def edit(request, username):
             # Check that the image is OK
             if not check_image(form, 'photo'):
                 errors.append('employeeCreation_imageNotValid')
-
+            
+            # Check that the email is unique
+            if not is_email_unique(form.cleaned_data["email"]) and employee.user.email != form.cleaned_data["email"]:
+                errors.append('employeeCreation_emailNotUnique')
+            
             if not errors:
                 # Update employee data
                 employee.identifier = form.cleaned_data["identifier"]

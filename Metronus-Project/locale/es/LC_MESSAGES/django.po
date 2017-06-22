@@ -861,3 +861,6 @@ msgid "companyRegister_adminEmailNotUnique"
 msgstr "Email de administrador no válido. Ya está en uso."
 msgid "invalidEmail"
 msgstr "¡Lo sentimos! Este email no ha sido registrado."
+msgid "companyRegister_companyEmailNotUnique"
+msgstr "Email de la compañía no válido. Ya está en uso."
+

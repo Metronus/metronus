@@ -37,7 +37,7 @@
                                         <img src="/static/avatar.png" alt="{{user.get_username}}" class="avatar" alt="IMG">
                                     {% endif %}
                                     
-                                    {% if employee.user.is_active%}
+                                    {% if not employee.user.is_active%}
                                        <u>  {{employee.user}} ({% trans 'inactive' %})</u>
                                     {% else %}
                                          {{employee.user}}

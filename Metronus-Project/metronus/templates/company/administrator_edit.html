@@ -95,7 +95,7 @@
                     callback: {
                     	message: "{% trans 'passwords_must_match'%}",
                     	callback: function(value, validator, $field) {
-                    		return value == $("#id_{{ form.newpass1.label }}").val()
+                    		return value == $("#id_newpass1").val()
                     	}
                     }
                 }
@@ -236,25 +236,25 @@
             <div class="form-group required form-class">
 
                 <div class="form-group required form-class" id="div_pass_current">
-                    <label class="control-label col-sm-3" for="id_{{ form.currentpass.name }}">{% trans 'curPass' %}</label>
+                    <label class="control-label col-sm-3" for="id_currentpass">{% trans 'curPass' %}</label>
                     <div class="col-sm-6">
-                        <input type="password" class="form-control col-md-6" name="currentpass" id="id_{{ form.currentpass.label }}">
+                        <input type="password" class="form-control col-md-6" name="currentpass" id="id_currentpass">
                         <div class="help-block with-errors" id="id_unique_message" style="color:#a94442;">{{ form.currentpass.errors }}</div>
                     </div>
                 </div>
 
                  <div class="form-group required form-class" id="div_pass_1">
-                      <label class="control-label col-sm-3" for="id_{{ form.newpass1.name }}">{% trans 'newPass1' %}</label>
+                      <label class="control-label col-sm-3" for="id_newpass1">{% trans 'newPass1' %}</label>
                         <div class="col-sm-6">
-                            <input type="password" class="form-control col-md-6" name="newpass1" id="id_{{ form.newpass1.label }}">
+                            <input type="password" class="form-control col-md-6" name="newpass1" id="id_newpass1">
                             <div class="help-block with-errors" id="id_unique_message" style="color:#a94442;">{{ form.newpass1.errors }}</div>
                         </div>
                 </div>
 
                 <div class="form-group required form-class" id="div_pass_2">
-                  <label class="control-label col-sm-3" for="id_{{ form.newpass2.name }}">{% trans 'newPass2' %}</label>
+                  <label class="control-label col-sm-3" for="id_newpass2">{% trans 'newPass2' %}</label>
                     <div class="col-sm-6">
-                      <input type="password" class="form-control col-md-6" name="newpass2" id="id_{{ form.newpass2.label }}">
+                      <input type="password" class="form-control col-md-6" name="newpass2" id="id_newpass2">
                       <div class="help-block with-errors" id="id_unique_message" style="color:#a94442;">{{ form.newpass2.errors }}</div>
                     </div>
                 </div>

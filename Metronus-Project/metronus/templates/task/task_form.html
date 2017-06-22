@@ -242,13 +242,13 @@ $(function() {
     <div class="form-group" >
         <label class="control-label col-sm-4" for="id_{{ form.price_per_unit.name }}">{% trans 'price_per_unit' %}</label>
         <div class="col-sm-6">
-            <input type="text" class="form-control col-md-6 precio" name="{{ form.price_per_unit.name }}" id="id_{{ form.price_per_unit.name }}" value="{{ form.price_per_unit.value }}">
+            <input type="text" class="form-control col-md-6 precio" name="{{ form.price_per_unit.name }}" id="id_{{ form.price_per_unit.name }}" value="{{ form.price_per_unit.value|floatformat:2 }}">
         </div>
     </div>
   <div class="form-group" >
         <label class="control-label col-sm-4" for="id_{{ form.price_per_hour.name }}">{% trans 'price_per_hour' %}</label>
         <div class="col-sm-6">
-            <input type="text" class="form-control col-md-6 precio" name="{{ form.price_per_hour.name }}" id="id_{{ form.price_per_hour.name }}" value="{{ form.price_per_hour.value }}">
+            <input type="text" class="form-control col-md-6 precio" name="{{ form.price_per_hour.name }}" id="id_{{ form.price_per_hour.name }}" value="{{ form.price_per_hour.value|floatformat:2 }}">
         </div>
     </div>
     <!--this is the hidden input for task id, do not remove!!! -->

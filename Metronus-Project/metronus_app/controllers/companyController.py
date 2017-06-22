@@ -38,11 +38,15 @@ def create(request,
 
             # Check that the passwords match
             if not check_passwords(form):
-                errors.append('companyRegister_passwordsDontMatch')
+                errors.append('passwordsDontMatch')
 
             # Check that the username is unique
             if not is_username_unique(form.cleaned_data["username"]):
                 errors.append('companyRegister_usernameNotUnique')
+
+            # Check that the admin email is unique
+            if Company.objects.filter(email=form.cleaned_data["company_email"]).exists():
+                errors.append('companyRegister_companyEmailNotUnique')
 
             # Check that the admin email is unique
             if not is_email_unique(form.cleaned_data["admin_email"]):
@@ -54,7 +58,7 @@ def create(request,
 
             # Check that the image is OK
             if not check_image(form, 'logo'):
-                errors.append('companyRegister_imageNotValid')
+                errors.append('company_imageNotValid')
 
             if not form.cleaned_data["terms_agree"]:
                 errors.append("agree_terms_error")
@@ -127,7 +131,16 @@ def edit(request):
 
         form = CompanyForm(request.POST, request.FILES)
         if form.is_valid():
-            if check_image(form, 'logo'):
+            errors = []
+           
+            # Check that the image is OK
+            if not check_image(form, 'logo'):
+                errors.append('company_imageNotValid')
+            # Check that the company email is unique
+            if Company.objects.filter(email=form.cleaned_data["company_email"]).exists() and company.email!=form.cleaned_data["company_email"]:
+                errors.append('companyRegister_companyEmailNotUnique')
+
+            if not errors:
                 # Company data
                 company.visible_short_name = form.cleaned_data["visible_short_name"]
                 company.email = form.cleaned_data["company_email"]
@@ -142,7 +155,7 @@ def edit(request):
 
                 return HttpResponseRedirect('/company/view/')
             else:
-                return render(request, 'company/company_edit.html', {'form': form, 'errors': ['error.imageNotValid']})
+                return render(request, 'company/company_edit.html', {'form': form, 'errors': errors})
 
     else:
         raise PermissionDenied
