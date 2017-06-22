@@ -422,16 +422,14 @@
               if(!isUnique || !checkCIF(cif.value)) {
 
                 div_cif.className = "form-group required company_class form-class has-feedback has-error";
-                div_cif.childNodes[3].childNodes[1].className = "form-control col-md-6 glyphicon glyphicon-remove"
+                div_cif.childNodes[3].childNodes[1].className = "form-control col-md-6 glyphicon glyphicon-remove";
 
                 unique_message.style.display = 'block';
 
               } else {
                 unique_message.style.display = 'none';
                 div_cif.className = "form-group required company_class form-class has-feedback has-success";
-                div_cif.childNodes[3].childNodes[1].className = "form-control col-md-6 glyphicon glyphicon-ok"
-
-
+                div_cif.childNodes[3].childNodes[1].className = "form-control col-md-6 glyphicon glyphicon-ok";
               }
                 }
 

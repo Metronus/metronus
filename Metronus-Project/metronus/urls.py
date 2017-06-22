@@ -179,6 +179,7 @@ urlpatterns += [  # i18n_patterns(
     url(r'^ajax/validate_cif/$', companyController.validate_cif, name='validate_cif'),
     url(r'^ajax/validate_admin/$', companyController.validate_admin, name='validate_admin'),
     url(r'^ajax/validate_short_name/$', companyController.validate_short_name, name='validate_short_name'),
+    url(r'^ajax/validate_email_unique/$', companyController.validate_email, name='validate_email_unique'),
 ]
 
 urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)

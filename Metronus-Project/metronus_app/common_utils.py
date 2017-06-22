@@ -175,6 +175,14 @@ def is_email_unique(email):
     """
     return User.objects.filter(email=email).count() == 0
 
+
+def is_company_email_unique(email):
+    """
+    Checks the company email is unique and does not exists in the database
+    """
+    return Company.objects.filter(email=email).count() == 0
+
+
 def is_cif_unique(cif):
     """
     Checks the CIF is unique and does not exists in the database

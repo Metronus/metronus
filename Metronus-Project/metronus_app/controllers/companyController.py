@@ -5,7 +5,7 @@ from metronus_app.model.companyLog import CompanyLog
 from metronus_app.model.administrator import Administrator
 from django.contrib.auth.models import User
 from django.shortcuts import render
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseBadRequest
 from django.contrib.sites.shortcuts import get_current_site
 
 from django.contrib.auth.decorators import login_required
@@ -14,7 +14,7 @@ from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from metronus_app.common_utils import (get_current_admin_or_403, check_image, send_mail, is_email_unique,
-                                       get_or_none, is_username_unique, is_cif_unique)
+                                       get_or_none, is_username_unique, is_cif_unique, is_company_email_unique)
 from django.core.exceptions import PermissionDenied
 
 
@@ -305,3 +305,19 @@ def validate_short_name(request):
     if data['is_taken']:
         data['error_message'] = 'ERROR'
     return JsonResponse(data)
+
+
+def validate_email(request):
+    """
+    checks whether the email is unique
+    """
+
+    email = request.GET.get("email", None)
+
+    if not email:
+        return HttpResponseBadRequest()
+
+    if is_company_email_unique(email) and is_email_unique(email):
+        return JsonResponse({'res': True})
+    else:
+        return JsonResponse({'res': False})
