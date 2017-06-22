@@ -52,6 +52,7 @@ urlpatterns += [  # i18n_patterns(
     # Department
     url(r'^department/create$', departmentController.create, name='department_create'),
     url(r'^department/createAsync$', departmentController.create_async),
+    url(r'^department/recover/(?P<department_id>.*)/$', departmentController.recover, name='department_recover'),
     url(r'^department/list$', departmentController.list_departments, name='department_list'),
     url(r'^department/edit/(?P<department_id>.*)/$', departmentController.edit, name='department_edit'),
     url(r'^department/view/(?P<department_id>.*)/$', departmentController.view, name='department_view'),
@@ -65,6 +66,7 @@ urlpatterns += [  # i18n_patterns(
     # Task
     url(r'^task/create$', taskController.create, name='task_create'),
     url(r'^task/createAsync$', taskController.create_async),
+    url(r'^task/recover/(?P<task_id>.*)/$', taskController.recover, name='task_recover'),
     url(r'^task/list$', taskController.list_tasks, name='task_list'),
     url(r'^task/view/(?P<task_id>.*)/$', taskController.view, name='task_view'),
     url(r'^task/edit/(?P<task_id>.*)/$', taskController.edit, name='task_edit'),
@@ -75,6 +77,7 @@ urlpatterns += [  # i18n_patterns(
 
     # Project
     url(r'^project/list$', projectController.list_projects, name='project_list'),
+    url(r'^project/recover/(?P<project_id>.*)/$', projectController.recover, name='project_recover'),
     url(r'^project/edit/(?P<project_id>.*)/$', projectController.edit, name='project_edit'),
     url(r'^project/view/(?P<project_id>.*)/$', projectController.show, name='project_view'),
     url(r'^project/delete/(?P<project_id>.*)/$', projectController.delete, name='project_delete'),
@@ -98,6 +101,7 @@ urlpatterns += [  # i18n_patterns(
     url(r'^employee/list$', employeeController.list_employees, name='employee_list'),
     url(r'^employee/view/(?P<username>.*)/$', employeeController.view, name='employee_view'),
     url(r'^employee/edit/(?P<username>.*)/$', employeeController.edit, name='employee_edit'),
+    url(r'^employee/recover/(?P<username>.*)/$', employeeController.recover, name='employee_recover'),
     url(r'^employee/updatePassword/(?P<username>.*)/$', employeeController.update_password,
         name='employee_updatePassword'),
     url(r'^employee/delete/(?P<username>.*)/$', employeeController.delete, name='employee_delete'),

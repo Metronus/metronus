@@ -36,7 +36,13 @@
                                     {% else %}
                                         <img src="/static/avatar.png" alt="{{user.get_username}}" class="avatar" alt="IMG">
                                     {% endif %}
-                                    {{employee.user}}
+                                    
+                                    {% if employee.user.is_active%}
+                                       <u>  {{employee.user}} ({% trans 'inactive' %})</u>
+                                    {% else %}
+                                         {{employee.user}}
+                                    {% endif %}
+                                 
                                 </td>
                                 <td>{{employee.identifier}}</td>
                                 <td>{{employee.phone}}</td>
@@ -52,8 +58,15 @@
                                         {% trans 'update' %}</a>
                                 </td>
                                 <td class="hidden-xs">
-                                    <a href="#" class="btn btn-default" data-href="{% url 'employee_delete' employee.user.username %}"
+                                 <td class="hidden-xs">
+                                {% if  employee.user.is_active %}
+                                <a href="#" class="btn btn-default" data-href="{% url 'employee_delete' employee.user.username %}"
                                        data-toggle="modal" data-target="#confirm-delete">{% trans 'fire' %}</a>
+                                {% else %}
+                                 <a href="#" class="btn btn-default" data-href="{% url 'employee_recover' employee.user.username %}"
+                                   data-toggle="modal" data-target="#confirm-recover">{% trans 'recover' %}</a>
+                                {% endif %}
+                                  
                                 </td>
                             </tr>
                         {% endfor %}
@@ -61,12 +74,27 @@
                 </table>
             </div>
             <div class="text-center">
+             {% if employees|length_is:"0"  %}
+             <h2>{% trans 'plsEmployee' %}</h2>
+             {% endif %}
                 <a class="btn btn-dark" href="{% url 'employee_create' %}">{% trans 'create' %}</a>
             </div>
         </div>
     </div>
 </div>
 
+<div class="modal fade" id="confirm-recover" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">{% trans 'recover' %}</div>
+            <div class="modal-body">{% trans 'employeeRecoverConfirm' %}</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'cancel' %}</button>
+                <a class="btn btn-danger btn-ok">{% trans 'recover' %}</a>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -88,6 +116,9 @@
 {% block javascript %}
 <script>
     $('#confirm-delete').on('show.bs.modal', function(e) {
+        $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+    });
+       $('#confirm-recover').on('show.bs.modal', function(e) {
         $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
     });
 </script>

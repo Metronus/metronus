@@ -117,7 +117,7 @@ def list_employees(request):
 
     # Check that the user is logged in and it's an administrator
     admin = get_authorized_or_403(request)
-    employees = Employee.objects.filter(company_id=admin.company_id, user__is_active=True)
+    employees = Employee.objects.filter(company_id=admin.company_id)
     return render(request, 'employee/employee_list.html', {'employees': employees})
 
 
@@ -316,6 +316,30 @@ def delete(request, username):
     employee_user.save()
 
     EmployeeLog.objects.create(employee_id=employee, event="B", price_per_hour=employee.price_per_hour)
+    return HttpResponseRedirect('/employee/list')
+
+def recover(request, username):
+    """
+    url = employee/recover/<username>
+
+    parameters/returns:
+    Nada, redirecciona a la vista de listado de empleados
+
+    template: ninguna
+    """
+
+    admin = get_authorized_or_403(request)
+    employee = get_object_or_404(Employee, user__username=username, user__is_active=False)
+
+    # Check that the admin has permission to edit that employee
+    if employee.company_id != admin.company_id:
+        raise PermissionDenied
+
+    employee_user = employee.user
+    employee_user.is_active = True
+    employee_user.save()
+
+    EmployeeLog.objects.create(employee_id=employee, event="A", price_per_hour=employee.price_per_hour)
     return HttpResponseRedirect('/employee/list')
 
 
