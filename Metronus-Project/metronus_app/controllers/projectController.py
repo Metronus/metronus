@@ -41,12 +41,7 @@ def create(request):
             pname = form.cleaned_data['name']
             pro = find_name(pname, admin)
             if pro is not None:
-                if pro.deleted:
-                    pro.deleted = False
-                    pro.save()
-                    return redirect('project_list')
-                else:
-                    repeated_name = True
+                repeated_name = True
             else:
                 project = create_project(form, admin)
                 return redirect('project_view', project_id=project.id)
@@ -92,12 +87,7 @@ def create_async(request):
             pname = form.cleaned_data['name']
             pro = find_name(pname, admin)
             if pro is not None:
-                if pro.deleted:
-                    pro.deleted = False
-                    pro.save()
-                    return JsonResponse(data)
-                else:
-                    data['repeated_name'] = True
+                data['repeated_name'] = True
             else:
                 create_project(form, admin)
                 return JsonResponse(data)
@@ -204,6 +194,24 @@ def edit(request, project_id):
 
     return render(request, 'project/project_form.html', {'form': form, 'repeated_name': repeated_name,'error':error})
 
+def recover(request, project_id):
+    """
+    parameters:
+    project_id: the project id to recover
+
+    returns:
+    nothing
+
+    template:
+    project_list.html
+    """
+    # Check that the user is logged in
+    admin = get_admin_executive_or_403(request)
+    project = get_object_or_404(Project, pk=project_id,deleted=True)
+    if check_company_project(project, admin.company_id):
+        recover_project(project)
+
+    return HttpResponseRedirect('/project/list')
 
 def delete(request, project_id):
     """
@@ -218,7 +226,7 @@ def delete(request, project_id):
     """
     # Check that the user is logged in
     admin = get_admin_executive_or_403(request)
-    project = get_object_or_404(Project, pk=project_id)
+    project = get_object_or_404(Project, pk=project_id,deleted=False)
     if check_company_project(project, admin.company_id):
         delete_project(project)
 
@@ -479,6 +487,11 @@ def delete_project(project):
     project.deleted = True
     project.save()
 
+def recover_project(project):
+    """Deletes a project"""
+    project.deleted = False
+    project.save()
+
 
 def check_company_project_session(project, admin):
     """
@@ -491,7 +504,7 @@ def check_company_project(project, company_id):
     """
     checks if the project belongs to the specified company
     """
-    res = project is not None and company_id == project.company_id and project.deleted is False
+    res = project is not None and company_id == project.company_id
     if not res:
         raise PermissionDenied
     return res

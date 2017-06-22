@@ -288,7 +288,7 @@ class ProjectTestCase(TestCase):
 
         pro_id = Project.objects.get(deleted=True).id
         response = c.get("/project/delete/" + str(pro_id) + "/")
-        self.assertEquals(response.status_code, 403)
+        self.assertEquals(response.status_code, 404)
 
     def test_view_project_positive(self):
         """
