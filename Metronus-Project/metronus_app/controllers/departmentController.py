@@ -39,12 +39,7 @@ def create(request):
             dname = form.cleaned_data['name']
             dep = find_name(dname, admin)
             if dep is not None:
-                if not dep.active:
-                    dep.active = True
-                    dep.save()
-                    return HttpResponseRedirect('/department/view/'+str(dep.id)+"/")
-                else:
-                    repeated_name = True
+                repeated_name = True
             else:
                 department = create_department(form, admin)
                 return HttpResponseRedirect('/department/view/'+str(department.id)+"/")
@@ -88,12 +83,7 @@ def create_async(request):
             dname = form.cleaned_data['name']
             dep = find_name(dname, admin)
             if dep is not None:
-                if not dep.active:
-                    dep.active = True
-                    dep.save()
-                    return JsonResponse(data)
-                else:
-                    data['repeated_name'] = True
+                data['repeated_name'] = True
             else:
                 create_department(form, admin)
                 return JsonResponse(data)
@@ -180,8 +170,7 @@ def edit(request, department_id):
                 edit_department(department, form)
                 return HttpResponseRedirect('/department/view/'+str(department.id)+"/")
             else:
-                if dep.active:
-                    repeated_name = True
+                repeated_name = True
     # if a GET (or any other method) we'll create a blank form
     else:
         department = get_object_or_404(Department, pk=department_id)
@@ -202,11 +191,31 @@ def delete(request, department_id):
     template:
     deparment_list.html
     """
-    department = get_object_or_404(Department, pk=department_id)
+    department = get_object_or_404(Department, pk=department_id,active=True)
 
     # Check that the current user is an administrator
     check_department(department, request)
     delete_department(department)
+
+    return HttpResponseRedirect('/department/list')
+
+def recover(request, department_id):
+    """
+    url = department/recover/(department_id)/
+    parameters:
+    department_id: the department id to recover
+
+    returns:
+    nothing
+
+    template:
+    deparment_list.html
+    """
+    department = get_object_or_404(Department, pk=department_id,active=False)
+
+    # Check that the current user is an administrator
+    check_department(department, request)
+    recover_department(department)
 
     return HttpResponseRedirect('/department/list')
 
@@ -435,6 +444,10 @@ def delete_department(department):
     department.active = False
     department.save()
 
+def recover_department(department):
+    """Recover a department"""
+    department.active = True
+    department.save()
 
 def check_department(dep, request):
     """
@@ -457,20 +470,19 @@ def check_department_for_fiew(dep, request, for_view):
         raise PermissionDenied
 
     # Check that the actor has permission to view the dep
-    if dep is not None and (dep.company_id != actor.company_id or not dep.active):
+    if dep is not None and (dep.company_id != actor.company_id):
         raise PermissionDenied
 
+
     if actor.user_type != 'A':
-        is_team_manager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                                                                       role_id__tier=30)
-        res = is_team_manager.count() > 0
+        is_executive = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=50)
+        res = is_executive.count() > 0    
 
         if not res:
             if for_view:
-                roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                                                                     role_id__tier__in=[50, 40, 20])
+                roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,projectDepartment_id__department_id=dep, role_id__tier__gte=20)
             else:
-                roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+                roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,projectDepartment_id__department_id=dep,
                                                                      role_id__tier__gte=40)
             res = roles.count() > 0
         if not res:
@@ -508,13 +520,11 @@ def get_list_for_role(request):
         raise PermissionDenied
 
     if actor.user_type != 'A':
-        is_team_manager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                                                                       role_id__tier=30)
-        res = is_team_manager.count() > 0
+        is_executive = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=50)
+        res = is_executive.count() > 0    
 
         if not res:
-            roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                                                                 role_id__tier__in=[50, 40, 20])
+            roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=20)
             res = roles.count() > 0
             if not res:
                 raise PermissionDenied
@@ -523,9 +533,9 @@ def get_list_for_role(request):
                     projectdepartment__projectdepartmentemployeerole__employee_id=actor,
                     company_id=actor.company_id, active=True)
         else:
-            departments = Department.objects.filter(company_id=actor.company_id, active=True)
+            departments = Department.objects.filter(company_id=actor.company_id)
     else:
-        departments = Department.objects.filter(company_id=actor.company_id, active=True)
+        departments = Department.objects.filter(company_id=actor.company_id)
 
     return departments
 

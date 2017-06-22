@@ -27,8 +27,14 @@
                     <tbody>
                         {% for department in departments %}
                             <tr>
-                                <td>{{department.name}}</td>
-
+                              
+                                <td>  
+                                {% if department.active %}
+                                  {{department.name}}
+                                {% else %}
+                                     <u> {{department.name}}({% trans 'deleted' %})</u>
+                                {% endif %}
+                                </td>
 
                                 <td>
                                     <a href="{% url 'department_view' department.id %}" type="button" class="btn btn-success">
@@ -39,14 +45,22 @@
                                         {% trans 'update' %}</a>
                                 </td>
                                 <td class="hidden-xs">
-                                    <a href="#" class="btn btn-default" data-href="{% url 'department_delete' department.id %}"
+                                {% if  department.active %}
+                                 <a href="#" class="btn btn-default" data-href="{% url 'department_delete' department.id %}"
                                        data-toggle="modal" data-target="#confirm-delete">{% trans 'delete' %}</a>
+                                {% else %}
+                                 <a href="#" class="btn btn-default" data-href="{% url 'department_recover' department.id %}"
+                                   data-toggle="modal" data-target="#confirm-recover">{% trans 'recover' %}</a>
+                                {% endif %}
                                 </td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
+             {% if departments|length_is:"0"  %}
+             <h2>{% trans 'plsDepartment' %}</h2>
+             {% endif %}
             <div class="text-center">
                 <a class="btn btn-dark" href="{% url 'department_create' %}">{% trans 'create' %}</a>
             </div>
@@ -54,7 +68,18 @@
     </div>
 </div>
 
-
+<div class="modal fade" id="confirm-recover" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">{% trans 'recover' %}</div>
+            <div class="modal-body">{% trans 'departmentRecoverConfirm' %}</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'cancel' %}</button>
+                <a class="btn btn-danger btn-ok">{% trans 'recover' %}</a>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -74,6 +99,10 @@
 {% block javascript %}
 <script>
     $('#confirm-delete').on('show.bs.modal', function(e) {
+        $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+    });
+
+    $('#confirm-recover').on('show.bs.modal', function(e) {
         $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
     });
 </script>
