@@ -155,12 +155,12 @@ def edit(request):
 
                 return HttpResponseRedirect('/company/view/')
             else:
-                return render(request, 'company/company_edit.html', {'form': form, 'errors': errors})
+                return render(request, 'company/company_edit.html', {'form': form, 'errors': errors, 'logo': company.logo})
 
     else:
         raise PermissionDenied
 
-    return render(request, 'company/company_edit.html', {'form': form})
+    return render(request, 'company/company_edit.html', {'form': form, 'logo': company.logo})
 
 
 @login_required

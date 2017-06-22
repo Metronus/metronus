@@ -54,7 +54,18 @@
         </div>
 
        <div class="form-group company_class form-class">
-          <label class="control-label col-sm-3" for="id_{{ form.logo.name }}">{% trans 'logo' %}</label>
+          <label class="control-label col-sm-3" for="id_curlogo">{% trans 'current_logo' %}</label>
+            <div class="col-sm-6">
+                {% if logo %}
+                    <img src="{{ MEDIA_URL }}{{logo}}" style="max-height: 120px; max-width: auto;">
+                {% else %}
+                    {% trans 'none' %}
+                {% endif %}
+            </div>
+        </div>
+
+       <div class="form-group company_class form-class">
+          <label class="control-label col-sm-3" for="id_{{ form.logo.name }}">{% trans 'new_logo' %}</label>
             <div class="col-sm-6">
               <input id="id_{{ form.logo.label }}" name="{{ form.logo.name }}" multiple type="file" value="{{form.logo.value}}" >
             </div>
