@@ -193,7 +193,7 @@ def edit(request, username):
             'price_per_hour': employee.price_per_hour
         })
 
-        return render(request, 'employee/employee_edit.html', {'form': form})
+        return render(request, 'employee/employee_edit.html', {'form': form, 'picture': employee.picture})
 
     elif request.method == "POST":
         # Process the received form
@@ -240,11 +240,11 @@ def edit(request, username):
                 return HttpResponseRedirect('/employee/view/' + username + '/')
             else:
                 # There are errors
-                return render(request, 'employee/employee_edit.html', {'form': form, 'errors': errors})
+                return render(request, 'employee/employee_edit.html', {'form': form, 'errors': errors, 'picture': employee.picture})
 
         else:
             # Form is not valid
-            return render(request, 'employee/employee_edit.html', {'form': form,
+            return render(request, 'employee/employee_edit.html', {'form': form, 'picture': employee.picture,
                                                                    'errors': ['employeeCreation_formNotValid']})
     else:
         raise PermissionDenied
