@@ -36,8 +36,8 @@
         </div>
 
         <div class="name">
-          <h3 class="name_title">{{employee.user}}</h3>
-          <p>{{employee.identifier}}</p>
+          <h3 class="name_title">{{employee.user.first_name}}</h3>
+          <p>{{employee.user.last_name}}</p>
         </div>
 
 
@@ -47,31 +47,16 @@
       <div>
         <ul class="list-inline widget_tally">
         <li>
-          <strong>{% trans 'name' %}</strong> <span class="pull-right">{{employee.user.first_name}}</span>
+          <strong>{% trans 'username' %}</strong> <span class="pull-right">{{employee.user}}</span>
         </li>
         <li>
-          <strong>{% trans 'surname' %}</strong> <span class="pull-right">{{employee.user.last_name}}</span>
+          <strong>{% trans 'identifier' %}</strong> <span class="pull-right">{{employee.identifier}}</span>
         </li>
         <li>
           <strong>{% trans 'email' %}</strong> <span class="pull-right">{{employee.user.email}}</span>
         </li>
         <li>
           <strong>{% trans 'phone' %}</strong> <span class="pull-right">{{employee.phone}}</span>
-        </li>
-        <li>
-          <strong>{% trans 'roles' %}</strong> <span class="pull-right">
-        {% if employee_roles %}
-           {{ employee_roles|length }}
-      {% else %}
-          0
-      {% endif %}
-          </span>
-        </li>
-        <li>
-          <strong>{% trans 'projects' %}</strong> <span class="pull-right">0</span>
-        </li>
-        <li>
-          <strong>{% trans 'departments' %}</strong> <span class="pull-right">0</span>
         </li>
         <li>
             <strong>{% trans 'price_per_hour' %}</strong> <span class="pull-right">{{employee.price_per_hour}} &euro;</span>

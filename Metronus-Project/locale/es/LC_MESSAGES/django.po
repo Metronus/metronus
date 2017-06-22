@@ -456,7 +456,7 @@ msgstr "Gastos e ingresos de la tarea"
 
 #: Employee
 msgid "registryDate"
-msgstr "Fecha de registro"
+msgstr "Fecha de alta"
 msgid "plsEmployee"
 msgstr "No existen empleados, por favor añada uno"
 msgid "employeeRecoverConfirm"

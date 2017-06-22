@@ -457,7 +457,7 @@ msgstr "Task expenses and income"
 
 #: Employee
 msgid "registryDate"
-msgstr "Registry Date"
+msgstr "Registry date"
 msgid "plsEmployee"
 msgstr "There are no employees, please add one"
 msgid "employeeRecoverConfirm"
