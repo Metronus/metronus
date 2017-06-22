@@ -182,21 +182,21 @@ $(function() {
 
     <form id="register_form" method="POST" action="" class="form-horizontal" align="center">{% csrf_token %}
     <div class="form-group" >
-        <label class="control-label col-sm-4" for="id_{{ form.name.name }}">{% trans 'name' %}</label>
+        <label class="control-label col-sm-4" for="id_{{ form.name.name }}">{% trans 'name' %} *</label>
         <div class="col-sm-6">
             <input type="text" class="form-control col-md-6" name="{{ form.name.name }}" id="id_{{ form.name.name }}" value="{{ form.name.value }}" required>
         </div>
     </div>
 
     <div class="form-group" >
-        <label class="control-label col-sm-4" for="id_{{ form.description.name }}">{% trans 'description' %}</label>
+        <label class="control-label col-sm-4" for="id_{{ form.description.name }}">{% trans 'description' %} *</label>
         <div class="col-sm-6">
             <input type="text" class="form-control col-md-6" name="{{ form.description.name }}" id="id_{{ form.description.name }}" value="{{ form.description.value }}" required>
         </div>
     </div>
 
     <div class="form-group" >
-        <label class="control-label col-sm-4" for="id_{{ form.project_id.name }}">{% trans 'project' %}</label>
+        <label class="control-label col-sm-4" for="id_{{ form.project_id.name }}">{% trans 'project' %} *</label>
         <div class="col-sm-6">
         <select class="form-control" name="{{ form.project_id.name }}" id="id_{{ form.project_id.name }}" required>
                 {% if  form.task_id.value == '0' or form.project_id.value == '0' %}
@@ -215,7 +215,7 @@ $(function() {
     </div>
 
     <div class="form-group" >
-        <label class="control-label col-sm-4" for="id_{{ form.department_id.name }}">{% trans 'department' %}</label>
+        <label class="control-label col-sm-4" for="id_{{ form.department_id.name }}">{% trans 'department' %} *</label>
         <div class="col-sm-6">
             <select class="form-control" name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}" required>
             {% if  form.task_id.value == '0' %}
@@ -257,6 +257,7 @@ $(function() {
     </br>
     <div class="col-sm-4" ></div>
         <div class="col-sm-6" align="center" >
+        <a class="btn btn-danger" href="{% url 'task_list' %}">{% trans 'cancel' %}</a>
             {% if  form.task_id.value == '0' %}
             <button type="submit" class="btn btn-success submit-button" >{% trans 'confirm' %}</button>
                 <input type="button" class="btn btn-info submit-button" value="{% trans 'taskAdd' %}" onclick="ajax();" />

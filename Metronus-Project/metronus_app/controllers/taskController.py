@@ -60,19 +60,13 @@ def create(request):
                 errors.append('task_creation_project_department_not_related')
             else:
                 pro = find_name(pname,pdtuple)
-                if pro is not None and pro.active:
+                if pro is not None:
                     errors.append('task_creation_repeated_name')
             
             if not errors:
-                if pro and not pro.active:
-                    check_task(pro, request)
-                    pro.active = True
-                    pro.save()
-                    return HttpResponseRedirect('/task/list')
-                else:
-                    actor = check_task(pro, request)
-                    create_task(form, pdtuple, actor)
-                    return HttpResponseRedirect('/task/list')
+                actor = check_task(pro, request)
+                create_task(form, pdtuple, actor)
+                return HttpResponseRedirect('/task/list')
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -125,19 +119,13 @@ def create_async(request):
                 errors.append('task_creation_project_department_not_related')
             else:
                 pro = find_name(pname, pdtuple)
-                if pro is not None and pro.active:
+                if pro is not None:
                     errors.append('task_creation_repeated_name')
 
             if not errors:
-                if pro and not pro.active:
-                    check_task(pro, request)
-                    pro.active = True
-                    pro.save()
-                    return JsonResponse(data)
-                else:
-                    actor = check_task(pro, request)
-                    create_task(form, pdtuple, actor)
-                    return JsonResponse(data)
+                actor = check_task(pro, request)
+                create_task(form, pdtuple, actor)
+                return JsonResponse(data)
     # if a GET (or any other method) we'll create a blank form
     else:
         return HttpResponseRedirect('/department/create')
@@ -230,7 +218,7 @@ def edit(request, task_id):
                                       projectDepartment_id=task.projectDepartment_id).first()
 
             # pro does not exists or it's the same
-            if pro is not None and pro.id != task.id and pro.active:
+            if pro is not None and pro.id != task.id:
                 errors.append('task_creation_repeated_name')
 
             if not errors:
@@ -269,6 +257,24 @@ def delete(request, task_id):
     task = get_object_or_404(Task, pk=task_id, active=True)
     check_task(task, request)
     delete_task(task)
+
+    return HttpResponseRedirect('/task/list')
+
+def recover(request, task_id):
+    """
+    parameters:
+    task_id: the task id to recover
+
+    returns:
+    nothing
+
+    template:
+    task_list.html
+    """
+    # Check that the user is logged in
+    task = get_object_or_404(Task, pk=task_id, active=False)
+    check_task(task, request)
+    recover_task(task)
 
     return HttpResponseRedirect('/task/list')
 
@@ -515,6 +521,12 @@ def delete_task(task):
     task.active = False
     task.save()
 
+def recover_task(task):
+    """Recovers a task"""
+    task.active = True
+    task.save()
+
+
 
 def check_role_for_list(request):
     """
@@ -529,12 +541,12 @@ def check_role_for_list(request):
 
     if actor.user_type != 'A':
         # not an admin
-        is_team_manager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=30)
-        res = is_team_manager.count() > 0
+        is_executive = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=50)
+        res = is_executive.count() > 0
 
         if res:
             # is manager
-            task = Task.objects.filter(actor_id__company_id=actor.company_id, active=True).distinct()
+            task = Task.objects.filter(actor_id__company_id=actor.company_id).distinct()
         else:
             # not a manager
             task = Task.objects.filter(actor_id__company_id=actor.company_id,
@@ -542,7 +554,7 @@ def check_role_for_list(request):
                                        active=True).distinct()
     else:
         # is admin
-        task = Task.objects.filter(actor_id__company_id=actor.company_id, active=True).distinct()
+        task = Task.objects.filter(actor_id__company_id=actor.company_id).distinct()
     return task
 
 
@@ -563,11 +575,16 @@ def check_task(task, request):
         raise PermissionDenied
 
     if actor.user_type != 'A':
-        is_team_manager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=30)
-        res = is_team_manager.count() > 0
+        is_executive = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=50)
+        res = is_executive.count() > 0
 
         if not res:
-            roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__in=[50, 40, 20])
+            if task is None:
+                roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+                     role_id__tier__gte=20)
+            else:
+                roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+                    projectDepartment_id=task.projectDepartment_id, role_id__tier__gte=20)
             res = roles.count() > 0
         if not res:
             raise PermissionDenied
@@ -683,7 +700,7 @@ def check_metrics_authorized_for_task(user, task_id):
     if not user.is_authenticated():
         raise PermissionDenied
 
-    task = get_object_or_404(Task, active=True, id=task_id)
+    task = get_object_or_404(Task, id=task_id)
     logged = user.actor
 
     # Check that the companies match

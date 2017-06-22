@@ -30,7 +30,13 @@
                     <tbody>
                         {% for task in tasks %}
                             <tr>
-                                <td>{{task.name}}</td>
+                                <td>
+                                {% if task.active %}
+                                  {{task.name}}
+                                {% else %}
+                                     <u> {{task.name}}({% trans 'deleted' %})</u>
+                                {% endif %}
+                                </td>
                                 <td>{{task.projectDepartment_id.project_id.name}} / {{task.projectDepartment_id.department_id.name}}</td>
                                 <td>{{task.actor_id.user.first_name}} {{task.actor_id.user.last_name}}</td>
                                 <td>{{task.registryDate}}</td>
@@ -45,14 +51,22 @@
                                         {% trans 'edit' %}</a>
                                 </td>
                                 <td class="hidden-xs">
-                                    <a href="#" class="btn btn-default" data-href="{% url 'task_delete' task.id %}"
+                                 {% if  task.active %}
+                                 <a href="#" class="btn btn-default" data-href="{% url 'task_delete' task.id %}"
                                        data-toggle="modal" data-target="#confirm-delete">{% trans 'delete' %}</a>
-                                </td>
+                                {% else %}
+                                 <a href="#" class="btn btn-default" data-href="{% url 'task_recover' task.id %}"
+                                   data-toggle="modal" data-target="#confirm-recover">{% trans 'recover' %}</a>
+                                {% endif %}
+                                 </td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
+                {% if tasks|length_is:"0"  %}
+             <h2>{% trans 'plsTask' %}</h2>
+             {% endif %}
             <div class="text-center">
                 <a class="btn btn-dark" href="{% url 'task_create' %}">{% trans 'create' %}</a>
             </div>
@@ -61,7 +75,18 @@
 </div>
 
 
-
+<div class="modal fade" id="confirm-recover" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">{% trans 'recover' %}</div>
+            <div class="modal-body">{% trans 'taskRecoverConfirm' %}</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'cancel' %}</button>
+                <a class="btn btn-danger btn-ok">{% trans 'recover' %}</a>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -79,6 +104,9 @@
 {% block javascript %}
 <script>
     $('#confirm-delete').on('show.bs.modal', function(e) {
+        $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+    });
+    $('#confirm-recover').on('show.bs.modal', function(e) {
         $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
     });
 </script>
