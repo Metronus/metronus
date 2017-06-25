@@ -60,4 +60,5 @@ function setValidationState(error, div, message){
     div.find("i").removeClass("glyphicon-remove").addClass("glyphicon-ok");
     message.hide();
   }
+  div.find("input").removeClass("glyphicon");
 }

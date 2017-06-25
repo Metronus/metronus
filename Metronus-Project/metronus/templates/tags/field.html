@@ -3,7 +3,7 @@
 {% load l10n %}
 
 
-<div class="form-group required form-class" id="div_{{field.name}}">
+<div class="form-group required form-class {% if field.errors %} has-error {% endif %}" id="div_{{field.name}}">
   <label class="control-label col-md-4 col-sm-4 col-xs-12" for="id_{{ field.name }}">{% trans field.name %} {{required}}</label>
   <div class="col-md-4 col-sm-5 col-xs-12">
     {% if type == "file" %}
@@ -13,7 +13,7 @@
     {% else %}
     <input type="{{type}}" class="form-control" name="{{ field.name }}" id="id_{{ field.name }}" value="{{field.value|default_if_none:""}}" placeholder={{placeholder}}>
     {% endif %}
-    <div class="help-block with-errors" id="id_unique_message">{{ field.errors }}</div>
+    <div class="help-block with-errors" id="id_unique_message">{{ field.errors.0 }}</div>
     {% if custom_error_str %}
     <div class="help-block with-errors ajax-error" id="{{id_custom_error}}">{% trans custom_error_str %}</div>
     {% endif %}

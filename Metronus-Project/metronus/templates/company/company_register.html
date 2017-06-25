@@ -105,6 +105,7 @@
 <script src="/static/js/jquery.min.js"></script>
 <script src="/static/js/bootstrap.min.js"></script>
 <script src="/static/js/fastclick.js"></script>
+<script src="/static/landing/js/wow.min.js"></script>
 <script src="/static/js/nprogress.js"></script>
 <script src="/static/js/validator.js"></script>
 <script src="/static/js/jquery.smartWizard.js"></script>
@@ -123,6 +124,7 @@
     $(".buttonNext").text("{% trans 'next' %}");
     $(".buttonPrevious").text("{% trans 'previous' %}");
     $(".buttonFinish").text("{% trans 'finish' %}");
+    $(".buttonFinish").attr("type", "submit");
     $(".btn-file span").text("{% trans 'browseFile' %}");
 
     // BootstrapValidator. Here. We. Go.
