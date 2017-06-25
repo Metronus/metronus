@@ -6,105 +6,154 @@
 {% block title %}{% trans 'departmentList' %}{% endblock %}
 
 {% block content %}
+<!-- DEPARTAMENTOS ACTIVOS -->
 <div class="row">
-    <div class="col-xs-12">
-        <div class="x_panel">
-            <div class="x_title">
-                <h2>{% trans 'departmentList' %}</h2>
-                <div class="clearfix"></div>
-            </div>
-            <div class="x_content">
+  <div class="col-xs-12">
+    <div class="x_panel">
+      <div class="x_title">
+        <h2>{% trans 'departmentList' %}</h2>
+        <ul class="nav navbar-right panel_toolbox">
+          <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+        </ul>
+        <div class="clearfix"></div>
+      </div>
 
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th class="col-xs-9">{% trans 'name' %}</th>
-                            <th class="col-xs-1">{% trans 'actions' %}</th>
-                            <th class="col-xs-1 hidden-xs"></th>
-                            <th class="col-xs-1 hidden-xs"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for department in departments %}
-                            <tr>
-                              
-                                <td>  
-                                {% if department.active %}
-                                  {{department.name}}
-                                {% else %}
-                                     <u> {{department.name}}({% trans 'deleted' %})</u>
-                                {% endif %}
-                                </td>
+      <div class="x_content">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th class="col-xs-9">{% trans 'name' %}</th>
+              <th class="col-xs-1">{% trans 'actions' %}</th>
+              <th class="col-xs-1 hidden-xs"></th>
+              <th class="col-xs-1 hidden-xs"></th>
+            </tr>
+          </thead>
 
-                                <td>
-                                    <a href="{% url 'department_view' department.id %}" type="button" class="btn btn-success">
-                                        {% trans 'details' %}</a>
-                                </td>
-                                <td class="hidden-xs">
-                                    <a href="{% url 'department_edit' department.id %}" type="button" class="btn btn-dark">
-                                        {% trans 'update' %}</a>
-                                </td>
-                                <td class="hidden-xs">
-                                {% if  department.active %}
-                                 <a href="#" class="btn btn-default" data-href="{% url 'department_delete' department.id %}"
-                                       data-toggle="modal" data-target="#confirm-delete">{% trans 'delete' %}</a>
-                                {% else %}
-                                 <a href="#" class="btn btn-default" data-href="{% url 'department_recover' department.id %}"
-                                   data-toggle="modal" data-target="#confirm-recover">{% trans 'recover' %}</a>
-                                {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="text-center">
-             {% if departments|length_is:"0"  %}
-             <h2>{% trans 'plsDepartment' %}</h2>
-             {% endif %}
-                <a class="btn btn-dark" href="{% url 'department_create' %}">{% trans 'create' %}</a>
-            </div>
-        </div>
+          <tbody>
+            {% for department in departments %}
+            <tr>
+              <td>{{department.name}}</td>
+              <td>
+                <a href="{% url 'department_view' department.id %}" type="button" class="btn btn-success">
+                  {% trans 'details' %}
+                </a>
+              </td>
+              <td class="hidden-xs">
+                <a href="{% url 'department_edit' department.id %}" type="button" class="btn btn-dark">
+                    {% trans 'update' %}
+                </a>
+              </td>
+              <td class="hidden-xs">
+                <a href="#" class="btn btn-default" data-href="{% url 'department_delete' department.id %}"
+                  data-toggle="modal" data-target="#confirm-delete">{% trans 'delete' %}</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="text-center">
+        {% if departments|length_is:"0"  %}
+        <h2>{% trans 'plsDepartment' %}</h2>
+        {% endif %}
+        <a class="btn btn-dark" href="{% url 'department_create' %}">{% trans 'create' %}</a>
+      </div>
     </div>
-</div>
-
-<div class="modal fade" id="confirm-recover" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">{% trans 'recover' %}</div>
-            <div class="modal-body">{% trans 'departmentRecoverConfirm' %}</div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'cancel' %}</button>
-                <a class="btn btn-danger btn-ok">{% trans 'recover' %}</a>
-            </div>
-        </div>
-    </div>
+  </div>
 </div>
 
 <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">{% trans 'delete' %}</div>
-            <div class="modal-body">{% trans 'departmentConfirm' %}</div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'cancel' %}</button>
-                <a class="btn btn-danger btn-ok">{% trans 'delete' %}</a>
-            </div>
-        </div>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">{% trans 'delete' %}</div>
+      <div class="modal-body">{% trans 'departmentConfirm' %}</div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'cancel' %}</button>
+        <a class="btn btn-danger btn-ok">{% trans 'delete' %}</a>
+      </div>
     </div>
+  </div>
 </div>
-{% endblock %}
+<!-- FIN DEPARTAMENTOS ACTIVOS -->
 
+<!-- DEPARTAMENTOS INACTIVOS -->
+{% if actor_is_admin or actor_is_executive %}
+{% if deleted|length > 0 %}
+<div class="row">
+  <div class="col-xs-12">
+    <div class="x_panel">
+      <div class="x_title">
+        <h2>{% trans 'departmentListDeleted' %}</h2>
+        <ul class="nav navbar-right panel_toolbox">
+          <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+        </ul>
+        <div class="clearfix"></div>
+      </div>
+
+      <div class="x_content">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th class="col-xs-9">{% trans 'name' %}</th>
+              <th class="col-xs-1">{% trans 'actions' %}</th>
+              <th class="col-xs-1 hidden-xs"></th>
+              <th class="col-xs-1 hidden-xs"></th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for department in deleted %}
+            <tr>
+              <td>{{department.name}}</td>
+              <td>
+                <a href="{% url 'department_view' department.id %}" type="button" class="btn btn-success">
+                  {% trans 'details' %}
+                </a>
+              </td>
+              <td class="hidden-xs">
+                <a href="{% url 'department_edit' department.id %}" type="button" class="btn btn-dark">
+                    {% trans 'update' %}
+                </a>
+              </td>
+              <td class="hidden-xs">
+                <a href="#" class="btn btn-default" data-href="{% url 'department_recover' department.id %}"
+                  data-toggle="modal" data-target="#confirm-recover">{% trans 'recover' %}</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="confirm-recover" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">{% trans 'recover' %}</div>
+          <div class="modal-body">{% trans 'departmentRecoverConfirm' %}</div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'cancel' %}</button>
+            <a class="btn btn-danger btn-ok">{% trans 'recover' %}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+<!-- FIN DEPARTAMENTOS INACTIVOS -->
+{% endif %}
+{% endif %}
+{% endblock %}
 
 {% block javascript %}
 <script>
-    $('#confirm-delete').on('show.bs.modal', function(e) {
-        $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
-    });
+  $('#confirm-delete').on('show.bs.modal', function(e) {
+    $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+  });
 
-    $('#confirm-recover').on('show.bs.modal', function(e) {
-        $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
-    });
+  $('#confirm-recover').on('show.bs.modal', function(e) {
+    $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+  });
 </script>
 {% endblock %}

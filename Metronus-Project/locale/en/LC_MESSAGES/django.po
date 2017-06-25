@@ -386,6 +386,9 @@ msgid "departmentNotNull"
 msgstr "Department can't be null"
 msgid "register_mail_subject"
 msgstr "Welcome to Metronus"
+msgid "departmentListDeleted"
+msgstr "Inactive departments"
+
 
 
 #: Charts

@@ -385,6 +385,8 @@ msgid "selectDepartment"
 msgstr "Seleccione departamento"
 msgid "departmentNotNull"
 msgstr "El departamento no puede ser nulo"
+msgid "departmentListDeleted"
+msgstr "Departamentos eliminados"
 
 
 

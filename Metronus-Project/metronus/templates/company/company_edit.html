@@ -58,5 +58,40 @@
       </div>
     </div>
   </div>
-  </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+$('#form').bootstrapValidator({
+  feedbackIcons: {
+    valid: 'glyphicon glyphicon-ok',
+    invalid: 'glyphicon glyphicon-remove',
+    validating: 'glyphicon glyphicon-refresh'
+  },
+  fields: {
+    company_phone: {
+      validators: {
+        notEmpty: {
+          message: '{% trans 'company_phone_error#1' %}'
+        },
+        regexp:{
+          regexp: /^\d{9}$/ig,
+          message: '{% trans 'company_phone_error#2' %}'
+        },
+      }
+    },
+    company_email: {
+      validators: {
+        notEmpty: {
+          message: '{% trans 'company_email_error#1' %}'
+        },
+        emailAddress: {
+          message: '{% trans 'company_email_error#2' %}'
+        }
+      }
+    }
+  }
+});
+</script>
 {% endblock %}

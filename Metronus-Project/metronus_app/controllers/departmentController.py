@@ -108,8 +108,10 @@ def list_departments(request):
 
     # Check that the current user has permissions
     lista = get_list_for_role(request)
-    return render(request, "department/department_list.html", {"departments": lista})
-
+    departments = lista.filter(active=True)
+    deleted = lista.filter(active=False)
+    return render(request, "department/department_list.html",
+        {"departments": departments,"deleted":deleted})
 
 def view(request, department_id):
     """
@@ -476,7 +478,7 @@ def check_department_for_fiew(dep, request, for_view):
 
     if actor.user_type != 'A':
         is_executive = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=50)
-        res = is_executive.count() > 0    
+        res = is_executive.count() > 0
 
         if not res:
             if for_view:
@@ -521,7 +523,7 @@ def get_list_for_role(request):
 
     if actor.user_type != 'A':
         is_executive = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=50)
-        res = is_executive.count() > 0    
+        res = is_executive.count() > 0
 
         if not res:
             roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=20)
@@ -537,7 +539,7 @@ def get_list_for_role(request):
     else:
         departments = Department.objects.filter(company_id=actor.company_id)
 
-    return departments
+    return departments.order_by("name")
 
 
 def get_coordinator(department):
