@@ -34,6 +34,9 @@
 		<link href="/static/css/daterangepicker.css" rel="stylesheet">
 		<link href="/static/css/custom.min.css" rel="stylesheet">
     <link href="/static/css/bootstrapvalidator.min.css" rel="stylesheet"/>
+    <link href="/static/css/animate.min.css" rel="stylesheet">
+    <link href="/static/css/fileinput.min.css" rel="stylesheet"/>
+    <link href="/static/css/green.css" rel="stylesheet"/>
     {% endcompress %}
   </head>
 
@@ -221,7 +224,12 @@
     <script src="/static/js/moment.min.js"></script>
     <script src="/static/js/daterangepicker.js"></script>
     <script src="/static/js/bootstrapvalidator.min.js"></script>
+    <script src="/static/js/metronus.js"></script>
+    <script src="/static/js/custom.min.js"></script>
+    <script src="/static/landing/js/cookies.min.js"></script>
+    <script src="/static/landing/js/wow.min.js"></script>
     {% endcompress %}
+
 
   <script>
       var theme = {
@@ -447,13 +455,7 @@
     {% block javascript %}
 
     {% endblock %}
-    <script src="/static/js/custom.min.js"></script>
 
-    <!-- js -->
-    {% compress js %}
-    <script src="/static/landing/js/cookies.min.js"></script>
-    <script src="/static/landing/js/wow.min.js"></script>
-    {% endcompress %}
 
     <script>
       $( document ).ready(function() {

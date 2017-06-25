@@ -783,11 +783,11 @@ msgstr "La contraseña actual no es correcta."
 msgid "editPasswordTitle"
 msgstr "Cambiar contraseña del administrador"
 
-msgid "curPass"
+msgid "currentpass"
 msgstr "Contraseña actual"
-msgid "newPass1"
+msgid "newpass1"
 msgstr "Nueva contraseña"
-msgid "newPass2"
+msgid "newpass2"
 msgstr "Repetir nueva contraseña"
 
 #: Task

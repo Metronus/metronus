@@ -168,6 +168,9 @@ def is_username_unique(username):
     """
     return User.objects.filter(username=username).count() == 0
 
+def email_in_use_logged(email, user):
+    """ Checks if a email is used by a user who is not me """
+    return User.objects.filter(email=email).exclude(pk=user.pk).count() == 0
 
 def is_email_unique(email):
     """

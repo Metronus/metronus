@@ -785,11 +785,11 @@ msgstr "The current password is not correct."
 msgid "editPasswordTitle"
 msgstr "Change administrator password"
 
-msgid "curPass"
+msgid "currentpass"
 msgstr "Current password"
-msgid "newPass1"
+msgid "newpass1"
 msgstr "New password"
-msgid "newPass2"
+msgid "newpass2"
 msgstr "Repeat new password"
 
 #: Task

@@ -4,7 +4,7 @@ from metronus_app.forms.administratorForm import AdministratorForm
 from metronus_app.forms.employeePasswordForm import EmployeePasswordForm
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from metronus_app.common_utils import check_image, get_current_admin_or_403,is_email_unique
+from metronus_app.common_utils import check_image, get_current_admin_or_403,is_email_unique, email_in_use_logged
 from django.contrib.auth import update_session_auth_hash
 
 
@@ -36,7 +36,7 @@ def edit(request):
         if form.is_valid():
             if not check_image(form, 'photo'):
                 errors.append('company_imageNotValid')
-            if not is_email_unique(form.cleaned_data['admin_email']):
+            if not email_in_use_logged(form.cleaned_data['admin_email'], administrator):
                 errors.append('companyRegister_adminEmailNotUnique')
             if not errors:
                 # Update employee data
@@ -58,12 +58,12 @@ def edit(request):
                 return HttpResponseRedirect('/company/view/')
             else:
                 return render(request, 'company/administrator_edit.html',
-                              {'form': form, 'errors': errors})
+                              {'form': form, 'errors': errors, 'pass_form': EmployeePasswordForm()})
 
     else:
         raise PermissionDenied
 
-    return render(request, 'company/administrator_edit.html', {'form': form})
+    return render(request, 'company/administrator_edit.html', {'form': form, 'pass_form': EmployeePasswordForm()})
 
 
 def update_password(request):
