@@ -16,7 +16,7 @@
         <div class="clearfix"></div><br>
 
         <!-- INI: Project Manager -->
-        {% if project_manager != null %}
+        {% if project_managers != null %}
             <div class="col-xs-12">
                 <div class="x_panel">
                     <div class="x_title">
@@ -25,35 +25,31 @@
                     </div>
 
                     <div class="clearfix"></div>
-
-                    <div class="x_content">
-                        <div class="profile_details text-center">
-                            <div class="well profile_view">
-                                <div class="col-sm-12">
-                                    <h4 class="brief"><em>{% trans 'projectManager' %}</em></h4>
-                                    <div class="left col-xs-7">
-                                        <h2>{{ project_manager.user.get_username }}</h2>
-                                        <ul class="list-unstyled">
-                                            <li><em class="fa fa-phone"></em> {{ project_manager.phone }}</li>
-                                        </ul>
-                                    </div>
-
-                                    <div class="right col-xs-5 text-center">
-                                        {% if project_manager.picture %}
-                                            <img src="{{ MEDIA_URL }}{{ project_manager.picture }}" alt="" class="img-circle img-responsive" width="150px">
+  <div class="x_content">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>{% trans 'username' %}</th>
+                                    <th>{% trans 'identifier' %}</th>
+                                    <th>{% trans 'phone' %}</th>
+                                    <th class="hidden-xs">{% trans 'registryDate' %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for employee in project_managers %}
+                                    <tr data-href="{% url 'employee_view' employee.user %}" style="cursor: pointer;">
+                                        {% if employee.picture %}
+                                            <td><img src="{{ MEDIA_URL }}{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
                                         {% else %}
-                                            <img src="/static/avatar.png" alt="" class="img-circle img-responsive" width="150px">
+                                            <td><img src="{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
                                         {% endif %}
-                                    </div>
-                                </div>
-
-                                <div class="col-xs-12 bottom text-center">
-                                    <a type="button" class="btn btn-primary btn-xs" href="{% url 'employee_view' project_manager.user %}">
-                                        <em class="fa fa-user"> </em> {% trans 'profile' %}
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+                                        <td>{{employee.identifier}}</td>
+                                        <td>{{employee.phone}}</td>
+                                        <td class="hidden-xs">{{employee.registryDate}}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -222,8 +218,12 @@
                             <thead>
                                 <tr>
                                     <th>{% trans 'username' %}</th>
+                                    <th>{% trans 'name' %}</th>
+                                    <th>{% trans 'surname' %}</th>
+                                   
                                     <th>{% trans 'identifier' %}</th>
                                     <th>{% trans 'phone' %}</th>
+                                    <th>{% trans 'email' %}</th>
                                     <th class="hidden-xs">{% trans 'registryDate' %}</th>
                                 </tr>
                             </thead>
@@ -235,8 +235,11 @@
                                         {% else %}
                                             <td><img src="{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
                                         {% endif %}
+                                        <td>{{employee.user.first_name}}</td>
+                                        <td>{{employee.user.last_name}}</td>
                                         <td>{{employee.identifier}}</td>
                                         <td>{{employee.phone}}</td>
+                                        <td>{{employee.user.email}}</td>
                                         <td class="hidden-xs">{{employee.registryDate}}</td>
                                     </tr>
                                 {% endfor %}

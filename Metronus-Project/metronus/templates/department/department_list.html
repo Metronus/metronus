@@ -58,10 +58,11 @@
                     </tbody>
                 </table>
             </div>
+            
+            <div class="text-center">
              {% if departments|length_is:"0"  %}
              <h2>{% trans 'plsDepartment' %}</h2>
              {% endif %}
-            <div class="text-center">
                 <a class="btn btn-dark" href="{% url 'department_create' %}">{% trans 'create' %}</a>
             </div>
         </div>

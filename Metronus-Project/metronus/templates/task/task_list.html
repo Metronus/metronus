@@ -64,10 +64,11 @@
                     </tbody>
                 </table>
             </div>
-                {% if tasks|length_is:"0"  %}
+             
+            <div class="text-center">
+               {% if tasks|length_is:"0"  %}
              <h2>{% trans 'plsTask' %}</h2>
              {% endif %}
-            <div class="text-center">
                 <a class="btn btn-dark" href="{% url 'task_create' %}">{% trans 'create' %}</a>
             </div>
         </div>

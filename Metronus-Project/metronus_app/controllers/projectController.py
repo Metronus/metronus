@@ -120,7 +120,7 @@ def show(request, project_id):
 
     returns:
     -project
-    -project_manager
+    -project_managers
     -employees
     -tasks
     -departments
@@ -135,16 +135,16 @@ def show(request, project_id):
 
 
     project = get_object_or_404(Project, pk=project_id)
-    project_manager = Employee.objects.filter(
+    project_managers = Employee.objects.filter(
         projectdepartmentemployeerole__projectDepartment_id__project_id=project,
-        projectdepartmentemployeerole__role_id__tier__gte=40).first()
+        projectdepartmentemployeerole__role_id__tier=40)
     employees = Employee.objects.filter(
-        projectdepartmentemployeerole__projectDepartment_id__project_id=project).distinct()
+        projectdepartmentemployeerole__projectDepartment_id__project_id=project).distinct().order_by("user__first_name","user__last_name")
     tasks = Task.objects.filter(active=True, projectDepartment_id__project_id__id=project_id)
     departments = Department.objects.filter(active=True, projectdepartment__project_id__id=project_id)
     return render(request, "project/project_view.html", {"project": project, "employees": employees,
                                                          "tasks": tasks, "departments": departments,
-                                                         "project_manager": project_manager})
+                                                         "project_managers": project_managers})
 
 
 def edit(request, project_id):
