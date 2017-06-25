@@ -180,7 +180,7 @@ class ProjectTestCase(TestCase):
         response = c.get("/project/list")
 
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(len(response.context["projects"]), 3)
+        self.assertEquals(len(response.context["projects"]), 2)
         self.assertEquals(response.context["projects"][0].name, "pro1")
 
     def test_list_projects_not_logged(self):
@@ -303,7 +303,7 @@ class ProjectTestCase(TestCase):
         form = response.context["project"]
 
         self.assertEquals(form.id, pro_id)
-    
+
     def test_view_project_negative_other_company(self):
         """
         View project from other company (negative)
@@ -331,7 +331,7 @@ class ProjectTestCase(TestCase):
         c.login(username="emp1", password="123456")
         response = c.get("/project/view/"+str(pro_id)+"/")
         self.assertEquals(response.status_code, 403)
-        
+
     def test_edit_project_positive(self):
         """
         Logged in as an administrator, try to edit a project
@@ -347,7 +347,7 @@ class ProjectTestCase(TestCase):
               })
 
         self.assertEquals(response.status_code, 302)
-        
+
         pro_up=Project.objects.get(pk=pro.id)
 
         self.assertEquals(pro_up.name, "Metronosa")
