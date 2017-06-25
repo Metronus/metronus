@@ -23,10 +23,11 @@ def get_form_type(form_type):
 def show_form(form):
     return {'form': form}
 
-
 @register.inclusion_tag('tags/field.html')
-def show_field(field, required=True):
-    return {'field': field, 'required': "required" if required else "", 'type': get_form_type(get_type(field))}
+def show_field(field, placeholder="", error_code=None):
+    return {'field': field, 'required': "*" if field.field.required else "",
+            'type': get_form_type(get_type(field)), 'placeholder':placeholder,
+            'custom_error_str':error_code}
 
 @register.inclusion_tag('tags/team_item.html')
 def team_item(name, img_name, role):

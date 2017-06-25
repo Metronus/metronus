@@ -132,7 +132,7 @@ def edit(request):
         form = CompanyForm(request.POST, request.FILES)
         if form.is_valid():
             errors = []
-           
+
             # Check that the image is OK
             if not check_image(form, 'logo'):
                 errors.append('company_imageNotValid')
@@ -311,13 +311,6 @@ def validate_email(request):
     """
     checks whether the email is unique
     """
-
     email = request.GET.get("email", None)
-
-    if not email:
-        return HttpResponseBadRequest()
-
-    if is_company_email_unique(email) and is_email_unique(email):
-        return JsonResponse({'res': True})
-    else:
-        return JsonResponse({'res': False})
+    is_taken = not (is_company_email_unique(email) and is_email_unique(email))
+    return JsonResponse({'is_taken': is_taken})
