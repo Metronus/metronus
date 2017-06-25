@@ -2,120 +2,118 @@
 {% load i18n %}
 {% load l10n %}
 
+{% if form.project_id.value|slugify == '0' %}
+  {% trans 'createProject' as tituloProyecto %}
+{% else %}
+  {% trans 'editProject' as tituloProyecto %}
+{% endif %}
+
+
 {% block title %}
-    {% if form.project_id.value|slugify == '0' %}
-        {% trans 'createProject' %}
-    {% else %}
-        {% trans 'editProject' %}
-    {% endif %}
+  {% if form.project_id.value|slugify == '0' %}
+    {% trans 'createProject' %}
+  {% else %}
+    {% trans 'editProject' %}
+  {% endif %}
 {% endblock %}
 
 {% block content %}
-    <div class="clearfix"></div>
+<div class="clearfix"></div>
 
-    <div id="successDiv" class="alert alert-success" hidden='true'></div>
-    <div id="errorDiv" class="alert alert-danger" {% if not error and not repeated_name %} hidden='true'{% endif %} >
-    	
-   {% if error %}
-            <span><strong>{% trans 'fail' %} |</strong> {% trans 'projectError' %}</span>
-    {% endif %}
+<div id="successDiv" class="alert alert-success" hidden='true'></div>
+<div id="errorDiv" class="alert alert-danger" {% if not error and not repeated_name %} hidden='true'{% endif %}>
+  {% if error %}
+  <span><strong>{% trans 'fail' %} |</strong> {% trans 'projectError' %}</span>
+  {% endif %}
 
-    {% if repeated_name %}
-         <span><strong>{% trans 'fail' %} |</strong> {% trans 'projectName' %}</span>
-    {% endif %}
+  {% if repeated_name %}
+  <span><strong>{% trans 'fail' %} |</strong> {% trans 'projectName' %}</span>
+  {% endif %}
+</div>
 
-    </div>
+<div class="row">
+  <div class="col-md-12 col-sm-12 col-xs-12">
+    <div class="x_panel">
+      <div class="x_title">
+        <h2>
+          {% if form.project_id.value|slugify == '0' %}
+            {% trans 'createProject' %}
+          {% else %}
+            {% trans 'editProject'%}
+          {% endif %}
+        </h2>
+        <div class="clearfix"></div>
+      </div>
 
- 
-
-    <div class="row">
-        <div class="col-md-12 col-sm-12 col-xs-12">
-            <div class="x_panel">
-                <div class="x_title">
-                    <h2>
-                        {% if form.project_id.value|slugify == '0' %}{% trans 'createProject' %}
-                        {% else %}{% trans 'editProject' %}{% endif %}
-                    </h2>
-                    <div class="clearfix"></div>
-                </div>
-                <div class="x_content">
-                    <form id="form" class="form-horizontal form-label-left" novalidate method="POST">{% csrf_token %}
-                        <div class="{{ form.name.name }} form-group">
-                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="{{ form.name.auto_id }}">
-                                {{ form.name.label }} *
-                            </label>
-                            <div class="col-md-6 col-sm-6 col-xs-12">
-                                <input id="{{ form.name.auto_id }}" class="form-control col-md-7 col-xs-12"
-                                       data-validate-length-range="2" name="{{ form.name.name }}" required="required"
-                                       type="text" value="{{ form.name.value|default_if_none:"" }}">
-                            </div>
-                        </div>
-
-                        {% for field in form.hidden_fields %}{{ field }}{% endfor %}
-                        <div class="ln_solid"></div>
-
-                        <div class="text-center">
-                            <a class="btn btn-danger" href="{% url 'project_list' %}">{% trans 'cancel' %}</a>
-                            <button type="submit" class="btn btn-success">{% trans 'confirm' %}</button>
-                            {% if form.project_id.value|slugify == '0' %}
-                                <a class="btn btn-info" onclick="createAndContinue()">{% trans 'createAndContinue' %}</a>
-                            {% endif %}
-                        </div>
-                    </form>
-                </div>
+      <div class="x_content">
+        <form id="form" class="form-horizontal form-label-left" novalidate method="POST">
+          {% csrf_token %}
+          <div class="{{ form.name.name }} form-group">
+            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="{{ form.name.auto_id }}">
+              {{ form.name.label }} *
+            </label>
+            <div class="col-md-6 col-sm-6 col-xs-12">
+              <input id="{{ form.name.auto_id }}" class="form-control col-md-7 col-xs-12"
+                data-validate-length-range="2" name="{{ form.name.name }}" required="required"
+                type="text" value="{{ form.name.value|default_if_none:"" }}">
+              </div>
             </div>
+
+            {% for field in form.hidden_fields %}{{ field }}{% endfor %}
+            <div class="ln_solid"></div>
+            <div class="text-center">
+              <a class="btn btn-danger" href="{% url 'project_list' %}">{% trans 'cancel' %}</a>
+              <button type="submit" class="btn btn-success">{% trans 'confirm' %}</button>
+              {% if form.project_id.value|slugify == '0' %}
+              <a class="btn btn-info" onclick="createAndContinue()">{% trans 'createAndContinue' %}</a>
+              {% endif %}
+            </div>
+          </form>
         </div>
+      </div>
     </div>
+  </div>
+
 {% endblock %}
 
 {% block javascript %}
 <script>
-/**
- * Función ajax de crear y continuar
- * */
-function createAndContinue() {
-    $.post('{% url 'project_create_async' %}',$('#form').serialize(), function(data,status) {
-        
+  function createAndContinue() {
+    $.post(
+      '{% url 'project_create_async' %}',
+      $('#form').serialize(),
+      function(data,status) {
         if(JSON.stringify(data['success'])=="true"){
-        	//only reset if the form was successfully
-		document.getElementById('form').reset();
-        $('#form').data('bootstrapValidator').resetForm();
-
-            $('#errorDiv').attr('hidden', true);
-    		$('#successDiv').attr('hidden', false).html("<strong>{% trans 'success' %} | </strong>{% trans 'projectSaved' %}");
-        } else if(JSON.stringify(data['repeated_name'])=="true") {
-    		$('#successDiv').attr('hidden', true);
-    		$('#errorDiv').attr('hidden', false).html("<strong>{% trans 'fail' %} | </strong>{% trans 'projectName' %}");
+          $('#form').find('input:text, input:password, input:file, select, textarea').val('');
+          $('#errorDiv').hide();
+          $('#successDiv').fadeIn().html("<strong>{% trans 'success' %} | </strong>{% trans 'projectSaved' %}");
+        } else if(JSON.stringify(data['repeated_name'])=="true"){
+    		  $('#successDiv').hide();
+          $('#errorDiv').fadeIn().html("<strong>{% trans 'fail' %} | </strong>{% trans 'projectName' %}");
     	} else {
-    		$('#successDiv').attr('hidden', true);
-    		$('#errorDiv').attr('hidden', false).html("<strong>{% trans 'fail' %} | </strong>{% trans 'projectError' %}");
+    		$('#successDiv').hide()
+    		$('#errorDiv').fadeIn().html("<strong>{% trans 'fail' %} | </strong>{% trans 'projectError' %}");
     	}
-    } );
-};
-
-
-/**
- * Validación en cliente del formulario
- * */
-$(document).ready(function() {
-    $('#form').bootstrapValidator({
-        feedbackIcons: {
-            valid: 'glyphicon glyphicon-ok',
-            invalid: 'glyphicon glyphicon-remove',
-            validating: 'glyphicon glyphicon-refresh'
-        },
-        fields: {
-            name: {
-                validators: {
-                    notEmpty: {
-                        message: "{% trans 'projectNameNotNull' %}"
-                    },
-                }
-            },
-
-
-        },
     });
-});
+  };
+
+  $(document).ready(function() {
+    $('#form').bootstrapValidator({
+      feedbackIcons: {
+        valid: 'glyphicon glyphicon-ok',
+        invalid: 'glyphicon glyphicon-remove',
+        validating: 'glyphicon glyphicon-refresh'
+      },
+      fields: {
+        name: {
+          validators: {
+            notEmpty: {
+              message: "{% trans 'projectNameNotNull' %}"
+            },
+          }
+        },
+      },
+    });
+  });
 </script>
 {% endblock %}

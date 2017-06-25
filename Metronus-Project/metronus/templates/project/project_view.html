@@ -1,5 +1,4 @@
 {% extends "layout_base.html" %}
-
 {% load i18n %}
 {% load l10n %}
 
@@ -7,250 +6,255 @@
 
 {% block content %}
 <div class="row">
-    <div class="page-title">
-        <div class="title_left">
-            <h3><strong>{% trans 'project' %}: </strong> {{ project.name }}</h3>
-        </div>
+  <div class="page-title">
+    <div class="title_left">
+      <h3><strong>{% trans 'project' %}: </strong> {{ project.name }}</h3>
     </div>
+  </div>
 
-        <div class="clearfix"></div><br>
+  <div class="clearfix"></div>
+  <br>
 
-        <!-- INI: Project Manager -->
-        {% if project_managers != null %}
-            <div class="col-xs-12">
-                <div class="x_panel">
-                    <div class="x_title">
-                        <h2>{% trans 'projectManager' %}</h2>
-                        <div class="clearfix"></div>
-                    </div>
-
-                    <div class="clearfix"></div>
-  <div class="x_content">
-                        <table class="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>{% trans 'username' %}</th>
-                                    <th>{% trans 'identifier' %}</th>
-                                    <th>{% trans 'phone' %}</th>
-                                    <th class="hidden-xs">{% trans 'registryDate' %}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for employee in project_managers %}
-                                    <tr data-href="{% url 'employee_view' employee.user %}" style="cursor: pointer;">
-                                        {% if employee.picture %}
-                                            <td><img src="{{ MEDIA_URL }}{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
-                                        {% else %}
-                                            <td><img src="{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
-                                        {% endif %}
-                                        <td>{{employee.identifier}}</td>
-                                        <td>{{employee.phone}}</td>
-                                        <td class="hidden-xs">{{employee.registryDate}}</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        {% endif %}
-        <!-- FIN: Project Manager -->
-
+  <!-- INI: Project Manager -->
+  {% if project_managers != null %}
+  <div class="col-xs-12">
+    <div class="x_panel">
+      <div class="x_title">
+        <h2>{% trans 'projectManager' %}</h2>
+        <ul class="nav navbar-right panel_toolbox">
+          <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+        </ul>
         <div class="clearfix"></div>
+      </div>
 
-        <!-- INI: gráficas departamentos -->
-        <div class="col-xs-12">
-            <div class="x_panel">
-                <div class="x_title">
-                    <h2>{% trans 'departmentGraphs' %}</h2>
-                    <div class="clearfix"></div>
-                </div>
+      <div class="clearfix"></div>
 
-                <div class="clearfix"></div>
+      <div class="x_content">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>{% trans 'username' %}</th>
+              <th>{% trans 'phone' %}</th>
+              <th>{% trans 'email' %}</th>
+            </tr>
+          </thead>
 
-                <div class="x_content row">
-                    <div class="col-md-6 col-xs-12">
-                        <div id="donut_department" style="height:200px;"></div>
-                    </div>
-                    <div class="col-md-6 col-xs-12">
-                        <div id="donut_task" style="height:200px;"></div>
-                    </div>
-                </div>
-            </div>
+          <tbody>
+            {% for employee in project_managers %}
+            <tr data-href="{% url 'employee_view' employee.user %}" style="cursor: pointer;">
+              {% if employee.picture %}
+              <td><img src="{{ MEDIA_URL }}{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user.first_name}} {{employee.user.last_name}}</td>
+              {% else %}
+              <td><img src="{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
+              {% endif %}
+              <td>{{employee.phone}}</td>
+              <td>{{employee.user.email}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  <!-- FIN: Project Manager -->
+
+  <div class="clearfix"></div>
+
+  <!-- INI: gráficas departamentos -->
+  <div class="col-xs-12">
+    <div class="x_panel">
+      <div class="x_title">
+        <h2>{% trans 'departmentGraphs' %}</h2>
+        <ul class="nav navbar-right panel_toolbox">
+          <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+        </ul>
+        <div class="clearfix"></div>
+      </div>
+
+      <div class="clearfix"></div>
+
+      <div class="x_content row">
+        <div class="col-md-6 col-xs-12">
+          <div id="donut_department" style="height:200px;"></div>
         </div>
-        <!-- FIN: gráficas departamentos -->
-
-        <div class="clearfix"></div>
-
-        <!-- INI: gráfica tiempo/departamento -->
-        <div class="col-xs-12">
-            <div class="x_panel">
-                <div class="x_content">
-                    <div id="timePerDepartment" style="min-height: 400px"></div>
-
-                    <div style="display: flex; justify-content: center;">
-                        <form class="form-horizontal">
-                            <fieldset>
-                              <legend>{% trans 'datePicker' %}</legend>
-                                <div class="control-group">
-                                    <div class="controls">
-                                        <div class="input-prepend input-group">
-                                            <span class="add-on input-group-addon"><em class="glyphicon glyphicon-calendar fa fa-calendar"></em></span>
-                                            <input type="text" style="width: 200px" name="timeDep_chart" id="timeDep_chart" class="form-control" value="" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </fieldset>
-                        </form>
-                    </div>
-                    <br/>
-                </div>
-            </div>
-        </div>
-        <!-- FIN: gráfica tiempo/departamento -->
-
-        <div class="clearfix"></div>
-
-        <!-- INI: gráfica de beneficio -->
-        <div class="col-xs-12">
-        <div class="x_panel">
-          <div class="x_content">
-
-            <div id="welp3" style="height:350px;"></div>
-
-            <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
-              <form class="form-horizontal">
-                <fieldset>
-                  <legend>{% trans 'datePicker' %}</legend>
-                  <div class="control-group">
-                    <div class="controls">
-                      <div class="input-prepend input-group">
-                        <span class="add-on input-group-addon"><em class="glyphicon glyphicon-calendar fa fa-calendar"></em></span>
-                        <input type="text" style="width: 200px" name="project_profit_chart" id="project_profit_chart" class="form-control" value=""/>
-                      </div>
-                    </div>
-                  </div>
-                </fieldset>
-              </form>
-              <form class="form-horizontal">
-                <fieldset>
-                  <legend>{% trans 'data_output_to' %}</legend>
-                  <div class="control-group">
-                    <div class="controls">
-                      <div class="input-prepend input-group">
-                        <span class="add-on input-group-addon"><em class="glyphicon glyphicon-refresh fa fa-refresh"></em></span>
-
-                        <div style="display: table-cell;border-radius: 0px 3px 3px 0px; min-width: 197px" id="switch-acum-button" type="text" class="btn btn-success">{% trans 'cumulative_values' %}</div>
-                      </div>
-                    </div>
-                  </div>
-                </fieldset>
-              </form>
-            </div>
-            <br/>
-          </div>
+        <div class="col-md-6 col-xs-12">
+          <div id="donut_task" style="height:200px;"></div>
         </div>
       </div>
-     <!-- Here ends profit graphics-->
-
-        <!-- FIN MISILES -->
-
-        <div class="clearfix"></div>
-
-            <div class="col-md-12 col-sm-12 col-xs-12">
-                <div class="x_panel">
-                    <div class="x_title">
-                  <h2> {% trans 'departments' %}</h2>
-                   </div>
-
-                    <div class="clearfix"></div>
-
-                    <div class="x_content">
-                        <div class="accordion" id="accordion1" role="tablist" aria-multiselectable="true">
-                            {% for department in departments %}
-                                <div class="panel">
-                                    <a class="panel-heading" role="tab" id="heading{{forloop.counter}}" data-toggle="collapse"
-                                       data-parent="#accordion1" href="#collapse{{forloop.counter}}"
-                                       aria-expanded="{% if forloop.counter == 1 %}true{% else %}false{% endif %}"
-                                       aria-controls="collapse{{forloop.counter}}">
-                                        <h4 class="panel-title">{{ department.name }}</h4>
-                                    </a>
-
-                                    <div id="collapse{{forloop.counter}}" class="panel-collapse collapse in"
-                                         role="tabpanel" aria-labelledby="heading{{forloop.counter}}">
-                                        <div class="panel-body">
-                                            <table class="table table-striped table-hover">
-                                                <thead>
-                                                    <tr>
-                                                      <th>{% trans 'task' %}</th>
-                                                      <th>{% trans 'creationDate' %}</th>
-                                                      <th>{% trans 'creator' %}</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {% for task in tasks %}
-                                                        <tr data-href="{% url 'task_view' task.id %}">
-                                                            <td>{{task.name}}</td>
-                                                            <td>{{task.registryDate}}</td>
-                                                            <td>{{task.actor_id.user.get_username}}</td>
-                                                        </tr>
-                                                    {% endfor %}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-xs-12">
-                <div class="x_panel">
-                    <div class="x_title">
-                     <h2> {% trans 'employeeList' %}</h2></div>
-
-                    <div class="clearfix"></div>
-
-                    <div class="x_content">
-                        <table class="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>{% trans 'username' %}</th>
-                                    <th>{% trans 'name' %}</th>
-                                    <th>{% trans 'surname' %}</th>
-                                   
-                                    <th>{% trans 'identifier' %}</th>
-                                    <th>{% trans 'phone' %}</th>
-                                    <th>{% trans 'email' %}</th>
-                                    <th class="hidden-xs">{% trans 'registryDate' %}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for employee in employees %}
-                                    <tr data-href="{% url 'employee_view' employee.user %}" style="cursor: pointer;">
-                                        {% if employee.picture %}
-                                            <td><img src="{{ MEDIA_URL }}{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
-                                        {% else %}
-                                            <td><img src="{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
-                                        {% endif %}
-                                        <td>{{employee.user.first_name}}</td>
-                                        <td>{{employee.user.last_name}}</td>
-                                        <td>{{employee.identifier}}</td>
-                                        <td>{{employee.phone}}</td>
-                                        <td>{{employee.user.email}}</td>
-                                        <td class="hidden-xs">{{employee.registryDate}}</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-        <div class="clearfix"></div>
     </div>
+  </div>
+  <!-- FIN: gráficas departamentos -->
+
+  <div class="clearfix"></div>
+
+  <!-- INI: gráfica tiempo/departamento -->
+  <div class="col-xs-12 col-lg-6">
+    <div class="x_panel">
+      <div class="x_content">
+        <div id="timePerDepartment" style="min-height: 400px"></div>
+
+        <div style="display: flex; justify-content: center;">
+          <form class="form-horizontal">
+            <fieldset>
+              <legend>{% trans 'datePicker' %}</legend>
+              <div class="control-group">
+                <div class="controls">
+                  <div class="input-prepend input-group">
+                    <span class="add-on input-group-addon"><em class="glyphicon glyphicon-calendar fa fa-calendar"></em></span>
+                    <input type="text" style="width: 200px" name="timeDep_chart" id="timeDep_chart" class="form-control" value="" />
+                  </div>
+                </div>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+        <br/>
+
+      </div>
+    </div>
+  </div>
+  <!-- FIN: gráfica tiempo/departamento -->
+
+  <!-- INI: gráfica de beneficio -->
+  <div class="col-xs-12 col-lg-6">
+    <div class="x_panel">
+      <div class="x_content">
+        <div id="welp3" style="height:350px;"></div>
+        <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
+          <form class="form-horizontal">
+            <fieldset>
+              <legend>{% trans 'datePicker' %}</legend>
+              <div class="control-group">
+                <div class="controls">
+                  <div class="input-prepend input-group">
+                    <span class="add-on input-group-addon"><em class="glyphicon glyphicon-calendar fa fa-calendar"></em></span>
+                    <input type="text" style="width: 200px" name="project_profit_chart" id="project_profit_chart" class="form-control" value=""/>
+                  </div>
+                </div>
+              </div>
+            </fieldset>
+          </form>
+
+          <form class="form-horizontal">
+            <fieldset>
+              <legend>{% trans 'data_output_to' %}</legend>
+              <div class="control-group">
+                <div class="controls">
+                  <div class="input-prepend input-group">
+                    <span class="add-on input-group-addon"><em class="glyphicon glyphicon-refresh fa fa-refresh"></em></span>
+                    <div style="display: table-cell;border-radius: 0px 3px 3px 0px; min-width: 197px" id="switch-acum-button" type="text" class="btn btn-success">{% trans 'cumulative_values' %}</div>
+                  </div>
+                </div>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+        <br/>
+
+      </div>
+    </div>
+  </div>
+  <!-- Here ends profit graphics-->
+
+  <div class="clearfix"></div>
+
+  <!-- DEPARTAMENTOS -->
+  <div class="col-xs-12 col-lg-6">
+    <div class="x_panel">
+      <div class="x_title">
+        <h2> {% trans 'departments' %}</h2>
+        <ul class="nav navbar-right panel_toolbox">
+          <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+        </ul>
+        <div class="clearfix"></div>
+      </div>
+
+      <div class="clearfix"></div>
+
+      <div class="x_content">
+        <div class="accordion" id="accordion1" role="tablist" aria-multiselectable="true">
+          {% for department in departments %}
+          <div class="panel">
+            <a class="panel-heading collapsed" role="tab" id="heading{{forloop.counter}}" data-toggle="collapse"
+              data-parent="#accordion1" href="#collapse{{forloop.counter}}"
+              aria-expanded="false"
+              aria-controls="collapse{{forloop.counter}}">
+              <h4 class="panel-title">{{ department.name }}</h4>
+            </a>
+            <div id="collapse{{forloop.counter}}" class="panel-collapse collapse"
+              role="tabpanel" aria-labelledby="heading{{forloop.counter}}">
+              <div class="panel-body">
+                <table class="table table-striped table-hover">
+                  <thead>
+                    <tr>
+                      <th>{% trans 'task' %}</th>
+                      <th>{% trans 'creationDate' %}</th>
+                      <th>{% trans 'creator' %}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for task in tasks %}
+                    <tr data-href="{% url 'task_view' task.id %}">
+                      <td>{{task.name}}</td>
+                      <td>{{task.registryDate}}</td>
+                      <td>{{task.actor_id.user.get_username}}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- FIN DEPARTAMENTOS -->
+
+  <!-- EMPLEADOS -->
+  <div class="col-xs-12 col-lg-6">
+    <div class="x_panel">
+      <div class="x_title">
+        <h2> {% trans 'employeeList' %}</h2>
+        <ul class="nav navbar-right panel_toolbox">
+          <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+        </ul>
+        <div class="clearfix"></div>
+      </div>
+
+      <div class="clearfix"></div>
+
+      <div class="x_content">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>{% trans 'username' %}</th>
+              <th>{% trans 'phone' %}</th>
+              <th>{% trans 'email' %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for employee in employees %}
+            <tr data-href="{% url 'employee_view' employee.user %}" style="cursor: pointer;">
+              {% if employee.picture %}
+              <td><img src="{{ MEDIA_URL }}{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user.first_name}} {{employee.user.last_name}}</td>
+              {% else %}
+              <td><img src="{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
+              {% endif %}
+              <td>{{employee.phone}}</td>
+              <td>{{employee.user.email}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <!-- FIN EMPLEADOS -->
+
+  </div>
 </div>
 {% endblock %}
 
@@ -259,260 +263,248 @@
     $("[data-href]").click( function () { window.location.href = this.dataset.href })
 </script>
 
-
 <script>
-
-$(document).ready(function() {
-
+  $(document).ready(function() {
     // Para que <legend> se vea como <label>
     $("legend").css({
-        "padding": "inherit",
-        "display": "inline-block",
-        "margin-bottom": "5px",
-        "font-weight": "700",
-        "font-size": "inherit",
-        "border": "inherit"
-    })
+      "padding": "inherit",
+      "display": "inline-block",
+      "margin-bottom": "5px",
+      "font-weight": "700",
+      "font-size": "inherit",
+      "border": "inherit"
+    });
 
-      var echartDonut = echarts.init(document.getElementById('donut_department'), theme);
+    var echartDonut = echarts.init(document.getElementById('donut_department'), theme);
+    var defaultBackendData = {'names': [''], 'values': [0]};
 
-      var defaultBackendData = { 'names': [''], 'values': [0] };
-      $.get({
-        url: "/project/ajaxEmployeesPerDpmt",
-        data: {project_id: {{project.id}}},
-        success: function ( backendData )  {
-          defaultBackendData = backendData
-          echartDonut.setOption(fromData(backendData, 1));
-        }
-      })
-
+    $.get({
+      url: "/project/ajaxEmployeesPerDpmt",
+      data: {project_id: {{project.id}}},
+      success: function(backendData){
+        defaultBackendData = backendData;
+        echartDonut.setOption(fromData(backendData, 1));
+      }
+    });
 
     var echartDonut2 = echarts.init(document.getElementById('donut_task'), theme);
+    var defaultBackendData = {'names': [''], 'values': [0]};
 
-      var defaultBackendData = { 'names': [''], 'values': [0] };
-      $.get({
-        url: "/project/ajaxTasksPerDpmt",
-        data: {project_id: {{project.id}}},
-        success: function ( backendData )  {
-          defaultBackendData = backendData
-          echartDonut2.setOption(fromData(backendData, 0));
-        }
-      });
+    $.get({
+      url: "/project/ajaxTasksPerDpmt",
+      data: {project_id: {{project.id}}},
+      success: function(backendData){
+        defaultBackendData = backendData;
+        echartDonut2.setOption(fromData(backendData, 0));
+      }
+    });
 
-      //BARRAS
+    //BARRAS
+    names = ["{% trans 'imputedTime' %}"];
+    echartLine = echarts.init(document.getElementById('timePerDepartment'), theme);
+    defaultRange = moment().startOf('month').format('MM/DD/YYYY') +' - '+ moment().endOf('month').format('MM/DD/YYYY');
 
-      names = ["{% trans 'imputedTime' %}"];
+    $.get({
+      url: "{% url 'project_time_per_department' %}",
+      data: {
+        project_id: {{project.id}},
+        start_date: moment().startOf('month').format('YYYY-MM-DD'),
+        end_date: moment().endOf('month').format('YYYY-MM-DD')
+      },
+      success: function(backendData)  {
+        data = backendData;
+        echartLine.setOption( fromDataBarChart(backendData) );
+      }
+    });
 
-      echartLine = echarts.init(document.getElementById('timePerDepartment'), theme);
+    $('input[name="timeDep_chart"]').val(defaultRange);
+    $('input[name="timeDep_chart"]').daterangepicker({
+      autoUpdateInput: false,
+      locale: {
+        cancelLabel: '{% trans 'default' %}',
+        applyLabel: '{% trans 'apply' %}'
+      }
+    });
 
-      defaultRange = moment().startOf('month').format('MM/DD/YYYY') +' - '+ moment().endOf('month').format('MM/DD/YYYY')
-
+    $('input[name="timeDep_chart"]').on('apply.daterangepicker', function(ev, picker) {
+      $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
       $.get({
         url: "{% url 'project_time_per_department' %}",
         data: {
           project_id: {{project.id}},
-          start_date: moment().startOf('month').format('YYYY-MM-DD'),
-          end_date: moment().endOf('month').format('YYYY-MM-DD')
+          start_date: picker.startDate.format('YYYY-MM-DD'),
+          end_date: picker.endDate.format('YYYY-MM-DD')
         },
         success: function ( backendData )  {
-          data = backendData
-          echartLine.setOption( fromDataBarChart(backendData) );
+          echartLine.setOption(fromDataBarChart(backendData));
         }
       });
-
-
-    $('input[name="timeDep_chart"]').val(defaultRange)
-
-      $('input[name="timeDep_chart"]').daterangepicker({
-            autoUpdateInput: false,
-            locale: {
-                cancelLabel: '{% trans 'default' %}',
-                applyLabel: '{% trans 'apply' %}'
-            }
-        });
-
-        $('input[name="timeDep_chart"]').on('apply.daterangepicker', function(ev, picker) {
-            $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
-            $.get({
-                url: "{% url 'project_time_per_department' %}",
-                data: {
-                    project_id: {{project.id}},
-                    start_date: picker.startDate.format('YYYY-MM-DD'),
-                    end_date: picker.endDate.format('YYYY-MM-DD')
-                },
-                success: function ( backendData )  {
-
-                    console.log(backendData);
-                    echartLine.setOption( fromDataBarChart(backendData ) );
-                }
-            });
-        });
-
-        $('input[name="timeDep_chart"]').on('cancel.daterangepicker', function(ev, picker) {
-            $(this).val(defaultRange);
-            echartLine.setOption( fromDataBarChart( names, data ) );
-        });
-
-      ///////////////////////////////////
-      // Gráfico de Gastos y Ganancias //
-      ///////////////////////////////////
-      var useAcum=false;
-      var echartLine2 = echarts.init(document.getElementById('welp3'), theme);
-      var  defaultProfitBackendData = {'dates':[],'expenses':[],'income':[],'acumExpenses':[],'acumIncome':[]};
-      $.get({
-        url: "/project/ajaxProfit/"+ {{project.id}} +"/",
-        success: function ( backendData )  {
-          defaultProfitBackendData = backendData
-          echartLine2.setOption( fromProfitData( backendData,useAcum ) );
-        }
-      })
-      //Date picker for profit
-      defaultRange = moment().startOf('month').format('MM/DD/YYYY') +' - '+ moment().endOf('month').format('MM/DD/YYYY')
-      $('input[name="project_profit_chart"]').val(defaultRange)
-
-      $('input[name="project_profit_chart"]').daterangepicker({
-        autoUpdateInput: false,
-        locale: {
-          cancelLabel: '{% trans 'default' %}',
-          applyLabel: '{% trans 'apply' %}'
-        }
-      });
-
-      $('input[name="project_profit_chart"]').on('apply.daterangepicker', function(ev, picker) {
-        $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
-        $.get({
-          url:"/project/ajaxProfit/"+{{project.id}}+"/",
-          data: {
-            start_date: picker.startDate.format('YYYY-MM-DD'),
-            end_date: picker.endDate.format('YYYY-MM-DD')
-          },
-          success: function ( backendData )  {
-            defaultProfitBackendData = backendData
-            echartLine2.setOption( fromProfitData( backendData ,useAcum) );
-          }
-        })
-      });
-
-      $('input[name="project_profit_chart"]').on('cancel.daterangepicker', function(ev, picker) {
-        $(this).val(defaultRange);
-        echartLine2.setOption( fromProfitData( defaultProfitBackendData,useAcum ) );
-      });
-      var switcher= $('#switch-acum-button');
-      switcher.click(function(){
-        useAcum=!useAcum;
-        if(useAcum){
-          switcher.html("{% trans 'non_cumulative_values' %}")
-          echartLine2.setOption( fromProfitData( defaultProfitBackendData ,useAcum) );
-        } else {
-          switcher.html("{% trans 'cumulative_values' %}")
-          echartLine2.setOption( fromProfitData( defaultProfitBackendData ,useAcum) );
-        }
-      })
-
-
-
-        //Responsive para todos
-        $(window).on('resize', () => {
-            [echartDonut, echartDonut2, echartLine, echartLine2].forEach( e => {
-                e.resize()
-            })
-        })
-
-
     });
 
+    $('input[name="timeDep_chart"]').on('cancel.daterangepicker', function(ev, picker) {
+      $(this).val(defaultRange);
+      echartLine.setOption(fromDataBarChart(names, data));
+    });
 
-function fromData (backendData, type) {
-             var opts = {
-                  title : {
-                      text: (function () {
-                                if(type == 1)
-                                    return "{% trans 'employeesPerDepartment' %}";
-                                else
-                                    return "{% trans 'tasksPerDepartment' %}"
-                          })(),
-                      x: 'left',
-                      textStyle:{fontSize:16},
-                      subtextStyle:{fontSize:12}
-                 },
-                tooltip: {
-                  trigger: 'item',
-                  formatter: "{a} <br/>{b} : {c} ({d}%)"
-                },
-                calculable: true,
-                toolbox: {
-                  show: true,
-                  feature: {
-                    magicType: {
-                      show: true,
-                      type: ['pie', 'funnel'],
-                      option: {
-                        funnel: {
-                          x: '25%',
-                          width: '50%',
-                          funnelAlign: 'center',
-                          max: 1548
-                        }
-                      }
-                    },
-                    restore: {
-                      show: true,
-                      title: "Restore"
-                    },
-                    saveAsImage: {
-                      show: true,
-                      title: "Save Image"
-                    }
-                  }
-                },
-                series: [{
-                  name: '{{project.name}}',
-                  type: 'pie',
-                  radius: ['35%', '55%'],
-                  itemStyle: {
-                    normal: {
-                      label: {
-                        show: true
-                      },
-                      labelLine: {
-                        show: true
-                      }
-                    },
-                    emphasis: {
-                      label: {
-                        show: true,
-                        position: 'center',
-                        textStyle: {
-                          fontSize: '14',
-                          fontWeight: 'normal'
-                        }
-                      }
-                    }
-                  },
-                  data: (function () {
-                          var res = [];
-                          for (var n in backendData.values) {
-                              var obj = {
-                                  name: backendData.names[n],
-                                  value: backendData.values[n]
-                              };
-                            if(backendData.values[n] != 0){
-                                res.push(obj);
-                            }
+    ///////////////////////////////////
+    // Gráfico de Gastos y Ganancias //
+    ///////////////////////////////////
+    var useAcum=false;
+    var echartLine2 = echarts.init(document.getElementById('welp3'), theme);
+    var defaultProfitBackendData = {'dates':[],'expenses':[],'income':[],'acumExpenses':[],'acumIncome':[]};
 
-                            }
-                          return res;
-                      })()
-                }]
+    $.get({
+      url: "/project/ajaxProfit/"+ {{project.id}} +"/",
+      success: function (backendData)  {
+        defaultProfitBackendData = backendData;
+        echartLine2.setOption(fromProfitData(backendData,useAcum));
+      }
+    });
+
+    //Date picker for profit
+    defaultRange = moment().startOf('month').format('MM/DD/YYYY') +' - '+ moment().endOf('month').format('MM/DD/YYYY');
+    $('input[name="project_profit_chart"]').val(defaultRange)
+    $('input[name="project_profit_chart"]').daterangepicker({
+      autoUpdateInput: false,
+      locale: {
+        cancelLabel: '{% trans 'default' %}',
+        applyLabel: '{% trans 'apply' %}'
+      }
+    });
+
+    $('input[name="project_profit_chart"]').on('apply.daterangepicker', function(ev, picker) {
+      $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+      $.get({
+        url:"/project/ajaxProfit/"+{{project.id}}+"/",
+        data: {
+          start_date: picker.startDate.format('YYYY-MM-DD'),
+          end_date: picker.endDate.format('YYYY-MM-DD')
+        },
+        success: function(backendData){
+          defaultProfitBackendData = backendData;
+          echartLine2.setOption(fromProfitData(backendData, useAcum));
+        }
+      })
+    });
+
+    $('input[name="project_profit_chart"]').on('cancel.daterangepicker', function(ev, picker) {
+      $(this).val(defaultRange);
+      echartLine2.setOption(fromProfitData(defaultProfitBackendData, useAcum));
+    });
+
+    var switcher= $('#switch-acum-button');
+    switcher.click(function(){
+      useAcum=!useAcum;
+
+      if(useAcum){
+        switcher.html("{% trans 'non_cumulative_values' %}")
+        echartLine2.setOption( fromProfitData( defaultProfitBackendData ,useAcum) );
+      } else {
+        switcher.html("{% trans 'cumulative_values' %}")
+        echartLine2.setOption( fromProfitData( defaultProfitBackendData ,useAcum) );
+      }
+    });
+
+    //Responsive para todos
+    $(window).on('resize', () => {
+      [echartDonut, echartDonut2, echartLine, echartLine2].forEach( e => {
+        e.resize();
+      })
+    });
+  });
+
+  function fromData(backendData, type) {
+    var opts = {
+      title : {
+        text: (function () {
+          if(type == 1)
+            return "{% trans 'employeesPerDepartment' %}";
+          else
+            return "{% trans 'tasksPerDepartment' %}"
+          })
+          (),
+          x: 'left',
+          textStyle:{fontSize:16},
+          subtextStyle:{fontSize:12}
+        },
+        tooltip: {
+          trigger: 'item',
+          formatter: "{a} <br/>{b} : {c} ({d}%)"
+        },
+        calculable: true,
+        toolbox: {
+          show: true,
+          feature: {
+            magicType: {
+              show: true,
+              type: ['pie', 'funnel'],
+              option: {
+                funnel: {
+                  x: '25%',
+                  width: '50%',
+                  funnelAlign: 'center',
+                  max: 1548
+                }
               }
-              return opts;
+            },
+            restore: {
+              show: true,
+              title: "Restore"
+            },
+            saveAsImage: {
+              show: true,
+              title: "Save Image"
+            }
           }
+        },
+        series: [{
+          name: '{{project.name}}',
+          type: 'pie',
+          radius: ['35%', '55%'],
+          itemStyle: {
+            normal: {
+              label: {
+                show: true
+              },
+              labelLine: {
+                show: true
+              }
+            },
+            emphasis: {
+              label: {
+                show: true,
+                position: 'center',
+                textStyle: {
+                  fontSize: '14',
+                  fontWeight: 'normal'
+                }
+              }
+            }
+          },
+          data: (function () {
+            var res = [];
+            for (var n in backendData.values) {
+              var obj = {
+                name: backendData.names[n],
+                value: backendData.values[n]
+              };
+              if(backendData.values[n] != 0){
+                res.push(obj);
+              }
+            }
+            return res;
+          })()
+        }]
+      }
+      return opts;
+    }
 
     function fromProfitData (backendData,acum) {
       dates=backendData["dates"];
       expenses=backendData["expenses"]
       income=backendData["income"]
       subtext='{% trans 'notAcum' %}';
+
       if(acum){
         subtext='{% trans 'acum' %}';
         expenses=backendData["acumExpenses"];
@@ -540,141 +532,119 @@ function fromData (backendData, type) {
           }
         },
         calculable : true,
-        xAxis : [
-        {
+        xAxis : [{
           type : 'category',
           show : false,
           data : dates
-        }
-        ],
-        yAxis : [
-        {
+        }],
+        yAxis : [{
           type : 'value'
-        }
-        ],
-        series : [
-        {
+        }],
+        series : [{
           name:'{% trans 'expenses' %}',
           type:'line',
           data: expenses,
           markPoint : {
-            data : [
-            {type : 'max', name: 'Max'},
-            {type : 'min', name: 'Min'}
-            ]
+            data : [{type : 'max', name: 'Max'},
+                    {type : 'min', name: 'Min'}]
           },
           markLine : {
-            data : [
-            {type : 'average', name: 'Avg'}
-            ]
+            data : [{type : 'average', name: 'Avg'}]
           }
         },
-        {
-          name:'{% trans 'income' %}',
-          type:'line',
-          data: income,
-          markPoint : {
-            data : [
-            {type : 'max', name: 'Max'},
-            {type : 'min', name: 'Min'}
-            ]
+        {name:'{% trans 'income' %}',
+        type:'line',
+        data: income,
+        markPoint : {
+          data : [{type : 'max', name: 'Max'},
+                  {type : 'min', name: 'Min'}]
           },
           markLine : {
-            data : [
-            {type : 'average', name: 'Avg'}
-            ]
+            data : [{type : 'average', name: 'Avg'}]
           }
-        }
-        ]
+        }]
       }
-
     }
 
-
- // AQUI COMIENZA LA GRÁFICA DE BARRAS
+    // AQUI COMIENZA LA GRÁFICA DE BARRAS
     function fromDataBarChart(backendData) {
-        return {
-            title: {
-                text: '{% trans 'timePerDepartment' %}',
-                subtext: '{% trans 'timePerDepartment2' %}'
+      return {
+        title: {
+          text: '{% trans 'timePerDepartment' %}',
+          subtext: '{% trans 'timePerDepartment2' %}'
+        },
+        tooltip: {
+          trigger: 'axis'
+        },
+        legend: {
+          show: true,
+          left: 'center',
+          data: backendData.values
+        },
+        toolbox: {
+          show: true,
+          feature: {
+            magicType: {
+              show: true,
+              title: {
+                line: '{% trans 'line' %}',
+                bar: '{% trans 'bar' %}'
+              },
+              type: ['bar', 'line']
             },
-            tooltip: {
-                trigger: 'axis'
+            restore: {
+              show: true,
+              title: '{% trans 'restore' %}'
             },
-            legend: {
-                show: true,
-                left: 'center',
-                data: backendData.values
-            },
-            toolbox: {
-                show: true,
-                feature: {
-                    magicType: {
-                        show: true,
-                        title: {
-                            line: '{% trans 'line' %}',
-                            bar: '{% trans 'bar' %}'
-                        },
-                        type: ['bar', 'line']
-                    },
-                    restore: {
-                        show: true,
-                        title: '{% trans 'restore' %}'
-                    },
-                    saveAsImage: {
-                        show: true,
-                        title: '{% trans 'saveImage' %}'
-                    }
-                }
-            },
-            calculable: true,
-            xAxis: [{
-                type: 'category',
-                boundaryGap: false,
-                data: (function () {
-                          var res = [];
-                          for (var n in backendData.names) {
-                            if(backendData.values[n] != 0){
-                                res.push(backendData.names[n]);
-                            }
-
-                            }
-                          return res;
-                      })()
-            }],
-            yAxis: [{
-                type: 'value'
-            }],
-             series: [{
-                name: names[0],
-                type: 'bar',
-                smooth: true,
-                itemStyle: {
-                    normal: {
-                        areaStyle: {
-                            type: 'default'
-                        }
-                    }
-                },
-
-                data: (function () {
-                          var res = [];
-                          for (var n in backendData.values) {
-                              var obj = {
-                                  name: backendData.names[n],
-                                  value: backendData.values[n]
-                              };
-                              if(backendData.values[n] != 0){
-                                res.push(obj);
-                            }
-
-                            }
-                          return res;
-                      })()
-            }]
-        };
+            saveAsImage: {
+              show: true,
+              title: '{% trans 'saveImage' %}'
+            }
+          }
+        },
+        calculable: true,
+        xAxis: [{
+          type: 'category',
+          boundaryGap: false,
+          data: (function () {
+            var res = [];
+            for (var n in backendData.names) {
+              if(backendData.values[n] != 0){
+                res.push(backendData.names[n]);
+              }
+            }
+            return res;
+          })()
+        }],
+        yAxis: [{
+          type: 'value'
+        }],
+        series: [{
+          name: names[0],
+          type: 'bar',
+          smooth: true,
+          itemStyle: {
+            normal: {
+              areaStyle: {
+                type: 'default'
+              }
+            }
+          },
+          data: (function () {
+            var res = [];
+            for (var n in backendData.values) {
+              var obj = {
+                name: backendData.names[n],
+                value: backendData.values[n]
+              };
+              if(backendData.values[n] != 0){
+                res.push(obj);
+              }
+            }
+            return res;
+          })()
+        }]
+      };
     }
 </script>
-
-
 {% endblock %}
