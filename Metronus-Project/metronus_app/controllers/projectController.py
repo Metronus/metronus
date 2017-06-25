@@ -109,8 +109,10 @@ def list_projects(request):
     project_list.html
     """
     # Check that the user is logged in
-    lista = get_list_for_role(request)
-    return render(request, "project/project_list.html", {"projects": lista})
+    projects = get_list_for_role(request)
+    deleted = projects.filter(deleted=True)
+    active = projects.filter(deleted=False)
+    return render(request, "project/project_list.html", {"projects": active, "deleted":deleted})
 
 
 def show(request, project_id):
@@ -157,7 +159,7 @@ def edit(request, project_id):
     """
     # Check that the user is logged in
     admin = get_admin_executive_or_403(request)
-    
+
     repeated_name = False
     error = False
     # if this is a POST request we need to process the form data
@@ -558,4 +560,4 @@ def get_list_for_role(request):
     else:
         projects = Project.objects.filter(company_id=actor.company_id)
 
-    return projects
+    return projects.order_by('name')

@@ -602,6 +602,9 @@ msgid "imputedTime"
 msgstr "Tiempo imputado"
 msgid "pro_profit"
 msgstr "Gastos e ingresos del proyecto"
+msgid "deletedProjects"
+msgstr "Proyectos eliminados"
+
 
 #: TimeLog
 msgid "timeLog"

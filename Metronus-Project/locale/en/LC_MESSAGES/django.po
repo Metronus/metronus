@@ -603,6 +603,8 @@ msgid "imputedTime"
 msgstr "Imputed time"
 msgid "pro_profit"
 msgstr "Project expenses and income"
+msgid "deletedProjects"
+msgstr "Inactive projects"
 
 #: TimeLog
 msgid "timeLog"
