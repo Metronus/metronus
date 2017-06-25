@@ -137,7 +137,7 @@ def show(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
     project_managers = Employee.objects.filter(
         projectdepartmentemployeerole__projectDepartment_id__project_id=project,
-        projectdepartmentemployeerole__role_id__tier=40)
+        projectdepartmentemployeerole__role_id__tier=40).distinct().order_by("user__first_name","user__last_name")
     employees = Employee.objects.filter(
         projectdepartmentemployeerole__projectDepartment_id__project_id=project).distinct().order_by("user__first_name","user__last_name")
     tasks = Task.objects.filter(active=True, projectDepartment_id__project_id__id=project_id)
