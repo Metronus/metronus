@@ -28,14 +28,9 @@ HEIGHT = 256
 WIDTH = 256
 VALID_FORMATS = ['JPEG', 'JPG', 'PNG']
 
-def default_round(val):
+def default_round(val,dig=2):
     """
     rounds to two decimal digits
-    """
-    return round_or_none(val,2)
-def round_or_none(val,dig):
-    """
-    rounds float to dig decimal digits, or none if it is none
     """
     return None if val is None else round(val,dig)
 
