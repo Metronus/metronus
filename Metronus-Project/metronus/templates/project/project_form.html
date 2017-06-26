@@ -19,9 +19,8 @@
 
 {% block content %}
 <div class="clearfix"></div>
-
-<div id="successDiv" class="alert alert-success" hidden='true'></div>
-<div id="errorDiv" class="alert alert-danger" {% if not error and not repeated_name %} hidden='true'{% endif %}>
+{% show_ajax_errors  %}
+<div id="error2Div" class="alert alert-danger" {% if not error and not repeated_name %} hidden='true'{% endif %}>
   {% if error %}
   <span><strong>{% trans 'fail' %} |</strong> {% trans 'projectError' %}</span>
   {% endif %}
@@ -83,9 +82,10 @@
       '{% url 'project_create_async' %}',
       $('#form').serialize(),
       function(data,status) {
+        $("#form").data('bootstrapValidator').resetForm();
+        $('#error2Div').hide();
         if(JSON.stringify(data['success'])=="true"){
           document.getElementById('register_form').reset();
-          $("#form").data('bootstrapValidator').resetForm();
           $('#errorDiv').hide();
           $('#successDiv').fadeIn().html("<strong>{% trans 'success' %} | </strong>{% trans 'projectSaved' %}");
         } else if(JSON.stringify(data['repeated_name'])=="true"){

@@ -16,7 +16,7 @@ from django.shortcuts import get_object_or_404
 from metronus_app.common_utils import (get_current_admin_or_403, check_image, send_mail, is_email_unique,
                                        get_or_none, is_username_unique, is_cif_unique, is_company_email_unique)
 from django.core.exceptions import PermissionDenied
-
+from django.contrib.auth.password_validation import validate_password, ValidationError
 
 def create(request,
            email_template_name='company/company_register_email.html',
@@ -43,6 +43,11 @@ def create(request,
             # Check that the username is unique
             if not is_username_unique(form.cleaned_data["username"]):
                 errors.append('companyRegister_usernameNotUnique')
+            
+            try:
+                validate_password(form.cleaned_data["password1"])
+            except ValidationError:
+                errors.append('currentPasswordInvalid')
 
             # Check that the admin email is unique
             if Company.objects.filter(email=form.cleaned_data["company_email"]).exists():

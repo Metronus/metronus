@@ -686,7 +686,7 @@ def find_departments(request):
 
         if res:
             # is executive
-            departamentos = Department.objects.filter(projectdepartment_id__project_id_id=project_id,company_id=actor.company_id, active=True)
+            departamentos = Department.objects.filter(projectdepartment__project_id_id=project_id,company_id=actor.company_id, active=True)
         else:
             # not an executive
             roles_dep = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=20,
@@ -704,7 +704,7 @@ def find_departments(request):
     else:
         # is admin
 
-        departamentos = Department.objects.filter(company_id=actor.company_id,projectdepartment_id__project_id_id=project_id, active=True)
+        departamentos = Department.objects.filter(company_id=actor.company_id,projectdepartment__project_id_id=project_id, active=True)
     return departamentos
 
 
