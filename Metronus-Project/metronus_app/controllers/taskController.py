@@ -342,8 +342,12 @@ def ajax_productivity_per_task(request):
     start_date_parse = parse_datetime(start_date)
     for i in range(0, 31):
         if production is not None and len(production) > z and abs((production[z].workDate-start_date_parse).days) == i:
-            data['production'].append(production[z].produced_units / (production[z].duration/60))
+            try:
+                data['production'].append(production[z].produced_units / (production[z].duration/60))
+            except TypeError:
+                data['production'].append(0)
             z += 1
+
         else:
             data['production'].append(0)
 

@@ -79,7 +79,7 @@ def list_all(request):
             valid_production_units = check_produced_units(form)
             over_day_limit = check_day_limit(form, employee)
             fwork_date = form.cleaned_data['workDate']
-            invalid_date=    fwork_date.date() > date.today()
+            invalid_date = fwork_date.date() > date.today()
        
             if has_permissions and valid_production_units and not over_day_limit and not invalid_date:
                 create_time_log(form, employee)

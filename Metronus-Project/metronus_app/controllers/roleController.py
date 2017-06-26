@@ -96,7 +96,7 @@ def manage_async(request):
             result = process_post_form(logged, form)
             return JsonResponse({'success': result["ok"], 'errors': result['errors']})
         else:
-            JsonResponse({'success': False, 'errors': ['roleCreation_formNotValid']})
+            return JsonResponse({'success': False, 'errors': ['roleCreation_formNotValid']})
 
 
 def ajax_departments_from_projects(request):
