@@ -1,74 +1,72 @@
 {% extends "layout_base.html" %}
 {% load i18n %}
 {% load l10n %}
+
 {% block title %}{% trans 'departmentList' %}{% endblock %}
 
 {% block content %}
 <div class="row">
   <div class="page-title">
     <div class="title_left">
-      <h1><strong>{% trans 'department' %}: </strong>{{department.name}}</h1>
+      <h3><strong>{% trans 'department' %}: </strong>{{department.name}}</h3>
     </div>
   </div>
 
   <div class="clearfix"></div>
+  </br>
+
+  <!-- INI: Project Manager -->
   {% if coordinator != null %}
-            <div class="col-md-12 col-sm-12 col-xs-12">
-                <div class="x_panel">
-                    <div class="x_title">{% trans 'projectManager' %}</div>
-
-                    <div class="clearfix"></div>
-
-                    <div class="x_content">
-                        <div class="profile_details text-center">
-                            <div class="well profile_view">
-                                <div class="col-sm-12">
-                                    <h4 class="brief"><em>{% trans 'projectManager' %}</em></h4>
-                                    <div class="left col-xs-7">
-                                        <h2>{{ coordinator.user.get_username }}</h2>
-                                        <ul class="list-unstyled">
-                                            <li><em class="fa fa-phone"></em> {{ coordinator.phone }}</li>
-                                        </ul>
-                                    </div>
-
-                                    <div class="right col-xs-5 text-center">
-                                        <img src="{{ coordinator.picture }}" alt="" class="img-circle img-responsive" width="150px">
-                                    </div>
-                                </div>
-
-                                <div class="col-xs-12 bottom text-center">
-                                    <a type="button" class="btn btn-primary btn-xs" href="{% url 'employee_view' coordinator.user %}">
-                                        <em class="fa fa-user"> </em> {% trans 'profile' %}
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-
-
-
-
-                    </div>
-                </div>
-            </div>
-  {% endif %}
-  <div class="clearfix"></div>
-
-  <div class="col-md-12 col-sm-12 col-xs-12">
+  <div class="col-lg-6 col-xs-12">
     <div class="x_panel">
+      <div class="x_title">
+        <h2>{% trans 'projectManager' %}</h2>
+        <div class="clearfix"></div>
+      </div>
+      <div class="clearfix"></div>
+
       <div class="x_content">
+        <div class="profile_details text-center">
+          <div class="well profile_view">
+            <div class="col-xs-12 collg">
+              <h4 class="brief"><em>{% trans 'projectManager' %}</em></h4>
+              <div class="left col-xs-7">
+                <h2>{{coordinator.user.first_name}} {{coordinator.user.last_name}}</h2>
+                <ul class="list-unstyled">
+                  <li><em class="fa fa-phone"></em> {{ coordinator.phone }}</li>
+                  <li><em class="fa fa-at"></em> {{ coordinator.user.email }}</li>
+                </ul>
+              </div>
+              <div class="right col-xs-5 text-center">
+                <img src="{{ coordinator.picture }}" alt="" class="img-circle img-responsive" width="150px">
+              </div>
+            </div>
 
-        <div id="welp2" style="height:350px;"></div>
-
+            <div class="col-xs-12 bottom text-center">
+              <a type="button" class="btn btn-primary btn-xs" href="{% url 'employee_view' coordinator.user %}">
+                <em class="fa fa-user"> </em> {% trans 'profile' %}
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+  {% endif %}
 
-  <div class="col-md-12 col-sm-12 col-xs-12">
+  <!-- EMPLOYEES PER TASK -->
+  <div class="col-lg-6 col-xs-12">
+    <div class="x_panel">
+      <div class="clearfix"></div>
+      <div id="welp2" style="height:350px;"></div>
+    </div>
+  </div>
+
+  <!-- GRAFIQUITAS -->
+  <div class="col-lg-6 col-xs-12">
     <div class="x_panel">
       <div class="x_content">
-
         <div id="welp" style="height:350px;"></div>
-
         <div style="display: flex;/*!  */justify-content: space-around;">
           <form class="form-horizontal">
             <fieldset>
@@ -85,22 +83,16 @@
           </form>
         </div>
         <br/>
-
       </div>
     </div>
   </div>
 
 
-  <div class="clearfix"></div>
-
-
-  <!-- Here comes profit graphics-->
-  <div class="col-md-12 col-sm-12 col-xs-12">
+  <!-- RENTABILIDAD -->
+  <div class="col-lg-6 col-xs-12">
     <div class="x_panel">
       <div class="x_content">
-
         <div id="welp3" style="height:350px;"></div>
-
         <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
           <form class="form-horizontal">
             <fieldset>
@@ -115,6 +107,7 @@
               </div>
             </fieldset>
           </form>
+
           <form class="form-horizontal">
             <fieldset>
               <legend>{% trans 'data_output_to' %}</legend>
@@ -122,33 +115,29 @@
                 <div class="controls">
                   <div class="input-prepend input-group">
                     <span class="add-on input-group-addon"><em class="glyphicon glyphicon-refresh fa fa-refresh"></em></span>
-
                     <div style="display: table-cell;border-radius: 0px 3px 3px 0px; min-width: 197px" id="switch-acum-button" type="text" class="btn btn-success">{% trans 'cumulative_values' %}</div>
                   </div>
                 </div>
               </div>
             </fieldset>
           </form>
+
         </div>
         <br/>
       </div>
     </div>
   </div>
 
-
   <div class="clearfix"></div>
 
-
- <!-- Here ends profit graphics-->
-  <div class="col-md-12 col-sm-12 col-xs-12">
+ <!-- INFO DE TRABAJADORES Y TAREAS -->
+  <div class="col-lg-6 col-xs-12">
     <div class="x_panel">
       <div class="x_title">
         <h2>{% trans 'taskList' %}</h2>
         <ul class="nav navbar-right panel_toolbox">
-          <li><a class="close-link"><em class="fa fa-close"></em></a>
-          </li>
+          <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
         </ul>
-
         <div class="clearfix"></div>
       </div>
 
@@ -156,10 +145,9 @@
         <thead>
           <tr>
             <th>{% trans 'task' %}</th>
-            <th>{% trans 'projectDeparment' %}</th>
-            <th>{% trans 'creationDate' %}</th>
+            <th>{% trans 'project' %}</th>
+            <th>{% trans 'goal_description' %}</th>
             <th>{% trans 'creator' %}</th>
-            <th>{% trans 'details' %}</th>
           </tr>
         </thead>
 
@@ -168,7 +156,7 @@
           <tr>
             <td>{{task.name}}</td>
             <td>{{task.projectDepartment_id.project_id.name}}</td>
-            <td>{{task.registryDate}}</td>
+            <td>{{task.goal_description}}</td>
             <td>{{task.actor_id.user.get_username}}</td>
             <td><a href="{% url 'task_view' task.id %}" type="button" class="btn btn-success">{% trans 'details' %}</a></td>
           </tr>
@@ -176,13 +164,14 @@
         </tbody>
       </table>
     </div>
+  </div>
 
+  <div class="col-lg-6 col-xs-12">
     <div class="x_panel">
       <div class="x_title">
         <h2>{% trans 'employeeList' %}</h2>
         <ul class="nav navbar-right panel_toolbox">
-          <li><a class="close-link"><em class="fa fa-close"></em></a>
-          </li>
+          <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
         </ul>
 
         <div class="clearfix"></div>
@@ -190,35 +179,31 @@
 
       <div class="x_content">
         <table class="table table-striped table-hover">
-            <thead>
-                <tr>
-                    <th>{% trans 'username' %}</th>
-                    <th>{% trans 'identifier' %}</th>
-                    <th>{% trans 'phone' %}</th>
-                    <th class="hidden-xs">{% trans 'registryDate' %}</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for employee in employees %}
-                    <tr data-href="{% url 'employee_view' employee.user %}" style="cursor: pointer;">
-                    
-                                        {% if employee.picture %}
-                                            <td><img src="{{ MEDIA_URL }}{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
-                                        {% else %}
-                                            <td><img src="{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
-                                        {% endif %}
+          <thead>
+            <tr>
+              <th>{% trans 'username' %}</th>
+              <th>{% trans 'phone' %}</th>
+              <th>{% trans 'email' %}</th>
+            </tr>
+          </thead>
 
-                        <td>{{employee.identifier}}</td>
-                        <td>{{employee.phone}}</td>
-                        <td class="hidden-xs">{{employee.registryDate}}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
+          <tbody>
+            {% for employee in employees %}
+            <tr data-href="{% url 'employee_view' employee.user %}" style="cursor: pointer;">
+              {% if employee.picture %}
+              <td><img src="{{ MEDIA_URL }}{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user.first_name}} {{employee.user.last_name}}</td>
+              {% else %}
+              <td><img src="{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
+              {% endif %}
+              <td>{{employee.phone}}</td>
+              <td>{{employee.user.email}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
         </table>
       </div>
     </div>
   </div>
-
 </div>
 {% endblock %}
 
@@ -360,7 +345,7 @@
 
     }
 
-    $(document).ready(function() {   
+    $(document).ready(function() {
 
       // Para que <legend> se vea como <label>
       $("legend").css({

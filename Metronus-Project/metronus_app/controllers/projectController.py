@@ -142,10 +142,9 @@ def show(request, project_id):
         projectdepartmentemployeerole__role_id__tier=40).distinct().order_by("user__first_name","user__last_name")
     employees = Employee.objects.filter(
         projectdepartmentemployeerole__projectDepartment_id__project_id=project).distinct().order_by("user__first_name","user__last_name")
-    tasks = Task.objects.filter(active=True, projectDepartment_id__project_id__id=project_id)
-    departments = Department.objects.filter(active=True, projectdepartment__project_id__id=project_id)
+    departments = Department.objects.filter(active=True, projectdepartment__project_id__id=project_id).order_by("name")
     return render(request, "project/project_view.html", {"project": project, "employees": employees,
-                                                         "tasks": tasks, "departments": departments,
+                                                         "departments": departments,
                                                          "project_managers": project_managers})
 
 

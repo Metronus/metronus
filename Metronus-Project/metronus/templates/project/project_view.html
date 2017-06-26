@@ -175,6 +175,7 @@
       <div class="x_content">
         <div class="accordion" id="accordion1" role="tablist" aria-multiselectable="true">
           {% for department in departments %}
+
           <div class="panel">
             <a class="panel-heading collapsed" role="tab" id="heading{{forloop.counter}}" data-toggle="collapse"
               data-parent="#accordion1" href="#collapse{{forloop.counter}}"
@@ -194,12 +195,16 @@
                     </tr>
                   </thead>
                   <tbody>
-                    {% for task in tasks %}
+                    {% for tasks in department.projectdepartment_set.all %}
+                    {% for task in  tasks.task_set.all%}
+                    {% if project.id == task.projectDepartment_id.project_id.id and  task.projectDepartment_id.department_id.id == department.id%}
                     <tr data-href="{% url 'task_view' task.id %}">
                       <td>{{task.name}}</td>
                       <td>{{task.registryDate}}</td>
                       <td>{{task.actor_id.user.get_username}}</td>
                     </tr>
+                    {% endif %}
+                    {% endfor %}
                     {% endfor %}
                   </tbody>
                 </table>

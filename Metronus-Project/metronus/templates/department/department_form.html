@@ -4,113 +4,101 @@
 {% load l10n %}
 
 {% block title %}
-    {% if form.department_id.value|slugify == '0' %}
-        {% trans 'createDepartment' %}
-    {% else %}
-        {% trans 'editDepartment' %}
-    {% endif %}
+  {% if form.department_id.value|slugify == '0' %}
+    {% trans 'createDepartment' %}
+  {% else %}
+    {% trans 'editDepartment' %}
+  {% endif %}
 {% endblock %}
 
-
 {% block content %}
-    <div class="clearfix"></div>
+<div class="clearfix"></div>
+{% show_ajax_errors  %}
 
-    {% show_ajax_errors  %}
+{% if  repeated_name == True %}
+<div id="error2Div" class="alert alert-danger">
+  <strong>{% trans 'fail' %} | </strong>{% trans 'departmentName' %}
+</div>
+{% endif %}
 
-    {% if  repeated_name == True %}
-        <div id="error2Div" class="alert alert-danger">
-            <strong>{% trans 'fail' %} | </strong>{% trans 'departmentName' %}
-        </div>
-    {% endif %}
+<div class="row">
+  <div class="col-md-12 col-sm-12 col-xs-12">
+    <div class="x_panel">
+      <div class="x_title">
+        <h2>
+          {% if form.department_id.value|slugify == '0' %}
+            {% trans 'createDepartment' %}
+          {% else %}
+            {% trans 'editDepartment' %}
+          {% endif %}
+        </h2>
+        <div class="clearfix"></div>
+      </div>
 
+      <div class="x_content">
+        <form id="register_form" class="form-horizontal form-label-left" novalidate method="POST">
+          {% csrf_token %}
+          {% for field in form.hidden_fields %}{{ field }}{% endfor %}
 
-    <div class="row">
-        <div class="col-md-12 col-sm-12 col-xs-12">
-            <div class="x_panel">
-                <div class="x_title">
-                    <h2>
-                        {% if form.department_id.value|slugify == '0' %}{% trans 'createDepartment' %}
-                        {% else %}{% trans 'editDepartment' %}{% endif %}
-                    </h2>
-                    <div class="clearfix"></div>
-                </div>
-                <div class="x_content">
-                    <form id="register_form" class="form-horizontal form-label-left" novalidate method="POST">{% csrf_token %}
-                        <div class="{{ form.name.name }} form-group">
-                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="{{ form.name.auto_id }}">
-                                {{ form.name.label }} *
-                            </label>
-                            <div class="col-md-6 col-sm-6 col-xs-12">
-                                <input id="{{ form.name.auto_id }}" class="form-control col-md-7 col-xs-12"
-                                       data-validate-length-range="2" name="{{ form.name.name }}" required="required"
-                                       type="text" value="{{ form.name.value|default_if_none:"" }}">
-                            </div>
-                        </div>
+          {% show_field form.name %}
 
-                        {% for field in form.hidden_fields %}{{ field }}{% endfor %}
-                        <div class="ln_solid"></div>
-
-                        <div class="text-center">
-                            <a class="btn btn-danger" href="{% url 'department_list' %}">{% trans 'cancel' %}</a>
-                            <button type="submit" class="btn btn-success">{% trans 'confirm' %}</button>
-                            {% if form.department_id.value|slugify == '0' %}
-                                <a class="btn btn-info" onclick="ajax();">{% trans 'departmentAdd' %}</a>
-                            {% endif %}
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+          <div class="ln_solid"></div>
+          <div class="text-center">
+            <a class="btn btn-danger" href="{% url 'department_list' %}">{% trans 'cancel' %}</a>
+            <button type="submit" class="btn btn-success">{% trans 'confirm' %}</button>
+            {% if form.department_id.value|slugify == '0' %}
+            <a class="btn btn-info" onclick="ajax();">{% trans 'departmentAdd' %}</a>
+            {% endif %}
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
+</div>
 {% endblock %}
 
 
 {% block javascript %}
 <script>
-//Esto es para validar en cliente de forma bonita con bootstrap :)
-$(document).ready(function() {
+  $(document).ready(function() {
     $('#register_form').bootstrapValidator({
-        feedbackIcons: {
-            valid: 'glyphicon glyphicon-ok',
-            invalid: 'glyphicon glyphicon-remove',
-            validating: 'glyphicon glyphicon-refresh'
-        },
-        fields: {
-            name: {
-                validators: {
-                    notEmpty: {
-                        message: "{% trans 'departmentNameNotNull' %}"
-                    },
-                }
+      feedbackIcons: {
+        valid: 'glyphicon glyphicon-ok',
+        invalid: 'glyphicon glyphicon-remove',
+        validating: 'glyphicon glyphicon-refresh'
+      },
+      fields: {
+        name: {
+          validators: {
+            notEmpty: {
+              message: "{% trans 'departmentNameNotNull' %}"
             },
-
-
+          }
         },
+      },
     });
-});
+  });
 </script>
 
 <script type="text/javascript">
-
-function ajax(){
-    $.post('/department/createAsync', $('#register_form').serialize(), function(data, status){
+  function ajax(){
+    $.post(
+      '/department/createAsync',
+      $('#register_form').serialize(),
+      function(data, status){
         $("#register_form").data('bootstrapValidator').resetForm();
-    	if(JSON.stringify(data['success'])=="true"){
-            $('#id_{{ form.name.name }}').val('');
-    		$('#errorDiv').attr('hidden', true);
-    		$('#error2Div').attr('hidden', true);
-    		$('#successDiv').attr('hidden', false).html("<strong>{% trans 'success' %} | </strong>{% trans 'departmentSaved' %}");
-    	}else if(JSON.stringify(data['repeated_name'])=="true"){
-    		$('#successDiv').attr('hidden', true);
-    		$('#error2Div').attr('hidden', true);
-    		$('#errorDiv').attr('hidden', false).html("<strong>{% trans 'fail' %} | </strong>{% trans 'departmentName' %}");
-    	}else{
-    		$('#successDiv').attr('hidden', true);
-    		$('#error2Div').attr('hidden', true);
-    		$('#errorDiv').attr('hidden', false).html("<strong>{% trans 'fail' %} | </strong>{% trans 'departmentError' %}");
-    	}
+        $('#error2Div').hide();
 
-    });
-};
+        if(JSON.stringify(data['success'])=="true"){
+          $('#errorDiv').hide();
+          $('#successDiv').fadeIn().html("<strong>{% trans 'success' %} | </strong>{% trans 'departmentSaved' %}");
+        }else {
+          var dup = JSON.stringify(data['repeated_name'])=="true";
+          $('#successDiv').hide();
+          $('#errorDiv').fadeIn().html("<strong>{% trans 'fail' %} | </strong>" + (dup ? "{% trans 'departmentName' %}" : "{% trans 'departmentError' %}"));
+        }
+      }
+    );
+  };
 </script>
 {% endblock %}

@@ -131,9 +131,10 @@ def view(request, department_id):
     check_department_for_fiew(department, request, True)
 
     coordinator = get_coordinator(department)
-    tasks = Task.objects.filter(active=True, projectDepartment_id__department_id__id=department_id)
+
+    tasks = Task.objects.filter(active=True, projectDepartment_id__department_id__id=department_id).order_by("name")
     employees = Employee.objects.filter(
-        projectdepartmentemployeerole__projectDepartment_id__department_id=department).distinct()
+        projectdepartmentemployeerole__projectDepartment_id__department_id=department).distinct().order_by("user__first_name", "user__last_name")
 
     return render(request, 'department/department_view.html', {'department': department, 'employees': employees,
                                                                'tasks': tasks, 'coordinator': coordinator})
