@@ -233,6 +233,18 @@
 
     <script>
       const theme = getMetronusTheme();
+      $(function() {
+        new WOW().init();
+        $("#flag_es").click(function() {
+          Cookies.set('lang', 'es-es' {% if is_production %},{domain: '.metronus.es'}{% endif %});
+          location.reload(true);
+        });
+
+        $("#flag_en").click(function() {
+          Cookies.set('lang', 'en-us' {% if is_production %},{domain: '.metronus.es'}{% endif %});
+          location.reload(true);
+        });
+      });
     </script>
     {% endcompress %}
 

@@ -2,6 +2,7 @@ from django import template
 from datetime import datetime
 import calendar
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
+from django.conf import settings
 
 register = template.Library()
 
@@ -133,3 +134,7 @@ def is_team_manager(actor):
             return True
 
     return False
+
+@register.simple_tag
+def is_production():
+    return settings["production"]
