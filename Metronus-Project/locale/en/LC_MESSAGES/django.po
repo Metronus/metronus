@@ -781,6 +781,8 @@ msgid "company_duplicate"
 msgstr "The company is already registered"
 msgid "company_imageNotValid"
 msgstr "The image is not valid, it cannot be larger than 256 by 256 pixels and it must be in JPG or PNG format"
+msgid "company_short_name_duplicate"
+msgstr "The short name is already registered by another company"
 
 #: Admin
 msgid "admin_email"
@@ -809,7 +811,7 @@ msgstr "The phone cannot be empty"
 msgid "admin_phone_error#2"
 msgstr "Invalid format"
 msgid "admin_duplicate"
-msgstr "This admin is already registered"
+msgstr "This username is already registered"
 
 msgid "formNotValid"
 msgstr "The form does not contain valid values."

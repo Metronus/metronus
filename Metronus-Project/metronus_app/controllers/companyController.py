@@ -56,6 +56,10 @@ def create(request,
             if not is_cif_unique(form.cleaned_data["cif"]):
                 errors.append('companyRegister_cifNotUnique')
 
+            # Check that the short name is unique
+            if get_or_none(Company, short_name=form.cleaned_data["short_name"]):
+                errors.append('company_short_name_duplicate')
+
             # Check that the image is OK
             if not check_image(form, 'logo'):
                 errors.append('company_imageNotValid')
