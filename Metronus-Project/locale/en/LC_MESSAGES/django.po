@@ -17,6 +17,18 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: Email stuff
+msgid "password_reset_text_1"
+msgstr "Someone requested a password reset for the email"
+msgid "password_reset_text_2"
+msgstr "If it was you, please follow the link below. Otherwise, you may safely ignore this message."
+msgid "admin_register_1"
+msgstr "Your company has been successfully registered in Metronus."
+msgid "admin_register_2"
+msgstr "As an administrator, you may start using the application by accessing the following link:"
+msgid "admin_register_3"
+msgstr "We hope you enjoy using Metronus as much as we do being useful to your company."
+
 #: Error Pages
 msgid "bad_request"
 msgstr "Bad request"

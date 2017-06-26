@@ -1,10 +1,15 @@
 {% extends "email_master.html" %}
 
+{% load i18n %}
+{% load l10n %}
+
 {% block content %}
-  <p>Su compañía sido registrada exitosamente en la aplicación.</p>
-  <p>Como administrador podrá comenzar a usar Metronus a través del siguiente enlace.</p>
+  <p>{% trans 'admin_register_1' %}</p>
+  <p>{% trans 'admin_register_2' %}</p>
   <br/>
-  <a href="{{ protocol}}://{{ domain }}/{{ company }}{% url 'login' %}">
-    {{ protocol}}://{{ domain }}/{{ company }}{% url 'login' %}
+  <a href="{{ protocol}}://{{ domain }}{% url 'login' %}">
+    {{ protocol}}://{{ domain }}{% url 'login' %}
   </a>
+  <br/>
+  <p>{% trans 'admin_register_3' %}</p>
 {% endblock %}

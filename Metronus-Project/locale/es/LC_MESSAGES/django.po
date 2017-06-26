@@ -19,6 +19,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#: Email stuff
+msgid "password_reset_text_1"
+msgstr "Alguien ha solicitado un restablecimiento de contraseña para el email"
+msgid "password_reset_text_2"
+msgstr "Si ha sido usted, por favor acceda al enlace mostrado abajo. En otro caso, puede ignorar este mensaje."
+msgid "admin_register_1"
+msgstr "Su compañía ha sido registrada con éxito en Metronus."
+msgid "admin_register_2"
+msgstr "Como administrador, podrá empezar a usar la aplicación accediendo al siguiente enlace:"
+msgid "admin_register_3"
+msgstr "Esperamos que disfrute de Metronus tanto como nosotros disfrutamos siendo de utilidad a su compañía."
+
 #: Error Pages
 msgid "bad_request"
 msgstr "Solicitud incorrecta"
