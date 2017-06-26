@@ -25,6 +25,10 @@
      #error_msg {
         font-size: 200%;
      }
+
+      #image_error {
+        padding-bottom: 15px;
+      }
     </style>
   </head>
 
@@ -35,11 +39,17 @@
         <div class="col-md-12">
           <div class="col-middle">
             <div class="text-center text-center">
+              {% block error_number %}
+
+              {% endblock %}
+
+              <img id="image_error" class="img-responsive center-block" src="{{img}}" alt="Image error"/>
+
               {% block error_description %}
 
               {% endblock %}
               <div class="mid_center">
-                <button  type="button" class="btn btn-warning submit" onclick="window.location.href='/'">{% trans 'return_to_landingpage' %}</button>
+                <button  type="button" class="btn btn-warning submit" onclick="window.history.back()">{% trans 'return_to_landingpage' %}</button>
               </div>
             </div>
           </div>
