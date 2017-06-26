@@ -1,15 +1,60 @@
 {% extends "layout_base.html" %}
 {% load i18n %}
 {% load l10n %}
+{% load static %}
+{% load custom_tags %}
 
-{% block title %}
-    {% trans 'registerEmployee' %}
-{% endblock %}
-{% block contentTitle %}
-    {% trans 'registerEmployee' %}
-{% endblock %}
+{% block title %}{% trans 'registerEmployee' %}{% endblock %}
+{% block contentTitle %}{% trans 'registerEmployee' %}{% endblock %}
 
-{% load static }
+{% block content %}
+  {% if form.errors %}
+  <p class="alert alert-danger">{{ form.errors }}</p>
+  {% endif %}
+
+  {% for err in errors%}
+  <p class="alert alert-danger">{% trans err %}</p>
+  {% endfor %}
+
+  {% if success %}
+  <p class="alert alert-success"> {% trans 'success' %}</p>
+  {% endif %}
+
+<div class="row">
+  <div class="col-md-12 col-sm-12 col-xs-12">
+    <div class="x_panel">
+      <div class="x_title">
+        <h2>{% trans 'registerEmployee' %}</h2>
+        <div class="clearfix"></div>
+      </div>
+
+      <div class="x_content">
+        <form id="register_form" method="POST" class="form-horizontal" data-toggle="validator" role="form" action="" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          {% show_field form.username      "johndoe" %}
+          {% show_field form.password1  %}
+          {% show_field form.password2  %}
+          {% show_field form.first_name  "John" %}
+          {% show_field form.last_name  "Doe" %}
+          {% show_field form.email  "info@metronus.es" %}
+          {% show_field form.phone  "666777888" %}
+          {% show_field form.identifier  "3024602M" %}
+          {% show_field form.price_per_hour  "9.8" %}
+          {% show_field form.photo  "9.8" %}
+
+          <div class="form-group control-buttons">
+            <div class="text-center">
+              <a class="btn btn-danger" href="{% url 'employee_list' %}">{% trans 'cancel' %}</a>
+              <button type="submit" class="btn btn-success submit-button">{% trans 'register' %}</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+ </div>
+{% endblock %}
 
 {% block javascript %}
 
@@ -47,7 +92,7 @@
                     callback: {
                     	message: "{% trans 'passwords_must_match'%}",
                     	callback: function(value, validator, $field) {
-                    		return value == $("#id_{{ form.password1.label }}").val()
+                    		return value == $("#id_{{ form.password1.name }}").val()
                     	}
                     }
                 }
@@ -121,126 +166,4 @@ $(function() {
     });
 });
 </script>
-{% endblock %}
-
-{% block content %}
-
-{% if form.errors %}
-        <p class="alert alert-danger">{{ form.errors }}</p>
-{% endif %}
- 
-{% if errors %}
-    {% for err in errors%}
-        <p class="alert alert-danger">{% trans err %}</p>
-    {% endfor %}
-{% endif %}
-
-{% if success %}
-        <p class="alert alert-success"> {% trans 'success' %}</p>
-{% endif %}
-
-<div class="row">
-
-<div class="col-md-12 col-sm-12 col-xs-12">
-  <div class="x_panel">
-    <div class="x_title">
-      <h2>{% trans 'registerEmployee' %}</h2>
-      <div class="clearfix"></div>
-    </div>
-    <div class="x_content">
-
-    
-   <form id="register_form" method="POST" class="form-horizontal" data-toggle="validator" role="form" action="" enctype="multipart/form-data">
-
-    {% csrf_token %}
-
-	    <div class="col-md-6 col-md-offset-2 collapse in" >
-
-        <div class="form-group required form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.username.name }}">{% trans 'username' %}</label>
-            <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.username.name }}" id="id_{{ form.username.label }}" value="{{ form.username.value }}" required>
-              <div class="help-block with-errors" id="id_unique_message" style="display: none;">{% trans 'employee_username_duplicate' %}</div>
-            </div>
-        </div>
-
-        <div class="form-group required form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.password1.name }}">{% trans 'password'%}</label>
-            <div class="col-sm-6">
-              <input type="password" class="form-control col-md-6" name="{{ form.password1.name }}" id="id_{{ form.password1.label }}"value="{{ form.password1.value }}" required>
-            </div>
-        </div>
-
-        <div class="form-group required form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.password2.name }}">{% trans 'repeatPassword' %}</label>
-            <div class="col-sm-6">
-              <input type="password" class="form-control col-md-6" name="{{ form.password2.name }}" id="id_{{ form.password2.label }}" value="{{ form.password2.value }}" required>
-            </div>
-        </div>
-
-        <div class="form-group required form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.first_name.name }}">{% trans 'name' %}</label>
-            <div class="col-sm-6">
-            <input type="text" class="form-control col-md-6" name="{{ form.first_name.name }}" id="id_{{ form.first_name.label }}" value="{{ form.first_name.value }}" required>
-            </div>
-        </div>
-
-        <div class="form-group required form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.last_name.name }}">{% trans 'surname' %}</label>
-            <div class="col-sm-6">
-            <input type="text" class="form-control col-md-6" name="{{ form.last_name.name }}" id="id_{{ form.last_name.label }}" value="{{ form.last_name.value }}" required>
-            </div>
-        </div>
-
-        <div class="form-group required form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.email.name }}">{% trans 'email' %}</label>
-            <div class="col-sm-6">
-              <input type="email" class="form-control col-md-6" name="{{ form.email.name }}" id="id_{{ form.email.label }}" value="{{ form.email.value }}" required>
-            </div>
-        </div>
-
-        <div class="form-group required form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.phone.name }}">{% trans 'phone' %}</label>
-            <div class="col-sm-6">
-            <input type="text" class="form-control col-md-6" name="{{ form.phone.name }}" id="id_{{ form.phone.label }}" value="{{ form.phone.value }}" required>
-            </div>
-        </div>
-
-        <div class="form-group required form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.identifier.name }}">{% trans 'identifier' %}</label>
-            <div class="col-sm-6">
-            <input type="text" class="form-control col-md-6" name="{{ form.identifier.name }}" id="id_{{ form.identifier.label }}" value="{{ form.identifier.value }}" required>
-            </div>
-        </div>
-       <div class="form-group required form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.price_per_hour.name }}">{% trans 'price_per_hour' %}</label>
-            <div class="col-sm-6">
-            <input type="text" class="form-control col-md-6 precio" name="{{ form.price_per_hour.name }}" id="id_{{ form.price_per_hour.label }}" value="{{ form.price_per_hour.value }}" required />
-            </div>
-        </div>
-
-        
-        <div class="form-group required form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.photo.name }}">{% trans 'photo' %}</label>
-            <div class="col-sm-6">
-            <input type="file" accept="image/*" class="" name="{{ form.photo.name }}" id="id_{{ form.photo.label }}" value="{{ form.photo.value }}" >
-            </div>
-        </div>
-
-
-        <div class="form-group control-buttons">
-            <div class="col-sm-offset-4 col-sm-10">
-                <a class="btn btn-danger" href="{% url 'employee_list' %}">{% trans 'cancel' %}</a>
-                <button type="submit" class="btn btn-success submit-button">{% trans 'register' %}</button>
-
-            </div>
-          
-        </div>
-        </div>
-
-    </form>
- </div>
- </div>
- </div>
- </div>
 {% endblock %}

@@ -498,6 +498,8 @@ msgid "employeeCreation_priceNotValid"
 msgstr "El precio por hora debe ser mayor que 0 (impuestos incluidos)"
 msgid "employeeListInactive"
 msgstr "Empleados inactivos"
+msgid "employeeCreation_emailNotUnique"
+msgstr "El email introducido ya está dado de alta"
 
 msgid "identifier_not_empty"
 msgstr "El identificador no puede estar vacío"
