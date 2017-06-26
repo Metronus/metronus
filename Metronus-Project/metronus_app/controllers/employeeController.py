@@ -89,11 +89,8 @@ def create(request):
                 EmployeeLog.objects.create(employee_id=employee, event="A", price_per_hour=employee.price_per_hour)
                 send_register_email(form.cleaned_data["email"], form.cleaned_data["first_name"])
 
-                if "redirect" in request.GET:  # Redirect to the created employee
-                    return HttpResponseRedirect('/employee/view/' + form.cleaned_data["username"] + '/')
-                else:  # Return a new form
-                    return render(request, 'employee/employee_register.html',
-                                  {'form': EmployeeRegisterForm(), 'success': True})
+                # Redirect to the newly created employee
+                return HttpResponseRedirect('/employee/view/' + form.cleaned_data["username"] + '/')
             else:
                 # There are errors
                 return render(request, 'employee/employee_register.html', {'form': form, 'errors': errors})

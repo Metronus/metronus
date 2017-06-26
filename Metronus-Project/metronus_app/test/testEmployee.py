@@ -123,8 +123,7 @@ class EmployeeTestCase(TestCase):
             "price_per_hour": "1.0"
         })
 
-        self.assertEquals(response.status_code, 200)
-        self.assertTrue(response.context["success"])
+        self.assertRedirects(response, "/employee/view/employee1/", fetch_redirect_response=False)
 
         # Check that the employee has been successfully created
 

@@ -34,16 +34,16 @@
         <form id="register_form" method="POST" class="form-horizontal" data-toggle="validator" role="form" action="" enctype="multipart/form-data">
           {% csrf_token %}
 
-          {% show_field form.username      "johndoe" %}
+          {% show_field form.username      "johndoe"    "errorUsernameNotUnique" %}
           {% show_field form.password1  %}
           {% show_field form.password2  %}
           {% show_field form.first_name  "John" %}
           {% show_field form.last_name  "Doe" %}
-          {% show_field form.email  "info@metronus.es" %}
+          {% show_field form.email  "johndoe@metronus.es"    "employeeCreation_emailNotUnique" %}
           {% show_field form.phone  "666777888" %}
-          {% show_field form.identifier  "3024602M" %}
+          {% show_field form.identifier  "j_doe" %}
           {% show_field form.price_per_hour  "9.8" %}
-          {% show_field form.photo  "9.8" %}
+          {% show_field form.photo  %}
 
           <div class="form-group control-buttons">
             <div class="text-center">
@@ -192,13 +192,19 @@
                 validators: {
                     numeric: {
                         thousandsSeparator: '',
-                        decimalSeparator: '.'
+                        decimalSeparator: '.',
+                        message: "{% trans 'invalid_number' %}",
+                    },
+                    notEmpty: {
+                        message: "{% trans 'price_per_hour_not_empty' %}"
                     }
                 }
             }
         }
-    })
+    });
 
+    initAjax($("#id_username"), 'username', '/ajax/validate_username/');
+    initAjax($("#id_email"), 'email', '/ajax/validate_email_unique/');
 
    $('button[type="submit"]').click(function (e) {
         var b = $('[data-bv-validator="callback"]')[0]
