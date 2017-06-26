@@ -271,21 +271,21 @@ def validate_cif(request):
     return JsonResponse(data)
 
 
-def validate_admin(request):
+def validate_username(request):
     """
     checks if the company administrator is registered
     """
-    admin = request.GET.get('admin')
+    username = request.GET.get('username', None)
 
-    check = get_or_none(Administrator, user__username=admin)
-    if check is not None:
-        check = check.user.username
+    if not username:
+        return HttpResponseBadRequest
 
     data = {
-        'is_taken': admin == check
+        'is_taken': bool(get_or_none(User, username=username))
     }
     if data['is_taken']:
         data['error_message'] = 'ERROR'
+
     return JsonResponse(data)
 
 

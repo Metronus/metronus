@@ -178,7 +178,7 @@ urlpatterns += [  # i18n_patterns(
 
     url(r'^register$', companyController.create),
     url(r'^ajax/validate_cif/$', companyController.validate_cif, name='validate_cif'),
-    url(r'^ajax/validate_admin/$', companyController.validate_admin, name='validate_admin'),
+    url(r'^ajax/validate_username/$', companyController.validate_username, name='validate_username'),
     url(r'^ajax/validate_short_name/$', companyController.validate_short_name, name='validate_short_name'),
     url(r'^ajax/validate_email_unique/$', companyController.validate_email, name='validate_email_unique'),
 ]
