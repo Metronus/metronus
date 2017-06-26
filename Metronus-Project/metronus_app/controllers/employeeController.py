@@ -106,6 +106,79 @@ def create(request):
         # Another request method
         raise PermissionDenied
 
+def create_async(request):
+    """
+    parameters:
+        redirect: opcional, incluir en la URL de la petición si se quiere redirigir a la página del empleado creado
+    returns:
+        form: formulario con los datos necesarios para el registro del empleado
+        success: opcional, si se ha tenido éxito al crear un empleado
+        errors: opcional, array de mensajes de error si ha habido algún error
+
+    errores: (todos empiezan por employeeCreation_)
+        passwordsDontMatch: las contraseñas no coinciden
+        usernameNotUnique: el nombre de usuario ya existe
+        imageNotValid: la imagen no es válida por formato y/o tamaño
+        formNotValid: el formulario contiene errores
+        priceNotValid: el precio debe ser mayor que 0
+        emailNotUnique:si el correo no es úinco
+
+    template:
+        employee_register.html
+    """
+
+    # Check that the user is logged in and it's an administrator
+    admin = get_authorized_or_403(request)
+    errors = []
+    data = {
+        'success': True
+    }
+    if request.method == "POST":
+        # We are serving a POST request
+        form = EmployeeRegisterForm(request.POST, request.FILES)
+
+        if form.is_valid():
+
+            # Check that the passwords match
+            if not check_passwords(form):
+                errors.append('employeeCreation_passwordsDontMatch')
+
+            # Check that the username is unique
+            if not is_username_unique(form.cleaned_data["username"]):
+                errors.append('employeeCreation_usernameNotUnique')
+
+            # Check that the email is unique
+            if not is_email_unique(form.cleaned_data["email"]):
+                errors.append('employeeCreation_emailNotUnique')
+
+            # Check that the image is OK
+            if not check_image(form, 'photo'):
+                errors.append('employeeCreation_imageNotValid')
+
+            # Check that the price is OK
+            if form.cleaned_data['price_per_hour'] <= 0:
+                errors.append('employeeCreation_priceNotValid')
+
+            if not errors:
+                # Everything is OK, create the employee
+                employee_user = create_employee_user(form)
+                employee = create_employee(employee_user, admin, form)
+                EmployeeLog.objects.create(employee_id=employee, event="A", price_per_hour=employee.price_per_hour)
+                send_register_email(form.cleaned_data["email"], form.cleaned_data["first_name"])
+
+                return JsonResponse(data)
+
+        # Form is not valid
+        else:
+            errors.append('employeeCreation_formNotValid')
+       
+    else:
+        # Another request method
+        raise PermissionDenied
+    
+    data['success'] = False
+    data['errors'] = errors
+    return JsonResponse(data)
 
 def list_employees(request):
     """

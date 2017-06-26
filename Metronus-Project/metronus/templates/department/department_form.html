@@ -90,6 +90,7 @@
         $('#error2Div').hide();
 
         if(JSON.stringify(data['success'])=="true"){
+          document.getElementById('register_form').reset();
           $('#errorDiv').hide();
           $('#successDiv').fadeIn().html("<strong>{% trans 'success' %} | </strong>{% trans 'departmentSaved' %}");
         }else {
