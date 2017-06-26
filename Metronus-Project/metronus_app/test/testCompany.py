@@ -73,7 +73,7 @@ class CompanyTestCase(TestCase):
         Checks if the AJAX method of checking an admin is correct
         """
         admin = Administrator.objects.all()[:1].get()
-        data = get_ajax("/ajax/validate_admin/", {'admin' : admin.user.username})
+        data = get_ajax("/ajax/validate_username/", {'username' : admin.user.username})
         self.assertTrue(data['is_taken'])
 
 
@@ -81,7 +81,7 @@ class CompanyTestCase(TestCase):
         """
         Checks if the AJAX method of checking an admin is correct
         """
-        data = get_ajax("/ajax/validate_admin/", {'admin' : "ultra_random_string"})
+        data = get_ajax("/ajax/validate_username/", {'username' : "ultra_random_string"})
         self.assertTrue(not data['is_taken'])
 
     def test_cif_positive(self):
