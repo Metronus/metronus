@@ -84,6 +84,7 @@
       $('#form').serialize(),
       function(data,status) {
         if(JSON.stringify(data['success'])=="true"){
+          document.getElementById('register_form').reset();
           $("#form").data('bootstrapValidator').resetForm();
           $('#errorDiv').hide();
           $('#successDiv').fadeIn().html("<strong>{% trans 'success' %} | </strong>{% trans 'projectSaved' %}");

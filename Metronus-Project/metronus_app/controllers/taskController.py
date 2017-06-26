@@ -67,6 +67,8 @@ def create(request):
                 actor = check_task(pro, request)
                 create_task(form, pdtuple, actor)
                 return HttpResponseRedirect('/task/list')
+            else:  
+                errors.append('task_creation_error')
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -126,6 +128,8 @@ def create_async(request):
                 actor = check_task(pro, request)
                 create_task(form, pdtuple, actor)
                 return JsonResponse(data)
+        else:
+            errors.append('task_creation_error')
     # if a GET (or any other method) we'll create a blank form
     else:
         return HttpResponseRedirect('/department/create')
@@ -677,7 +681,7 @@ def find_departments(request):
 
         if res:
             # is executive
-            departamentos = Department.objects.filter(company_id=actor.company_id, active=True)
+            departamentos = Department.objects.filter(projectdepartment_id__project_id_id=project_id,company_id=actor.company_id, active=True)
         else:
             # not an executive
             roles_dep = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=20,
@@ -695,7 +699,7 @@ def find_departments(request):
     else:
         # is admin
 
-        departamentos = Department.objects.filter(company_id=actor.company_id, active=True)
+        departamentos = Department.objects.filter(company_id=actor.company_id,projectdepartment_id__project_id_id=project_id, active=True)
     return departamentos
 
 

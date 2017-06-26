@@ -98,6 +98,7 @@ urlpatterns += [  # i18n_patterns(
 
     # Employee
     url(r'^employee/create$', employeeController.create, name='employee_create'),
+    url(r'^employee/createAsync$', employeeController.create_async, name='employee_create_async'),
     url(r'^employee/list$', employeeController.list_employees, name='employee_list'),
     url(r'^employee/view/(?P<username>.*)/$', employeeController.view, name='employee_view'),
     url(r'^employee/edit/(?P<username>.*)/$', employeeController.edit, name='employee_edit'),
