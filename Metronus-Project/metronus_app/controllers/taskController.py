@@ -202,7 +202,8 @@ def edit(request, task_id):
     task_form.html
     """
     # Check that the user is logged in
-    actor = check_task(None, request)
+    task = get_object_or_404(Task, pk=task_id)
+    actor = check_task(task, request)
 
     errors = []
 
@@ -214,7 +215,6 @@ def edit(request, task_id):
         if form.is_valid():
             # process the data in form.cleaned_data as required
             errors=process_task_form(form)
-            task = get_object_or_404(Task, pk=form.cleaned_data['task_id'])
             check_task(task, request)
             # find tasks with the same name
             pro = Task.objects.filter(name=form.cleaned_data['name'],
@@ -230,7 +230,6 @@ def edit(request, task_id):
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        task = get_object_or_404(Task, pk=task_id)
         form = TaskForm(initial={"name": task.name, "description": task.description,
                                  "task_id": task.id,
                                  "production_goal": task.production_goal if task.production_goal is not None else "",
@@ -553,6 +552,7 @@ def check_role_for_list(request):
         else:
             # not a manager
             task = Task.objects.filter(actor_id__company_id=actor.company_id,
+                projectDepartment_id__project_id__deleted=False,projectDepartment_id__department_id__active=True,
                                        projectDepartment_id__projectdepartmentemployeerole__employee_id=actor,
                                        active=True).distinct()
     else:
@@ -627,19 +627,20 @@ def find_collections(request):
 
     if actor.user_type != 'A':
         # not an admin
-        is_team_manager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=30)
-        res = is_team_manager.count() > 0
+        is_executive = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=50)
+        res = is_executive.count() > 0
+
 
         if res:
-            # is manager
+            # is executive
             proyectos = Project.objects.filter(company_id=actor.company_id, deleted=False)
             departamentos = Department.objects.filter(company_id=actor.company_id, active=True)
         else:
-            # not a manager
-            roles_pro = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=40)
-            roles_dep = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=20)
+            # not an executive
+          
+            roles_dep = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=20)
 
-            if roles_pro.count() > 0 or roles_dep.count() > 0:
+            if roles_dep.count() > 0:
                 # you're a project manager. Loading your projects
                 proyectos = Project.objects.filter(
                     company_id=actor.company_id, deleted=False,
@@ -671,19 +672,19 @@ def find_departments(request):
 
     if actor.user_type != 'A':
         # not an admin
-        is_team_manager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=30)
-        res = is_team_manager.count() > 0
+        is_executive = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=50)
+        res = is_executive.count() > 0
 
         if res:
-            # is manager
+            # is executive
             departamentos = Department.objects.filter(company_id=actor.company_id, active=True)
         else:
-            # not a manager
-            roles_pro = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=40)
-            roles_dep = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=20)
+            # not an executive
+            roles_dep = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=20,
+                projectDepartment_id__project_id__deleted=False,projectDepartment_id__department_id__active=True)
 
-            if roles_pro.count() > 0 or roles_dep.count() > 0:
-                # you're a project manager or a coordinator. Loading your projects
+            if roles_dep.count() > 0:
+                # you're a project manager or a coordinator. Loading your departments for the selected project
                 departamentos = Department.objects.filter(
                     company_id=actor.company_id, active=True,
                     projectdepartment__projectdepartmentemployeerole__employee_id=actor,

@@ -153,7 +153,8 @@ def edit(request, department_id):
     """
 
     # Check that the current user is an administrator
-    admin = check_department(None, request)
+    department = get_object_or_404(Department, pk=department_id)
+    admin = check_department(department, request)
     repeated_name = False
 
     # if this is a POST request we need to process the form data
@@ -165,7 +166,7 @@ def edit(request, department_id):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-            department = get_object_or_404(Department, pk=form.cleaned_data['department_id'])
+            
 
             dep = find_name(form.cleaned_data['name'], admin)
             # dep does not exists or it's the same
