@@ -8,10 +8,8 @@
 {% block contentTitle %}{% trans 'registerEmployee' %}{% endblock %}
 
 {% block content %}
-  {% if form.errors %}
-  <p class="alert alert-danger">{{ form.errors }}</p>
-  {% endif %}
 
+<div class="clearfix"></div>
   {% for err in errors%}
   <p class="alert alert-danger">{% trans err %}</p>
   {% endfor %}
@@ -19,7 +17,10 @@
   {% if success %}
   <p class="alert alert-success"> {% trans 'success' %}</p>
   {% endif %}
-
+  <div id="successDiv" class="alert alert-success" hidden='true'>
+                  </div>
+  <div id="errorDiv" class="alert alert-danger" hidden='true' >
+          </div>
 <div class="row">
   <div class="col-md-12 col-sm-12 col-xs-12">
     <div class="x_panel">
@@ -27,10 +28,7 @@
         <h2>{% trans 'registerEmployee' %}</h2>
         <div class="clearfix"></div>
       </div>
-       <div id="successDiv" class="alert alert-success" hidden='true'>
-                  </div>
-      <div id="errorDiv" class="alert alert-danger" hidden='true' >
-          </div>
+    
       <div class="x_content">
 
         <form id="register_form" method="POST" class="form-horizontal" data-toggle="validator" role="form" action="" enctype="multipart/form-data">
