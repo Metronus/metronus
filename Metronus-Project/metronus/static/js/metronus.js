@@ -3,18 +3,22 @@ const error_input_icon = "form-control col-md-6 glyphicon glyphicon-remove";
 const ok_div_class = "form-group required company_class form-class has-feedback has-success";
 const ok_input_icon = "form-control col-md-6 glyphicon glyphicon-ok";
 
-$( document ).ready(function() {
-  new WOW().init();
+$(function() {
+    new WOW().init();
 
-  $("#flag_es").click(function() {
-    Cookies.set('lang', 'es-es');
-    location.reload(true);
-  });
+    var prod = window.location.hostname.indexOf("metronus.es") !== -1;
 
-  $("#flag_en").click(function() {
-    Cookies.set('lang', 'en-us');
-    location.reload(true);
-  });
+    $("#flag_es").click(function() {
+      if(prod) Cookies.set('lang', 'es-es', {domain: '.metronus.es'});
+      else Cookies.set('lang', 'es-es');
+      location.reload(true);
+    });
+
+    $("#flag_en").click(function() {
+      if(prod) Cookies.set('lang', 'en-us', {domain: '.metronus.es'});
+      else Cookies.set('lang', 'en-us');
+      location.reload(true);
+    });
 });
 
 function initAjax(field, field_str, url){
