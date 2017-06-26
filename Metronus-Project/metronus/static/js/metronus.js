@@ -66,3 +66,11 @@ function setValidationState(error, div, message){
   }
   div.find("input").removeClass("glyphicon");
 }
+
+// Collapse the last collapsible if there is more than one
+function autocollapse() {
+  var collapse_buttons = $("a.collapse-link");
+  if(collapse_buttons.length > 1) {
+      collapse_buttons.last().click();
+  }
+}

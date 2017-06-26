@@ -44,7 +44,7 @@
                 </a>
               </td>
               <td class="hidden-xs">
-                <a href="#" class="btn btn-default" data-href="{% url 'project_delete' project.id %}" data-toggle="modal" data-target="#confirm-delete">{% trans 'delete' %}</a>
+                <a href="#" class="btn btn-danger" data-href="{% url 'project_delete' project.id %}" data-toggle="modal" data-target="#confirm-delete">{% trans 'delete' %}</a>
               </td>
               {% endif %}
             </tr>
@@ -86,7 +86,7 @@
 <hr>
 <div class="row">
   <div class="col-xs-12">
-    <div class="x_panel collapsed">
+    <div class="x_panel collapse">
       <div class="x_title">
         <h2>{% trans 'deletedProjects' %}</h2>
         <ul class="nav navbar-right panel_toolbox">
@@ -148,12 +148,19 @@
 
 {% block javascript %}
 <script>
-  $('#confirm-delete').on('show.bs.modal', function(e) {
-    $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+  $(function() {
+      autocollapse();
+
+      $('#confirm-delete').on('show.bs.modal', function(e) {
+        $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+      });
+
+      $('#confirm-recover').on('show.bs.modal', function(e) {
+        $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+      });
   });
 
-  $('#confirm-recover').on('show.bs.modal', function(e) {
-    $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
-});
+
+
 </script>
 {% endblock %}
