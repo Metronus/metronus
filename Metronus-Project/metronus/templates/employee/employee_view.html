@@ -83,10 +83,10 @@
           <tbody>
             {% for rol in employee_roles %}
             <tr>
-              <td>{{rol.projectDepartment_id.project_id.name}}</td>
-              <td>{{rol.projectDepartment_id.department_id.name}}</td>
-              <td>{% trans rol.role_id.name %}</td>
-              <td>
+              <td align="center" >{{rol.projectDepartment_id.project_id.name}}</td>
+              <td align="center" >{{rol.projectDepartment_id.department_id.name}}</td>
+              <td align="center" >{% trans rol.role_id.name %}</td>
+              <td align="center" >
                 <div align="right">
                   <a align="right" class="btn btn-primary" href="/roles/manage?role_id={{rol.id}}">{% trans 'update' %}</a>
                   <a href="#" align="right" class="btn btn-danger" data-href="/roles/delete/{{rol.id}}" data-toggle="modal" data-target="#confirm-delete">{% trans 'delete' %}</a>
@@ -100,7 +100,8 @@
         {% trans 'noRoles' %}
         {% endif %}
       </div>
-    </br>
+    </div>
+    <br>
 
     <a align="center" class="btn btn-primary" href="/roles/manage?employee_id={{employee.id}}">{% trans 'addRole' %}</a>
 
@@ -126,7 +127,7 @@
   <div class="clearfix"></div>
 
   <!-- Productivity graphics starts -->
-  <div class="col-xs-12">
+  <div class="col-xs-12 col-md-12 col-lg-6">
     <div class="x_panel">
 
       <div class="x_title">
@@ -168,7 +169,7 @@
   <!-- Productivity graphics ends -->
 
   <!-- Profit graphics starts -->
-  <div class="col-xs-12">
+  <div class="col-xs-12 col-md-12 col-lg-6">
     <div class="x_panel">
 
       <div class="x_title">
@@ -193,9 +194,9 @@
                   <input type="text" style="width: 200px" name="employee_profit_chart" id="employee_profit_chart" class="form-control" value=""/>
                 </div>
               </div>
-            </div>
-          </fieldset>
-        </form>
+            </fieldset>
+          </form>
+        </div>
 
         <form class="form-horizontal">
           <fieldset>
@@ -210,16 +211,14 @@
               </div>
             </div>
           </fieldset>
-        </form>    
-
+        </form>
       </div>
-
     </div>
   </div>
-</div>
-<!-- Profit graphics ends -->
+  <!-- Profit graphics ends -->
 
 </div>
+
 {% endblock %}
 
 
