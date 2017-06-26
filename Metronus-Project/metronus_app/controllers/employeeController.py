@@ -21,7 +21,7 @@ from django.core import serializers
 from django.http import HttpResponse
 
 from metronus_app.common_utils import (get_current_admin_or_403, check_image, get_current_employee_or_403, send_mail,
-                                       is_email_unique, is_username_unique, get_authorized_or_403)
+                                       is_email_unique, is_username_unique, get_authorized_or_403,default_round)
 from datetime import date, timedelta, datetime
 import re
 
@@ -269,7 +269,7 @@ def edit(request, username):
             'price_per_hour': employee.price_per_hour
         })
 
-        return render(request, 'employee/employee_edit.html', {'form': form, 'picture': employee.picture})
+        return render(request, 'employee/employee_edit.html', {'form': form, 'picture': employee.picture,'username':username})
 
     elif request.method == "POST":
         # Process the received form
@@ -316,12 +316,12 @@ def edit(request, username):
                 return HttpResponseRedirect('/employee/view/' + username + '/')
             else:
                 # There are errors
-                return render(request, 'employee/employee_edit.html', {'form': form, 'errors': errors, 'picture': employee.picture})
+                return render(request, 'employee/employee_edit.html', {'form': form, 'errors': errors, 'picture': employee.picture,'username':username})
 
         else:
             # Form is not valid
             return render(request, 'employee/employee_edit.html', {'form': form, 'picture': employee.picture,
-                                                                   'errors': ['employeeCreation_formNotValid']})
+                                                                   'errors': ['employeeCreation_formNotValid'],'username':username})
     else:
         raise PermissionDenied
 
@@ -578,8 +578,8 @@ def ajax_productivity_per_task_and_date(request, username):
         else:
             expected_productivity = expected_productivity.production_goal
 
-        data["task"]["real_productivity"].append(total_productivity)
-        data["task"]["expected_productivity"].append(expected_productivity)
+        data["task"]["real_productivity"].append(default_round(total_productivity))
+        data["task"]["expected_productivity"].append(default_round(expected_productivity))
 
     return JsonResponse(data)
 
@@ -658,8 +658,8 @@ def ajax_profit_per_date(request, employee_id):
                                 )["total_income"]
         income = income if income is not None else 0
 
-        data['expenses'].append(expenses)
-        data['income'].append(income)
+        data['expenses'].append(default_round(expenses))
+        data['income'].append(default_round(income))
         if index == 0:
             data['acumExpenses'].append(expenses)
             data['acumIncome'].append(income)
@@ -748,8 +748,8 @@ def ajax_profit_per_date_in_project(request, employee_id, project_id):
         data['expenses'].append(expenses)
         data['income'].append(income)
         if index == 0:
-            data['acumExpenses'].append(expenses)
-            data['acumIncome'].append(income)
+            data['acumExpenses'].append(default_round(expenses))
+            data['acumIncome'].append(default_round(income))
         else:
             data['acumExpenses'].append(data['acumExpenses'][index - 1] + expenses)
             data['acumIncome'].append(data['acumIncome'][index - 1] + income)

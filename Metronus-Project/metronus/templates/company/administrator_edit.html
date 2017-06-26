@@ -138,11 +138,9 @@
         <div id="errorDiv2" class="alert alert-error alert-dismissible" role="alert">
           <a class="close" data-dismiss="alert">x</a>
           {% for error in errors %}
-            {% if error == "error.imageNotValid" %}
-              {% trans 'company_imageNotValid' %}
-            {% else %}
+              <p>
               {% trans error %}
-            {% endif %}
+              </p>
           {% endfor %}
         </div>
       {% endif %}

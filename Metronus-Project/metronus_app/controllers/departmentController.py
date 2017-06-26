@@ -11,7 +11,7 @@ from metronus_app.model.task import Task
 from metronus_app.model.timeLog import TimeLog
 from datetime import date, timedelta, datetime
 import re
-
+from metronus_app.common_utils import default_round
 
 def create(request):
     """
@@ -387,8 +387,8 @@ def ajax_profit_per_date(request, department_id):
         income = logs.aggregate(total_income=Sum(F("task_id__price_per_unit")*F("produced_units")))["total_income"]
         income = income if income is not None else 0
 
-        data['expenses'].append(expenses)
-        data['income'].append(income)
+        data['expenses'].append(default_round(expenses))
+        data['income'].append(default_round(income))
         if index == 0:
             data['acumExpenses'].append(expenses)
             data['acumIncome'].append(income)

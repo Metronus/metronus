@@ -52,7 +52,13 @@
 
          <div class="form-group control-buttons">
            <div class="text-center">
-             <a class="btn btn-danger" href="{% url 'employee_list' %}">{% trans 'cancel' %}</a>
+             {% if username %}
+               <a class="btn btn-danger" href="{% url 'employee_view' username %}">{% trans 'cancel' %}</a>
+              {% else %}
+                <a class="btn btn-danger" href="{% url 'employee_list' %}">{% trans 'cancel' %}</a>
+              {% endif %}
+
+
              <button type="submit" class="btn btn-success submit-button" >{% trans 'confirm' %}</button>
            </div>
          </div>

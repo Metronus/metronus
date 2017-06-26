@@ -59,7 +59,7 @@
           <strong>{% trans 'phone' %}</strong> <span class="pull-right">{{employee.phone}}</span>
         </li>
         <li>
-            <strong>{% trans 'price_per_hour' %}</strong> <span class="pull-right">{{employee.price_per_hour}} &euro;</span>
+            <strong>{% trans 'price_per_hour' %}</strong> <span class="pull-right">{{employee.price_per_hour|floatformat:2}} &euro;</span>
         </li>
         <li style="text-align: center">
 

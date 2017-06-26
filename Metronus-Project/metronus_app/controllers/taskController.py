@@ -16,6 +16,7 @@ from metronus_app.model.department import Department
 from metronus_app.model.goalEvolution import GoalEvolution
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
+from metronus_app.common_utils import default_round
 
 from datetime import date, timedelta, datetime
 
@@ -347,7 +348,7 @@ def ajax_productivity_per_task(request):
     for i in range(0, 31):
         if production is not None and len(production) > z and abs((production[z].workDate-start_date_parse).days) == i:
             try:
-                data['production'].append(production[z].produced_units / (production[z].duration/60))
+                data['production'].append(default_round(production[z].produced_units / (production[z].duration/60)))
             except TypeError:
                 data['production'].append(0)
             z += 1
@@ -355,7 +356,7 @@ def ajax_productivity_per_task(request):
         else:
             data['production'].append(0)
 
-        data['goal_evolution'].append(task.production_goal)
+        data['goal_evolution'].append(default_round(task.production_goal))
 
         prod_day = start_date_parse + timedelta(days=i)
         data['days'].append(str(prod_day.day)+", "+str(calendar.month_name[prod_day.month]))
@@ -436,8 +437,8 @@ def ajax_profit_per_date(request, task_id):
         data['expenses'].append(expenses)
         data['income'].append(income)
         if index == 0:
-            data['acumExpenses'].append(expenses)
-            data['acumIncome'].append(income)
+            data['acumExpenses'].append(default_round(expenses))
+            data['acumIncome'].append(default_round(income))
         else:
             data['acumExpenses'].append(data['acumExpenses'][index - 1] + expenses)
             data['acumIncome'].append(data['acumIncome'][index - 1] + income)
