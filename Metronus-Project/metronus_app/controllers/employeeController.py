@@ -118,7 +118,10 @@ def list_employees(request):
     # Check that the user is logged in and it's an administrator
     admin = get_authorized_or_403(request)
     employees = Employee.objects.filter(company_id=admin.company_id)
-    return render(request, 'employee/employee_list.html', {'employees': employees})
+    active = employees.filter(user__is_active = True)
+    inactive = employees.filter(user__is_active = False)
+    return render(request, 'employee/employee_list.html',
+            {'employees': active, 'inactive' : inactive})
 
 
 def view(request, username):
@@ -137,7 +140,7 @@ def view(request, username):
         logged = get_current_admin_or_403(request)
     except PermissionDenied:
         logged = get_current_employee_or_403(request)
-    employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
+    employee = get_object_or_404(Employee, user__username=username)
 
     # Check that the admin has permission to view that employee
     if employee.company_id != logged.company_id:
@@ -176,7 +179,7 @@ def edit(request, username):
 
     # Check that the user is logged in and it's an administrator
     admin = get_authorized_or_403(request)
-    employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
+    employee = get_object_or_404(Employee, user__username=username)
 
     # Check that the admin has permission to view that employee
     if employee.company_id != admin.company_id:
@@ -208,11 +211,11 @@ def edit(request, username):
             # Check that the image is OK
             if not check_image(form, 'photo'):
                 errors.append('employeeCreation_imageNotValid')
-            
+
             # Check that the email is unique
             if not is_email_unique(form.cleaned_data["email"]) and employee.user.email != form.cleaned_data["email"]:
                 errors.append('employeeCreation_emailNotUnique')
-            
+
             if not errors:
                 # Update employee data
                 employee.identifier = form.cleaned_data["identifier"]

@@ -192,7 +192,7 @@ class DepartmentTestCase(TestCase):
         response = c.get("/department/list")
 
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(len(response.context["departments"]), 3)
+        self.assertEquals(len(response.context["departments"]), 2)
         self.assertEquals(response.context["departments"][0].name, "dep1")
 
     def test_list_departments_positive_2(self):
@@ -277,7 +277,7 @@ class DepartmentTestCase(TestCase):
                   })
 
             self.assertEquals(response.status_code, 302)
-            
+
             pro_up=Department.objects.get(pk=pro.id)
 
             self.assertEquals(pro_up.name, "Metronosa")

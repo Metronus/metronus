@@ -57,6 +57,7 @@
       <div class="text-center">
         {% if projects|length_is:"0"  %}
         <h2>{% trans 'plsProject' %}</h2>
+        </br>
         {% endif %}
         <a class="btn btn-dark" href="{% url 'project_create' %}">{% trans 'create' %}</a>
       </div>

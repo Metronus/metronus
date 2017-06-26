@@ -63,6 +63,10 @@
 
 {% block javascript %}
 <script>
+$(function() {
+  $(".btn-file span").text("{% trans 'browseFile' %}");
+});
+
 $('#form').bootstrapValidator({
   feedbackIcons: {
     valid: 'glyphicon glyphicon-ok',

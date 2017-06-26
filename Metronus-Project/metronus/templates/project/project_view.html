@@ -8,7 +8,13 @@
 <div class="row">
   <div class="page-title">
     <div class="title_left">
-      <h3><strong>{% trans 'project' %}: </strong> {{ project.name }}</h3>
+      <h3>
+        <strong>{% trans 'project' %}: </strong>
+        {{ project.name }}
+        {% if project.deleted == True %}
+          <i>({% trans "inactive" %})</i>
+        {% endif %}
+      </h3>
     </div>
   </div>
 

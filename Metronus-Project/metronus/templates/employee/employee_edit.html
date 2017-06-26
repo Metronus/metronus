@@ -1,136 +1,76 @@
 {% extends "layout_base.html" %}
 {% load i18n %}
 {% load l10n %}
+{% load static %}
+{% load custom_tags %}
 
-{% block title %}
-    {% trans 'editEmployee' %}
-{% endblock %}
-{% block contentTitle %}
-    {% trans 'editEmployee' %}
+{% block title %}{% trans 'editEmployee' %}{% endblock %}
+{% block contentTitle %}{% trans 'editEmployee' %}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-12 col-sm-12 col-xs-12">
+    <div class="x_panel">
+      <div class="x_title">
+        <h1 align="center"> {% trans 'editEmployee' %} </h1></br>
+        <div class="clearfix"></div>
+      </div>
+
+      <div class="x_content">
+        <!-- FORM ERRORS -->
+        {% for err in errors%}
+            <p class="alert alert-danger">{% trans err %}</p>
+        {% endfor %}
+        <form id="register_form" method="POST" action="" class="form-horizontal" enctype="multipart/form-data">
+         {% csrf_token %}
+
+         {% show_field form.first_name      "John" %}
+         {% show_field form.last_name       "Doe" %}
+         {% show_field form.email           "info@metronus.es" %}
+         {% show_field form.identifier      "emply_mtn" %}
+         {% show_field form.phone           "666775899" %}
+         {% show_field form.price_per_hour  "9.8" %}
+         {% show_field form.photo %}
+         <div class="form-group required form-class">
+           <label class="control-label col-sm-4"></label>
+             <div class="col-sm-6">
+             {% trans 'change_pic_warning' %}
+             </div>
+         </div>
+
+         <!-- MOSTRAR FOTO ACTUAL -->
+         <div class="form-group required form-class">
+           <label class="control-label col-sm-4" for="id_current_picture">{% trans 'current_employee_pic' %}</label>
+           <div class="col-sm-6">
+             {% if picture %}
+              <img src="{{ MEDIA_URL }}{{picture}}" style="max-height: 120px; max-width: auto;">
+             {% else %}
+              {% trans 'none' %}
+             {% endif %}
+           </div>
+         </div>
+
+         <div class="form-group control-buttons">
+           <div class="text-center">
+             <a class="btn btn-danger" href="{% url 'employee_list' %}">{% trans 'cancel' %}</a>
+             <button type="submit" class="btn btn-success submit-button" >{% trans 'confirm' %}</button>
+           </div>
+         </div>
+       </div>
+      </form>
+    </div>
+   </div>
+ </div>
 {% endblock %}
 
 {% block javascript %}
 <script>
-$(function() {
-    $(':input[type="number"]').each(function(i) {
-        $(this).val($(this).attr("value").replace(",", "."));
-    });
-});
-</script>
-{% endblock %}
-
-{% load static }
-
-{% block content %}
-    <div class="row">
-
-<div class="col-md-12 col-sm-12 col-xs-12">
-  <div class="x_panel">
-    <div class="x_title">
-            <h1 align="center"> {% trans 'editEmployee' %} </h1></br>
-      <div class="clearfix"></div>
-    </div>
-    <div class="x_content">
-
+  $(function() {
+    $(".btn-file span").text("{% trans 'browseFile' %}");
     
-   <form id="register_form" method="POST" action="" class="form-horizontal" enctype="multipart/form-data">
-       {% csrf_token %}
-   {% if  errors %}
-        <div id="errorDiv2" class="alert alert-error alert-dismissible" role="alert">
-        <a class="close" data-dismiss="alert">x</a>
-        {% for error in errors %}
-          {% trans error %}
-        {% endfor %}
-        </div>
-    {% endif %}
-
-    {% csrf_token %}
-
-        <div class="col-md-6 col-md-offset-2 collapse in" >
-
-        <div class="form-group required form-class">
-          
-          <label class="control-label col-sm-4" for="id_{{ form.first_name.name }}">{{ form.first_name.label }}</label>
-            <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.first_name.name }}" id="id_{{ form.first_name.name }}" value="{{ form.first_name.value }}" required />
-            </div>
-        </div>
-        <div class="form-group required form-class">
-          
-          <label class="control-label col-sm-4" for="id_{{ form.last_name.name }}">{{ form.last_name.label }}</label>
-            <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.last_name.name }}" id="id_{{ form.last_name.name }}" value="{{ form.last_name.value }}" required />
-            </div>
-        </div>
-        <div class="form-group required form-class">
-          
-          <label class="control-label col-sm-4" for="id_{{ form.email.name }}">{{ form.email.label }}</label>
-            <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.email.name }}" id="id_{{ form.email.name }}" value="{{ form.email.value }}" required />
-            </div>
-        </div>
-        <div class="form-group required form-class">
-          
-          <label class="control-label col-sm-4" for="id_{{ form.identifier.name }}">{{ form.identifier.label }}</label>
-            <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.identifier.name }}" id="id_{{ form.identifier.name }}" value="{{ form.identifier.value }}" required />
-            </div>
-        </div>
-        <div class="form-group required form-class">
-          
-          <label class="control-label col-sm-4" for="id_{{ form.phone.name }}">{{ form.phone.label }}</label>
-            <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.phone.name }}" id="id_{{ form.phone.name }}" value="{{ form.phone.value }}" required />
-            </div>
-        </div>
-        <div class="form-group required form-class">
-          
-          <label class="control-label col-sm-4" for="id_{{ form.price_per_hour.name }}">{{ form.price_per_hour.label }}</label>
-            <div class="col-sm-6">
-              <input type="number" min="0" step="0.01" class="form-control col-md-6" name="{{ form.price_per_hour.name }}" id="id_{{ form.price_per_hour.name }}" value="{{ form.price_per_hour.value |floatformat:2|unlocalize}}" required />
-            </div>
-        </div>
-
-        <div class="form-group required form-class">
-          <label class="control-label col-sm-4" for="id_current_picture">{% trans 'current_employee_pic' %}</label>
-            <div class="col-sm-6">
-            {% if picture %}
-                <img src="{{ MEDIA_URL }}{{picture}}" style="max-height: 120px; max-width: auto;">
-            {% else %}
-                {% trans 'none' %}
-            {% endif %}
-            </div>
-        </div>
-
-        <div class="form-group required form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.photo.name }}">{% trans 'new_employee_pic' %}</label>
-            <div class="col-sm-6">
-            <input type="file" accept="image/*" class="" name="{{ form.photo.name }}" id="id_{{ form.photo.label }}" value="{{ form.photo.value }}" >
-            </div>
-        </div>
-
-        <div class="form-group required form-class">
-          <label class="control-label col-sm-4"></label>
-            <div class="col-sm-6">
-            {% trans 'change_pic_warning' %}
-            </div>
-        </div>
-        
-        <div class="form-group control-buttons">
-            <div class="col-sm-offset-4 col-sm-10">
-            <a class="btn btn-danger" href="{% url 'employee_list' %}">{% trans 'cancel' %}</a>
-            <button type="submit" class="btn btn-success submit-button" >{% trans 'confirm' %}</button>
-            
-
-            </div>
-          
-        </div>
-        </div>
-
-    </form>
- </div>
- </div>
- </div>
- </div>
-
+    $(':input[type="number"]').each(function(i) {
+      $(this).val($(this).attr("value").replace(",", "."));
+    });
+  });
+</script>
 {% endblock %}

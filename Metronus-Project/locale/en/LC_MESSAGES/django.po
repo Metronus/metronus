@@ -332,6 +332,8 @@ msgid "previous"
 msgstr "Previous"
 msgid "finish"
 msgstr "Finish"
+msgid "inactive"
+msgstr "Inactive"
 
 # Password recover
 msgid "recover_password_instructions"
@@ -498,6 +500,8 @@ msgid "employeeCreation_priceNotValid"
 msgstr "Price must be greater than 0 (taxes are included)"
 msgid "employeeCreation_emailNotUnique"
 msgstr "The email is not unique"
+msgid "employeeListInactive"
+msgstr "Inactive employees"
 
 msgid "identifier_not_empty"
 msgstr "Employee's ID can't be empty"

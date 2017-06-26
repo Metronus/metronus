@@ -333,6 +333,8 @@ msgid "previous"
 msgstr "Anterior"
 msgid "finish"
 msgstr "Finalizar"
+msgid "inactive"
+msgstr "Inactivo"
 
 # Password recover
 msgid "recover_password_instructions"
@@ -494,6 +496,8 @@ msgid "employeeCreation_formNotValid"
 msgstr "El formulario no es válido"
 msgid "employeeCreation_priceNotValid"
 msgstr "El precio por hora debe ser mayor que 0 (impuestos incluidos)"
+msgid "employeeListInactive"
+msgstr "Empleados inactivos"
 
 msgid "identifier_not_empty"
 msgstr "El identificador no puede estar vacío"
