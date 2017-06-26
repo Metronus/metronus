@@ -12,7 +12,7 @@
 {% load static }
 
 {% block javascript %}
-
+{% load custom_tags %}
 <script>
 
   //Esto es para validar en cliente de forma bonita con bootstrap :)
@@ -21,26 +21,26 @@
     
     var dep_select = $("#id_{{ form.department_id.name }}")
     {% if  form.department_id.value is not None %}
-    var p_id=0
-    {% if  form.project_id.value is not None %}
-        p_id={{form.project_id.value }}
-    {% endif %}
+        var p_id=0
+        {% if  form.project_id.value is not None %}
+            p_id={{form.project_id.value }}
+        {% endif %}
 
-        $.get({
-            url: "/task/getdepartments",
-            data: {project_id: p_id},
-            success: function ( data )  {
-                console.log(JSON.stringify(data))
-                dep_select.empty()
-                dep_select.append($('<option value="" selected>{% trans "selectDepartment" %}</option>)'))
-                data.forEach(function (department) {
-                    console.log(department.pk+", "+'{{form.department_id.value}}')
-                    dep_select.append($('<option value="'+department.pk+'">'+department.fields.name+'</option>'))
+            $.get({
+                url: "/task/getdepartments",
+                data: {project_id: p_id},
+                success: function ( data )  {
+                    console.log(JSON.stringify(data))
+                    dep_select.empty()
+                    dep_select.append($('<option value="" selected>{% trans "selectDepartment" %}</option>)'))
+                    data.forEach(function (department) {
+                        console.log(department.pk+", "+'{{form.department_id.value}}')
+                        dep_select.append($('<option value="'+department.pk+'">'+department.fields.name+'</option>'))
 
-                })
-                dep_select.val("{{ form.department_id.value }}").attr('selected','selected')
-            }
-        });
+                    })
+                    dep_select.val("{{ form.department_id.value }}").attr('selected','selected')
+                }
+            });
     {% endif %}
 
     // Carga el select de departamentos con los correspondientes al proyecto seleccionado
@@ -229,7 +229,7 @@ $(function() {
     <div class="form-group" >
         <label class="control-label col-sm-4" for="id_{{ form.production_goal.name }}">{% trans 'production_goal' %}</label>
         <div class="col-sm-6">
-            <input type="text" class="form-control col-md-6 precio" name="{{ form.production_goal.name }}" id="id_{{ form.production_goal.name }}" value="{{ form.production_goal.value }}">
+            <input type="text" class="form-control col-md-6 precio" name="{{ form.production_goal.name }}" id="id_{{ form.production_goal.name }}" value="{{ form.production_goal.value|floatformat:2 }}">
         </div>
     </div>
 
