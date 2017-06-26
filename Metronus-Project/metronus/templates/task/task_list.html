@@ -49,7 +49,7 @@
                 </a>
               </td>
               <td class="hidden-xs">
-                <a href="#" class="btn btn-default" data-href="{% url 'task_delete' task.id %}"
+                <a href="#" class="btn btn-danger" data-href="{% url 'task_delete' task.id %}"
                   data-toggle="modal" data-target="#confirm-delete">{% trans 'delete' %}</a>
               </td>
             </tr>
@@ -157,11 +157,15 @@
 
 {% block javascript %}
 <script>
+$(function() {
     $('#confirm-delete').on('show.bs.modal', function(e) {
-        $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+      $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
     });
     $('#confirm-recover').on('show.bs.modal', function(e) {
         $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
     });
+
+    autocollapse();
+});
 </script>
 {% endblock %}

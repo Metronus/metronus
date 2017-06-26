@@ -113,29 +113,30 @@
   });
   function ajax(){
     $.post('/task/createAsync', $('#register_form').serialize(), function(data, status){
-        console.log(data)
         if(data['success']){
             document.getElementById('register_form').reset();
             $("#register_form").data('bootstrapValidator').resetForm();
-            $('#errorDiv').attr('hidden', true);
-            
-            $('#successDiv').attr('hidden', false).html("<strong>{% trans 'success' %} | </strong>{% trans 'taskSaved' %}");
+            $('#errorDiv').hide();
+            $('#successDiv').hide();
+            $('#successDiv').fadeIn().html("<strong>{% trans 'success' %} | </strong>{% trans 'taskSaved' %}");
         }else{
-            $('#successDiv').attr('hidden', true)
-            $('#errorDiv').attr('hidden', false).html("")
+            $('#errorDiv').hide();
+            $('#successDiv').hide();
+            $('#errorDiv').fadeIn().html("");
             for(var i=0;i<data['errors'].length;i++){
-                err=data['errors'][i]
+                var err = data['errors'][i];
                 
                 //cannot pass the errors the directly, so we must check each one
                 if(err=='task_creation_invalid_goal'){
-                    $('#errorDiv').append("<p><strong>{% trans 'fail' %} |</strong>{% trans 'task_creation_invalid_goal' %}</p>"); 
+                    $('#errorDiv').append("<p><strong>{% trans 'fail' %} | </strong>{% trans 'task_creation_invalid_goal' %}</p>");
                 }else if(err=='task_creation_invalid_price'){
-                    $('#errorDiv').append("<p><strong>{% trans 'fail' %} |</strong>{% trans 'task_creation_invalid_price' %}</p>"); 
+                    $('#errorDiv').append("<p><strong>{% trans 'fail' %} | </strong>{% trans 'task_creation_invalid_price' %}</p>");
                 }else if(err=='task_creation_project_department_not_related'){
-                    $('#errorDiv').append("<p><strong>{% trans 'fail' %} |</strong>{% trans 'task_creation_project_department_not_related' %}</p>"); 
+                    $('#errorDiv').append("<p><strong>{% trans 'fail' %} | </strong>{% trans 'task_creation_project_department_not_related' %}</p>");
                 }else if(err=='task_creation_repeated_name'){
-                    $('#errorDiv').append("<p><strong>{% trans 'fail' %} |</strong>{% trans 'task_creation_repeated_name' %}</p>"); 
-
+                    $('#errorDiv').append("<p><strong>{% trans 'fail' %} | </strong>{% trans 'task_creation_repeated_name' %}</p>");
+                } else if (err == 'task_creation_error') {
+                    $('#errorDiv').append("<p><strong>{% trans 'fail' %} | </strong>{% trans 'task_creation_error' %}</p>");
                 }
             }
 
@@ -158,11 +159,10 @@ $(function() {
 {% if form.errors %}
         <p>{{ form.errors }}</p>
 {% endif %}
+<div class="clearfix"></div>
 
-<div id="successDiv" class="alert alert-success" hidden='true'>
-            </div>
-<div id="errorDiv" class="alert alert-danger" >
-           
+<div id="successDiv" class="alert alert-success" hidden='true'></div>
+<div id="errorDiv" class="alert alert-danger" hidden='true'>
 {% if errors %}
     {% for err in errors%}
         <p><strong>{% trans 'fail' %} | </strong>{% trans err %}</p>

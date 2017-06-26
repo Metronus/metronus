@@ -92,9 +92,11 @@
         if(JSON.stringify(data['success'])=="true"){
           document.getElementById('register_form').reset();
           $('#errorDiv').hide();
+          $('#successDiv').hide();
           $('#successDiv').fadeIn().html("<strong>{% trans 'success' %} | </strong>{% trans 'departmentSaved' %}");
         }else {
           var dup = JSON.stringify(data['repeated_name'])=="true";
+          $('#errorDiv').hide();
           $('#successDiv').hide();
           $('#errorDiv').fadeIn().html("<strong>{% trans 'fail' %} | </strong>" + (dup ? "{% trans 'departmentName' %}" : "{% trans 'departmentError' %}"));
         }

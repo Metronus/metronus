@@ -86,14 +86,17 @@
         $("#form").data('bootstrapValidator').resetForm();
         $('#error2Div').hide();
         if(JSON.stringify(data['success'])=="true"){
-          document.getElementById('register_form').reset();
-          $('#errorDiv').hide();
-          $('#successDiv').fadeIn().html("<strong>{% trans 'success' %} | </strong>{% trans 'projectSaved' %}");
+              document.getElementById('form').reset();
+              $('#errorDiv').hide();
+              $('#successDiv').hide();
+              $('#successDiv').fadeIn().html("<strong>{% trans 'success' %} | </strong>{% trans 'projectSaved' %}");
         } else if(JSON.stringify(data['repeated_name'])=="true"){
-    		  $('#successDiv').hide();
-          $('#errorDiv').fadeIn().html("<strong>{% trans 'fail' %} | </strong>{% trans 'projectName' %}");
+    		  $('#errorDiv').hide();
+              $('#successDiv').hide();
+              $('#errorDiv').fadeIn().html("<strong>{% trans 'fail' %} | </strong>{% trans 'projectName' %}");
     	} else {
-    		$('#successDiv').hide()
+    		$('#errorDiv').hide();
+            $('#successDiv').hide();
     		$('#errorDiv').fadeIn().html("<strong>{% trans 'fail' %} | </strong>{% trans 'projectError' %}");
     	}
     });
