@@ -149,7 +149,7 @@ def create_timelog_in_task(task, duration, date, employee):
     creates a timelog for an employee involving a task during a specific date
     """
     if task.production_goal is not None and task.production_goal != "":
-        punits = random.uniform(0.1, 0.5)*duration/60*task.production_goal
+        punits = random.uniform(0.5, 1.5)*duration/60*task.production_goal
     else:
         punits = None
     TimeLog.objects.create(

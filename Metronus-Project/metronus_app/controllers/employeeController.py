@@ -24,7 +24,7 @@ from metronus_app.common_utils import (get_current_admin_or_403, check_image, ge
                                        is_email_unique, is_username_unique, get_authorized_or_403,default_round)
 from datetime import date, timedelta, datetime
 import re
-
+from django.contrib.auth.password_validation import validate_password, ValidationError
 
 def create(request):
     """
@@ -66,6 +66,11 @@ def create(request):
             if not check_passwords(form):
                 errors.append('employeeCreation_passwordsDontMatch')
 
+            try:
+                validate_password(form.cleaned_data["password1"])
+            except ValidationError:
+                errors.append('currentPasswordInvalid')
+
             # Check that the username is unique
             if not is_username_unique(form.cleaned_data["username"]):
                 errors.append('employeeCreation_usernameNotUnique')
@@ -89,8 +94,8 @@ def create(request):
                 EmployeeLog.objects.create(employee_id=employee, event="A", price_per_hour=employee.price_per_hour)
                 send_register_email(form.cleaned_data["email"], form.cleaned_data["first_name"])
 
-                # Redirect to the newly created employee
                 return HttpResponseRedirect('/employee/view/' + form.cleaned_data["username"] + '/')
+   
             else:
                 # There are errors
                 return render(request, 'employee/employee_register.html', {'form': form, 'errors': errors})
@@ -357,6 +362,11 @@ def update_password(request, username):
             pass1 = form.cleaned_data["newpass1"]
             pass2 = form.cleaned_data["newpass2"]
 
+            try:
+                validate_password(pass1)
+            except ValidationError:
+                return JsonResponse({'success': False, 'errors': ['currentPasswordInvalid']})
+
             if pass1 != pass2:
                 return JsonResponse({'success': False, 'errors': ['employeeCreation_passwordsDontMatch']})
 
@@ -556,6 +566,7 @@ def ajax_productivity_per_task_and_date(request, username):
         if log is None:
             # He did not work that day
             total_productivity = 0
+            total_duration=0
         else:
             total_produced_units = log.produced_units
             total_duration = log.duration
@@ -570,10 +581,13 @@ def ajax_productivity_per_task_and_date(request, username):
                                                              registryDate__gte=log_date).first()
 
         # If we do not find the goal or if the date is after the last task update, it may be the current task goal
-        if expected_productivity is None or task.registryDate <= log_date:
-            expected_productivity = task.production_goal
+        if total_duration==0:
+            expected_productivity=0
         else:
-            expected_productivity = expected_productivity.production_goal
+            if expected_productivity is None or task.registryDate <= log_date:
+                expected_productivity = task.production_goal
+            else:
+                expected_productivity = expected_productivity.production_goal
 
         data["task"]["real_productivity"].append(default_round(total_productivity))
         data["task"]["expected_productivity"].append(default_round(expected_productivity))

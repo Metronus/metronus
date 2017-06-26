@@ -10,17 +10,18 @@
 {% block content %}
 
 <div class="clearfix"></div>
-  {% for err in errors%}
-  <p class="alert alert-danger">{% trans err %}</p>
-  {% endfor %}
+ 
 
   {% if success %}
   <p class="alert alert-success"> {% trans 'success' %}</p>
   {% endif %}
-  <div id="successDiv" class="alert alert-success" hidden='true'>
-                  </div>
-  <div id="errorDiv" class="alert alert-danger" hidden='true' >
-          </div>
+  <div id="successDiv" class="alert alert-success" hidden='true'></div>
+
+  <div id="errorDiv" class="alert alert-danger"  {% if not errors %} hidden='true'{% endif %} >
+  {% for err in errors%}
+    <p>{% trans err %}</p>
+  {% endfor %}
+  </div>
 <div class="row">
   <div class="col-md-12 col-sm-12 col-xs-12">
     <div class="x_panel">
