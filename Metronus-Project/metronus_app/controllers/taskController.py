@@ -62,7 +62,7 @@ def create(request):
                 pro = find_name(pname,pdtuple)
                 if pro is not None:
                     errors.append('task_creation_repeated_name')
-            
+
             if not errors:
                 actor = check_task(pro, request)
                 create_task(form, pdtuple, actor)
@@ -157,7 +157,10 @@ def list_tasks(request):
     """
     # Check that the user is logged in
     tasks = check_role_for_list(request)
-    return render(request, "task/task_list.html", {"tasks": tasks})
+    active = tasks.filter(active=True)
+    inactive = tasks.filter(active=False)
+    return render(request, "task/task_list.html",
+            {"tasks": active, "inactive":inactive})
 
 
 def view(request, task_id):

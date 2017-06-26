@@ -851,6 +851,8 @@ msgstr "Precio por hora"
 
 msgid "editTask"
 msgstr "Editar tarea"
+msgid "taskListInactive"
+msgstr "Tareas inactivas"
 
 
 #: Dashboard

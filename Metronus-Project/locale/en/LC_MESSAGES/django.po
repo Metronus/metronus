@@ -850,6 +850,8 @@ msgid "price_per_hour"
 msgstr "Price per hour"
 msgid "editTask"
 msgstr "Edit task"
+msgid "taskListInactive"
+msgstr "Inactive tasks"
 
 
 #: Dashboard
