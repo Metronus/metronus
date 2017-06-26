@@ -3,6 +3,24 @@ const error_input_icon = "form-control col-md-6 glyphicon glyphicon-remove";
 const ok_div_class = "form-group required company_class form-class has-feedback has-success";
 const ok_input_icon = "form-control col-md-6 glyphicon glyphicon-ok";
 
+$(function() {
+    new WOW().init();
+
+    var prod = window.location.hostname.indexOf("metronus.es") !== -1;
+
+    $("#flag_es").click(function() {
+      if(prod) Cookies.set('lang', 'es-es', {domain: '.metronus.es'});
+      else Cookies.set('lang', 'es-es');
+      location.reload(true);
+    });
+
+    $("#flag_en").click(function() {
+      if(prod) Cookies.set('lang', 'en-us', {domain: '.metronus.es'});
+      else Cookies.set('lang', 'en-us');
+      location.reload(true);
+    });
+});
+
 function initAjax(field, field_str, url){
   field.parent().find(".ajax-error").hide()
   field.change(function(){

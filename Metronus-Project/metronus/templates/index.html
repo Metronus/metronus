@@ -253,21 +253,7 @@
 		<script src="/static/landing/js/cookies.min.js"></script>
 		<script src="/static/landing/js/wow.min.js"></script>
 		<script src="/static/landing/js/jquery.actual.min.js"></script>
+		<script src="/static/js/metronus.js"></script>
 		{% endcompress %}
-
-		<script>
-			$(function() {
-				new WOW().init();
-				$("#flag_es").click(function() {
-				  Cookies.set('lang', 'es-es' {% if is_production %},{domain: '.metronus.es'}{% endif %});
-				  location.reload(true);
-				});
-
-				$("#flag_en").click(function() {
-				  Cookies.set('lang', 'en-us' {% if is_production %},{domain: '.metronus.es'}{% endif %});
-				  location.reload(true);
-				});
-			});
-		</script>
 	</body>
 </html>
