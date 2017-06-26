@@ -251,6 +251,7 @@ $(function() {
             <input type="text" class="form-control col-md-6 precio" name="{{ form.price_per_hour.name }}" id="id_{{ form.price_per_hour.name }}" value="{{ form.price_per_hour.value|floatformat:2 }}">
         </div>
     </div>
+
     <!--this is the hidden input for task id, do not remove!!! -->
     {{form.task_id}}
 
@@ -267,6 +268,9 @@ $(function() {
             {% endif %}
 
         </div>
+     <p class="help-block">{% trans 'task_creation_help_1' %}</p>
+     <p class="help-block">{% trans 'task_creation_help_2' %}</p>
+     <p class="help-block">{% trans 'task_creation_help_3' %}</p>
 </form>
 
  </div>
