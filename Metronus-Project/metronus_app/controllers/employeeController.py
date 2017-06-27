@@ -1,8 +1,8 @@
 from django.contrib.auth.models import User
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
-from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseRedirect, JsonResponse
+from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.utils.translation import ugettext_lazy
 from django.db.models import Sum, F, FloatField
 from django.contrib.auth.decorators import login_required
@@ -510,13 +510,13 @@ def ajax_productivity_per_task_and_date(request, username):
     date_regex = re.compile("^\d{4}-\d{2}-\d{2}$")
 
     if date_regex.match(start_date) is None or date_regex.match(end_date) is None:
-        return HttpResponseBadRequest("Start/end date are not valid")
+        raise SuspiciousOperation("Start/end date are not valid")
 
     offset = request.GET.get("offset", "+00:00")
     offset_regex = re.compile("^(\+|-)\d{2}:\d{2}$")
 
     if offset_regex.match(offset) is None:
-        return HttpResponseBadRequest("Time offset is not valid")
+        raise SuspiciousOperation("Time offset is not valid")
 
     # Append time offsets
     start_date += " 00:00" + offset
@@ -539,7 +539,7 @@ def ajax_productivity_per_task_and_date(request, username):
                                projectDepartment_id__projectdepartmentemployeerole__employee_id=employee,
                                production_goal__isnull=False).distinct().first()
     if task is None:
-        return HttpResponseBadRequest("The task could not be found")
+        raise SuspiciousOperation("The task could not be found")
 
     # Get all dates between start and end
     dates = []
@@ -625,13 +625,13 @@ def ajax_profit_per_date(request, employee_id):
     date_regex = re.compile("^\d{4}-\d{2}-\d{2}$")
 
     if date_regex.match(start_date) is None or date_regex.match(end_date) is None:
-        return HttpResponseBadRequest("Start/end date are not valid")
+        raise SuspiciousOperation("Start/end date are not valid")
 
     offset = request.GET.get("offset", "+00:00")
     offset_regex = re.compile("^(\+|-)\d{2}:\d{2}$")
 
     if offset_regex.match(offset) is None:
-        return HttpResponseBadRequest("Time offset is not valid")
+        raise SuspiciousOperation("Time offset is not valid")
 
     # Append time offsets
     start_date += " 00:00" + offset
@@ -711,13 +711,13 @@ def ajax_profit_per_date_in_project(request, employee_id, project_id):
     date_regex = re.compile("^\d{4}-\d{2}-\d{2}$")
 
     if date_regex.match(start_date) is None or date_regex.match(end_date) is None:
-        return HttpResponseBadRequest("Start/end date are not valid")
+        raise SuspiciousOperation("Start/end date are not valid")
 
     offset = request.GET.get("offset", "+00:00")
     offset_regex = re.compile("^(\+|-)\d{2}:\d{2}$")
 
     if offset_regex.match(offset) is None:
-        return HttpResponseBadRequest("Time offset is not valid")
+        raise SuspiciousOperation("Time offset is not valid")
 
     # Append time offsets
     start_date += " 00:00" + offset

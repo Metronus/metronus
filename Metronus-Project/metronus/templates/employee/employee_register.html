@@ -40,7 +40,7 @@
           {% show_field form.password2  %}
           {% show_field form.first_name  "John" %}
           {% show_field form.last_name  "Doe" %}
-          {% show_field form.email  "johndoe@metronus.es"    "employeeCreation_emailNotUnique" %}
+          {% show_field form.email  "johndoe@metronus.es"    "invalidEmail" %}
           {% show_field form.phone  "666777888" %}
           {% show_field form.identifier  "j_doe" %}
           {% show_field form.price_per_hour  "9.8" %}
@@ -79,11 +79,13 @@
         if(JSON.stringify(data['success'])=="true"){
           document.getElementById('register_form').reset();
           $("#register_form").data('bootstrapValidator').resetForm();
+          $('#successDiv').hide();
           $('#errorDiv').hide();
           $('#successDiv').fadeIn().html("<strong>{% trans 'success' %} | </strong>{% trans 'employeeSaved' %}");
         } else {
           $('#successDiv').hide();
           var htm="";
+
           for(var i=0;i<data['errors'].length;i++){
             var er=data['errors'][i];
             var tr=null;

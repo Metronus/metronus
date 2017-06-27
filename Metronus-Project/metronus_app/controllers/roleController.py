@@ -6,10 +6,10 @@ from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEm
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.forms.roleManagementForm import RoleManagementForm
 
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, SuspiciousOperation
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 
 from metronus_app.common_utils import get_authorized_or_403
 
@@ -51,7 +51,7 @@ def manage(request):
     if request.method == "GET":
         # Check that at least 'employee_id' or 'role_id' are provided as GET params, raise 400 otherwise
         if "employee_id" not in request.GET and "role_id" not in request.GET:
-            return HttpResponseBadRequest()
+            raise SuspiciousOperation
 
         # Return the initial form
         return get_form(request, logged)
@@ -110,7 +110,7 @@ def ajax_departments_from_projects(request):
 
     logged = get_authorized_or_403(request)
     if "project_id" not in request.GET:
-        return HttpResponseBadRequest()
+        raise SuspiciousOperation
 
     if logged.user_type == "E":
         ids = ProjectDepartmentEmployeeRole.objects.values_list('projectDepartment_id__department_id', flat=True).filter(employee_id=logged, role_id__tier__gt=10, projectDepartment_id__department_id__active=True, projectDepartment_id__project_id__id=request.GET["project_id"])
@@ -137,7 +137,7 @@ def ajax_roles_from_tuple(request):
 
     logged = get_authorized_or_403(request)
     if "project_id" not in request.GET or "department_id" not in request.GET:
-        return HttpResponseBadRequest()
+        raise SuspiciousOperation
 
     if logged.user_type == "E":
         try:

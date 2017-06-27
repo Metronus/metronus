@@ -5,7 +5,7 @@ from metronus_app.model.companyLog import CompanyLog
 from metronus_app.model.administrator import Administrator
 from django.contrib.auth.models import User
 from django.shortcuts import render
-from django.http import JsonResponse, HttpResponseBadRequest
+from django.http import JsonResponse
 from django.contrib.sites.shortcuts import get_current_site
 
 from django.contrib.auth.decorators import login_required
@@ -15,7 +15,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from metronus_app.common_utils import (get_current_admin_or_403, check_image, send_mail, is_email_unique,
                                        get_or_none, is_username_unique, is_cif_unique, is_company_email_unique)
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.contrib.auth.password_validation import validate_password, ValidationError
 
 def create(request,
@@ -287,7 +287,7 @@ def validate_username(request):
     username = request.GET.get('username', None)
 
     if not username:
-        return HttpResponseBadRequest
+        raise SuspiciousOperation
 
     data = {
         'is_taken': bool(get_or_none(User, username=username))

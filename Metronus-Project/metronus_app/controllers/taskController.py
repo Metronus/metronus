@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponseRedirect, HttpResponseBadRequest, JsonResponse, HttpResponse
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, SuspiciousOperation
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum, F, FloatField
 from django.core import serializers
@@ -313,7 +313,7 @@ def ajax_productivity_per_task(request):
         raise PermissionDenied
 
     if "task_id" not in request.GET:
-        return HttpResponseBadRequest()
+        raise SuspiciousOperation
 
     task_id = request.GET["task_id"]
 
@@ -323,13 +323,13 @@ def ajax_productivity_per_task(request):
     date_regex = re.compile("^\d{4}-\d{2}-\d{2}$")
 
     if date_regex.match(start_date) is None or date_regex.match(end_date) is None:
-        return HttpResponseBadRequest("Start/end date are not valid")
+        raise SuspiciousOperation("Start/end date are not valid")
 
     offset = request.GET.get("offset", "+00:00")
     offset_regex = re.compile("^(\+|-)\d{2}:\d{2}$")
 
     if offset_regex.match(offset) is None:
-        return HttpResponseBadRequest("Time offset is not valid")
+        raise SuspiciousOperation("Time offset is not valid")
 
     # Append time offsets
     start_date += " 00:00" + offset
@@ -393,13 +393,13 @@ def ajax_profit_per_date(request, task_id):
     date_regex = re.compile("^\d{4}-\d{2}-\d{2}$")
 
     if date_regex.match(start_date) is None or date_regex.match(end_date) is None:
-        return HttpResponseBadRequest("Start/end date are not valid")
+        raise SuspiciousOperation("Start/end date are not valid")
 
     offset = request.GET.get("offset", "+00:00")
     offset_regex = re.compile("^(\+|-)\d{2}:\d{2}$")
 
     if offset_regex.match(offset) is None:
-        return HttpResponseBadRequest("Time offset is not valid")
+        raise SuspiciousOperation("Time offset is not valid")
 
     # Append time offsets
     start_date += " 00:00" + offset
