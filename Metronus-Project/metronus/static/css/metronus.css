@@ -1,0 +1,31 @@
+.legaltext {
+    margin-left: 20%;
+    margin-right: 20%;
+    font-size: 130%;
+    text-align: justify;
+    color: #181c31;
+}
+
+.register_company_container {
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    padding: 10px;
+    background: #F7F7F7;
+}
+.register_company_form {
+    width: 100%;
+}
+
+#id_unique_message {
+    color:#a94442;
+}
+
+.error_ajax {
+    display: none;
+}
+
+div.name {
+    text-align: center;
+    font-size: 120%;
+}
