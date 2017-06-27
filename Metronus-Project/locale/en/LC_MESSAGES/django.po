@@ -820,7 +820,10 @@ msgstr "The form does not contain valid values."
 msgid "passwordsDontMatch"
 msgstr "New passwords do not match."
 msgid "currentPasswordInvalid"
-msgstr "The current password is not correct (8 characters min and cannot be exclusively numeric)."
+msgstr "The current password is not correct."
+
+msgid "newPasswordInvalid"
+msgstr "The new password is not correct (8 characters min and cannot be exclusively numeric)."
 msgid "editPasswordTitle"
 msgstr "Change administrator password"
 

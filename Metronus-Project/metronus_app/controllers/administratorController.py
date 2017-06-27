@@ -95,9 +95,11 @@ def update_password(request):
 
         if form.is_valid():
 
-            #Check password validation
-            if not validate_pass(form.cleaned_data["currentpass"]):
+            if not admin.user.check_password(form.cleaned_data["currentpass"]):
                 return JsonResponse({'success': False, 'errors': ['currentPasswordInvalid']})
+            #Check password validation
+            if not validate_pass(form.cleaned_data["newpass1"]):
+                return JsonResponse({'success': False, 'errors': ['newPasswordInvalid']})
 
             pass1 = form.cleaned_data["newpass1"]
             pass2 = form.cleaned_data["newpass2"]

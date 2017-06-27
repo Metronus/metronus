@@ -45,7 +45,7 @@ def create(request,
             
             #Check password validation
             if not validate_pass(form.cleaned_data["password"]):
-                errors.append('currentPasswordInvalid')
+                errors.append('newPasswordInvalid')
 
 
             # Check that the admin email is unique

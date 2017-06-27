@@ -5,7 +5,9 @@ from metronus_app.model.employee import Employee
 from metronus_app.model.administrator import Administrator
 from django.contrib.auth.models import User
 from metronus_app.model.employeeLog import EmployeeLog
+from django.urls import reverse
 
+import json
 
 class EmployeeTestCase(TestCase):
     """This class provides a test case for employee management"""
@@ -308,7 +310,202 @@ class EmployeeTestCase(TestCase):
 
         logs_after = EmployeeLog.objects.all().count()
         self.assertEquals(logs_before, logs_after)
+### ----------------Create async----------------------###
+    def test_create_employee_positive_async(self):
+        """ Logged in as an administrator, try to create an employee"""
+        c = Client()
+        c.login(username="admin1", password="123456")
 
+        logs_before = EmployeeLog.objects.all().count()
+
+        response = c.post(reverse("employee_create_async"), {
+            "username": "employee1",
+            "password1": "ihatemyboss",
+            "password2": "ihatemyboss",
+            "first_name": "Francisco",
+            "last_name": "Romualdo",
+            "email": "frc@empresa.com",
+            "identifier": "frc01",
+            "phone": "654321987",
+            "price_per_hour": "1.0"
+        })
+
+        self.assertEquals(response.status_code, 200)
+
+        # Check that the employee has been successfully created
+
+        employee = Employee.objects.get(identifier="frc01")
+        self.assertEquals(employee.user_type, "E")
+        self.assertEquals(employee.phone, "654321987")
+        self.assertEquals(employee.company_id, Administrator.objects.get(identifier="adm01").company_id)
+        self.assertEquals(employee.user.username, "employee1")
+        self.assertEquals(employee.user.first_name, "Francisco")
+        self.assertEquals(employee.user.last_name, "Romualdo")
+        self.assertEquals(employee.user.email, "frc@empresa.com")
+
+        logs_after = EmployeeLog.objects.all().count()
+
+        self.assertEquals(logs_before + 1, logs_after)
+
+  
+    def test_create_employee_password_not_match_negative_async(self):
+        """ Logged in as an administrator, try to create an employee"""
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        logs_before = EmployeeLog.objects.all().count()
+
+        response = c.post(reverse("employee_create_async"), {
+            "username": "employee_creating",
+            "password1": "ihatemyboss",
+            "password2": "dontmatch",
+            "first_name": "Francisco",
+            "last_name": "Romualdo",
+            "email": "frc@empresa.com",
+            "identifier": "frc01",
+            "phone": "654321987",
+            "price_per_hour": "2.0",
+        })
+
+        self.assertEquals(response.status_code, 200)
+        # response in bytes must be decode to string
+        data = response.content.decode("utf-8")
+        # string to dict
+        data = json.loads(data)
+
+        self.assertTrue('employeeCreation_passwordsDontMatch' in data["errors"])
+
+        # Check that the employee has not been created
+
+        logs_after = EmployeeLog.objects.all().count()
+        self.assertEquals(logs_before, logs_after)
+    def test_create_employee_email_not_unique_negative_async(self):
+        """ Logged in as an administrator, try to create an employee. email not unique"""
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        logs_before = EmployeeLog.objects.all().count()
+
+        response = c.post(reverse("employee_create_async"), {
+            "username": "employee_creating",
+            "password1": "dontmatch",
+            "password2": "dontmatch",
+            "first_name": "Francisco",
+            "last_name": "Romualdo",
+            "email": "admin1@metronus.es",
+            "identifier": "frc01",
+            "phone": "654321987",
+            "price_per_hour": "2.0",
+        })
+
+        self.assertEquals(response.status_code, 200)
+        # response in bytes must be decode to string
+        data = response.content.decode("utf-8")
+        # string to dict
+        data = json.loads(data)
+
+        self.assertTrue('employeeCreation_emailNotUnique' in data["errors"])
+
+        # Check that the employee has not been created
+
+        logs_after = EmployeeLog.objects.all().count()
+        self.assertEquals(logs_before, logs_after)
+
+    def test_create_employee_negative_price_negative_async(self):
+        """ Logged in as an administrator, try to create an employee"""
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        logs_before = EmployeeLog.objects.all().count()
+
+        response = c.post(reverse("employee_create_async"), {
+            "username": "employee_creating",
+            "password1": "dontmatch",
+            "password2": "dontmatch",
+            "first_name": "Francisco",
+            "last_name": "Romualdo",
+            "email": "frc@empresa.com",
+            "identifier": "frc01",
+            "phone": "654321987",
+            "price_per_hour": "-1.0",
+        })
+
+        self.assertEquals(response.status_code, 200)
+        # response in bytes must be decode to string
+        data = response.content.decode("utf-8")
+        # string to dict
+        data = json.loads(data)
+        self.assertTrue('employeeCreation_priceNotValid' in data["errors"])
+
+        # Check that the employee has not been created
+
+        logs_after = EmployeeLog.objects.all().count()
+        self.assertEquals(logs_before, logs_after)
+
+    def test_create_employee_username_taken_negative_async(self):
+        """ Logged in as an administrator, try to create an employee"""
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        logs_before = EmployeeLog.objects.all().count()
+
+        response = c.post(reverse("employee_create_async"), {
+            "username": "emp1",
+            "password1": "ihatemyboss",
+            "password2": "ihatemyboss",
+            "first_name": "Francisco",
+            "last_name": "Romualdo",
+            "email": "frc@empresa.com",
+            "identifier": "frc01",
+            "phone": "654321987",
+            "price_per_hour": "2.0",
+        })
+
+        self.assertEquals(response.status_code, 200)
+        # response in bytes must be decode to string
+        data = response.content.decode("utf-8")
+        # string to dict
+        data = json.loads(data)
+
+        self.assertTrue('employeeCreation_usernameNotUnique' in data["errors"])
+
+        # Check that the employee has not been created
+
+        logs_after = EmployeeLog.objects.all().count()
+        self.assertEquals(logs_before, logs_after)
+
+    def test_create_employee_invalid_form_negative_async(self):
+        """ Logged in as an administrator, try to create an employee"""
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        logs_before = EmployeeLog.objects.all().count()
+
+        response = c.post(reverse("employee_create_async"), {
+            "username": "adsfafafaf",
+            "password1": "ihatemyboss",
+            "password2": "ihatemyboss",
+            "first_name": "",
+            "last_name": "",
+            "email": "frc@empresa.com",
+            "identifier": "frc01",
+            "phone": "654321987",
+        })
+
+        self.assertEquals(response.status_code, 200)
+        # response in bytes must be decode to string
+        data = response.content.decode("utf-8")
+        # string to dict
+        data = json.loads(data)
+
+        self.assertTrue('employeeCreation_formNotValid' in data["errors"])
+
+        # Check that the employee has not been created
+
+        logs_after = EmployeeLog.objects.all().count()
+        self.assertEquals(logs_before, logs_after)
+
+###------------List--------------#
     def test_list_employees_positive(self):
         """
         As an admin, list the employees

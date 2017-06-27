@@ -68,7 +68,7 @@ def create(request):
 
             #Check password validation
             if not validate_pass(form.cleaned_data["password1"]):
-                errors.append('currentPasswordInvalid')
+                errors.append('newPasswordInvalid')
 
             # Check that the username is unique
             if not is_username_unique(form.cleaned_data["username"]):
@@ -146,7 +146,7 @@ def create_async(request):
             
             #Check password validation
             if not validate_pass(form.cleaned_data["password1"]):
-                errors.append('currentPasswordInvalid')
+                errors.append('newPasswordInvalid')
             
             # Check that the username is unique
             if not is_username_unique(form.cleaned_data["username"]):
@@ -362,9 +362,11 @@ def update_password(request, username):
             pass1 = form.cleaned_data["newpass1"]
             pass2 = form.cleaned_data["newpass2"]
 
+            if not employee.user.check_password(form.cleaned_data["currentpass"]):
+                return JsonResponse({'success': False, 'errors': ['currentPasswordInvalid']})
             #Check password validation
             if not validate_pass(pass1):
-                return JsonResponse({'success': False, 'errors': ['currentPasswordInvalid']})
+                return JsonResponse({'success': False, 'errors': ['newPasswordInvalid']})
 
             if pass1 != pass2:
                 return JsonResponse({'success': False, 'errors': ['employeeCreation_passwordsDontMatch']})
