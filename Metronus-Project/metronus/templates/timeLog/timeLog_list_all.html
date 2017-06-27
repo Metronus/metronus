@@ -276,10 +276,10 @@
                     $.each($.parseJSON(resp), function(key,value){
                         taskname=value.fields['name']
                         if(value.fields['goal_description'] != null && value.fields['goal_description'] != ""){
-                            taskname+="("+value.fields['goal_description']+")"
+                            taskname+=" ("+value.fields['goal_description']+")"
                         }
                         else{
-                            taskname+="("+'{% trans 'no_goal' %}'+")"
+                            taskname+=" ("+'{% trans 'no_goal' %}'+")"
                         }
                         select.options.add(new Option(taskname,value.pk));
                     });
@@ -306,8 +306,48 @@
                         },
                     }
                 },
-
-
+                project_id: {
+                    validators: {
+                        notEmpty: {
+                            message: "{% trans 'pls_select_project' %}"
+                        },
+                    }
+                },
+                department_id: {
+                    validators: {
+                        notEmpty: {
+                            message: "{% trans 'pls_select_department' %}"
+                        },
+                    }
+                },
+                task_id: {
+                    validators: {
+                        notEmpty: {
+                            message: "{% trans 'pls_select_task' %}"
+                        },
+                    }
+                },
+                duration: {
+                    validators: {
+                        numeric: {
+                            thousandsSeparator: '',
+                            decimalSeparator: '.',
+                            message: "{% trans 'invalid_number' %}",
+                        },
+                        notEmpty: {
+                            message: "{% trans 'fieldEmpty' %}"
+                        }
+                    }
+                },
+                produced_units: {
+                    validators: {
+                        numeric: {
+                            thousandsSeparator: '',
+                            decimalSeparator: '.',
+                            message: "{% trans 'invalid_number' %}",
+                        },
+                    }
+                },
             },
         });
     });

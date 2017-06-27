@@ -83,11 +83,26 @@
                     }
                 }
             },
+            project_id: {
+                validators: {
+                    notEmpty: {
+                        message: "{% trans 'pls_select_project' %}"
+                    }
+                }
+            },
+            department_id: {
+                validators: {
+                    notEmpty: {
+                        message: "{% trans 'pls_select_department' %}"
+                    }
+                }
+            },
             price_per_hour: {
                 validators: {
                     numeric: {
                         thousandsSeparator: '',
-                        decimalSeparator: '.'
+                        decimalSeparator: '.',
+                        message: "{% trans 'invalid_number' %}",
                     }
                 }
             },
@@ -95,7 +110,8 @@
                 validators: {
                     numeric: {
                         thousandsSeparator: '',
-                        decimalSeparator: '.'
+                        decimalSeparator: '.',
+                        message: "{% trans 'invalid_number' %}",
                     }
                 }
             },
@@ -103,7 +119,8 @@
                 validators: {
                     numeric: {
                         thousandsSeparator: '',
-                        decimalSeparator: '.'
+                        decimalSeparator: '.',
+                        message: "{% trans 'invalid_number' %}",
                     }
                 }
             }
