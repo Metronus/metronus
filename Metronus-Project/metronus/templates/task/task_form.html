@@ -113,6 +113,7 @@
   });
   function ajax(){
     $.post('/task/createAsync', $('#register_form').serialize(), function(data, status){
+        $('html, body').animate({ scrollTop: 0 }, 'fast');
         if(data['success']){
             document.getElementById('register_form').reset();
             $("#register_form").data('bootstrapValidator').resetForm();
@@ -159,10 +160,15 @@ $(function() {
 <div class="clearfix"></div>
 
 
-{% show_ajax_errors  %}
-{% for err in errors%}
-    <p class="alert alert-danger">{% trans err %}</p>
-{% endfor %}
+<div id="successDiv" class="alert alert-success" hidden='true'></div>
+<div id="errorDiv" class="alert alert-danger" {% if not errors %}hidden='true'{% endif %}>
+{% if errors %}
+    {% for err in errors%}
+        <p><strong>{% trans 'fail' %} | </strong>{% trans err %}</p>
+    {% endfor %}
+{% endif %}
+ </div>
+
 
 <div class="row">
 

@@ -75,7 +75,7 @@
       processData: false,
       contentType: false,
       success: function(data,status) {
-         console.log(JSON.stringify(data))
+        $('html, body').animate({ scrollTop: 0 }, 'fast');
         if(JSON.stringify(data['success'])=="true"){
           document.getElementById('register_form').reset();
           $("#register_form").data('bootstrapValidator').resetForm();

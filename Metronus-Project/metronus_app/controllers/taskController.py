@@ -66,8 +66,8 @@ def create(request):
 
             if not errors:
                 actor = check_task(pro, request)
-                create_task(form, pdtuple, actor)
-                return HttpResponseRedirect('/task/list')
+                tid = create_task(form, pdtuple, actor)
+                return HttpResponseRedirect('/task/view/%d/' % tid)
             else:  
                 errors.append('task_creation_error')
 
@@ -465,10 +465,12 @@ def create_task(form, project_department, actor):
     fperunit = form.cleaned_data['price_per_unit']
     fperhour = form.cleaned_data['price_per_hour']
 
-    Task.objects.create(name=fname, description=fdescription,
+    created_task = Task.objects.create(name=fname, description=fdescription,
                         projectDepartment_id=project_department, actor_id=actor,
                         production_goal=fgoal, goal_description=fgoaldescription,
                         price_per_unit=fperunit, price_per_hour=fperhour)
+
+    return created_task.id
 
 
 def update_task(task, form, actor):

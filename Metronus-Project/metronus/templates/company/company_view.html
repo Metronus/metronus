@@ -4,11 +4,17 @@
 {% block title %}{% trans 'companyView' %}{% endblock %}
 
 {% block content %}
+<style>
+  ul.quick-list > li {
+    overflow: visible !important;
+  }
+</style>
+
 <h1><strong>{{company.company_name}} </strong>{{company.name}}</h1>
 <div class="clearfix"></div>
 
 <div class="col-md-4 col-md-offset-2 col-sm-4 col-sm-offset-2 col-xs-12">
-  <div class="x_panel tile fixed_height_320">
+  <div class="x_panel tile">
     <div class="x_title">
       <h2>{% trans 'company_info' %}</h2>
       <div class="clearfix"></div>
@@ -16,6 +22,10 @@
 
     <div class="x_content">
       <div class="dashboard-widget-content">
+        {% if company.logo %}
+          <img src="{{ MEDIA_URL }}{{company.logo}}" style="max-height: 120px; max-width: auto;" class="img-responsive center-block">
+        <hr>
+        {% endif %}
         <ul class="quick-list">
           <li><i class="glyphicon glyphicon-text-size"></i>{{company.company_name}}</li>
           <li><i class="fa fa-briefcase"></i>{{company.cif}}</li>
@@ -30,7 +40,7 @@
 </div>
 
 <div class="col-md-4 col-sm-4 col-xs-12">
-  <div class="x_panel tile fixed_height_320">
+  <div class="x_panel tile">
     <div class="x_title">
       <h2>{% trans 'admin_info' %}</h2>
       <div class="clearfix"></div>

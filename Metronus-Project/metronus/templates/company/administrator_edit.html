@@ -33,7 +33,7 @@
             },
           },
         },
-        email: {
+        admin_email: {
           validators: {
             notEmpty: {
               message: "{% trans 'email_not_empty' %}"
@@ -48,6 +48,10 @@
             notEmpty: {
               message: "{% trans 'phone_not_empty' %}"
             },
+            regexp:{
+              regexp: /^\d{9}$/ig,
+              message: '{% trans 'admin_phone_error#2' %}'
+            }
           }
         },
         identifier: {
@@ -124,6 +128,8 @@
       });
     });
   });
+
+  initAjax($("#id_admin_email"), 'email', '/ajax/validate_email_unique/');
 </script>
 {% endblock %}
 
@@ -151,7 +157,7 @@
       <form id="form_editar_admin" method="POST"  class="form-horizontal" data-toggle="validator" role="form" action="" enctype="multipart/form-data">
         {% csrf_token %}
 
-        {% show_field form.admin_email  "admin_metronus" %}
+        {% show_field form.admin_email  "admin_metronus"  "companyRegister_adminEmailNotUnique" %}
         {% show_field form.first_name   "John" %}
         {% show_field form.last_name    "Doe" %}
         {% show_field form.identifier   "admn_mtn" %}
