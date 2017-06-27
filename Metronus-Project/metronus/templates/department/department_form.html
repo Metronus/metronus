@@ -40,7 +40,7 @@
           {% csrf_token %}
           {% for field in form.hidden_fields %}{{ field }}{% endfor %}
 
-          {% show_field form.name %}
+          {% show_field form.name "" "departmentName" %}
 
           <div class="ln_solid"></div>
           <div class="text-center">
@@ -103,5 +103,9 @@
       }
     );
   };
+
+  $(function() {
+      initAjax($("#id_name"), 'name', '/ajax/validate_department_unique/');
+  });
 </script>
 {% endblock %}

@@ -233,6 +233,13 @@ def delete(request, project_id):
 
     return HttpResponseRedirect('/project/list')
 
+def validate_name_ajax(request):
+    """
+    checks whether the project name is unique
+    """
+    name = request.GET.get("name", None)
+    is_taken = name and Project.objects.filter(name=name).exists()
+    return JsonResponse({'is_taken': is_taken})
 
 ############################################################################
 # Ajax methods for metric graphics

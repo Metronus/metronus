@@ -48,16 +48,7 @@
       <div class="x_content">
         <form id="form" class="form-horizontal form-label-left" novalidate method="POST">
           {% csrf_token %}
-          <div class="{{ form.name.name }} form-group">
-            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="{{ form.name.auto_id }}">
-              {{ form.name.label }} *
-            </label>
-            <div class="col-md-6 col-sm-6 col-xs-12">
-              <input id="{{ form.name.auto_id }}" class="form-control col-md-7 col-xs-12"
-                data-validate-length-range="2" name="{{ form.name.name }}" required="required"
-                type="text" value="{{ form.name.value|default_if_none:"" }}">
-              </div>
-            </div>
+          {% show_field form.name "" "projectName" %}
 
             {% for field in form.hidden_fields %}{{ field }}{% endfor %}
             <div class="ln_solid"></div>
@@ -119,6 +110,10 @@
         },
       },
     });
+  });
+
+  $(function() {
+      initAjax($("#id_name"), 'name', '/ajax/validate_project_unique/');
   });
 </script>
 {% endblock %}

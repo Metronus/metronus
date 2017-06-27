@@ -398,6 +398,14 @@ def ajax_profit_per_date(request, department_id):
         index += 1
     return JsonResponse(data)
 
+def validate_name_ajax(request):
+    """
+    checks whether the department name is unique
+    """
+    name = request.GET.get("name", None)
+    is_taken = name and Department.objects.filter(name=name).exists()
+    return JsonResponse({'is_taken': is_taken})
+
 
 ##################################################################################################################
 # Auxiliar methods, containing the operation logic
