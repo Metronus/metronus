@@ -729,3 +729,23 @@ class EmployeeTestCase(TestCase):
         self.assertFalse(User.objects.get(username="emp1").is_active)
         logs_after = EmployeeLog.objects.all().count()
         self.assertEquals(logs_before + 1, logs_after)
+
+    def test_recover_employee_positive(self):
+        """
+        As an admin, recover an employee from the company and check the log updates
+        """
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        response = c.get("/employee/delete/emp1/")
+        self.assertRedirects(response, "/employee/list", fetch_redirect_response=False)
+
+        logs_before = EmployeeLog.objects.all().count()
+        self.assertFalse(User.objects.get(username="emp1").is_active)
+
+        response = c.get(reverse("employee_recover",args=("emp1",)))
+        self.assertRedirects(response, "/employee/list", fetch_redirect_response=False)
+
+        self.assertTrue(User.objects.get(username="emp1").is_active)
+        logs_after = EmployeeLog.objects.all().count()
+        self.assertEquals(logs_before + 1, logs_after)
