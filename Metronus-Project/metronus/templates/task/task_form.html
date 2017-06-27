@@ -10,9 +10,9 @@
 {% endblock %}
 
 {% load static }
+{% load custom_tags %}
 
 {% block javascript %}
-{% load custom_tags %}
 <script>
 
   //Esto es para validar en cliente de forma bonita con bootstrap :)
@@ -233,6 +233,8 @@ $(function() {
         </div>
     </div>
 
+    <hr/>
+
     <div class="form-group" >
         <label class="control-label col-sm-4" for="id_{{ form.production_goal.name }}">{% trans 'production_goal' %}</label>
         <div class="col-sm-6">
@@ -252,6 +254,9 @@ $(function() {
             <input type="text" class="form-control col-md-6 precio" name="{{ form.price_per_unit.name }}" id="id_{{ form.price_per_unit.name }}" value="{{ form.price_per_unit.value|floatformat:2 }}">
         </div>
     </div>
+
+    <hr/>
+
   <div class="form-group" >
         <label class="control-label col-sm-4" for="id_{{ form.price_per_hour.name }}">{% trans 'price_per_hour' %}</label>
         <div class="col-sm-6">
