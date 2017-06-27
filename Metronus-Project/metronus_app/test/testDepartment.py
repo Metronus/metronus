@@ -238,7 +238,7 @@ class DepartmentTestCase(TestCase):
         self.assertEquals(len(response.context["employees"]), 1)
         self.assertEquals(len(response.context["tasks"]), 0)
         # self.assertEquals(response.context["employees"][0].department.id, dep_id)
-        self.assertEquals(response.context["coordinator"], None)
+        self.assertTrue(response.context["coordinators"] is not None)
 
     def test_view_department_not_allowed(self):
         """Without proper roles, try to view a department """

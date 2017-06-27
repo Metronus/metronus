@@ -69,6 +69,14 @@ class TaskMetricsTestCase(TestCase):
             last_name="Berto"
         )
 
+        employee3_user = User.objects.create_user(
+            username="emp3",
+            password="123456",
+            email="emp3@metronus.es",
+            first_name="Alberta",
+            last_name="Berta"
+        )
+
         employee1 = Employee.objects.create(
             user=employee1_user,
             user_type="E",
@@ -82,6 +90,13 @@ class TaskMetricsTestCase(TestCase):
             user_type="E",
             identifier="emp02",
             phone="666555444",
+            company_id=company1
+        )
+        employee3 = Employee.objects.create(
+            user=employee3_user,
+            user_type="E",
+            identifier="emp03",
+            phone="666555445",
             company_id=company1
         )
 
@@ -131,7 +146,7 @@ class TaskMetricsTestCase(TestCase):
         # role_co
         role_co = Role.objects.create(name="COORDINATOR", tier=20)
         # role_em
-        Role.objects.create(name="EMPLOYEE", tier=10)
+        role_emp=Role.objects.create(name="EMPLOYEE", tier=10)
 
         pro1 = Project.objects.create(name="pro1", deleted=False, company_id=company1)
         pro2 = Project.objects.create(name="pro2", deleted=False, company_id=company2)
@@ -166,7 +181,12 @@ class TaskMetricsTestCase(TestCase):
             role_id=role_ex,
             employee_id=employee2
         )
-
+        # pdrole4
+        ProjectDepartmentEmployeeRole.objects.create(
+            projectDepartment_id=pd,
+            role_id=role_emp,
+            employee_id=employee3
+        )
         # task1
         Task.objects.create(
             name="Hacer cosas",
@@ -238,7 +258,7 @@ class TaskMetricsTestCase(TestCase):
         Without proper roles, try getting the profit JSON
         """
         c = Client()
-        c.login(username="emp1", password="123456")
+        c.login(username="emp3", password="123456")
 
         response = c.get("/task/ajaxProfit/{0}/" .format( Task.objects.get(name="Hacer cosas").id))
         self.assertEquals(response.status_code, 403)
