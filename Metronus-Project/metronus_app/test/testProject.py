@@ -7,7 +7,7 @@ from metronus_app.model.employee import Employee
 from django.core.exceptions import PermissionDenied
 from metronus_app.controllers.projectController import check_company_project
 import json
-
+from django.urls import reverse
 class ProjectTestCase(TestCase):
     """This class provides a test case for project management"""
     def setUp(self):
@@ -120,7 +120,7 @@ class ProjectTestCase(TestCase):
 
         logs_before = Project.objects.all().count()
 
-        response = c.post("/project/createAsync", {
+        response = c.post(reverse("project_create_async"), {
             "project_id": "0",
             "name": "pro4",
         })
@@ -141,6 +141,26 @@ class ProjectTestCase(TestCase):
         logs_after = Project.objects.all().count()
 
         self.assertEquals(logs_before + 1, logs_after)
+
+    def test_create_project_duplicate_async(self):
+        """ Logged in as an administrator, try to create a project with the name of an existing company """
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        # ??????????????????????????????????????
+        # logs_before = Project.objects.all().count()
+
+        response = c.post(reverse("project_create_async"), {
+            "project_id": "0",
+            "name": "pro1",
+        })
+        #response in bytes must be decode to string
+        data=response.content.decode("utf-8")
+        #string to dict
+        data=json.loads(data)
+        self.assertEquals(data["success"],False)
+        self.assertEquals(data["repeated_name"], True)
+
 
 
     def test_create_project_duplicate(self):
@@ -289,6 +309,19 @@ class ProjectTestCase(TestCase):
         pro_id = Project.objects.get(deleted=True).id
         response = c.get("/project/delete/" + str(pro_id) + "/")
         self.assertEquals(response.status_code, 404)
+    
+    def test_recover_project_not_active(self):
+        """
+        As an admin, recover an already deleted project
+        """
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        pro_id = Project.objects.get(deleted=True).id
+        response = c.get(reverse("project_recover",args=(pro_id,)))
+        self.assertRedirects(response, "/project/list", fetch_redirect_response=False)
+
+        self.assertFalse(Project.objects.get(pk=pro_id).deleted)
 
     def test_view_project_positive(self):
         """

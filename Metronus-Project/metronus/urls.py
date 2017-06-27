@@ -51,7 +51,7 @@ urlpatterns += [  # i18n_patterns(
 
     # Department
     url(r'^department/create$', departmentController.create, name='department_create'),
-    url(r'^department/createAsync$', departmentController.create_async),
+    url(r'^department/createAsync$', departmentController.create_async,name='department_create_async'),
     url(r'^department/recover/(?P<department_id>.*)/$', departmentController.recover, name='department_recover'),
     url(r'^department/list$', departmentController.list_departments, name='department_list'),
     url(r'^department/edit/(?P<department_id>.*)/$', departmentController.edit, name='department_edit'),
@@ -65,7 +65,7 @@ urlpatterns += [  # i18n_patterns(
 
     # Task
     url(r'^task/create$', taskController.create, name='task_create'),
-    url(r'^task/createAsync$', taskController.create_async),
+    url(r'^task/createAsync$', taskController.create_async,name='task_create_async'),
     url(r'^task/recover/(?P<task_id>.*)/$', taskController.recover, name='task_recover'),
     url(r'^task/list$', taskController.list_tasks, name='task_list'),
     url(r'^task/view/(?P<task_id>.*)/$', taskController.view, name='task_view'),
@@ -176,7 +176,7 @@ urlpatterns += [  # i18n_patterns(
     url(r'^cookie_policy/$', legalController.cookie_policy, name='cookie_policy'),
     url(r'^legal_terms/$', legalController.legal_terms, name='legal_terms'),
 
-    url(r'^register$', companyController.create),
+    url(r'^register$', companyController.create,name="register"),
     url(r'^ajax/validate_cif/$', companyController.validate_cif, name='validate_cif'),
     url(r'^ajax/validate_username/$', companyController.validate_username, name='validate_username'),
     url(r'^ajax/validate_short_name/$', companyController.validate_short_name, name='validate_short_name'),

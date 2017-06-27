@@ -8,7 +8,7 @@ from metronus_app.model.administrator import Administrator
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 from django.test import TestCase, Client
-
+from django.urls import reverse
 import json
 
 
@@ -131,7 +131,7 @@ class DepartmentTestCase(TestCase):
 
         logs_before = Department.objects.all().count()
 
-        response = c.post("/department/createAsync", {
+        response = c.post(reverse("department_create_async"), {
             "department_id": "0",
             "name": "dep4",
         })
@@ -154,6 +154,26 @@ class DepartmentTestCase(TestCase):
         logs_after = Department.objects.all().count()
 
         self.assertEquals(logs_before + 1, logs_after)
+    def test_create_department_duplicate_async(self):
+        """ Logged in as an administrator, try to create an department with the name of an existing company"""
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        # ??????????????????? Again
+        # logs_before = Department.objects.all().count()
+
+        response = c.post(reverse("department_create_async"), {
+            "department_id": "0",
+            "name": "dep1",
+        })
+
+        self.assertEquals(response.status_code, 200)
+        # response in bytes must be decode to string
+        data = response.content.decode("utf-8")
+        # string to dict
+        data = json.loads(data)
+        self.assertEquals(data["repeated_name"], True)
+        self.assertEquals(data["success"], False)
 
     def test_create_department_duplicate(self):
         """ Logged in as an administrator, try to create an department with the name of an existing company"""
@@ -315,3 +335,16 @@ class DepartmentTestCase(TestCase):
         dep_id = Department.objects.get(active=False).id
         response = c.get("/department/delete/"+str(dep_id)+"/")
         self.assertEquals(response.status_code, 404)
+
+    def test_recover_department_positive(self):
+        """As an admin, recover a department"""
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        response = c.get("/department/list")
+        dep_id = Department.objects.get(active=False).id
+
+        response = c.get(reverse("department_recover",args=(dep_id,)))
+        self.assertRedirects(response, "/department/list", fetch_redirect_response=False)
+
+        self.assertTrue(Department.objects.get(pk=dep_id).active)
