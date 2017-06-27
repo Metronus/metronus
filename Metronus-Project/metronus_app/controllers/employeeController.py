@@ -21,7 +21,7 @@ from django.core import serializers
 from django.http import HttpResponse
 
 from metronus_app.common_utils import (is_role_updatable_by_user, check_image, get_current_employee_or_403, send_mail,
-                                       is_email_unique, is_username_unique, get_authorized_or_403,default_round,validate_pass, get_admin_executive_or_403)
+                                       is_email_unique, is_username_unique, get_authorized_or_403,default_round,validate_pass, get_admin_executive_or_403, is_executive)
 from datetime import date, timedelta, datetime
 import re
 
@@ -48,7 +48,7 @@ def create(request):
     """
 
     # Check that the user is logged in and it's an administrator
-    admin = get_authorized_or_403(request)
+    admin = get_admin_executive_or_403(request)
 
     # If it's a GET request, return an empty form
     if request.method == "GET":
@@ -129,7 +129,7 @@ def create_async(request):
     """
 
     # Check that the user is logged in and it's an administrator
-    admin = get_authorized_or_403(request)
+    admin = get_admin_executive_or_403(request)
     errors = []
     data = {
         'success': True
@@ -216,6 +216,10 @@ def view(request, username):
 
     # Check that the admin has permission to view that employee
     if employee.company_id != logged.company_id:
+        raise PermissionDenied
+
+    # Check that the user is active, unless it's an admin or exec
+    if not employee.user.is_active and not logged.user_type == "A" and not is_executive(logged):
         raise PermissionDenied
 
     employee_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee,
@@ -350,7 +354,7 @@ def update_password(request, username):
     """
 
     # Check that the user is logged in and it's an administrator
-    admin = get_authorized_or_403(request)
+    admin = get_admin_executive_or_403(request)
     employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
 
     # Check that the admin has permission to view that employee
