@@ -7,7 +7,10 @@
 <div class="row">
     <div class="page-title">
         <div class="title_left">
-            <h3><strong>{% trans 'task' %}: </strong> {{ task.name }}</h3>
+            <h3><strong>{% trans 'task' %}: </strong> {{ task.name }}
+            {% if task.active == False %}
+              <i>({% trans "inactive" %})</i>
+            {% endif %}</h3>
         </div>
     </div>
 
