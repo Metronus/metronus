@@ -21,7 +21,7 @@ from django.core import serializers
 from django.http import HttpResponse
 
 from metronus_app.common_utils import (is_role_updatable_by_user, check_image, get_current_employee_or_403, send_mail,
-                                       is_email_unique, is_username_unique, get_authorized_or_403,default_round,validate_pass)
+                                       is_email_unique, is_username_unique, get_authorized_or_403,default_round,validate_pass, get_admin_executive_or_403)
 from datetime import date, timedelta, datetime
 import re
 
@@ -256,7 +256,7 @@ def edit(request, username):
     """
 
     # Check that the user is logged in and it's an administrator
-    admin = get_authorized_or_403(request)
+    admin = get_admin_executive_or_403(request)
     employee = get_object_or_404(Employee, user__username=username)
 
     # Check that the admin has permission to view that employee
@@ -395,7 +395,7 @@ def delete(request, username):
     template: ninguna
     """
 
-    admin = get_authorized_or_403(request)
+    admin = get_admin_executive_or_403(request)
     employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
 
     # Check that the admin has permission to edit that employee
@@ -419,7 +419,7 @@ def recover(request, username):
     template: ninguna
     """
 
-    admin = get_authorized_or_403(request)
+    admin = get_admin_executive_or_403(request)
     employee = get_object_or_404(Employee, user__username=username, user__is_active=False)
 
     # Check that the admin has permission to edit that employee
