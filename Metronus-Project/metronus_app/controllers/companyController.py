@@ -45,7 +45,7 @@ def create(request,
                 errors.append('companyRegister_usernameNotUnique')
             
             try:
-                validate_password(form.cleaned_data["password1"])
+                validate_password(form.cleaned_data["password"])
             except ValidationError:
                 errors.append('currentPasswordInvalid')
 
