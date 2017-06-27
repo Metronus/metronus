@@ -130,7 +130,7 @@
                   </li>
                   {% endif %}
 
-                  {% if actor_is_admin or actor_is_executive %}
+                  {% if actor_is_admin or actor_is_executive or actor_is_projectManager %}
                   <li><a><em class="fa fa-user"></em>{% trans 'dashEmployees' %}<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/employee/list">{% trans 'dashEmployeesList' %}</a></li>
