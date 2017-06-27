@@ -16,7 +16,7 @@ from metronus_app.model.department import Department
 from metronus_app.model.goalEvolution import GoalEvolution
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
-from metronus_app.common_utils import default_round
+from metronus_app.common_utils import default_round,get_actor_or_403
 
 from datetime import date, timedelta, datetime
 
@@ -305,12 +305,7 @@ def ajax_productivity_per_task(request):
     """
     # ------------------------- Cortesía de Agu ------------------------------
 
-    if not request.user.is_authenticated():
-        raise PermissionDenied
-    try:
-        Actor.objects.get(user=request.user)
-    except ObjectDoesNotExist:
-        raise PermissionDenied
+    actor=get_actor_or_403(request)
 
     if "task_id" not in request.GET:
         raise SuspiciousOperation
@@ -545,12 +540,7 @@ def check_role_for_list(request):
     """
     returns the list depending on the actor
     """
-    if not request.user.is_authenticated():
-        raise PermissionDenied
-    try:
-        actor = Actor.objects.get(user=request.user)
-    except ObjectDoesNotExist:
-        raise PermissionDenied
+    actor=get_actor_or_403(request)
 
     if actor.user_type != 'A':
         # not an admin
@@ -577,12 +567,7 @@ def check_task(task, request):
     checks if the task belongs to the logged actor with appropiate roles
     Admin, manager or dep/proj manager
     """
-    if not request.user.is_authenticated():
-        raise PermissionDenied
-    try:
-        actor = Actor.objects.get(user=request.user)
-    except ObjectDoesNotExist:
-        raise PermissionDenied
+    actor=get_actor_or_403(request)
 
     # Check that the actor has permission to view the task
     if task is not None and task.actor_id.company_id != actor.company_id:
@@ -629,12 +614,7 @@ def find_collections(request):
     """
     Gets the projects and departments the logged user can create tasks for, depending to their roles
     """
-    if not request.user.is_authenticated():
-        raise PermissionDenied
-    try:
-        actor = Actor.objects.get(user=request.user)
-    except ObjectDoesNotExist:
-        raise PermissionDenied
+    actor=get_actor_or_403(request)
 
     if actor.user_type != 'A':
         # not an admin
@@ -673,14 +653,13 @@ def find_departments(request):
     """
     Gets the  departments the logged user can create tasks for a project, depending to their roles
     """
-    project_id = request.GET.get("project_id")
-    if not request.user.is_authenticated():
-        raise PermissionDenied
-    try:
-        actor = Actor.objects.get(user=request.user)
-    except ObjectDoesNotExist:
-        raise PermissionDenied
+    if "project_id" not in request.GET:
+        raise SuspiciousOperation
 
+    project_id = request.GET.get("project_id")
+    
+    actor=get_actor_or_403(request)
+    
     if actor.user_type != 'A':
         # not an admin
         is_executive = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=50)

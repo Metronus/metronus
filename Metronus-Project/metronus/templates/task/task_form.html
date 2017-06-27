@@ -174,10 +174,8 @@ $(function() {
 
 {% block content %}
 
-{% if form.errors %}
-        <p>{{ form.errors }}</p>
-{% endif %}
 <div class="clearfix"></div>
+
 
 <div id="successDiv" class="alert alert-success" hidden='true'></div>
 <div id="errorDiv" class="alert alert-danger" {% if not errors %}hidden='true'{% endif %}>
@@ -187,6 +185,7 @@ $(function() {
     {% endfor %}
 {% endif %}
  </div>
+
 
 <div class="row">
 
@@ -224,12 +223,13 @@ $(function() {
         <label class="control-label col-sm-4" for="id_{{ form.project_id.name }}">{% trans 'project' %} *</label>
         <div class="col-sm-6">
         <select class="form-control" name="{{ form.project_id.name }}" id="id_{{ form.project_id.name }}" required>
-                {% if  form.task_id.value == '0' or form.project_id.value == '0' %}
-                    <option value="" {% if form.project_id.value is None %}selected{% endif %}>{% trans 'selectProject' %}</option>
-                {% endif %}
-                {% for project in projects %}
+                
+                <option value="0" {% if form.project_id.value is None  %}selected{% endif %}>{% trans 'selectProject' %}</option>
+                
                 <!-- slugify pasa de int a string, porque value es un string e id es un int y no son iguales-->
-                <option value="{{ project.id }}" {% if form.project_id.value == project.id|slugify %}selected{% endif %}>
+                {% for project in projects %}
+                
+                <option value="{{ project.id }}" {% if form.project_id.value|slugify == project.id|slugify %}selected{% endif %}>
                 {{ project.name }}
                 </option>
 

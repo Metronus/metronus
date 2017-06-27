@@ -11,7 +11,7 @@ from metronus_app.model.task import Task
 from metronus_app.model.timeLog import TimeLog
 from datetime import date, timedelta, datetime
 import re
-from metronus_app.common_utils import default_round
+from metronus_app.common_utils import default_round,get_actor_or_403
 
 def create(request):
     """
@@ -472,13 +472,8 @@ def check_department_for_fiew(dep, request, for_view):
     Admin, manager or project manager
     if forView is true, the coordinator has access too
     """
-    if not request.user.is_authenticated():
-        raise PermissionDenied
-    try:
-        actor = Actor.objects.get(user=request.user)
-    except ObjectDoesNotExist:
-        raise PermissionDenied
 
+    actor=get_actor_or_403(request)
     # Check that the actor has permission to view the dep
     if dep is not None and (dep.company_id != actor.company_id):
         raise PermissionDenied
@@ -522,13 +517,8 @@ def get_list_for_role(request):
     """
     Gets the list of departments according to the role tier of the logged user
     """
-    if not request.user.is_authenticated():
-        raise PermissionDenied
-    try:
-        actor = Actor.objects.get(user=request.user)
-    except ObjectDoesNotExist:
-        raise PermissionDenied
-
+    actor=get_actor_or_403(request)
+    
     if actor.user_type != 'A':
         is_executive = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=50)
         res = is_executive.count() > 0

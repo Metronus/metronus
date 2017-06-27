@@ -10,6 +10,7 @@ from metronus_app.model.timeLog import TimeLog
 from django.core.exceptions import ObjectDoesNotExist
 from metronus_app.model.company import Company
 from metronus_app.model.role import Role
+from metronus_app.model.actor import Actor
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.task import Task
 from django.test import Client
@@ -58,7 +59,7 @@ def get_current_admin_or_403(request):
 
 def get_current_employee_or_403(request):
     """
-    Returns employee admin or 403 if not logged or logged is not an employee
+    Returns employee or 403 if not logged or logged is not an employee
     """
 
     if not request.user.is_authenticated():
@@ -68,6 +69,16 @@ def get_current_employee_or_403(request):
     except ObjectDoesNotExist:
         raise PermissionDenied
 
+def get_actor_or_403(request):
+    """
+    Returns employee or admin or 403 if not logged
+    """
+    if not request.user.is_authenticated():
+        raise PermissionDenied
+    try:
+        return Actor.objects.get(user=request.user)
+    except ObjectDoesNotExist:
+        raise PermissionDenied
 
 def get_authorized_or_403(request):
     """
