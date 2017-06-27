@@ -881,7 +881,12 @@ msgid "task_creation_help_3"
 msgstr "There cannot be two tasks assigned to the same project and department with the same name."
 msgid "task_creation_help_4"
 msgstr "Please note that, when selecting a project, only departments that are related to it will appear (i.e. there is at least one employee with a role for that project and department)."
-
+msgid "pls_select_project"
+msgstr "You must select a project"
+msgid "pls_select_department"
+msgstr "You must select a department"
+msgid "pls_select_task"
+msgstr "You must select a task"
 
 msgid "projectDeparment"
 msgstr "Project / Department"

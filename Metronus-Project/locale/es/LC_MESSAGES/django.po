@@ -878,7 +878,12 @@ msgid "task_creation_help_3"
 msgstr "Dos tareas asignadas al mismo proyecto y departamento no podrán tener el mismo nombre."
 msgid "task_creation_help_4"
 msgstr "Tenga en cuenta que al seleccionar un proyecto sólo aparecerán los departamentos relacionados con el mismo (i.e. que exista al menos un empleado con rol para ese departamento y proyecto)"
-
+msgid "pls_select_project"
+msgstr "Debe seleccionar un proyecto"
+msgid "pls_select_department"
+msgstr "Debe seleccionar un departamento"
+msgid "pls_select_task"
+msgstr "Debe seleccionar una tarea"
 
 
 msgid "taskError"
