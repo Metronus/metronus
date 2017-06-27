@@ -768,6 +768,8 @@ msgid "editAdmin"
 msgstr "Administrator edit"
 msgid "visible_short_name"
 msgstr "Short name visible"
+msgid "change_logo_warn"
+msgstr "The logo will remain unchanged unless you upload a new one."
 
 msgid "companyRegister_cifNotUnique"
 msgstr "That CIF has already been registered."
@@ -831,7 +833,7 @@ msgid "currentPasswordInvalid"
 msgstr "The current password is not correct."
 
 msgid "newPasswordInvalid"
-msgstr "The new password is not correct (8 characters min and cannot be exclusively numeric)."
+msgstr "The password is not valid (at least 8 characters and cannot be exclussively numeric)."
 msgid "editPasswordTitle"
 msgstr "Change administrator password"
 
