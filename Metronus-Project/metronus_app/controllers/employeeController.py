@@ -21,10 +21,10 @@ from django.core import serializers
 from django.http import HttpResponse
 
 from metronus_app.common_utils import (is_role_updatable_by_user, check_image, get_current_employee_or_403, send_mail,
-                                       is_email_unique, is_username_unique, get_authorized_or_403,default_round)
+                                       is_email_unique, is_username_unique, get_authorized_or_403,default_round,validate_pass)
 from datetime import date, timedelta, datetime
 import re
-from django.contrib.auth.password_validation import validate_password, ValidationError
+
 
 def create(request):
     """
@@ -66,10 +66,9 @@ def create(request):
             if not check_passwords(form):
                 errors.append('employeeCreation_passwordsDontMatch')
 
-            try:
-                validate_password(form.cleaned_data["password1"])
-            except ValidationError:
-                errors.append('currentPasswordInvalid')
+            #Check password validation
+            if not validate_pass(form.cleaned_data["password1"]):
+                errors.append('newPasswordInvalid')
 
             # Check that the username is unique
             if not is_username_unique(form.cleaned_data["username"]):
@@ -138,13 +137,17 @@ def create_async(request):
     if request.method == "POST":
         # We are serving a POST request
         form = EmployeeRegisterForm(request.POST, request.FILES)
-
+        print(form.is_valid())
         if form.is_valid():
-
+            print(form.cleaned_data['photo'])
             # Check that the passwords match
             if not check_passwords(form):
                 errors.append('employeeCreation_passwordsDontMatch')
-
+            
+            #Check password validation
+            if not validate_pass(form.cleaned_data["password1"]):
+                errors.append('newPasswordInvalid')
+            
             # Check that the username is unique
             if not is_username_unique(form.cleaned_data["username"]):
                 errors.append('employeeCreation_usernameNotUnique')
@@ -174,9 +177,6 @@ def create_async(request):
         else:
             errors.append('employeeCreation_formNotValid')
        
-    else:
-        # Another request method
-        raise PermissionDenied
     
     data['success'] = False
     data['errors'] = errors
@@ -365,10 +365,11 @@ def update_password(request, username):
             pass1 = form.cleaned_data["newpass1"]
             pass2 = form.cleaned_data["newpass2"]
 
-            try:
-                validate_password(pass1)
-            except ValidationError:
+            if not employee.user.check_password(form.cleaned_data["currentpass"]):
                 return JsonResponse({'success': False, 'errors': ['currentPasswordInvalid']})
+            #Check password validation
+            if not validate_pass(pass1):
+                return JsonResponse({'success': False, 'errors': ['newPasswordInvalid']})
 
             if pass1 != pass2:
                 return JsonResponse({'success': False, 'errors': ['employeeCreation_passwordsDontMatch']})

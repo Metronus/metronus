@@ -5,7 +5,7 @@ from metronus_app.model.project         import Project
 from metronus_app.model.goalEvolution   import GoalEvolution
 from populate_database                  import populate_database
 import json
-
+from django.urls import reverse
 
 class TaskTestCase(TestCase):
     """This class provides a test case for using and managing tasks"""
@@ -582,3 +582,24 @@ class TaskTestCase(TestCase):
         dep_id=Task.objects.filter(active=False).first().id
         response = c.get("/task/delete/"+str(dep_id)+"/")
         self.assertEquals(response.status_code, 404)
+
+    def test_recover_task_positive(self):
+        """
+        Delete a task with proper roles
+        """
+        c = Client()
+        c.login(username="agubelu", password="123456")
+
+        response = c.get("/task/list")
+        dep_id=response.context["tasks"][0].id
+
+        response = c.get(reverse("task_delete",args=(dep_id,)))
+        self.assertRedirects(response, "/task/list", fetch_redirect_response=False)
+
+        self.assertFalse(Task.objects.get(pk=dep_id).active)
+
+
+        response = c.get(reverse("task_recover",args=(dep_id,)))
+        self.assertRedirects(response, "/task/list", fetch_redirect_response=False)
+
+        self.assertTrue(Task.objects.get(pk=dep_id).active)

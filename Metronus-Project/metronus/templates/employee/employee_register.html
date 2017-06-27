@@ -66,10 +66,15 @@
 
 <script>
   function register_and_continue() {
-    $.post(
-      '{% url 'employee_create_async' %}',
-      $('#register_form').serialize(),
-      function(data,status) {
+    var dataform = new FormData($('#register_form').get(0));
+
+    $.ajax({
+      url:'{% url 'employee_create_async' %}',
+      type: 'POST',
+      data:dataform,
+      processData: false,
+      contentType: false,
+      success: function(data,status) {
          console.log(JSON.stringify(data))
         if(JSON.stringify(data['success'])=="true"){
           document.getElementById('register_form').reset();
@@ -78,11 +83,13 @@
           $('#errorDiv').hide();
           $('#successDiv').fadeIn().html("<strong>{% trans 'success' %} | </strong>{% trans 'employeeSaved' %}");
         } else {
-           $('#successDiv').hide();
-           $('#errorDiv').hide();
+          $('#successDiv').hide();
+          var htm="";
+
           for(var i=0;i<data['errors'].length;i++){
             var er=data['errors'][i];
-            var tra=null;
+            var tr=null;
+            
             switch(er){
               case 'employeeCreation_passwordsDontMatch':
                 tr="{% trans 'employeeCreation_passwordsDontMatch' %}";
@@ -102,15 +109,23 @@
               case 'employeeCreation_formNotValid':
                 tr="{% trans 'employeeCreation_formNotValid' %}";
                 break;
+              case 'currentPasswordInvalid':
+                tr="{% trans 'currentPasswordInvalid' %}";
+                break;
+              case 'newPasswordInvalid':
+                tr="{% trans 'newPasswordInvalid' %}";
+                break;
               default:
                 break;
             
             }
-              $('#errorDiv').fadeIn().html("<p><strong>{% trans 'fail' %} | </strong>"+tr+"</p>");
+            if(tr!=null){
+              htm +="<p><strong>{% trans 'fail' %} | </strong>"+tr+"</p>";
+            }
           }
-         
+         $('#errorDiv').fadeIn().html(htm);
       } 
-    });
+    }});
   };
   //Esto es para validar en cliente de forma bonita con bootstrap :)
 

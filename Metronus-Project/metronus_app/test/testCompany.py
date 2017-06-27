@@ -3,6 +3,7 @@ from metronus_app.model.administrator   import Administrator
 from django.contrib.auth.models         import User
 from django.test                        import TestCase, Client
 from metronus_app.common_utils          import get_ajax
+from django.urls import reverse
 import json
 
 
@@ -38,18 +39,44 @@ class CompanyTestCase(TestCase):
 
     def test_create_company(self):
         """
-        checks the number of companies increased
+        Register new company
         """
-        count1 = Company.objects.count()
-        Company.objects.create(
-            cif="123",
-            company_name="company1",
-            short_name="cosa",
-            email="company1@gmail.com",
-            phone="123456789")
-        count2 = Company.objects.count()
-        self.assertTrue(count1+1, count2)
+        c = Client()
 
+        logs_before = Company.objects.all().count()
+
+        response = c.post(reverse("register"), {
+            # Company
+            "cif" :"A01234567",
+            "company_name" :"comapniadejuego",
+            "short_name" :"cdj",
+            "company_email" :"emaildeemp@es.es",
+            "company_phone":"123456987",
+          
+
+            # User (Account data)
+            "username" : "usuarionumero1",
+            "admin_email" : "es@es.es",
+            "password" : "alcontraeslarga",
+            "repeatPassword" : "alcontraeslarga",
+            "first_name" :"pepito",
+            "last_name" : "name1",
+
+            # Administrator (Profile data)
+            "admin_identifier" :"ide",
+            "admin_phone" : "123456789",
+            "terms_agree" : "True",
+
+        })
+    
+        self.assertEquals(response.status_code, 302)
+        self.assertRedirects(response, reverse("dashboard_view"), fetch_redirect_response=False)
+        # Check that the department has been successfully created
+
+       
+        logs_after = Company.objects.all().count()
+
+        self.assertEquals(logs_before + 1, logs_after)
 
     def test_shortname_positive(self):
         """

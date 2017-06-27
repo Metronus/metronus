@@ -134,7 +134,7 @@ class AdministratorTestCase(TestCase):
 
         initialpass = User.objects.get(username="admin1").password
 
-        c.post("/administrator/updatePassword", {
+        response =c.post("/administrator/updatePassword", {
             "newpass1": "nuevapassword",
             "newpass2": "ojala morir",
             "currentpass": "123456",
@@ -142,6 +142,87 @@ class AdministratorTestCase(TestCase):
 
         final = Administrator.objects.get(user__username="admin1")
         self.assertTrue(final.user.password == initialpass)
+        
+        #response in bytes must be decode to string
+        data=response.content.decode("utf-8")
+        #string to dict
+        data=json.loads(data)
+        self.assertEquals(data["success"],False)
+        self.assertTrue('passwordsDontMatch' in data["errors"])
+
+    def test_edit_admin_pass_negative_2(self):
+        """
+        As an admin, wrong new password
+        """
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        initialpass = User.objects.get(username="admin1").password
+
+        response =c.post("/administrator/updatePassword", {
+            "newpass1": "122",
+            "newpass2": "122",
+            "currentpass": "123456",
+        })
+
+        final = Administrator.objects.get(user__username="admin1")
+        self.assertTrue(final.user.password == initialpass)
+        
+        #response in bytes must be decode to string
+        data=response.content.decode("utf-8")
+        #string to dict
+        data=json.loads(data)
+        self.assertEquals(data["success"],False)
+        self.assertTrue('newPasswordInvalid' in data["errors"])
+
+    def test_edit_admin_pass_negative_3(self):
+        """
+        As an admin, wrong current password
+        """
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        initialpass = User.objects.get(username="admin1").password
+
+        response =c.post("/administrator/updatePassword", {
+            "newpass1": "nuevapassword",
+            "newpass2": "nuevapassword",
+            "currentpass": "12356",
+        })
+
+        final = Administrator.objects.get(user__username="admin1")
+        self.assertTrue(final.user.password == initialpass)
+        
+        #response in bytes must be decode to string
+        data=response.content.decode("utf-8")
+        #string to dict
+        data=json.loads(data)
+        self.assertEquals(data["success"],False)
+        self.assertTrue('currentPasswordInvalid' in data["errors"])
+
+    def test_edit_admin_pass_negative_4(self):
+        """
+        As an admin, wrong form
+        """
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        initialpass = User.objects.get(username="admin1").password
+
+        response =c.post("/administrator/updatePassword", {
+            "newpass1": "nuevapassword",
+            "currentpass": "123456",
+        })
+
+        final = Administrator.objects.get(user__username="admin1")
+        self.assertTrue(final.user.password == initialpass)
+        
+        #response in bytes must be decode to string
+        data=response.content.decode("utf-8")
+        #string to dict
+        data=json.loads(data)
+        self.assertEquals(data["success"],False)
+        self.assertTrue('formNotValid' in data["errors"])
 
     def test_edit_admin_not_allowed_password(self):
         """

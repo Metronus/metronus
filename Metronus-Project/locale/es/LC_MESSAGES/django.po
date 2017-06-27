@@ -827,6 +827,9 @@ msgid "passwordsDontMatch"
 msgstr "Las nuevas contraseñas no coinciden"
 msgid "currentPasswordInvalid"
 msgstr "La contraseña actual no es correcta."
+
+msgid "newPasswordInvalid"
+msgstr "La contraseña nueva no es correcta (mínimo 8 caracteres y no puede ser exclusivamente númerica)."
 msgid "editPasswordTitle"
 msgstr "Cambiar contraseña del administrador"
 
