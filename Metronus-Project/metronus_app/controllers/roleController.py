@@ -179,18 +179,6 @@ def delete(request, role_id):
     if not is_role_updatable_by_user(logged, role_id):
         raise PermissionDenied
 
-    """
-    elif logged.user_type == 'E':
-        # If it's an executive, check that the role they're trying to delete is lower than their role
-        try:
-            logged_role = ProjectDepartmentEmployeeRole.objects.get(employee_id=logged,
-                                                                    projectDepartment_id=role.projectDepartment_id)
-            if role.role_id.tier >= logged_role.role_id.tier:
-                raise PermissionDenied
-
-        except ObjectDoesNotExist:
-            raise PermissionDenied
-    """
 
     employee_username = role.employee_id.user.username
     role.delete()

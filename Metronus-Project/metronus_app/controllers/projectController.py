@@ -463,10 +463,8 @@ def check_metrics_authorized_for_project(user, project_id):
         res = is_executive.count() > 0
 
         if not res:
-            try:
-                ProjectDepartmentEmployeeRole.objects.get(employee_id=logged, role_id__tier__gte=40,
-                                                          projectDepartment_id__project_id=project)
-            except ObjectDoesNotExist:
+            if not ProjectDepartmentEmployeeRole.objects.filter(employee_id=logged, role_id__tier__gte=40,
+                                                          projectDepartment_id__project_id=project).exists():
                 raise PermissionDenied
 
 

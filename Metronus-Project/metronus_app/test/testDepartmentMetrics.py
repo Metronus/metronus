@@ -70,7 +70,13 @@ class DepartmentMetricsTestCase(TestCase):
             first_name="Alberto",
             last_name="Berto"
         )
-
+        employee3_user = User.objects.create_user(
+            username="emp3",
+            password="123456",
+            email="emp3@metronus.es",
+            first_name="Alberta",
+            last_name="Berta"
+        )
         employee1 = Employee.objects.create(
             user=employee1_user,
             user_type="E",
@@ -86,7 +92,13 @@ class DepartmentMetricsTestCase(TestCase):
             phone="666555444",
             company_id=company1
         )
-
+        employee3 = Employee.objects.create(
+            user=employee3_user,
+            user_type="E",
+            identifier="emp03",
+            phone="666555445",
+            company_id=company1
+        )
         # Department 1
         Department.objects.create(
             name="Departamento1",
@@ -132,7 +144,7 @@ class DepartmentMetricsTestCase(TestCase):
         role_tm = Role.objects.create(name="TEAM_MANAGER", tier=30)
         # role_co
         role_co = Role.objects.create(name="COORDINATOR", tier=20)
-        Role.objects.create(name="EMPLOYEE", tier=10)
+        role_emp=Role.objects.create(name="EMPLOYEE", tier=10)
 
         pro1 = Project.objects.create(name="pro1", deleted=False, company_id=company1)
         # pro2
@@ -166,7 +178,12 @@ class DepartmentMetricsTestCase(TestCase):
             role_id=role_ex,
             employee_id=employee2
         )
-
+        # pdrole4
+        ProjectDepartmentEmployeeRole.objects.create(
+            projectDepartment_id=pd,
+            role_id=role_emp,
+            employee_id=employee3
+        )
     def test_access_denied_not_logged_emppertask(self):
         """
         Without authentication, try getting the emppertask JSON
@@ -182,7 +199,7 @@ class DepartmentMetricsTestCase(TestCase):
         Without proper roles, try getting the emppertask JSON
         """
         c = Client()
-        c.login(username="emp1", password="123456")
+        c.login(username="emp3", password="123456")
 
         response = c.get("/department/ajaxEmployeesPerTask?department_id={0}" .format(
             Department.objects.get(name="Departamento2").id))
@@ -278,7 +295,7 @@ class DepartmentMetricsTestCase(TestCase):
         Try getting the timepertask JSON without proper roles
         """
         c = Client()
-        c.login(username="emp1", password="123456")
+        c.login(username="emp3", password="123456")
 
         response = c.get("/department/ajaxTimePerTask?department_id={0}" .format(
             Department.objects.get(name="Departamento2").id))
@@ -384,7 +401,7 @@ class DepartmentMetricsTestCase(TestCase):
         Without proper roles, try getting the profit JSON
         """
         c = Client()
-        c.login(username="emp1", password="123456")
+        c.login(username="emp3", password="123456")
 
         response = c.get("/department/ajaxProfit/{0}/" .format(Department.objects.get(name="Departamento2").id))
         self.assertEquals(response.status_code, 403)
