@@ -138,9 +138,9 @@ def create_async(request):
     if request.method == "POST":
         # We are serving a POST request
         form = EmployeeRegisterForm(request.POST, request.FILES)
-
+        print(form.is_valid())
         if form.is_valid():
-
+            print(form.cleaned_data['photo'])
             # Check that the passwords match
             if not check_passwords(form):
                 errors.append('employeeCreation_passwordsDontMatch')
@@ -174,9 +174,6 @@ def create_async(request):
         else:
             errors.append('employeeCreation_formNotValid')
        
-    else:
-        # Another request method
-        raise PermissionDenied
     
     data['success'] = False
     data['errors'] = errors
