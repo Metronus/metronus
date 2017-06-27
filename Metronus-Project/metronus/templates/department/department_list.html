@@ -52,14 +52,15 @@
           </tbody>
         </table>
       </div>
-
-      <div class="text-center">
-        {% if departments|length_is:"0"  %}
-        <h2>{% trans 'plsDepartment' %}</h2>
-        </br>
-        {% endif %}
-        <a class="btn btn-dark" href="{% url 'department_create' %}">{% trans 'create' %}</a>
-      </div>
+      {% if actor_is_admin or actor_is_executive %}
+        <div class="text-center">
+          {% if departments|length_is:"0"  %}
+              <h2>{% trans 'plsDepartment' %}</h2>
+              </br>
+          {% endif %}
+          <a class="btn btn-dark" href="{% url 'department_create' %}">{% trans 'create' %}</a>
+        </div>
+      {% endif %}
     </div>
   </div>
 </div>

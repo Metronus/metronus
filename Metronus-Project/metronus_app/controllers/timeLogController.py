@@ -88,6 +88,8 @@ def list_all(request):
         form = TimeLog2Form(employee, initial={"timeLog_id": 0, "workDate": today})
 
     tareas = Task.objects.filter(actor_id__company_id=employee.company_id,
+                                 projectDepartment_id__project_id__deleted=False,
+                                 projectDepartment_id__department_id__active=True,
                                  projectDepartment_id__projectdepartmentemployeerole__employee_id=employee,
                                  active=True).distinct()
     my_tasks = [MyTask(x, current_month, current_year, employee) for x in tareas]
@@ -167,24 +169,32 @@ def check_permission_for_task(employee, task):
     """
     Comprobación para saber si el empleado puede imputar horas
     """
-    if employee is not None and task is not None:
-        res = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee,
-                                                           projectDepartment_id=task.projectDepartment_id)
-        return res.count() > 0
-    return False
+    is_executive = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee,
+                                                                   role_id__tier=50)
+    res = is_executive.count() > 0
+    
+    if not res and task is not None:
+        has_role = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee,
+            projectDepartment_id__project_id__deleted=False,
+            projectDepartment_id__department_id__active=True,
+            projectDepartment_id=task.projectDepartment_id)
+        res= has_role.count() > 0
+    return res
 
 
 def check_role_for_task(employee, task):
     """Comprobacion para saber si el empleado es un mando superior y
     tiene acceso a todas las imputaciones de una tarea"""
 
-    is_team_manager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee,
-                                                                   role_id__tier=30)
-    res = is_team_manager.count() > 0
+    is_executive = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee,
+                                                                   role_id__tier=50)
+    res = is_executive.count() > 0
     if not res:
         roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee,
-                                                             projectDepartment_id=task.projectDepartment_id,
-                                                             role_id__tier__in=[50, 40, 20])
+                projectDepartment_id__project_id__deleted=False,
+                projectDepartment_id__department_id__active=True,
+                projectDepartment_id=task.projectDepartment_id,
+                role_id__tier__gte= 20)
         res = roles.count() > 0
     return res
 
