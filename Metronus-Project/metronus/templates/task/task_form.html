@@ -163,7 +163,7 @@ $(function() {
 <div class="clearfix"></div>
 
 <div id="successDiv" class="alert alert-success" hidden='true'></div>
-<div id="errorDiv" class="alert alert-danger" hidden='true'>
+<div id="errorDiv" class="alert alert-danger" {% if not errors %}hidden='true'{% endif %}>
 {% if errors %}
     {% for err in errors%}
         <p><strong>{% trans 'fail' %} | </strong>{% trans err %}</p>
