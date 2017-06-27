@@ -201,7 +201,11 @@
         validators: {
           notEmpty: {
             message: '{% trans 'password_error' %}'
-          }
+          },
+          regexp:{
+              regexp: /(?!^\d+$)^.{8,}$/,
+              message: '{% trans 'password_format_help' %}'
+          },
         }
       },
       repeatPassword: {

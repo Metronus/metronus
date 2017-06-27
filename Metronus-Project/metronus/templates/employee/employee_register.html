@@ -148,6 +148,10 @@
                 validators: {
                     notEmpty: {
                         message: "{% trans 'password_not_empty' %}"
+                    },
+                    regexp:{
+                        regexp: /(?!^\d+$)^.{8,}$/,
+                        message: '{% trans 'password_format_help' %}'
                     }
                 }
             },
