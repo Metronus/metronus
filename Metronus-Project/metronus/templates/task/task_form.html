@@ -47,16 +47,20 @@
     var proj_select = $("#id_{{ form.project_id.name }}")
 
     proj_select.change(function () {
-        console.log(proj_select.val())
+        if(proj_select.val() === "") {
+            dep_select.empty();
+            dep_select.append($("<option value='' selected>{% trans 'selectDepartment' %}</option>"));
+            return;
+        }
         $.get({
             url: "/task/getdepartments",
             data: {project_id: proj_select.val()},
             success: function ( data )  {
-                console.log(JSON.stringify(data))
-                dep_select.empty()
-                dep_select.append($("<option value='' selected>{% trans 'selectDepartment' %}</option>"))
+                dep_select.empty();
+                dep_select.append($("<option value='' selected>{% trans 'selectDepartment' %}</option>"));
+                dep_select.trigger("change");
                 data.forEach(function (department) {
-                    dep_select.append($('<option value="'+department.pk+'">'+department.fields.name+'</option>'))
+                    dep_select.append($('<option value="'+department.pk+'">'+department.fields.name+'</option>'));
                 })                
             }
         })
@@ -224,7 +228,7 @@ $(function() {
         <div class="col-sm-6">
         <select class="form-control" name="{{ form.project_id.name }}" id="id_{{ form.project_id.name }}" required>
                 
-                <option value="0" {% if form.project_id.value is None  %}selected{% endif %}>{% trans 'selectProject' %}</option>
+                <option value="" {% if form.project_id.value is None  %}selected{% endif %}>{% trans 'selectProject' %}</option>
                 
                 <!-- slugify pasa de int a string, porque value es un string e id es un int y no son iguales-->
                 {% for project in projects %}
