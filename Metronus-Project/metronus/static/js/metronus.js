@@ -74,3 +74,9 @@ function autocollapse() {
       collapse_buttons.last().click();
   }
 }
+
+// Añadir el icono de info a los tooltips de información
+$(function() {
+  $("div.help-tooltip > p").first().prepend("<span class='glyphicon glyphicon-info-sign'></span>&nbsp;");
+  $("div.help-tooltip > p").slice(1).prepend("<span class='glyphicon glyphicon-info-sign' style='visibility: hidden;'></span>&nbsp;");
+});

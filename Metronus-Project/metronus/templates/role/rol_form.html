@@ -20,16 +20,19 @@
 <div class="col-md-12 col-sm-12 col-xs-12">
   <div class="x_panel">
     <div class="x_title">
-      {% if  editing == False %}
-		  <h2 > {% trans 'addRole' %}  : {{employee.user.first_name}} {{employee.user.last_name}}</h2>
+      {% if editing == False %}
+		  <h2 > {% trans 'addRole' %} {{employee.user.first_name}} {{employee.user.last_name}}</h2>
 	  {% else %}
-		  <h2 > {% trans 'editRole' %} : {{employee.user.first_name}} {{employee.user.last_name}}</h2>
+		  <h2 > {% trans 'editRole' %} {{employee.user.first_name}} {{employee.user.last_name}}</h2>
 	  {% endif %}
       <div class="clearfix"></div>
     </div>
-    <p class="help-block">{% trans 'roleCreation_help' %}</p>
-    <div class="x_content">
 
+    <div class="help-tooltip">
+        <p>{% trans 'roleCreation_help' %}</p>
+    </div>
+
+    <div class="x_content">
     
    <form id="register_form" method="POST" action="" class="form-horizontal">
 

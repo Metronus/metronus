@@ -29,3 +29,7 @@ div.name {
     text-align: center;
     font-size: 120%;
 }
+
+div.help-tooltip {
+    font-size: 120%;
+}
