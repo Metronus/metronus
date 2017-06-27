@@ -557,17 +557,17 @@ def check_role_for_list(request):
 
         if res:
             # is manager
-            task = Task.objects.filter(actor_id__company_id=actor.company_id).distinct()
+            task = Task.objects.filter(actor_id__company_id=actor.company_id)
         else:
             # not a manager
             task = Task.objects.filter(actor_id__company_id=actor.company_id,
                 projectDepartment_id__project_id__deleted=False,projectDepartment_id__department_id__active=True,
                                        projectDepartment_id__projectdepartmentemployeerole__employee_id=actor,
-                                       active=True).distinct()
+                                       active=True)
     else:
         # is admin
-        task = Task.objects.filter(actor_id__company_id=actor.company_id).distinct()
-    return task
+        task = Task.objects.filter(actor_id__company_id=actor.company_id)
+    return task.distinct()
 
 
 def check_task(task, request):
@@ -723,7 +723,7 @@ def check_metrics_authorized_for_task(user, task_id):
     if logged.user_type == 'E':
         # If it's not an admin, check that it has role EXECUTIVE (50) or higher for the projdept tuple
         try:
-            ProjectDepartmentEmployeeRole.objects.get(employee_id=logged, role_id__tier__gte=30,
+            ProjectDepartmentEmployeeRole.objects.get(employee_id=logged, role_id__tier__gte=20,
                                                       projectDepartment_id=task.projectDepartment_id)
         except ObjectDoesNotExist:
             raise PermissionDenied

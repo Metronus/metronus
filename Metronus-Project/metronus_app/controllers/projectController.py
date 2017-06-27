@@ -559,4 +559,4 @@ def get_list_for_role(request):
     else:
         projects = Project.objects.filter(company_id=actor.company_id)
 
-    return projects.order_by('name')
+    return projects.distinct().order_by('name')

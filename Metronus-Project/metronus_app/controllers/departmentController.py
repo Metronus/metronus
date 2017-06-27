@@ -130,14 +130,14 @@ def view(request, department_id):
     department = get_object_or_404(Department, pk=department_id)
     check_department_for_fiew(department, request, True)
 
-    coordinator = get_coordinator(department)
+    coordinators = get_coordinator(department)
 
     tasks = Task.objects.filter(active=True, projectDepartment_id__department_id__id=department_id).order_by("name")
     employees = Employee.objects.filter(
         projectdepartmentemployeerole__projectDepartment_id__department_id=department).distinct().order_by("user__first_name", "user__last_name")
 
     return render(request, 'department/department_view.html', {'department': department, 'employees': employees,
-                                                               'tasks': tasks, 'coordinator': coordinator})
+                                                               'tasks': tasks, 'coordinators': coordinators})
 
 
 def edit(request, department_id):
@@ -541,7 +541,7 @@ def get_list_for_role(request):
     else:
         departments = Department.objects.filter(company_id=actor.company_id)
 
-    return departments.order_by("name")
+    return departments.distinct().order_by("name")
 
 
 def get_coordinator(department):
@@ -549,4 +549,4 @@ def get_coordinator(department):
     Gets the coordinator from a department(the first of them if there is many)
     """
     return Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__department_id=department,
-                                   projectdepartmentemployeerole__role_id__tier=20).first()
+                                   projectdepartmentemployeerole__role_id__tier=20).distinct().order_by("user__first_name","user__last_name")
