@@ -532,12 +532,7 @@ def find_name(pname, admin):
 
 def get_list_for_role(request):
     """Gets the list of projects visible to the logged user, as it depends on their roles"""
-    if not request.user.is_authenticated():
-        raise PermissionDenied
-    try:
-        actor = Actor.objects.get(user=request.user)
-    except ObjectDoesNotExist:
-        raise PermissionDenied
+    actor = get_actor_or_403(request)
 
     if actor.user_type != 'A':
         is_executive = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=50)
