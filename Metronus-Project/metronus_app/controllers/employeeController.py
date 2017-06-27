@@ -395,7 +395,7 @@ def delete(request, username):
     template: ninguna
     """
 
-    admin = get_authorized_or_403(request)
+    admin = get_admin_executive_or_403(request)
     employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
 
     # Check that the admin has permission to edit that employee
@@ -419,7 +419,7 @@ def recover(request, username):
     template: ninguna
     """
 
-    admin = get_authorized_or_403(request)
+    admin = get_admin_executive_or_403(request)
     employee = get_object_or_404(Employee, user__username=username, user__is_active=False)
 
     # Check that the admin has permission to edit that employee
