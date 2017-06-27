@@ -54,11 +54,13 @@
 
             <span>{% trans 'registryDate' %}: {{employee.registryDate}}</span>
           </li>
-          <li style="text-align: center">
-            <span>
-              <a href="{% url 'employee_edit' employee.user.username %}" type="button" class="btn btn-primary">{% trans 'update' %}</a>
-            </span>
-          </li>
+          {% if actor_is_executive or actor_is_admin %}
+            <li style="text-align: center">
+              <span>
+                <a href="{% url 'employee_edit' employee.user.username %}" type="button" class="btn btn-primary">{% trans 'update' %}</a>
+              </span>
+            </li>
+          {% endif %}
         </ul>
       </div>
     </div>

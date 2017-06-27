@@ -48,7 +48,7 @@ def create(request):
     """
 
     # Check that the user is logged in and it's an administrator
-    admin = get_authorized_or_403(request)
+    admin = get_admin_executive_or_403(request)
 
     # If it's a GET request, return an empty form
     if request.method == "GET":
@@ -129,7 +129,7 @@ def create_async(request):
     """
 
     # Check that the user is logged in and it's an administrator
-    admin = get_authorized_or_403(request)
+    admin = get_admin_executive_or_403(request)
     errors = []
     data = {
         'success': True
