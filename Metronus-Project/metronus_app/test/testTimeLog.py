@@ -3,6 +3,7 @@ from metronus_app.model.timeLog import TimeLog
 from django.test import TestCase, Client
 from populate_database import populate_database
 from datetime import datetime,timedelta
+from django.utils import timezone
 
 
 class TimeLogTestCase(TestCase):
@@ -291,5 +292,6 @@ class TimeLogTestCase(TestCase):
         """
         c = Client()
         c.login(username="ddlsb", password="123456")
-        response = c.get("/timeLog/delete/{0}/".format(TimeLog.objects.filter(employee_id__user__username="ddlsb",registryDate__lt=datetime.today()-timedelta(days=1)).first().id))
+        response = c.get("/timeLog/delete/{0}/".format(TimeLog.objects.filter(employee_id__user__username="ddlsb",
+                                                                              registryDate__lt=timezone.make_aware(datetime.today()-timedelta(days=1), timezone.get_current_timezone())).first().id))
         self.assertEquals(response.status_code, 403)

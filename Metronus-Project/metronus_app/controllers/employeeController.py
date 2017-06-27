@@ -20,7 +20,7 @@ from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEm
 from django.core import serializers
 from django.http import HttpResponse
 
-from metronus_app.common_utils import (get_current_admin_or_403, check_image, get_current_employee_or_403, send_mail,
+from metronus_app.common_utils import (is_role_updatable_by_user, check_image, get_current_employee_or_403, send_mail,
                                        is_email_unique, is_username_unique, get_authorized_or_403,default_round)
 from datetime import date, timedelta, datetime
 import re
@@ -211,32 +211,35 @@ def view(request, username):
     """
 
     # Check that the user is logged in and it's an administrator
-    try:
-        logged = get_current_admin_or_403(request)
-    except PermissionDenied:
-        logged = get_current_employee_or_403(request)
+    logged = get_authorized_or_403(request)
     employee = get_object_or_404(Employee, user__username=username)
 
     # Check that the admin has permission to view that employee
     if employee.company_id != logged.company_id:
         raise PermissionDenied
 
-    employee_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee)
+    employee_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee,
+                                                                  projectDepartment_id__department_id__active=True,
+                                                                  projectDepartment_id__project_id__deleted=False)
 
-    #Check the logged's roles are greater than this for at least one project
-    if logged.user_type=="E":
-        my_roles=ProjectDepartmentEmployeeRole.objects.filter(employee_id=logged)
-        authorized=my_roles.exists()
+    # Check the logged's roles are greater than this for at least one project
+    if logged.user_type == "E":
+        my_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=logged)
+        authorized = my_roles.exists()
         if authorized:
             for role in my_roles:
                 if ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee,
-                  projectDepartment_id=role.projectDepartment_id, role_id__tier__lt=role.role_id.tier).exists():
-                    authorized=True
+                                                                projectDepartment_id=role.projectDepartment_id,
+                                                                role_id__tier__lt=role.role_id.tier).exists():
+                    authorized = True
                     break
 
         if not authorized:
             raise PermissionDenied
-    return render(request, 'employee/employee_view.html', {'employee': employee, 'employee_roles': employee_roles})
+
+    is_editable_role = {role.id: is_role_updatable_by_user(logged, role.id) for role in employee_roles}
+
+    return render(request, 'employee/employee_view.html', {'employee': employee, 'employee_roles': employee_roles, 'is_editable_role': is_editable_role})
 
 
 def edit(request, username):

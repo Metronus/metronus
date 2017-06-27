@@ -4,6 +4,7 @@
 {% block title %}
 {{employee.user}}
 {% endblock %}
+{% load custom_tags %}
 
 {% block content %}
 <h1>{% trans 'profile' %}</h1>
@@ -67,6 +68,13 @@
   <!-- Roles information -->
   <div class="col-lg-9 col-sm-8 col-xs-12">
     <div class="x_panel x_content">
+
+      {% if actor_is_executive %}
+      <div class="help-tooltip" style="margin: 10px;">
+        <p>{% trans 'role_help_tooltip_executives' %}</p>
+      </div>
+      {% endif %}
+
       <div class="clearfix"></div>
       <div>
         <h2 align="center">{% trans 'roles' %}</h2>
@@ -87,10 +95,14 @@
               <td align="center" >{{rol.projectDepartment_id.department_id.name}}</td>
               <td align="center" >{% trans rol.role_id.name %}</td>
               <td align="center" >
-                <div align="right">
-                  <a align="right" class="btn btn-primary" href="/roles/manage?role_id={{rol.id}}">{% trans 'update' %}</a>
-                  <a href="#" align="right" class="btn btn-danger" data-href="/roles/delete/{{rol.id}}" data-toggle="modal" data-target="#confirm-delete">{% trans 'delete' %}</a>
-                </div>
+                {% if actor_is_admin or actor_is_executive %}
+                {% if is_editable_role|getval:rol.id %}
+                  <div align="right">
+                    <a align="right" class="btn btn-primary" href="/roles/manage?role_id={{rol.id}}">{% trans 'update' %}</a>
+                    <a href="#" align="right" class="btn btn-danger" data-href="/roles/delete/{{rol.id}}" data-toggle="modal" data-target="#confirm-delete">{% trans 'delete' %}</a>
+                  </div>
+                {% endif %}
+                {% endif %}
               </td>
             </tr>
             {% endfor %}
@@ -103,8 +115,13 @@
     </div>
     <br>
 
+    {% if actor_is_admin or actor_is_executive %}
     <a align="center" class="btn btn-primary" href="/roles/manage?employee_id={{employee.id}}">{% trans 'addRoleButton' %}</a>
+    {% endif %}
 
+    {% comment %}
+      Esto está aquí en lugar de quitarlo cuando no es admin ni ejecutivo porque si no se descuadra todo por motivos desconocidos
+    {% endcomment %}
     <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -122,6 +139,7 @@
       </div>
     </div>
   </div>
+
   <!-- Roles information ends -->
 
   <div class="clearfix"></div>

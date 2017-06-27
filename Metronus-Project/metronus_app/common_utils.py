@@ -95,6 +95,12 @@ def get_admin_executive_or_403(request):
             raise PermissionDenied
 
 
+def is_executive(employee):
+    if employee.user_type != "E":
+        return False
+    return ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee, role_id__tier__gte=50).count() > 0
+
+
 def get_or_none(model, *args, **kwargs):
     """
     Gets an instance of the model class from the database
@@ -292,3 +298,30 @@ def get_ajax(url, data = None):
     c = Client()
     response = c.get(url, data)
     return json.loads(response.content.decode("utf-8"))
+
+
+def is_role_updatable_by_user(logged, pdrole_id):
+    """
+    Determines whether the provided user can update/delete the role with the given ID
+    """
+    pdrole = get_or_none(ProjectDepartmentEmployeeRole, id=pdrole_id)
+
+    # Check that it exists and belongs to the logged user's company
+    if not pdrole or pdrole.employee_id.company_id != logged.company_id:
+        return False
+
+    # Admins can always do whatever the fuck they want
+    if logged.user_type == "A":
+        return True
+
+    # Only admins and executives can edit role
+    if not is_executive(logged):
+        return False
+
+    # If it belongs to the same user, check that it's not their highest role
+    if pdrole.employee_id == logged:
+        return ProjectDepartmentEmployeeRole.objects.filter(employee_id=logged, role_id__tier__gt=pdrole.role_id.tier).exists()
+    # If it belongs to someone else, check that the role they're trying to edit is not Executive
+    # Because only executives and administrator can manage roles, then execs can edit anything below their level
+    else:
+        return pdrole.role_id.tier < 50

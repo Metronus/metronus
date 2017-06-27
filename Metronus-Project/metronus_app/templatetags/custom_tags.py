@@ -133,3 +133,8 @@ def is_team_manager(actor):
             return True
 
     return False
+
+
+@register.filter
+def getval(dic, key):
+    return dic[key]

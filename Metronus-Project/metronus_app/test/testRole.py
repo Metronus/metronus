@@ -75,6 +75,14 @@ class RoleTestCase(TestCase):
             last_name="Morir"
         )
 
+        employee4_user = User.objects.create_user(
+            username="emp4",
+            password="123456",
+            email="emp4@metronus.es",
+            first_name="Mequiero",
+            last_name="Morir"
+        )
+
         employee1 = Employee.objects.create(
             user=employee1_user,
             user_type="E",
@@ -96,6 +104,14 @@ class RoleTestCase(TestCase):
             user=employee3_user,
             user_type="E",
             identifier="emp03",
+            phone="666555444",
+            company_id=company1
+        )
+
+        employee4 = Employee.objects.create(
+            user=employee4_user,
+            user_type="E",
+            identifier="emp04",
             phone="666555444",
             company_id=company1
         )
@@ -152,6 +168,7 @@ class RoleTestCase(TestCase):
         # role_pm
         Role.objects.create(name="PROJECT_MANAGER", tier=40)
 
+        role_ex = Role.objects.create(name="EXECUTIVE", tier=50)
         role_tm = Role.objects.create(name="TEAM_MANAGER", tier=30)
         role_co = Role.objects.create(name="COORDINATOR", tier=20)
 
@@ -162,7 +179,14 @@ class RoleTestCase(TestCase):
         ProjectDepartmentEmployeeRole.objects.create(
             projectDepartment_id=projdept1,
             employee_id=employee1,
-            role_id=role_tm,
+            role_id=role_ex,
+        )
+
+        # EmpRole1
+        ProjectDepartmentEmployeeRole.objects.create(
+            projectDepartment_id=projdept1,
+            employee_id=employee4,
+            role_id=role_ex,
         )
 
         # EmpRole2
@@ -221,9 +245,9 @@ class RoleTestCase(TestCase):
         response = c.get("/roles/manage?employee_id={0}" .format(emp.id))
 
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(1, len(response.context["departments"]))
-        self.assertEquals(1, len(response.context["projects"]))
-        self.assertEquals(len(Role.objects.all()), len(response.context["roles"]))
+        self.assertEquals(2, len(response.context["departments"]))
+        self.assertEquals(2, len(response.context["projects"]))
+        self.assertEquals(len(Role.objects.all()) - 1, len(response.context["roles"]))
 
         self.assertEquals(response.context["departments"][0], Department.objects.get(name="departamento 1"))
         self.assertEquals(response.context["projects"][0], Project.objects.get(name="proyecto 1"))
@@ -454,39 +478,6 @@ class RoleTestCase(TestCase):
         # Check that the proper error is passed
         self.assertTrue(response.status_code == 404)
 
-
-    def test_post_new_role_user_projdept_not_allowed(self):
-        """
-        Try adding a role to an employee when you do not have permissions for that project-department pair
-        """
-        c = Client()
-        c.login(username="emp1", password="123456")
-
-        employee = Employee.objects.get(identifier="emp02")
-        department = Department.objects.get(name="departamento 1")
-        project = Project.objects.get(name="proyecto 2")
-        role = Role.objects.get(name="COORDINATOR")
-
-        projdepts_before = ProjectDepartment.objects.all().count()
-        employeeroles_before = ProjectDepartmentEmployeeRole.objects.all().count()
-
-        response = c.post("/roles/manage", {
-            'employee_id': employee.id,
-            'department_id': department.id,
-            'project_id': project.id,
-            'employeeRole_id': 0,
-            'role_id': role.id,
-        })
-
-        projdepts_after = ProjectDepartment.objects.all().count()
-        employeeroles_after = ProjectDepartmentEmployeeRole.objects.all().count()
-
-        self.assertEquals(projdepts_before, projdepts_after)
-        self.assertEquals(employeeroles_before, employeeroles_after)
-
-        # Check that the proper error is passed
-        self.assertTrue('roleCreation_notAuthorizedProjectDepartment' in response.context["errors"])
-
     def test_post_new_role_user_role_not_allowed(self):
         """
         Try adding a role to an employee when you cannot assign that role
@@ -497,7 +488,7 @@ class RoleTestCase(TestCase):
         employee = Employee.objects.get(identifier="emp01")
         department = Department.objects.get(name="departamento 1")
         project = Project.objects.get(name="proyecto 1")
-        role = Role.objects.get(name="TEAM_MANAGER")
+        role = Role.objects.get(name="EXECUTIVE")
 
         projdepts_before = ProjectDepartment.objects.all().count()
         employeeroles_before = ProjectDepartmentEmployeeRole.objects.all().count()
@@ -558,12 +549,12 @@ class RoleTestCase(TestCase):
         """
 
         c = Client()
-        c.login(username="emp3", password="123456")
+        c.login(username="emp1", password="123456")
 
-        employee = Employee.objects.get(identifier="emp01")
+        employee = Employee.objects.get(identifier="emp04")
         department = Department.objects.get(name="departamento 1")
         project = Project.objects.get(name="proyecto 1")
-        role = Role.objects.get(name="EMPLOYEE")
+        role = Role.objects.get(name="EXECUTIVE")
 
         projdepts_before = ProjectDepartment.objects.all().count()
         employeeroles_before = ProjectDepartmentEmployeeRole.objects.all().count()
@@ -584,8 +575,8 @@ class RoleTestCase(TestCase):
         self.assertEquals(projdepts_before, projdepts_after)
         self.assertEquals(employeeroles_before, employeeroles_after)
 
-        # Check that the proper error is passed
-        self.assertTrue('roleCreation_editingHigherRole' in response.context["errors"])
+        # Check that the user cannot do that
+        self.assertTrue('roleCreation_notAuthorizedRole' in response.context["errors"])
 
     def test_edit_role_positive(self):
         """
