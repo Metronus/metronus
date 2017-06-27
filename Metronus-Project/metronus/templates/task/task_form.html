@@ -113,6 +113,7 @@
   });
   function ajax(){
     $.post('/task/createAsync', $('#register_form').serialize(), function(data, status){
+        $('html, body').animate({ scrollTop: 0 }, 'fast');
         if(data['success']){
             document.getElementById('register_form').reset();
             $("#register_form").data('bootstrapValidator').resetForm();
