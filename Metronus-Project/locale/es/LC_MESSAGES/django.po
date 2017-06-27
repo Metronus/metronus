@@ -860,9 +860,11 @@ msgstr "Debe rellenar sólo uno de los campos de precio, y solo puede especifica
 msgid "task_creation_help_1"
 msgstr "Una tarea con objetivo de producción requiere una descripción del objetivo (e.g. kgs por hora) y un precio por unidad (e.g. por kg)."
 msgid "task_creation_help_2"
-msgstr "Una tarea sin objetivo de producción se paga por horas."
+msgstr "Una tarea sin objetivo de producción requiere un precio por hora."
 msgid "task_creation_help_3"
-msgstr "En resumen, debes rellenar esos tres campos, o bien sólo el precio por hora (y dejar los otros en blanco)."
+msgstr "Dos tareas asignadas al mismo proyecto y departamento no podrán tener el mismo nombre."
+msgid "task_creation_help_4"
+msgstr "Tenga en cuenta que al seleccionar un proyecto sólo aparecerán los departamentos relacionados con el mismo (i.e. que exista al menos un empleado con rol para ese departamento y proyecto)"
 
 
 

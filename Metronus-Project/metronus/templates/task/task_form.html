@@ -180,6 +180,13 @@ $(function() {
     </div>
     <div class="x_content">
 
+    <div class="help-tooltip">
+        <p class="help-block">{% trans 'task_creation_help_1' %}</p>
+        <p class="help-block">{% trans 'task_creation_help_2' %}</p>
+        <p class="help-block">{% trans 'task_creation_help_3' %}</p>
+        <p class="help-block">{% trans 'task_creation_help_4' %}</p>
+    </div>
+
     <form id="register_form" method="POST" action="" class="form-horizontal" align="center">{% csrf_token %}
     <div class="form-group" >
         <label class="control-label col-sm-4" for="id_{{ form.name.name }}">{% trans 'name' %} *</label>
@@ -268,12 +275,6 @@ $(function() {
             {% endif %}
 
         </div>
-    <div class="clearfix"></div>
-    <div class="col-sm-4" ></div>
-         <p class="help-block">{% trans 'task_creation_help_1' %}</p>
-         <p class="help-block">{% trans 'task_creation_help_2' %}</p>
-         <p class="help-block">{% trans 'task_creation_help_3' %}</p>
-    </div>
 </form>
 
  </div>

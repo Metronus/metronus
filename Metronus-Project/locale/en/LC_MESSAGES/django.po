@@ -861,11 +861,13 @@ msgstr "The project and the department are not related. Please select other comb
 msgid "taskConfirm"
 msgstr "Are you sure about deleting this task? Its timelogs will be erased too"
 msgid "task_creation_help_1"
-msgstr "A task with a production goal requires a goal description (e.g. kgs per hour) and a price per unit (e.g. per kg)."
+msgstr "A task with a production goal requires a goal description (e.g. kgs per hour) and a price per unit (e.g. € per kg)."
 msgid "task_creation_help_2"
 msgstr "A task without production goal requires a price per hour."
 msgid "task_creation_help_3"
-msgstr "In summary, you must fill either those three fields or only the price per hour field (and leave the others in blank)."
+msgstr "There cannot be two tasks assigned to the same project and department with the same name."
+msgid "task_creation_help_4"
+msgstr "Please note that, when selecting a project, only departments that are related to them will appear (i.e. there is at least one employee with a role for that project and department)."
 
 
 msgid "projectDeparment"
