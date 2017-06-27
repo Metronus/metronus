@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponseRedirect, JsonResponse, HttpResponseBadRequest
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.http import HttpResponseRedirect, JsonResponse
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, SuspiciousOperation
 from django.db.models import Sum, F, FloatField
 from metronus_app.forms.departmentForm import DepartmentForm
 from metronus_app.model.department import Department
@@ -237,7 +237,7 @@ def ajax_employees_per_task(request):
     # department_id - ID del departamento
     """
     if "department_id" not in request.GET:
-        return HttpResponseBadRequest()
+        raise SuspiciousOperation
 
     department_id = request.GET["department_id"]
     check_metrics_authorized_for_department(request.user, department_id)
@@ -271,7 +271,7 @@ def ajax_time_per_task(request):
     # Si se proporcionan pero no tienen el formato correcto se lanzará un error HTTP 400 Bad Request
     """
     if "department_id" not in request.GET:
-        return HttpResponseBadRequest()
+        raise SuspiciousOperation
 
     department_id = request.GET["department_id"]
     check_metrics_authorized_for_department(request.user, department_id)
@@ -282,13 +282,13 @@ def ajax_time_per_task(request):
     date_regex = re.compile("^\d{4}-\d{2}-\d{2}$")
 
     if date_regex.match(start_date) is None or date_regex.match(end_date) is None:
-        return HttpResponseBadRequest("Start/end date are not valid")
+        raise SuspiciousOperation("Start/end date are not valid")
 
     offset = request.GET.get("offset", "+00:00")
     offset_regex = re.compile("^(\+|-)\d{2}:\d{2}$")
 
     if offset_regex.match(offset) is None:
-        return HttpResponseBadRequest("Time offset is not valid")
+        raise SuspiciousOperation("Time offset is not valid")
 
     # Append time offsets
     start_date += " 00:00" + offset
@@ -348,13 +348,13 @@ def ajax_profit_per_date(request, department_id):
     date_regex = re.compile("^\d{4}-\d{2}-\d{2}$")
 
     if date_regex.match(start_date) is None or date_regex.match(end_date) is None:
-        return HttpResponseBadRequest("Start/end date are not valid")
+        raise SuspiciousOperation("Start/end date are not valid")
 
     offset = request.GET.get("offset", "+00:00")
     offset_regex = re.compile("^(\+|-)\d{2}:\d{2}$")
 
     if offset_regex.match(offset) is None:
-        return HttpResponseBadRequest("Time offset is not valid")
+        raise SuspiciousOperation("Time offset is not valid")
 
     # Append time offsets
     start_date += " 00:00" + offset
