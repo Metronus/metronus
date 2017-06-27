@@ -21,10 +21,10 @@ from django.core import serializers
 from django.http import HttpResponse
 
 from metronus_app.common_utils import (get_current_admin_or_403, check_image, get_current_employee_or_403, send_mail,
-                                       is_email_unique, is_username_unique, get_authorized_or_403,default_round)
+                                       is_email_unique, is_username_unique, get_authorized_or_403,default_round,validate_pass)
 from datetime import date, timedelta, datetime
 import re
-from django.contrib.auth.password_validation import validate_password, ValidationError
+
 
 def create(request):
     """
@@ -66,9 +66,8 @@ def create(request):
             if not check_passwords(form):
                 errors.append('employeeCreation_passwordsDontMatch')
 
-            try:
-                validate_password(form.cleaned_data["password1"])
-            except ValidationError:
+            #Check password validation
+            if not validate_pass(form.cleaned_data["password1"]):
                 errors.append('currentPasswordInvalid')
 
             # Check that the username is unique
@@ -144,7 +143,11 @@ def create_async(request):
             # Check that the passwords match
             if not check_passwords(form):
                 errors.append('employeeCreation_passwordsDontMatch')
-
+            
+            #Check password validation
+            if not validate_pass(form.cleaned_data["password1"]):
+                errors.append('currentPasswordInvalid')
+            
             # Check that the username is unique
             if not is_username_unique(form.cleaned_data["username"]):
                 errors.append('employeeCreation_usernameNotUnique')
@@ -359,9 +362,8 @@ def update_password(request, username):
             pass1 = form.cleaned_data["newpass1"]
             pass2 = form.cleaned_data["newpass2"]
 
-            try:
-                validate_password(pass1)
-            except ValidationError:
+            #Check password validation
+            if not validate_pass(pass1):
                 return JsonResponse({'success': False, 'errors': ['currentPasswordInvalid']})
 
             if pass1 != pass2:

@@ -4,7 +4,7 @@ from metronus_app.forms.administratorForm import AdministratorForm
 from metronus_app.forms.employeePasswordForm import EmployeePasswordForm
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from metronus_app.common_utils import check_image, get_current_admin_or_403,is_email_unique, email_in_use_logged
+from metronus_app.common_utils import check_image, get_current_admin_or_403,is_email_unique, email_in_use_logged,validate_pass
 from django.contrib.auth import update_session_auth_hash
 
 
@@ -95,7 +95,8 @@ def update_password(request):
 
         if form.is_valid():
 
-            if not admin.user.check_password(form.cleaned_data["currentpass"]):
+            #Check password validation
+            if not validate_pass(form.cleaned_data["currentpass"]):
                 return JsonResponse({'success': False, 'errors': ['currentPasswordInvalid']})
 
             pass1 = form.cleaned_data["newpass1"]

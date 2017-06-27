@@ -1,7 +1,7 @@
 from django.core.exceptions import PermissionDenied
 from metronus_app.model.administrator import Administrator
 from metronus_app.model.employee import Employee
-from metronus.settings import DEFAULT_FROM_EMAIL
+from metronus.settings import DEFAULT_FROM_EMAIL,AUTH_PASSWORD_VALIDATORS
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 from django.template import loader
 from django.core.mail import EmailMultiAlternatives
@@ -13,7 +13,7 @@ from metronus_app.model.role import Role
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.task import Task
 from django.test import Client
-
+from django.contrib.auth.password_validation import validate_password, ValidationError,get_password_validators
 from PIL import Image
 
 import sys
@@ -27,6 +27,16 @@ FILE_SIZE = 100000000
 HEIGHT = 256
 WIDTH = 256
 VALID_FORMATS = ['JPEG', 'JPG', 'PNG']
+
+def validate_pass(password):
+    """
+    checks if the password is valid
+    """
+    try:
+        validate_password(password,get_password_validators(AUTH_PASSWORD_VALIDATORS))
+    except ValidationError:
+        return False
+    return True
 
 def default_round(val,dig=2):
     """
