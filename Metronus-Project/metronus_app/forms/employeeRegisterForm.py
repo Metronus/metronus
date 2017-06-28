@@ -7,11 +7,11 @@ from metronus_app.common_utils import phone_validator
 class EmployeeRegisterForm(Form):
     """Form for Employee registering"""
     # User (Account data)
-    username = forms.CharField(label=_("username"), initial="")
+    username = forms.CharField(label=_("username"),max_length=150, initial="")
     password1 = forms.CharField(label=_("password"), widget=forms.PasswordInput, initial="")
     password2 = forms.CharField(label=_("repeatPassword"), widget=forms.PasswordInput, initial="")
-    first_name = forms.CharField(label=_("name"), max_length=50, initial="")
-    last_name = forms.CharField(label=_("surname"), max_length=50, initial="")
+    first_name = forms.CharField(label=_("name"), max_length=30, initial="")
+    last_name = forms.CharField(label=_("surname"), max_length=30, initial="")
     email = forms.EmailField(label=_("email"), initial="")
 
     # Employee (Actor) data

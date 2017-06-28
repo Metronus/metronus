@@ -7,8 +7,8 @@ from metronus_app.common_utils import phone_validator
 class EmployeeEditForm(Form):
     """Form for Employee profile editing"""
     # User (Account data)
-    first_name = forms.CharField(max_length=50)
-    last_name = forms.CharField(max_length=50)
+    first_name = forms.CharField(max_length=30)
+    last_name = forms.CharField(max_length=30)
     email = forms.EmailField()
 
     # Employee (Actor) data

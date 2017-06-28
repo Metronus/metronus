@@ -19,8 +19,8 @@ class RegistrationForm(Form):
     admin_email = forms.EmailField(label=_("admin_email"))
     password = forms.CharField(label=_("password"), widget=forms.PasswordInput)
     repeatPassword = forms.CharField(label=_("repeatPassword"), widget=forms.PasswordInput)
-    first_name = forms.CharField(label=_("first_name"), max_length=50)
-    last_name = forms.CharField(label=_("last_name"), max_length=50)
+    first_name = forms.CharField(label=_("first_name"), max_length=30)
+    last_name = forms.CharField(label=_("last_name"), max_length=30)
 
     # Administrator (Profile data)
     admin_identifier = forms.CharField(label=_("admin_identifier"), max_length=15)
