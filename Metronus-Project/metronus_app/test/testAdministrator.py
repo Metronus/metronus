@@ -93,14 +93,14 @@ class AdministratorTestCase(TestCase):
             "last_name": "NuevoApellido",
             "admin_email": "nuevocorreo@empresa.com",
             "identifier": "nuevoid",
-            "phone": "nuevotelefono",
+            "phone": "456456456",
         })
 
         self.assertRedirects(response, "/company/view/", fetch_redirect_response=False)
 
         final = Administrator.objects.get(user__username="admin1")
         self.assertEquals(final.identifier, "nuevoid")
-        self.assertEquals(final.phone, "nuevotelefono")
+        self.assertEquals(final.phone, "456456456")
         self.assertEquals(final.user.first_name, "NuevoNombre")
         self.assertEquals(final.user.last_name, "NuevoApellido")
         self.assertEquals(final.user.email, "nuevocorreo@empresa.com")

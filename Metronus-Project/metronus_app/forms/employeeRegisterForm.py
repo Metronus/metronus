@@ -1,6 +1,7 @@
 from django import forms
 from django.forms import Form
 from django.utils.translation import ugettext_lazy as _
+from metronus_app.common_utils import phone_validator
 
 
 class EmployeeRegisterForm(Form):
@@ -14,7 +15,7 @@ class EmployeeRegisterForm(Form):
     email = forms.EmailField(label=_("email"), initial="")
 
     # Employee (Actor) data
-    phone = forms.CharField(label=_("phone"), max_length=15, initial="")
+    phone = forms.CharField(label=_("phone"), max_length=15, initial="", validators=[phone_validator])
     identifier = forms.CharField(label=_("identifier"), max_length=15, initial="")
     photo = forms.ImageField(label=_("photo"), required=False)
     price_per_hour = forms.FloatField(label=_("price_per_hour"), initial="1.0")

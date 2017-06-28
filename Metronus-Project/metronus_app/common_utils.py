@@ -7,7 +7,7 @@ from django.template import loader
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth.models import User
 from metronus_app.model.timeLog import TimeLog
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from metronus_app.model.company import Company
 from metronus_app.model.role import Role
 from metronus_app.model.actor import Actor
@@ -16,11 +16,13 @@ from metronus_app.model.task import Task
 from django.test import Client
 from django.contrib.auth.password_validation import validate_password, ValidationError,get_password_validators
 from PIL import Image
+from django.utils.translation import ugettext_lazy as _
 
 import sys
 import string
 import random
 import json
+import re
 
 
 # Image limit parameters
@@ -28,6 +30,10 @@ FILE_SIZE = 100000000
 HEIGHT = 256
 WIDTH = 256
 VALID_FORMATS = ['JPEG', 'JPG', 'PNG']
+
+def phone_validator(text):
+    if not re.compile("^\d{9}$").match(text):
+        raise ValidationError(_("phone_valid"))
 
 def validate_pass(password):
     """
