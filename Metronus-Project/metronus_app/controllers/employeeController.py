@@ -276,7 +276,7 @@ def edit(request, username):
             'price_per_hour': employee.price_per_hour
         })
 
-        return render(request, 'employee/employee_edit.html', {'form': form, 'picture': employee.picture,'username':username})
+        return render(request, 'employee/employee_edit.html', {'form': form, 'picture': employee.picture,'username':username, 'pass_form': EmployeePasswordForm(), 'active':employee.user.is_active})
 
     elif request.method == "POST":
         # Process the received form
@@ -323,12 +323,14 @@ def edit(request, username):
                 return HttpResponseRedirect('/employee/view/' + username + '/')
             else:
                 # There are errors
-                return render(request, 'employee/employee_edit.html', {'form': form, 'errors': errors, 'picture': employee.picture,'username':username})
+                return render(request, 'employee/employee_edit.html', {'form': form, 'errors': errors, 'picture': employee.picture,'username':username,
+                                                                       'pass_form': EmployeePasswordForm(), 'active':employee.user.is_active})
 
         else:
             # Form is not valid
             return render(request, 'employee/employee_edit.html', {'form': form, 'picture': employee.picture,
-                                                                   'errors': ['employeeCreation_formNotValid'],'username':username})
+                                                                   'errors': ['employeeCreation_formNotValid'],'username':username,
+                                                                    'pass_form': EmployeePasswordForm(), 'active':employee.user.is_active})
     else:
         raise PermissionDenied
 
@@ -367,9 +369,7 @@ def update_password(request, username):
             pass1 = form.cleaned_data["newpass1"]
             pass2 = form.cleaned_data["newpass2"]
 
-            if not employee.user.check_password(form.cleaned_data["currentpass"]):
-                return JsonResponse({'success': False, 'errors': ['currentPasswordInvalid']})
-            #Check password validation
+            # Check password validation
             if not validate_pass(pass1):
                 return JsonResponse({'success': False, 'errors': ['newPasswordInvalid']})
 
@@ -379,7 +379,9 @@ def update_password(request, username):
             user = employee.user
             user.set_password(pass1)
             user.save()
-            notify_password_change(user.email, user.first_name)
+
+            if form.cleaned_data["send_password_notification"]:
+                notify_password_change(user.email, user.first_name, newpass=pass1, notifynewpass=form.cleaned_data["notify_new_pass"])
 
             return JsonResponse({'success': True, 'errors': []})
         else:
@@ -852,11 +854,11 @@ def check_passwords(form):
     return form.cleaned_data['password1'] == form.cleaned_data['password2']
 
 
-def notify_password_change(email, name):
+def notify_password_change(email, name, newpass=None, notifynewpass=False):
     """Notifies a password change to someone by sending them an email"""
-    send_mail(ugettext_lazy("register_changepw_subject"),
+    send_mail(ugettext_lazy("changepw_mail_subject"),
               "employee/employee_changepw_email.html", [email], "employee/employee_changepw_email.html",
-              {'html': True, 'employee_name': name})
+              {'html': True, 'employee_name': name, 'newpass': newpass, 'notifynewpass': notifynewpass})
 
 
 def send_register_email(email, name):

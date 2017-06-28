@@ -26,11 +26,12 @@
 
          {% show_field form.first_name      "John" %}
          {% show_field form.last_name       "Doe" %}
-         {% show_field form.email           "info@metronus.es" %}
-         {% show_field form.identifier      "emply_mtn" %}
+         {% show_field form.email           "johndoe@metronus.es"   "invalidEmail" %}
+         {% show_field form.identifier      "j_doe" %}
          {% show_field form.phone           "666775899" %}
          {% show_field form.price_per_hour  "9.8" %}
          {% show_field form.photo %}
+
          <div class="form-group required form-class">
            <label class="control-label col-sm-4"></label>
              <div class="col-sm-6">
@@ -62,8 +63,63 @@
              <button type="submit" class="btn btn-success submit-button" >{% trans 'confirm' %}</button>
            </div>
          </div>
-       </div>
+            </form>
+
+      {% if active %}
+          <hr>
+        <h1 align="center"> {% trans 'change_pass_employee_title' %} </h1>
+        </br>
+
+        <form id="form_cambiar_pass" method="POST"  class="form-horizontal" data-toggle="validator" role="form">
+        {% csrf_token %}
+
+        {% show_field pass_form.newpass1 %}
+        {% show_field pass_form.newpass2 %}
+        <input type="hidden" name="currentpass" value="lol">
+
+        <!-- Código precioso para los checkboxes -->
+
+        <div class="form-group required form-class">
+        <label class="control-label  col-md-4 col-sm-4 col-xs-12" for="id_send_password_notification">
+          {% trans 'send_password_notification' %}
+        </label>
+        <div class="col-md-4 col-sm-5 col-xs-12 text-center align-middle">
+          <div class="checkbox">
+            <label class="">
+              <div class="icheckbox_flat-green" style="position: relative;">
+                <input type="checkbox" class="flat" id="id_send_password_notification" name="send_password_notification">
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+    <div class="form-group required form-class">
+        <label class="control-label  col-md-4 col-sm-4 col-xs-12" for="id_notify_new_pass">
+          {% trans 'notify_new_pass' %}<br>{% trans 'notify_new_pass_2' %}
+        </label>
+        <div class="col-md-4 col-sm-5 col-xs-12 text-center align-middle">
+          <div class="checkbox">
+            <label class="">
+              <div class="icheckbox_flat-green" style="position: relative;">
+                <input type="checkbox" class="flat" id="id_notify_new_pass" name="notify_new_pass">
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+        <div class="form-group">
+          <div class="text-center">
+            <button type="button" id="enviar_pass" class="btn btn-success" >{% trans 'confirm' %}</button>
+          </div>
+        </div>
       </form>
+
+      <div id="res_passchange"></div>
+
+      {% endif %}
+
     </div>
    </div>
  </div>
@@ -78,5 +134,144 @@
       $(this).val($(this).attr("value").replace(",", "."));
     });
   });
+
+  $(function() {
+          $('#register_form').bootstrapValidator({
+          feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+          },
+          fields: {
+            first_name: {
+              validators: {
+                notEmpty: {
+                  message: "{% trans 'name_not_empty'%}"
+                },
+              },
+            },
+            last_name: {
+              validators: {
+                notEmpty: {
+                  message: "{% trans 'surname_not_empty'%}"
+                },
+              },
+            },
+            email: {
+              validators: {
+                notEmpty: {
+                  message: "{% trans 'email_not_empty' %}"
+                },
+                emailAddress: {
+                  message: "{% trans 'email_valid' %}"
+                }
+              }
+            },
+            phone: {
+              validators: {
+                notEmpty: {
+                  message: "{% trans 'phone_not_empty' %}"
+                },
+                regexp:{
+                  regexp: /^\d{9}$/ig,
+                  message: '{% trans 'admin_phone_error#2' %}'
+                }
+              }
+            },
+            identifier: {
+              validators: {
+                notEmpty: {
+                  message: "{% trans 'identifier_not_empty' %}"
+                }
+              }
+            },
+            price_per_hour: {
+                validators: {
+                    numeric: {
+                        thousandsSeparator: '',
+                        decimalSeparator: '.',
+                        message: "{% trans 'invalid_number' %}",
+                    },
+                    notEmpty: {
+                        message: "{% trans 'price_per_hour_not_empty' %}"
+                    }
+                }
+            }
+          }
+        });
+
+      initAjax($("#id_email"), 'email', '/ajax/validate_email_unique/');
+
+      $('#form_cambiar_pass').bootstrapValidator({
+          feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+          },
+          fields: {
+            newpass1: {
+              validators: {
+                notEmpty: {
+                  message: "{% trans 'password_not_empty' %}"
+                },
+                regexp:{
+                    regexp: /(?!^\d+$)^.{8,}$/,
+                    message: '{% trans 'password_format_help' %}'
+                }
+              }
+            },
+            newpass2: {
+              validators: {
+                notEmpty: {
+                  message: "{% trans 'password_not_empty' %}"
+                },
+                callback: {
+                  message: "{% trans 'passwords_must_match'%}",
+                  callback: function(value, validator, $field) {
+                    return value == $("#id_newpass1").val()
+                  }
+                }
+              }
+            },
+          }
+        });
+
+    // Esto pa enviar el form de contraseñas con ajax
+    $("#enviar_pass").click(function(e) {
+      $.ajax({
+        type: "POST",
+        url: "/employee/updatePassword/{{ username }}/",
+        data: $("#form_cambiar_pass").serialize(),
+        success: function(data) {
+            $('html, body').animate({ scrollTop: $(document).height() }, 'fast');
+          var html = "";
+          if(data.success) {
+            $("#form_cambiar_pass").data('bootstrapValidator').resetForm();
+            $("#form_cambiar_pass").trigger("reset");
+            html = "<div class='alert alert-success alert-dismissable'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><strong>{% trans 'success' %} &nbsp;</strong> {% trans 'change_pass_success' %}</div>";
+          } else {
+            var msg = "";
+            switch(data.errors[0]){
+              case "employeeCreation_passwordsDontMatch":
+                msg = '{% trans "employeeCreation_passwordsDontMatch" %}';
+                break;
+              case "newPasswordInvalid":
+                msg = '{% trans "newPasswordInvalid" %}';
+                break;
+              case "employeeCreation_formNotValid":
+                msg = '{% trans "employeeCreation_formNotValid" %}';
+                break;
+            }
+
+            html = '<div class="alert alert-danger alert-dismissable"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>{% trans "fail" %} &nbsp;</strong>' + msg + '</div>';
+          }
+
+          $("#res_passchange").hide().html(html).fadeIn();
+        }
+      });
+    });
+
+  });
+
 </script>
 {% endblock %}
