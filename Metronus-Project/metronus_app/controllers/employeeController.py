@@ -387,6 +387,9 @@ def update_password(request, username):
         else:
             # Invalid form
             return JsonResponse({'success': False, 'errors': ['employeeCreation_formNotValid']})
+    else:
+        # Invalid HTTP operation
+        raise SuspiciousOperation
 
 
 def delete(request, username):
