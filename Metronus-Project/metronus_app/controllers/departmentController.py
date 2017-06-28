@@ -11,8 +11,8 @@ from metronus_app.model.task import Task
 from metronus_app.model.timeLog import TimeLog
 from datetime import date, timedelta, datetime
 import re
-from metronus_app.common_utils import (get_admin_executive_or_403,default_round,get_actor_or_403, 
-    is_executive,same_company_or_403)
+from metronus_app.common_utils import (get_admin_executive_or_403,default_round,
+    get_actor_or_403, is_executive,same_company_or_403, get_highest_role_tier)
 
 def create(request):
     """
@@ -464,15 +464,16 @@ def check_department(department, request):
     """
 
     actor=get_actor_or_403(request)
-
-    # Admins and executives can do everything
-    if actor.user_type == "A" or is_executive(actor):
+    highest=get_highest_role_tier(actor)
+    if highest>=50:
+        # Admins and executives can do everything
         return actor
-
-    # If it's for view, coordinators and greater can access too
-    if ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+    elif not department.active:
+        raise PermissionDenied
+    elif ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
         projectDepartment_id__department_id=department, 
         role_id__tier__gte=20).exists():
+        # If it's for view, coordinators and greater can access too
         return actor
 
     # Otherwise GTFO

@@ -1,17 +1,19 @@
 from django.shortcuts import get_object_or_404, render, redirect
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, SuspiciousOperation
+from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.http import HttpResponseRedirect, JsonResponse
 from django.db.models import Sum, F, FloatField
 
 from metronus_app.forms.projectForm import ProjectForm
 from metronus_app.model.project import Project
-from metronus_app.common_utils import get_actor_or_403,get_current_admin_or_403, get_authorized_or_403,get_admin_executive_or_403,default_round,same_company_or_403,is_executive
+
+from metronus_app.common_utils import (get_actor_or_403,get_current_admin_or_403, 
+    get_authorized_or_403,get_admin_executive_or_403,
+    default_round,same_company_or_403,is_executive, get_highest_role_tier)
 from metronus_app.model.employee import Employee
 from metronus_app.model.task import Task
 from metronus_app.model.timeLog import TimeLog
 from metronus_app.model.department import Department
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
-from metronus_app.model.actor import Actor
 
 from datetime import date, timedelta, datetime
 import re
@@ -132,9 +134,11 @@ def show(request, project_id):
     project_form.html
 
     """
+
     project = get_object_or_404(Project, pk=project_id)
     admin=check_project(request, project)
     same_company_or_403(admin, project)
+
 
     project_managers = Employee.objects.filter(
         projectdepartmentemployeerole__projectDepartment_id__project_id=project,
@@ -446,21 +450,22 @@ def check_project(request,project):
     checks if the project belongs to the logged actor with appropiate roles
     Admin, manager or project manager
     """
-
     actor=get_actor_or_403(request)
 
-    # Admins and executives can do everything
-    if actor.user_type == "A" or is_executive(actor):
+    highest=get_highest_role_tier(actor)
+    if highest >=50:
+        # Admins and executives can do everything
         return actor
-
-    # If it's for view, coordinators and greater can access too
-    if ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+    elif project.deleted:
+        raise PermissionDenied
+    elif ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
         projectDepartment_id__project_id=project, 
         role_id__tier__gte=40).exists():
         return actor
 
     # Otherwise GTFO
     raise PermissionDenied
+    
 def create_project(form, admin):
     """Creates a new project supposing the data in the form is OK"""
     pname = form.cleaned_data['name']
@@ -493,17 +498,17 @@ def get_list_for_role(request):
     """
     Gets the list of projects according to the role tier of the logged user
     """
-    actor=get_actor_or_403(request)
-
-    # Admins and executives can do everything
+    actor=get_actor_or_403(request)        
     
-    if actor.user_type == "A" or is_executive(actor):
+    highest=get_highest_role_tier(actor)
+    
+    if highest < 40:
+        raise PermissionDenied
+    elif highest>=50:
+        # Admins and executives can do everything
         return Project.objects.filter(company_id=actor.company_id).distinct().order_by("name")
-    
-    # If it's for view, projectmanager and greater can access too
-    if ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-        role_id__tier__gte=40).exists():
-
+    else:
+        # If it's for view, projectmanager and greater can access too
         return Project.objects.filter(
                     projectdepartment__projectdepartmentemployeerole__employee_id=actor,
                     company_id=actor.company_id, deleted=False).distinct().order_by("name")

@@ -73,7 +73,10 @@
         <h2>{% trans 'plsEmployee' %}</h2>
         </br>
         {% endif %}
-        <a class="btn btn-dark" href="{% url 'employee_create' %}">{% trans 'create' %}</a>
+
+        {% if actor_is_admin or actor_is_executive %}
+          <a class="btn btn-dark" href="{% url 'employee_create' %}">{% trans 'create' %}</a>
+        {% endif %}
       </div>
     </div>
   </div>

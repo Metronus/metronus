@@ -43,7 +43,7 @@
                   {% trans 'details' %}
                 </a>
               </td>
-              {% if actor_is_admin or actor_is_executive or actor_is_projectManager%}
+              {% if actor_is_admin or actor_is_executive or actor_is_projectManager or actor_is_coordinator%}
                 <td class="hidden-xs">
                   <a href="{% url 'task_edit' task.id %}" type="button" class="btn btn-dark">
                     {% trans 'edit' %}
@@ -59,7 +59,7 @@
           </tbody>
         </table>
       </div>
-      {% if actor_is_admin or actor_is_executive or actor_is_projectManager%}
+      {% if actor_is_admin or actor_is_executive or actor_is_projectManager or actor_is_coordinator%}
         <div class="text-center">
           {% if tasks|length_is:"0"  %}
             <h2>{% trans 'plsTask' %}</h2>

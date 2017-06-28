@@ -40,13 +40,17 @@
               </td>
               {% if actor_is_admin or actor_is_executive %}
               <td class="hidden-xs">
+                {% if actor_is_admin or actor_is_executive %}
                 <a href="{% url 'department_edit' department.id %}" type="button" class="btn btn-dark">
                     {% trans 'update' %}
                 </a>
+                {% endif %}
               </td>
               <td class="hidden-xs">
+                {% if actor_is_admin or actor_is_executive %}
                 <a href="#" class="btn btn-danger" data-href="{% url 'department_delete' department.id %}"
                   data-toggle="modal" data-target="#confirm-delete">{% trans 'delete' %}</a>
+                {% endif %}
               </td>
                {% endif %}
             </tr>
