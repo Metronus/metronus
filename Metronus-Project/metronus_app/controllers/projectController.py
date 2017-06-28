@@ -1,17 +1,16 @@
 from django.shortcuts import get_object_or_404, render, redirect
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, SuspiciousOperation
+from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.http import HttpResponseRedirect, JsonResponse
 from django.db.models import Sum, F, FloatField
 
 from metronus_app.forms.projectForm import ProjectForm
 from metronus_app.model.project import Project
-from metronus_app.common_utils import get_actor_or_403,get_current_admin_or_403, get_authorized_or_403,get_admin_executive_or_403,default_round
+from metronus_app.common_utils import get_actor_or_403, get_authorized_or_403,get_admin_executive_or_403,default_round, get_highest_role_tier
 from metronus_app.model.employee import Employee
 from metronus_app.model.task import Task
 from metronus_app.model.timeLog import TimeLog
 from metronus_app.model.department import Department
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
-from metronus_app.model.actor import Actor
 
 from datetime import date, timedelta, datetime
 import re
@@ -135,8 +134,11 @@ def show(request, project_id):
     admin = get_authorized_or_403(request)
     check_metrics_authorized_for_project(request.user, project_id)
 
-
     project = get_object_or_404(Project, pk=project_id)
+
+    if project.deleted and get_highest_role_tier(admin) < 50:
+        raise PermissionDenied
+
     project_managers = Employee.objects.filter(
         projectdepartmentemployeerole__projectDepartment_id__project_id=project,
         projectdepartmentemployeerole__role_id__tier=40).distinct().order_by("user__first_name","user__last_name")
@@ -539,6 +541,9 @@ def find_name(pname, admin):
 def get_list_for_role(request):
     """Gets the list of projects visible to the logged user, as it depends on their roles"""
     actor = get_actor_or_403(request)
+
+    if get_highest_role_tier(actor) < 40:
+        raise PermissionDenied
 
     if actor.user_type != 'A':
         is_executive = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=50)

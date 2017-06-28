@@ -1,14 +1,12 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, SuspiciousOperation
+from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum, F, FloatField
 from django.core import serializers
-from django.utils.dateparse import parse_datetime
 
 from metronus_app.forms.taskForm import TaskForm
 from metronus_app.model.task import Task
-from metronus_app.model.actor import Actor
 from metronus_app.model.project import Project
 from metronus_app.model.timeLog import TimeLog
 from metronus_app.model.employee import Employee
@@ -16,12 +14,11 @@ from metronus_app.model.department import Department
 from metronus_app.model.goalEvolution import GoalEvolution
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
-from metronus_app.common_utils import default_round,get_actor_or_403
+from metronus_app.common_utils import default_round,get_actor_or_403, get_highest_role_tier
 
 from datetime import date, timedelta, datetime
 
 import re
-import calendar
 
 
 def create(request):
@@ -580,6 +577,9 @@ def check_role_for_list(request):
     """
     actor=get_actor_or_403(request)
 
+    if get_highest_role_tier(actor) < 20:
+        raise PermissionDenied
+
     if actor.user_type != 'A':
         # not an admin
         is_executive = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=50)
@@ -612,6 +612,10 @@ def check_task(task, request):
         raise PermissionDenied
 
     if actor.user_type != 'A':
+
+        if task and not task.active and get_highest_role_tier(actor) < 50:
+            raise PermissionDenied
+
         is_executive = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=50)
         res = is_executive.count() > 0
 

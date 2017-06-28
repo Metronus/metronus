@@ -18,6 +18,8 @@ from django.contrib.auth.password_validation import validate_password, Validatio
 from PIL import Image
 from django.utils.translation import ugettext_lazy as _
 
+from django.db.models import Max
+
 import sys
 import string
 import random
@@ -30,6 +32,16 @@ FILE_SIZE = 100000000
 HEIGHT = 256
 WIDTH = 256
 VALID_FORMATS = ['JPEG', 'JPG', 'PNG']
+
+def get_highest_role_tier(actor):
+    if actor.user_type == "A":
+        return 50
+
+    try:
+        res = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor).aggregate(Max('role_id__tier'))["role_id__tier__max"]
+        return res if res else 0
+    except:
+        return 0
 
 def phone_validator(text):
     if not re.compile("^\d{9}$").match(text):
