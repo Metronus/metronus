@@ -16,7 +16,7 @@
     {% endif %}
     <div class="help-block with-errors" id="id_unique_message">{{ field.errors.0 }}</div>
     {% if custom_error_str %}
-    <div class="help-block with-errors ajax-error" id="{{id_custom_error}}">{% trans custom_error_str %}</div>
+    <div class="help-block with-errors ajax-error" style="display: none;" id="{{id_custom_error}}">{% trans custom_error_str %}</div>
     {% endif %}
   </div>
 </div>
