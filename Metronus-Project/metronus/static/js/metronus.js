@@ -22,7 +22,6 @@ $(function() {
 
   // Cuando el AJAX da error pero se cambia, se quita el error del ajax para limpiar
   $("input").on('input', function(){
-    console.log("hola");
     if($(this).parent().find(".ajax-error").is(":visible")){
       $(this).parent().find(".ajax-error").hide();
       $(this).removeClass('glyphicon-remove')

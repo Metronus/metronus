@@ -26,7 +26,6 @@ def show_form(form):
 
 @register.inclusion_tag('tags/field.html')
 def show_field(field, placeholder="", error_code=None):
-    print(get_type(field))
     return {'field': field, 'required': "*" if field.field.required else "",
             'type': get_form_type(get_type(field)), 'placeholder':placeholder,
             'custom_error_str':error_code}
