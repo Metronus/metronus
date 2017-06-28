@@ -57,6 +57,10 @@ def create(request):
             ppro = form.cleaned_data['project_id']
             pdep = form.cleaned_data['department_id']
             pdtuple = find_tuple(ppro.id, pdep.id, actor)
+            if ppro.deleted:
+                errors.append('task_creation_project_inactive')
+            if not pdep.active:
+                errors.append('task_creation_department_inactive')
             if pdtuple is None:
                 errors.append('task_creation_project_department_not_related')
             else:
@@ -118,6 +122,10 @@ def create_async(request):
             ppro = form.cleaned_data['project_id']
             pdep = form.cleaned_data['department_id']
             pdtuple = find_tuple(ppro.id, pdep.id, actor)
+            if ppro.deleted:
+                errors.append('task_creation_project_inactive')
+            if not pdep.active:
+                errors.append('task_creation_department_inactive')
             if pdtuple is None:
                 errors.append('task_creation_project_department_not_related')
             else:
@@ -244,9 +252,9 @@ def edit(request, task_id):
                                  "price_per_unit": task.price_per_unit if task.price_per_unit is not None else "",
                                  "price_per_hour": task.price_per_hour if task.price_per_hour is not None else ""})
     # The project
-    coll = find_collections(request)
+    
     return render(request, 'task/task_form.html', {'form': form, "errors": errors,
-                                              "departments": coll["departments"], "projects": coll["projects"]})
+                                              "departments": [task.projectDepartment_id.department_id], "projects": [task.projectDepartment_id.project_id]})
 
 
 def delete(request, task_id):
@@ -311,6 +319,7 @@ def ajax_productivity_per_task(request):
         raise SuspiciousOperation
 
     task_id = request.GET["task_id"]
+    task=get_object_or_404(Task, pk=task_id)
 
     # Get and parse the dates and the offset
     start_date = request.GET.get("start_date", str(date.today() - timedelta(days=30)))
@@ -331,30 +340,59 @@ def ajax_productivity_per_task(request):
     end_date += " 00:00" + offset
 
     # --------------------------------------------------------------------------
-    data = {
-        'production': [],
-        'goal_evolution': [],
-        'days': []
-    }
-    production = TimeLog.objects.filter(task_id_id=task_id, workDate__range=[start_date, end_date]).order_by('workDate')
-    task = get_object_or_404(Task, pk=task_id, active=True)
-    z = 0
-    start_date_parse = parse_datetime(start_date)
-    for i in range(0, 31):
-        if production is not None and len(production) > z and abs((production[z].workDate-start_date_parse).days) == i:
-            try:
-                data['production'].append(default_round(production[z].produced_units / (production[z].duration/60)))
-            except TypeError:
-                data['production'].append(0)
-            z += 1
+    dates = []
+    str_dates = []
 
+    d1 = datetime.strptime(start_date[0:19] + start_date[20:22], '%Y-%m-%d %H:%M%z')
+    d2 = datetime.strptime(end_date[0:19] + end_date[20:22], '%Y-%m-%d %H:%M%z')
+    delta = d2 - d1  # timedelta
+
+    for i in range(delta.days + 1):
+        str_dates.append((d1 + timedelta(days=i)).date().strftime("%Y-%m-%d"))
+        dates.append(d1 + timedelta(days=i))
+
+    data = {"days": str_dates, "production": [], "goal_evolution": []}
+    index = 0
+    # Save productivity for each  date
+    # for each date, we will find the asociated timelog
+    for log_date in dates:
+        log = TimeLog.objects.filter(task_id=task_id, workDate__year=log_date.year, workDate__month=log_date.month,
+                                     workDate__day=log_date.day).aggregate(
+            total_duration=Sum(  F("duration")/60.0, output_field=FloatField()),
+            total_produced_units=Sum(  F("produced_units"), output_field=FloatField()))
+        if log is None:
+            # Not work that day
+            total_productivity = 0
+            total_duration = 0
         else:
-            data['production'].append(0)
+            total_produced_units = log["total_produced_units"]
+            total_duration = log["total_duration"]
+            if total_duration == 0 or total_duration is None:
+                total_productivity = 0
+            else:
+                # If not produced but spent time, 0 productivity (you lazy guy...)
+                if total_produced_units is None:
+                    total_productivity = 0
+                else:
+                    total_productivity = total_produced_units/total_duration
 
-        data['goal_evolution'].append(default_round(task.production_goal))
+        # Find the registry date of production goal evolution which is closest to the date
+        expected_productivity = GoalEvolution.objects.filter(task_id_id=task_id,
+                                                             registryDate__gte=log_date).first()
 
-        prod_day = start_date_parse + timedelta(days=i)
-        data['days'].append(str(prod_day.day)+", "+str(calendar.month_name[prod_day.month]))
+        # If we do not find the goal or if the date is after the last task update, it may be the current task goal
+        if total_duration==0 or total_duration is None:
+            expected_productivity=0
+        else:
+            if expected_productivity is None or task.registryDate <= log_date:
+                expected_productivity = task.production_goal
+            else:
+                expected_productivity = expected_productivity.production_goal
+
+        data["production"].append(default_round(total_productivity))
+        data["goal_evolution"].append(default_round(expected_productivity))
+    
+    
     return JsonResponse(data)
 
 
@@ -429,8 +467,8 @@ def ajax_profit_per_date(request, task_id):
                                 )["total_income"]
         income = income if income is not None else 0
 
-        data['expenses'].append(expenses)
-        data['income'].append(income)
+        data['expenses'].append(default_round(expenses))
+        data['income'].append(default_round(income))
         if index == 0:
             data['acumExpenses'].append(default_round(expenses))
             data['acumIncome'].append(default_round(income))

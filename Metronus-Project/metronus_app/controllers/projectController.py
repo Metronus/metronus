@@ -439,8 +439,8 @@ def ajax_profit_per_date(request, project_id):
         data['expenses'].append(default_round(expenses))
         data['income'].append(default_round(income))
         if index == 0:
-            data['acumExpenses'].append(expenses)
-            data['acumIncome'].append(income)
+            data['acumExpenses'].append(default_round(expenses))
+            data['acumIncome'].append(default_round(income))
         else:
             data['acumExpenses'].append(data['acumExpenses'][index-1]+expenses)
             data['acumIncome'].append(data['acumIncome'][index-1]+income)

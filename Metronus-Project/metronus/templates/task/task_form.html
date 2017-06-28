@@ -3,10 +3,12 @@
 {% load l10n %}
 
 {% block title %}
-    {% if  request.path == '/task/create'%}{% trans 'createTask' %}{% endif %}{% if  request.path == '/task/edit'%}{% trans 'editTask' %}{% endif %}
+    {% if  request.path == '/task/create'%}{% trans 'createTask' %}{% else %}
+    {% trans 'editTask' %}{% endif %}
 {% endblock %}
 {% block contentTitle %}
-    {% if  request.path == '/task/create'%}{% trans 'createTask' %}{% endif %}{% if  request.path == '/task/edit'%}{% trans 'editTask' %}{% endif %}
+    {% if  request.path == '/task/create'%}{% trans 'createTask' %}{% else %}
+   {% trans 'editTask' %}{% endif %}
 {% endblock %}
 
 {% load static }
@@ -18,54 +20,56 @@
   //Esto es para validar en cliente de forma bonita con bootstrap :)
 
   $(document).ready(function() {
-    
-    var dep_select = $("#id_{{ form.department_id.name }}")
-    {% if  form.department_id.value is not None %}
-        var p_id=0
-        {% if  form.project_id.value is not None %}
-            p_id={{form.project_id.value }}
+    {% if  request.path == '/task/create'%}
+        var dep_select = $("#id_{{ form.department_id.name }}")
+        {% if  form.department_id.value is not None %}
+            var p_id=
+            {% if  form.project_id.value is not None %}
+               {{form.project_id.value }}
+            {% else %}
+                  0
+            {% endif %};
+
+                $.get({
+                    url: "/task/getdepartments",
+                    data: {project_id: p_id},
+                    success: function ( data )  {
+                        console.log(JSON.stringify(data))
+                        dep_select.empty()
+                        dep_select.append($('<option value="" selected>{% trans "selectDepartment" %}</option>)'))
+                        data.forEach(function (department) {
+                            console.log(department.pk+", "+'{{form.department_id.value}}')
+                            dep_select.append($('<option value="'+department.pk+'">'+department.fields.name+'</option>'))
+
+                        })
+                        dep_select.val("{{ form.department_id.value }}").attr('selected','selected')
+                    }
+                });
         {% endif %}
 
-            $.get({
-                url: "/task/getdepartments",
-                data: {project_id: p_id},
-                success: function ( data )  {
-                    console.log(JSON.stringify(data))
-                    dep_select.empty()
-                    dep_select.append($('<option value="" selected>{% trans "selectDepartment" %}</option>)'))
-                    data.forEach(function (department) {
-                        console.log(department.pk+", "+'{{form.department_id.value}}')
-                        dep_select.append($('<option value="'+department.pk+'">'+department.fields.name+'</option>'))
+        // Carga el select de departamentos con los correspondientes al proyecto seleccionado
+        var proj_select = $("#id_{{ form.project_id.name }}")
 
-                    })
-                    dep_select.val("{{ form.department_id.value }}").attr('selected','selected')
-                }
-            });
-    {% endif %}
-
-    // Carga el select de departamentos con los correspondientes al proyecto seleccionado
-    var proj_select = $("#id_{{ form.project_id.name }}")
-
-    proj_select.change(function () {
-        if(proj_select.val() === "") {
-            dep_select.empty();
-            dep_select.append($("<option value='' selected>{% trans 'selectDepartment' %}</option>"));
-            return;
-        }
-        $.get({
-            url: "/task/getdepartments",
-            data: {project_id: proj_select.val()},
-            success: function ( data )  {
+        proj_select.change(function () {
+            if(proj_select.val() === "") {
                 dep_select.empty();
                 dep_select.append($("<option value='' selected>{% trans 'selectDepartment' %}</option>"));
-                dep_select.trigger("change");
-                data.forEach(function (department) {
-                    dep_select.append($('<option value="'+department.pk+'">'+department.fields.name+'</option>'));
-                })                
+                return;
             }
+            $.get({
+                url: "/task/getdepartments",
+                data: {project_id: proj_select.val()},
+                success: function ( data )  {
+                    dep_select.empty();
+                    dep_select.append($("<option value='' selected>{% trans 'selectDepartment' %}</option>"));
+                    dep_select.trigger("change");
+                    data.forEach(function (department) {
+                        dep_select.append($('<option value="'+department.pk+'">'+department.fields.name+'</option>'));
+                    })                
+                }
+            })
         })
-    })
-
+    {% endif %}
     $('#register_form').bootstrapValidator({
         feedbackIcons: {
             valid: 'glyphicon glyphicon-ok',
@@ -160,6 +164,12 @@
                 } else if (err == 'task_creation_error') {
                     $('#errorDiv').append("<p><strong>{% trans 'fail' %} | </strong>{% trans 'task_creation_error' %}</p>");
                 }
+                else if (err == 'task_creation_project_inactive') {
+                    $('#errorDiv').append("<p><strong>{% trans 'fail' %} | </strong>{% trans 'task_creation_project_inactive' %}</p>");
+                }
+                else if (err == 'task_creation_department_inactive') {
+                    $('#errorDiv').append("<p><strong>{% trans 'fail' %} | </strong>{% trans 'task_creation_department_inactive' %}</p>");
+                }
             }
 
     } 
@@ -180,23 +190,30 @@ $(function() {
 
 <div class="clearfix"></div>
 
-
-<div id="successDiv" class="alert alert-success" hidden='true'></div>
-<div id="errorDiv" class="alert alert-danger" {% if not errors %}hidden='true'{% endif %}>
+{%show_ajax_errors%}
+<div id="error2Div" class="alert alert-danger" {% if not errors and not form.errors %}hidden='true'{% endif %}>
 {% if errors %}
     {% for err in errors%}
         <p><strong>{% trans 'fail' %} | </strong>{% trans err %}</p>
     {% endfor %}
 {% endif %}
+{% if form.errors %}
+    <p>{{form.errors}}</p>
+{% endif %}
  </div>
-
 
 <div class="row">
 
 <div class="col-md-12 col-sm-12 col-xs-12">
   <div class="x_panel">
     <div class="x_title">
-      <h2>{% if  request.path == '/task/create'%}{% trans 'createTask' %}{% endif %}{% if  request.path == '/task/edit'%}{% trans 'editTask' %}{% endif %}</h2>
+      <h2>
+        {% if  request.path == '/task/create'%}
+            {% trans 'createTask' %}
+        {% else %}      
+            {% trans 'editTask' %}
+        {% endif %}
+        </h2>
       <div class="clearfix"></div>
     </div>
     <div class="x_content">
@@ -222,7 +239,7 @@ $(function() {
             <input type="text" class="form-control col-md-6" name="{{ form.description.name }}" id="id_{{ form.description.name }}" value="{{ form.description.value }}" required>
         </div>
     </div>
-
+{% if  request.path == '/task/create'%}
     <div class="form-group" >
         <label class="control-label col-sm-4" for="id_{{ form.project_id.name }}">{% trans 'project' %} *</label>
         <div class="col-sm-6">
@@ -254,7 +271,11 @@ $(function() {
             </select>
         </div>
     </div>
-
+{% else %}
+<!-- For edit, we hide the select options-->
+   <input type="hidden" class="form-control col-md-6 " name="{{ form.project_id.name }}" id="id_{{ form.project_id.name }}" value="{{ form.project_id.value}}">
+      <input type="hidden" class="form-control col-md-6 " name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}" value="{{ form.department_id.value }}">
+{% endif %}
     <hr/>
 
     <div class="form-group" >
