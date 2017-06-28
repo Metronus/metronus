@@ -15,7 +15,7 @@ class RegistrationForm(Form):
     logo = forms.ImageField(label=_("logo"), required=False)
 
     # User (Account data)
-    username = forms.CharField()
+    username = forms.CharField(max_length=100)
     admin_email = forms.EmailField(label=_("admin_email"))
     password = forms.CharField(label=_("password"), widget=forms.PasswordInput)
     repeatPassword = forms.CharField(label=_("repeatPassword"), widget=forms.PasswordInput)
