@@ -125,7 +125,7 @@ def edit(request):
 
     # Check that the user is logged in and it's an administrator
     admin = get_current_admin_or_403(request)
-    company = get_object_or_404(Company, cif=admin.company_id.cif)
+    company = admin.company_id
 
     if request.method == "GET":
         # Return a form filled with the employee's data
@@ -186,7 +186,7 @@ def view(request):
 
     # Check that the user is logged in and it's an administrator
     admin = get_current_admin_or_403(request)
-    company = get_object_or_404(Company, cif=admin.company_id.cif)
+    company = admin.company_id
 
     return render(request, 'company/company_view.html', {'company': company, 'admin': admin})
 
@@ -203,7 +203,7 @@ def delete(request):
     """
     # Check that the user is logged in and it's an administrator
     admin = get_current_admin_or_403(request)
-    company = get_object_or_404(Company, pk=admin.company_id)
+    company = admin.company_id
 
     # Check that the admin has permission to view that company
     if company.pk != admin.company_id:
@@ -235,7 +235,7 @@ def create_company(form):
 
 def register_administrator(form, company):
     """
-    Tegisters an administrator for a company, supposing the data provided by the form is OK
+    Registers an administrator for a company, supposing the data provided by the form is OK
     """
     username = form.cleaned_data['username']
     password = form.cleaned_data['password']

@@ -21,7 +21,8 @@ from django.core import serializers
 from django.http import HttpResponse
 
 from metronus_app.common_utils import (is_role_updatable_by_user, check_image, get_current_employee_or_403, send_mail,
-                                       is_email_unique, is_username_unique, get_authorized_or_403,default_round,validate_pass, get_admin_executive_or_403, is_executive)
+                                       is_email_unique, is_username_unique, get_authorized_or_403,default_round,
+                                       validate_pass, get_admin_executive_or_403, is_executive,same_company_or_403)
 from datetime import date, timedelta, datetime
 import re
 
@@ -213,31 +214,9 @@ def view(request, username):
     employee = get_object_or_404(Employee, user__username=username)
 
     # Check that the admin has permission to view that employee
-    if employee.company_id != logged.company_id:
-        raise PermissionDenied
+    same_company_or_403(employee, logged)
 
-    # Check that the user is active, unless it's an admin or exec
-    if not employee.user.is_active and not logged.user_type == "A" and not is_executive(logged):
-        raise PermissionDenied
-
-    employee_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee,
-                                                                  projectDepartment_id__department_id__active=True,
-                                                                  projectDepartment_id__project_id__deleted=False)
-
-    # Check the logged's roles are greater than this for at least one project
-    if logged.user_type == "E":
-        my_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=logged)
-        authorized = my_roles.exists()
-        if authorized:
-            for role in my_roles:
-                if ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee,
-                                                                projectDepartment_id=role.projectDepartment_id,
-                                                                role_id__tier__lt=role.role_id.tier).exists():
-                    authorized = True
-                    break
-
-        if not authorized:
-            raise PermissionDenied
+    employee_roles=check_higher_roles(logged,employee)
 
     is_editable_role = {role.id: is_role_updatable_by_user(logged, role.id) for role in employee_roles}
 
@@ -262,8 +241,7 @@ def edit(request, username):
     employee = get_object_or_404(Employee, user__username=username)
 
     # Check that the admin has permission to view that employee
-    if employee.company_id != admin.company_id:
-        raise PermissionDenied
+    same_company_or_403(admin, employee)
 
     if request.method == "GET":
         # Return a form filled with the employee's data
@@ -358,8 +336,7 @@ def update_password(request, username):
     employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
 
     # Check that the admin has permission to view that employee
-    if employee.company_id != admin.company_id:
-        raise PermissionDenied
+    same_company_or_403(admin, employee)
 
     if request.method == 'POST':
         # Process the form
@@ -405,9 +382,8 @@ def delete(request, username):
     admin = get_admin_executive_or_403(request)
     employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
 
-    # Check that the admin has permission to edit that employee
-    if employee.company_id != admin.company_id:
-        raise PermissionDenied
+    # Check that the admin has permission to view that employee
+    same_company_or_403(admin, employee)
 
     employee_user = employee.user
     employee_user.is_active = False
@@ -429,9 +405,8 @@ def recover(request, username):
     admin = get_admin_executive_or_403(request)
     employee = get_object_or_404(Employee, user__username=username, user__is_active=False)
 
-    # Check that the admin has permission to edit that employee
-    if employee.company_id != admin.company_id:
-        raise PermissionDenied
+     # Check that the admin has permission to view that employee
+    same_company_or_403(admin, employee)
 
     employee_user = employee.user
     employee_user.is_active = True
@@ -461,9 +436,8 @@ def ajax_productivity_per_task(request, username):
     
     employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
 
-    # Check the company is the same for logged and the searched employee
-    if employee.company_id != logged.company_id:
-        raise PermissionDenied
+     # Check that the admin has permission to view that employee
+    same_company_or_403(logged, employee)
 
     # Find tasks with timelog in date range and annotate the sum of the production and time
     tasks = Task.objects.filter(active=True, projectDepartment_id__projectdepartmentemployeerole__employee_id=employee,
@@ -540,9 +514,8 @@ def ajax_productivity_per_task_and_date(request, username):
 
     employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
 
-    # Check the company is the same for logged and the searched employee
-    if employee.company_id != logged.company_id:
-        raise PermissionDenied
+     # Check that the admin has permission to view that employee
+    same_company_or_403(logged, employee)
 
     task_id = request.GET.get("task_id")
     # Find task with id requested
@@ -629,7 +602,14 @@ def ajax_profit_per_date(request, employee_id):
     "income": [0, 155861.848663544, 106596.060817813, 133996.946277026, 176182.618433908, 130780.529090679, 185712.238665422, 168691.006425482, 201528.027548702, 133961.680656505, 146130.652317868, 160978.773806858, 254646.651869028, 232419.619341417, 113043.655527752, 128847.7293944, 186411.255163309, 126824.943128807, 261600.084774754, 200811.161504088, 158938.293244699, 188362.131387002, 166524.276102895, 114811.676076952, 210347.838939301, 115268.666410966, 126145.268594169, 131910.452677469, 274896.663475654, 127528.492837469, 177974.319716889],
     "expenses": [0, 1457.18015695298, 1614.1458826106, 1367.62026485911, 2026.87328274918, 1446.83842607798, 1878.80598163726, 1823.8647251497, 1879.3977160153, 1607.99448986952, 1615.72129910026, 1609.49391115067, 2513.94326680278, 2112.07014158364, 1360.67562490714, 1368.60590722518, 1603.92947753372, 1473.68308776497, 2343.40799525207, 1704.64596258349, 1938.38239104717, 1403.70478335668, 1372.6250345277, 1076.44946125988, 2353.7065671626, 1516.12119421768, 1611.60427318295, 1338.82219760799, 2525.26576799895, 1422.68356444232, 1765.66996904502]}  "expected_productivity": [9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 4.0, 4.0, 2.0, 2.0, 2.0]}}
     """
+    logged = get_authorized_or_403(request)
+    employee = get_object_or_404(Employee, pk=employee_id)
 
+    # Check that the admin has permission to view that employee
+    same_company_or_403(employee, logged)
+
+    check_higher_roles(logged, employee)
+    
     # Get and parse the dates
     start_date = request.GET.get("start_date", str(date.today() - timedelta(days=30)))
     end_date = request.GET.get("end_date", str(date.today()))
@@ -648,7 +628,6 @@ def ajax_profit_per_date(request, employee_id):
     start_date += " 00:00" + offset
     end_date += " 00:00" + offset
 
-    check_metrics_authorized_for_employee(request.user, employee_id)
     # Get all dates between start and end
     dates = []
     str_dates = []
@@ -787,18 +766,30 @@ def ajax_get_employee_projects(employee_id):
 ########################################################################################################################
 ########################################################################################################################
 
-def check_metrics_authorized_for_employee(user, employee_id):
-    """Raises 403 if the current actor is not allowed to obtain metrics for the department"""
-    if not user.is_authenticated():
+def check_higher_roles(logged, employee):
+    """Raises 403 if the current actor has lower roles than the one to be shown"""
+
+    # Check that the user is active, unless it's an admin or exec
+    if not employee.user.is_active and not logged.user_type == "A" and not is_executive(logged):
         raise PermissionDenied
 
-    employee = get_object_or_404(Employee, id=employee_id)
-    logged = user.actor
+    employee_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee)
 
-    # Check that the companies match
-    if logged.company_id != employee.company_id:
-        raise PermissionDenied
+    # Check the logged's roles are greater than this for at least one project
+    if logged.user_type == "E":
+        my_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=logged)
+        authorized = my_roles.exists()
+        if authorized:
+            for role in my_roles:
+                if ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee,
+                                                                projectDepartment_id=role.projectDepartment_id,
+                                                                role_id__tier__lt=role.role_id.tier).exists():
+                    authorized = True
+                    break
 
+        if not authorized:
+            raise PermissionDenied
+    return employee_roles
 
 def check_metrics_authorized_for_employee_in_project(user, employee_id, project_id):
     """
@@ -812,15 +803,11 @@ def check_metrics_authorized_for_employee_in_project(user, employee_id, project_
     project = get_object_or_404(Project, id=project_id)
     logged = user.actor
 
-    # Check that the companies match
-    if logged.company_id != employee.company_id:
-        raise PermissionDenied
+     # Check that the admin has permission to view that employee
+    same_company_or_403(logged, employee)
 
-    if logged.company_id != project.company_id:
-        raise PermissionDenied
-
-    if employee.company_id != project.company_id:
-        raise PermissionDenied
+     # Check that the admin has permission to view that employee
+    same_company_or_403(logged, project)
 
 
 def create_employee_user(form):

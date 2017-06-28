@@ -234,7 +234,7 @@ class TaskTestCase(TestCase):
             Get task creation form task  with proper roles (Backend department)
             """
             c = Client()
-            c.login(username="agubelu", password="123456")
+            c.login(username="ddlsb", password="123456")
             
             
             response = c.get("/task/create")
@@ -282,9 +282,10 @@ class TaskTestCase(TestCase):
         Try viewing details without proper roles (Backend employee-Backend task)
         """
         c = Client()
-        c.login(username="anddonram", password="123456")
+        c.login(username="agubelu", password="123456")
         response = c.get("/task/list")
         dep_id=response.context["tasks"][0].id
+        c.login(username="anddonram", password="123456")
         response = c.get("/task/view/"+str(dep_id)+"/")
         self.assertEquals(response.status_code, 403)
 
@@ -293,7 +294,7 @@ class TaskTestCase(TestCase):
         Try viewing details without proper roles (Frontend employee - Backend task)
         """
         c = Client()
-        c.login(username="anddonram", password="123456")
+        c.login(username="agubelu", password="123456")
         response = c.get("/task/list")
         dep_id=response.context["tasks"][0].id
 
@@ -307,7 +308,7 @@ class TaskTestCase(TestCase):
         Get the task edit form with proper roles
         """
         c = Client()
-        c.login(username="agubelu", password="123456")
+        c.login(username="ddlsb", password="123456")
         response = c.get("/task/list")
         dep_id=response.context["tasks"][0].id
         response = c.get("/task/edit/"+str(dep_id)+"/")
@@ -552,7 +553,7 @@ class TaskTestCase(TestCase):
         Delete a task with proper roles
         """
         c = Client()
-        c.login(username="agubelu", password="123456")
+        c.login(username="ddlsb", password="123456")
 
         response = c.get("/task/list")
         dep_id=response.context["tasks"][0].id
@@ -588,7 +589,7 @@ class TaskTestCase(TestCase):
         Delete a task with proper roles
         """
         c = Client()
-        c.login(username="agubelu", password="123456")
+        c.login(username="ddlsb", password="123456")
 
         response = c.get("/task/list")
         dep_id=response.context["tasks"][0].id

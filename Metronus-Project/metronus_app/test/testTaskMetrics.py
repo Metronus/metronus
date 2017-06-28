@@ -76,7 +76,13 @@ class TaskMetricsTestCase(TestCase):
             first_name="Alberta",
             last_name="Berta"
         )
-
+        employee4_user = User.objects.create_user(
+            username="emp4",
+            password="123456",
+            email="emp4@metronus.es",
+            first_name="aAlberta",
+            last_name="Baerta"
+        )
         employee1 = Employee.objects.create(
             user=employee1_user,
             user_type="E",
@@ -99,7 +105,13 @@ class TaskMetricsTestCase(TestCase):
             phone="666555445",
             company_id=company1
         )
-
+        employee4 = Employee.objects.create(
+            user=employee4_user,
+            user_type="E",
+            identifier="emp04",
+            phone="666555445",
+            company_id=company2
+        )
         # dep1
         Department.objects.create(
             name="Departamento1",
@@ -187,6 +199,12 @@ class TaskMetricsTestCase(TestCase):
             role_id=role_emp,
             employee_id=employee3
         )
+        # pdrole4
+        ProjectDepartmentEmployeeRole.objects.create(
+            projectDepartment_id=pd3,
+            role_id=role_ex,
+            employee_id=employee4
+        )
         # task1
         Task.objects.create(
             name="Hacer cosas",
@@ -207,7 +225,7 @@ class TaskMetricsTestCase(TestCase):
         Task.objects.create(
             name="Hacer cosas de front",
             description="nada",
-            actor_id=employee2,
+            actor_id=employee4,
             projectDepartment_id=pd3,
             production_goal="2.0",
             goal_description="kgs"

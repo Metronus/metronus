@@ -33,7 +33,7 @@ def ajax_time_per_project(request):
 
     # Si se proporcionan pero no tienen el formato correcto se lanzará un error HTTP 400 Bad Request
     """
-    get_current_admin_or_403(request)
+    logged = get_current_admin_or_403(request)
 
     # Get and parse the dates
     start_date = request.GET.get("start_date", str(date.today() - timedelta(days=30)))
@@ -53,7 +53,7 @@ def ajax_time_per_project(request):
     start_date += " 00:00" + offset
     end_date += " 00:00" + offset
 
-    logged = request.user.actor
+    
     company_projects = Project.objects.filter(deleted=False, company_id=logged.company_id)
 
     data = {}
@@ -78,8 +78,8 @@ def ajax_employees_per_project(request):
     """
     Gets the number of employees per project
     """
-    get_current_admin_or_403(request)
-    logged = request.user.actor
+    
+    logged = get_current_admin_or_403(request)
     company_projects = Project.objects.filter(deleted=False, company_id=logged.company_id)
     data = {}
     for project in company_projects:
@@ -95,8 +95,8 @@ def ajax_departments_per_project(request):
     """
     Gets the number of departments per project
     """
-    get_current_admin_or_403(request)
-    logged = request.user.actor
+    
+    logged = get_current_admin_or_403(request)
     company_projects = Project.objects.filter(deleted=False, company_id=logged.company_id)
     data = {}
     for project in company_projects:
@@ -111,8 +111,8 @@ def ajax_tasks_per_project(request):
     """
     Gets the number of tasks per project
     """
-    get_current_admin_or_403(request)
-    logged = request.user.actor
+    
+    logged = get_current_admin_or_403(request)
     company_projects = Project.objects.filter(deleted=False, company_id=logged.company_id)
     data = {}
     for project in company_projects:

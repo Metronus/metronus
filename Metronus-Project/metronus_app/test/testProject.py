@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase, Client
 from metronus_app.model.employee import Employee
 from django.core.exceptions import PermissionDenied
-from metronus_app.controllers.projectController import check_company_project
+
 import json
 from django.urls import reverse
 class ProjectTestCase(TestCase):
@@ -385,18 +385,3 @@ class ProjectTestCase(TestCase):
 
         self.assertEquals(pro_up.name, "Metronosa")
 
-    def test_check_valid_company_project(self):
-        """
-        checks the company is valid
-        """
-        project = Project.objects.get(name="pro1")
-        company = Company.objects.get(cif="123")
-        self.assertTrue(check_company_project(project, company))
-
-    def test_check_not_valid_company_project(self):
-        """
-        checks the company is NOT valid
-        """
-        project = Project.objects.get(name="pro1")
-        company = Company.objects.get(cif="456")
-        self.assertRaises(PermissionDenied, check_company_project, project, company)

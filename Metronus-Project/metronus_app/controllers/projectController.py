@@ -5,7 +5,7 @@ from django.db.models import Sum, F, FloatField
 
 from metronus_app.forms.projectForm import ProjectForm
 from metronus_app.model.project import Project
-from metronus_app.common_utils import get_actor_or_403,get_current_admin_or_403, get_authorized_or_403,get_admin_executive_or_403,default_round
+from metronus_app.common_utils import get_actor_or_403,get_current_admin_or_403, get_authorized_or_403,get_admin_executive_or_403,default_round,same_company_or_403,is_executive
 from metronus_app.model.employee import Employee
 from metronus_app.model.task import Task
 from metronus_app.model.timeLog import TimeLog
@@ -132,15 +132,14 @@ def show(request, project_id):
     project_form.html
 
     """
-    admin = get_authorized_or_403(request)
-    check_metrics_authorized_for_project(request.user, project_id)
-
-
     project = get_object_or_404(Project, pk=project_id)
+    admin=check_project(request, project)
+    same_company_or_403(admin, project)
+
     project_managers = Employee.objects.filter(
         projectdepartmentemployeerole__projectDepartment_id__project_id=project,
         projectdepartmentemployeerole__role_id__tier=40).distinct().order_by("user__first_name","user__last_name")
-    employees = Employee.objects.filter(
+    employees = Employee.objects.filter(user__is_active=True,
         projectdepartmentemployeerole__projectDepartment_id__project_id=project).distinct().order_by("user__first_name","user__last_name")
     departments = Department.objects.filter(active=True, projectdepartment__project_id__id=project_id).order_by("name")
     return render(request, "project/project_view.html", {"project": project, "employees": employees,
@@ -158,7 +157,9 @@ def edit(request, project_id):
     """
     # Check that the user is logged in
     admin = get_admin_executive_or_403(request)
-
+    project = get_object_or_404(Project, pk=project_id)
+    same_company_or_403(admin, project)
+    
     repeated_name = False
     error = False
     # if this is a POST request we need to process the form data
@@ -168,29 +169,20 @@ def edit(request, project_id):
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:
-            project = get_object_or_404(Project, pk=form.cleaned_data['project_id'])
-            if check_company_project(project, admin.company_id):
-                pro = find_name(form.cleaned_data['name'], admin)
-                # pro does not exists or it's the same
-                if pro is None or pro.id == project.id:
-                    update_project(project, form)
-                    return redirect('project_list')
-                else:
-                    repeated_name = True
-
-
+            pro = find_name(form.cleaned_data['name'], admin)
+            # pro does not exists or it's the same
+            if pro is None or pro.id == project.id:
+                update_project(project, form)
+                return redirect('project_list')
+            else:
+                repeated_name = True
         else:
             error = True
 
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        project = get_object_or_404(Project, pk=project_id)
         #Check is same company
-        if not check_company_project_id_session(project_id,admin):
-            raise PermissionDenied
         form = ProjectForm(initial={"name": project.name, "project_id": project.id})
 
     return render(request, 'project/project_form.html', {'form': form, 'repeated_name': repeated_name,'error':error})
@@ -209,8 +201,8 @@ def recover(request, project_id):
     # Check that the user is logged in
     admin = get_admin_executive_or_403(request)
     project = get_object_or_404(Project, pk=project_id,deleted=True)
-    if check_company_project(project, admin.company_id):
-        recover_project(project)
+    same_company_or_403(admin, project)
+    recover_project(project)
 
     return HttpResponseRedirect('/project/list')
 
@@ -228,8 +220,8 @@ def delete(request, project_id):
     # Check that the user is logged in
     admin = get_admin_executive_or_403(request)
     project = get_object_or_404(Project, pk=project_id,deleted=False)
-    if check_company_project(project, admin.company_id):
-        delete_project(project)
+    same_company_or_403(admin, project)
+    delete_project(project)
 
     return HttpResponseRedirect('/project/list')
 
@@ -256,13 +248,12 @@ def ajax_employees_per_department(request):
         raise SuspiciousOperation
 
     project_id = request.GET["project_id"]
-    check_metrics_authorized_for_project(request.user, project_id)
-
-    logged = request.user.actor
+    project = get_object_or_404(Project, pk=project_id)
+    logged=check_project(request, project)
+    same_company_or_403(logged, project)
+    
     company_departments = Department.objects.filter(active=True, company_id=logged.company_id)
 
-    # The first method checks that the project is fine
-    project = get_object_or_404(Project, pk=project_id)
 
     data = {'names': [], 'values': []}
 
@@ -281,19 +272,16 @@ def ajax_tasks_per_department(request):
     # Parámetros obligatorios:
     # project_id - ID del proyecto
     """
-
     if "project_id" not in request.GET:
         raise SuspiciousOperation
 
     project_id = request.GET["project_id"]
-    check_metrics_authorized_for_project(request.user, project_id)
-
-    logged = request.user.actor
-    company_departments = Department.objects.filter(active=True, company_id=logged.company_id)
-
-    # The first method checks that the project is fine
     project = get_object_or_404(Project, pk=project_id)
+    logged=check_project(request, project)
+    same_company_or_403(logged, project)
 
+    company_departments = Department.objects.filter(active=True, company_id=logged.company_id)
+   
     data = {'names': [], 'values': []}
 
     for dpmt in company_departments:
@@ -323,7 +311,9 @@ def ajax_time_per_department(request):
         raise SuspiciousOperation
 
     project_id = request.GET["project_id"]
-    check_metrics_authorized_for_project(request.user, project_id)
+    project = get_object_or_404(Project, pk=project_id)
+    logged=check_project(request, project)
+    same_company_or_403(logged, project)
 
     # Get and parse the dates
     start_date = request.GET.get("start_date", str(date.today() - timedelta(days=30)))
@@ -343,11 +333,7 @@ def ajax_time_per_department(request):
     start_date += " 00:00" + offset
     end_date += " 00:00" + offset
 
-    logged = request.user.actor
     company_departments = Department.objects.filter(active=True, company_id=logged.company_id)
-
-    # The first method checks that the project is fine
-    project = get_object_or_404(Project, pk=project_id)
 
     data = {'names': [], 'values': []}
 
@@ -392,6 +378,10 @@ def ajax_profit_per_date(request, project_id):
     "expenses": [0, 1457.18015695298, 1614.1458826106, 1367.62026485911, 2026.87328274918, 1446.83842607798, 1878.80598163726, 1823.8647251497, 1879.3977160153, 1607.99448986952, 1615.72129910026, 1609.49391115067, 2513.94326680278, 2112.07014158364, 1360.67562490714, 1368.60590722518, 1603.92947753372, 1473.68308776497, 2343.40799525207, 1704.64596258349, 1938.38239104717, 1403.70478335668, 1372.6250345277, 1076.44946125988, 2353.7065671626, 1516.12119421768, 1611.60427318295, 1338.82219760799, 2525.26576799895, 1422.68356444232, 1765.66996904502]}  "expected_productivity": [9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 4.0, 4.0, 2.0, 2.0, 2.0]}}
     """
 
+    project = get_object_or_404(Project, pk=project_id)
+    logged=check_project(request, project)
+    same_company_or_403(logged, project)
+
     # Get and parse the dates
     start_date = request.GET.get("start_date", str(date.today() - timedelta(days=30)))
     end_date = request.GET.get("end_date", str(date.today()))
@@ -410,7 +400,6 @@ def ajax_profit_per_date(request, project_id):
     start_date += " 00:00" + offset
     end_date += " 00:00" + offset
 
-    check_metrics_authorized_for_project(request.user, project_id)
     # Get all dates between start and end
     dates = []
     str_dates = []
@@ -452,28 +441,26 @@ def ajax_profit_per_date(request, project_id):
 # Auxiliar methods, containing the operation logic
 ##################################################################################################################
 
-def check_metrics_authorized_for_project(user, project_id):
-    """ Raises 403 if the current actor is not allowed to obtain metrics for the project"""
-    if not user.is_authenticated():
-        raise PermissionDenied
+def check_project(request,project):
+    """
+    checks if the project belongs to the logged actor with appropiate roles
+    Admin, manager or project manager
+    """
 
-    project = get_object_or_404(Project, pk=project_id)
-    logged = user.actor
+    actor=get_actor_or_403(request)
 
-    # Check that the companies match
-    if logged.company_id != project.company_id:
-        raise PermissionDenied
+    # Admins and executives can do everything
+    if actor.user_type == "A" or is_executive(actor):
+        return actor
 
-    if logged.user_type == 'E':
-        # If it's not an admin, check that it has role PROJECT_MANAGER (40) or higher
-        is_executive = ProjectDepartmentEmployeeRole.objects.filter(employee_id=logged, role_id__tier=50)
-        res = is_executive.exists()
+    # If it's for view, coordinators and greater can access too
+    if ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+        projectDepartment_id__project_id=project, 
+        role_id__tier__gte=40).exists():
+        return actor
 
-        if not res and not ProjectDepartmentEmployeeRole.objects.filter(employee_id=logged, role_id__tier__gte=40,
-                                                          projectDepartment_id__project_id=project).exists():
-            raise PermissionDenied
-
-
+    # Otherwise GTFO
+    raise PermissionDenied
 def create_project(form, admin):
     """Creates a new project supposing the data in the form is OK"""
     pname = form.cleaned_data['name']
@@ -498,64 +485,28 @@ def recover_project(project):
     project.save()
 
 
-def check_company_project_session(project, admin):
-    """
-    checks if the project belongs to the logged company
-    """
-    return check_company_project(project, admin.company_id)
-
-
-def check_company_project(project, company_id):
-    """
-    checks if the project belongs to the specified company
-    """
-    res = project is not None and company_id == project.company_id
-    if not res:
-        raise PermissionDenied
-    return res
-
-
-def check_company_project_id_session(project_id, admin):
-    """
-    checks if the project belongs to the logged company
-    """
-    return check_company_project_id(project_id, admin.company_id)
-
-
-def check_company_project_id(project_id, company_id):
-    """
-    checks if the project belongs to the specified company
-    """
-    project = get_object_or_404(Project, pk=project_id, company_id=company_id)
-
-    return project is not None
-
-
 def find_name(pname, admin):
     """ Finds a project with the specified name in the company, as it must be unique"""
     return Project.objects.filter(name=pname, company_id=admin.company_id).first()
 
-
 def get_list_for_role(request):
-    """Gets the list of projects visible to the logged user, as it depends on their roles"""
-    actor = get_actor_or_403(request)
+    """
+    Gets the list of projects according to the role tier of the logged user
+    """
+    actor=get_actor_or_403(request)
 
-    if actor.user_type != 'A':
-        is_executive = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=50)
-        res = is_executive.count() > 0
+    # Admins and executives can do everything
+    
+    if actor.user_type == "A" or is_executive(actor):
+        return Project.objects.filter(company_id=actor.company_id).distinct().order_by("name")
+    
+    # If it's for view, projectmanager and greater can access too
+    if ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+        role_id__tier__gte=40).exists():
 
-        if not res:
-            roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=20)
-            res = roles.count() > 0
-            if not res:
-                raise PermissionDenied
-            else:
-                projects = Project.objects.filter(
+        return Project.objects.filter(
                     projectdepartment__projectdepartmentemployeerole__employee_id=actor,
-                    company_id=actor.company_id, deleted=False)
-        else:
-            projects = Project.objects.filter(company_id=actor.company_id)
-    else:
-        projects = Project.objects.filter(company_id=actor.company_id)
+                    company_id=actor.company_id, deleted=False).distinct().order_by("name")
 
-    return projects.distinct().order_by('name')
+    # Otherwise GTFO
+    raise PermissionDenied

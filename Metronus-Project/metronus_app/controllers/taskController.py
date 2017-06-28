@@ -16,7 +16,7 @@ from metronus_app.model.department import Department
 from metronus_app.model.goalEvolution import GoalEvolution
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
-from metronus_app.common_utils import default_round,get_actor_or_403
+from metronus_app.common_utils import default_round,get_actor_or_403,same_company_or_403,is_executive
 
 from datetime import date, timedelta, datetime
 
@@ -40,7 +40,7 @@ def create(request):
     task_form.html
     """
     # Check that the user is logged in
-    actor = check_task(None, request)
+    actor = check_task(request,None, True)
     errors = []
 
     # if this is a POST request we need to process the form data
@@ -56,6 +56,8 @@ def create(request):
             pname = form.cleaned_data['name']
             ppro = form.cleaned_data['project_id']
             pdep = form.cleaned_data['department_id']
+            same_company_or_403(actor,ppro)
+            same_company_or_403(actor,pdep)
             pdtuple = find_tuple(ppro.id, pdep.id, actor)
             if ppro.deleted:
                 errors.append('task_creation_project_inactive')
@@ -69,7 +71,6 @@ def create(request):
                     errors.append('task_creation_repeated_name')
 
             if not errors:
-                actor = check_task(pro, request)
                 tid = create_task(form, pdtuple, actor)
                 return HttpResponseRedirect('/task/view/{0}/' .format( tid))
             else:  
@@ -102,7 +103,7 @@ def create_async(request):
     task_form.html
     """
     # Check that the user is logged in
-    actor = check_task(None, request)
+    actor = check_task(request,None,True)
 
     errors = []
     data = {
@@ -121,6 +122,8 @@ def create_async(request):
             pname = form.cleaned_data['name']
             ppro = form.cleaned_data['project_id']
             pdep = form.cleaned_data['department_id']
+            same_company_or_403(actor,ppro)
+            same_company_or_403(actor,pdep)
             pdtuple = find_tuple(ppro.id, pdep.id, actor)
             if ppro.deleted:
                 errors.append('task_creation_project_inactive')
@@ -134,7 +137,6 @@ def create_async(request):
                     errors.append('task_creation_repeated_name')
 
             if not errors:
-                actor = check_task(pro, request)
                 create_task(form, pdtuple, actor)
                 return JsonResponse(data)
         else:
@@ -169,7 +171,7 @@ def list_tasks(request):
     task_list.html
     """
     # Check that the user is logged in
-    tasks = check_role_for_list(request)
+    tasks = get_list_for_role(request)
     active = tasks.filter(active=True)
     inactive = tasks.filter(active=False)
     return render(request, "task/task_list.html",
@@ -191,7 +193,9 @@ def view(request, task_id):
     """
 
     task = get_object_or_404(Task, pk=task_id)
-    check_task(task, request)
+    actor=check_task(request,task)
+    same_company_or_403(actor,task.actor_id)
+
     goal_evolution = GoalEvolution.objects.filter(task_id=task.id)
     employees = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__task=task.id).distinct()
 
@@ -216,8 +220,9 @@ def edit(request, task_id):
     """
     # Check that the user is logged in
     task = get_object_or_404(Task, pk=task_id)
-    actor = check_task(task, request)
-
+    actor=check_task(request,task,True)
+    same_company_or_403(actor,task.actor_id)
+    
     errors = []
 
     # if this is a POST request we need to process the form data
@@ -228,7 +233,6 @@ def edit(request, task_id):
         if form.is_valid():
             # process the data in form.cleaned_data as required
             errors=process_task_form(form)
-            check_task(task, request)
             # find tasks with the same name
             pro = Task.objects.filter(name=form.cleaned_data['name'],
                                       projectDepartment_id=task.projectDepartment_id).first()
@@ -270,7 +274,9 @@ def delete(request, task_id):
     """
     # Check that the user is logged in
     task = get_object_or_404(Task, pk=task_id, active=True)
-    check_task(task, request)
+    actor=check_task(request,task,True)
+    same_company_or_403(actor,task.actor_id)
+    
     delete_task(task)
 
     return HttpResponseRedirect('/task/list')
@@ -288,7 +294,9 @@ def recover(request, task_id):
     """
     # Check that the user is logged in
     task = get_object_or_404(Task, pk=task_id, active=False)
-    check_task(task, request)
+    actor=check_task(request,task,True)
+    same_company_or_403(actor,task.actor_id)
+    
     recover_task(task)
 
     return HttpResponseRedirect('/task/list')
@@ -320,7 +328,9 @@ def ajax_productivity_per_task(request):
 
     task_id = request.GET["task_id"]
     task=get_object_or_404(Task, pk=task_id)
-
+    actor=check_task(request,task)
+    same_company_or_403(actor,task.actor_id)
+    
     # Get and parse the dates and the offset
     start_date = request.GET.get("start_date", str(date.today() - timedelta(days=30)))
     end_date = request.GET.get("end_date", str(date.today()))
@@ -419,7 +429,10 @@ def ajax_profit_per_date(request, task_id):
     "income": [0, 155861.848663544, 106596.060817813, 133996.946277026, 176182.618433908, 130780.529090679, 185712.238665422, 168691.006425482, 201528.027548702, 133961.680656505, 146130.652317868, 160978.773806858, 254646.651869028, 232419.619341417, 113043.655527752, 128847.7293944, 186411.255163309, 126824.943128807, 261600.084774754, 200811.161504088, 158938.293244699, 188362.131387002, 166524.276102895, 114811.676076952, 210347.838939301, 115268.666410966, 126145.268594169, 131910.452677469, 274896.663475654, 127528.492837469, 177974.319716889],
     "expenses": [0, 1457.18015695298, 1614.1458826106, 1367.62026485911, 2026.87328274918, 1446.83842607798, 1878.80598163726, 1823.8647251497, 1879.3977160153, 1607.99448986952, 1615.72129910026, 1609.49391115067, 2513.94326680278, 2112.07014158364, 1360.67562490714, 1368.60590722518, 1603.92947753372, 1473.68308776497, 2343.40799525207, 1704.64596258349, 1938.38239104717, 1403.70478335668, 1372.6250345277, 1076.44946125988, 2353.7065671626, 1516.12119421768, 1611.60427318295, 1338.82219760799, 2525.26576799895, 1422.68356444232, 1765.66996904502]}  "expected_productivity": [9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 4.0, 4.0, 2.0, 2.0, 2.0]}}
     """
-
+    task=get_object_or_404(Task, pk=task_id)
+    actor=check_task(request,task)
+    same_company_or_403(actor,task.actor_id)
+    
     # Get and parse the dates
     start_date = request.GET.get("start_date", str(date.today() - timedelta(days=30)))
     end_date = request.GET.get("end_date", str(date.today()))
@@ -438,7 +451,6 @@ def ajax_profit_per_date(request, task_id):
     start_date += " 00:00" + offset
     end_date += " 00:00" + offset
 
-    check_metrics_authorized_for_task(request.user, task_id)
     # Get all dates between start and end
     dates = []
     str_dates = []
@@ -572,61 +584,28 @@ def recover_task(task):
     task.active = True
     task.save()
 
-
-
-def check_role_for_list(request):
+def get_list_for_role(request):
     """
-    returns the list depending on the actor
+    Gets the list of tasks according to the role tier of the logged user
     """
     actor=get_actor_or_403(request)
 
-    if actor.user_type != 'A':
-        # not an admin
-        is_executive = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=50)
-        res = is_executive.count() > 0
+    # Admins and executives can do everything
+    
+    if actor.user_type == "A" or is_executive(actor):
+        return Task.objects.filter(actor_id__company_id=actor.company_id).distinct().order_by("name")
+    
+    # If it's for view, projectmanager and greater can access too
+    if ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+        role_id__tier__gte=20).exists():
 
-        if res:
-            # is manager
-            task = Task.objects.filter(actor_id__company_id=actor.company_id)
-        else:
-            # not a manager
-            task = Task.objects.filter(actor_id__company_id=actor.company_id,
-                projectDepartment_id__project_id__deleted=False,projectDepartment_id__department_id__active=True,
-                                       projectDepartment_id__projectdepartmentemployeerole__employee_id=actor,
-                                       active=True)
-    else:
-        # is admin
-        task = Task.objects.filter(actor_id__company_id=actor.company_id)
-    return task.distinct()
+        return Task.objects.filter(actor_id__company_id=actor.company_id,
+                projectDepartment_id__project_id__deleted=False,
+                projectDepartment_id__department_id__active=True,
+                projectDepartment_id__projectdepartmentemployeerole__employee_id=actor).distinct().order_by("name")
 
-
-def check_task(task, request):
-    """
-    checks if the task belongs to the logged actor with appropiate roles
-    Admin, manager or dep/proj manager
-    """
-    actor=get_actor_or_403(request)
-
-    # Check that the actor has permission to view the task
-    if task is not None and task.actor_id.company_id != actor.company_id:
-        raise PermissionDenied
-
-    if actor.user_type != 'A':
-        is_executive = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=50)
-        res = is_executive.count() > 0
-
-        if not res:
-            if task is None:
-                roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                     role_id__tier__gte=20)
-            else:
-                roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                    projectDepartment_id=task.projectDepartment_id, role_id__tier__gte=20)
-            res = roles.count() > 0
-        if not res:
-            raise PermissionDenied
-
-    return actor
+    # Otherwise GTFO
+    raise PermissionDenied
 
 
 def find_name(pname, project_department):
@@ -727,23 +706,30 @@ def find_departments(request):
     return departamentos
 
 
-def check_metrics_authorized_for_task(user, task_id):
-    """Raises 403 if the current actor is not allowed to obtain metrics for the department"""
-    if not user.is_authenticated():
-        raise PermissionDenied
+def check_task(request,task, for_edit=False):
+    """
+    checks if the task belongs to the logged actor with appropiate roles
+    """
+    min_tier=20
+    if for_edit:
+        min_tier=40
+    actor=get_actor_or_403(request)
 
-    task = get_object_or_404(Task, pk=task_id)
-    logged = user.actor
+    # Admins and executives can do everything
+    if actor.user_type == "A" or is_executive(actor):
+        return actor
 
-    # Check that the companies match
-    if logged.company_id != task.projectDepartment_id.department_id.company_id:
-        raise PermissionDenied
-    
-    # If it's not an admin, check that it has role coordinator (20) or higher for the projdept tuple
-    if logged.user_type == 'E':
-        is_executive = ProjectDepartmentEmployeeRole.objects.filter(employee_id=logged, role_id__tier=50)
-        res = is_executive.exists()
+    # If it's for creation, task is None
+    if task is None:
+        if ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, 
+            role_id__tier__gte=min_tier).exists():
+            return actor
+    else:
+        # If it's for view, coordinators and greater can access too
+        if ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+            projectDepartment_id=task.projectDepartment_id, 
+            role_id__tier__gte=min_tier).exists():
+            return actor
 
-        if not res and not ProjectDepartmentEmployeeRole.objects.filter(employee_id=logged, role_id__tier__gte=20,
-                                                      projectDepartment_id=task.projectDepartment_id).exists():
-            raise PermissionDenied
+    # Otherwise GTFO
+    raise PermissionDenied

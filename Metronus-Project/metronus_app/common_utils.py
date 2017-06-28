@@ -81,10 +81,9 @@ def get_actor_or_403(request):
     """
     if not request.user.is_authenticated():
         raise PermissionDenied
-    try:
-        return Actor.objects.get(user=request.user)
-    except ObjectDoesNotExist:
-        raise PermissionDenied
+    
+    return request.user.actor
+    
 
 def get_authorized_or_403(request):
     """
@@ -99,7 +98,7 @@ def get_authorized_or_403(request):
     except PermissionDenied:
         # The user is authenticated and it's not an admin
         cur_user = Employee.objects.get(user=request.user)
-        if ProjectDepartmentEmployeeRole.objects.filter(employee_id=cur_user, role_id__tier__gt=10).count() > 0:
+        if ProjectDepartmentEmployeeRole.objects.filter(employee_id=cur_user, role_id__tier__gt=10).exists():
             return cur_user
         else:
             raise PermissionDenied
@@ -116,16 +115,25 @@ def get_admin_executive_or_403(request):
     except PermissionDenied:
         # The user is authenticated and it's not an admin
         cur_user = Employee.objects.get(user=request.user)
-        if ProjectDepartmentEmployeeRole.objects.filter(employee_id=cur_user, role_id__tier__gte=50).count() > 0:
+        if ProjectDepartmentEmployeeRole.objects.filter(employee_id=cur_user, role_id__tier__gte=50).exists():
             return cur_user
         else:
             raise PermissionDenied
 
+def same_company_or_403(actor,thing):
+    """
+    Checks the user and whatever we are CRUDing shares the same company
+    """
+    if actor.company_id!=thing.company_id:
+        raise PermissionDenied
 
 def is_executive(employee):
+    """
+    Returns true if the employee has an executive role
+    """
     if employee.user_type != "E":
         return False
-    return ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee, role_id__tier__gte=50).count() > 0
+    return ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee, role_id__tier__gte=50).exists()
 
 
 def get_or_none(model, *args, **kwargs):
