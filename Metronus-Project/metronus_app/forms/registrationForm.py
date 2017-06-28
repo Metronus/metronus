@@ -11,7 +11,7 @@ class RegistrationForm(Form):
     company_name = forms.CharField(label=_("company_name"), max_length=100)
     short_name = forms.CharField(label=_("short_name"), max_length=50)
     company_email = forms.EmailField(label=_("company_email"))
-    company_phone = forms.CharField(label=_("company_phone"), max_length=15)
+    company_phone = forms.CharField(label=_("company_phone"), max_length=9, validators=[phone_validator])
     logo = forms.ImageField(label=_("logo"), required=False)
 
     # User (Account data)
@@ -24,6 +24,6 @@ class RegistrationForm(Form):
 
     # Administrator (Profile data)
     admin_identifier = forms.CharField(label=_("admin_identifier"), max_length=15)
-    admin_phone = forms.CharField(label=_("admin_phone"), max_length=15, validators=[phone_validator])
+    admin_phone = forms.CharField(label=_("admin_phone"), max_length=9, validators=[phone_validator])
     photo = forms.ImageField(label=_("photo"), required=False)
     terms_agree = forms.BooleanField(label=_("terms_agree"), required=False)
