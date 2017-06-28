@@ -43,27 +43,30 @@
                   {% trans 'details' %}
                 </a>
               </td>
-              <td class="hidden-xs">
-                <a href="{% url 'task_edit' task.id %}" type="button" class="btn btn-dark">
-                  {% trans 'edit' %}
-                </a>
-              </td>
-              <td class="hidden-xs">
-                <a href="#" class="btn btn-danger" data-href="{% url 'task_delete' task.id %}"
-                  data-toggle="modal" data-target="#confirm-delete">{% trans 'delete' %}</a>
-              </td>
+              {% if actor_is_admin or actor_is_executive or actor_is_projectManager%}
+                <td class="hidden-xs">
+                  <a href="{% url 'task_edit' task.id %}" type="button" class="btn btn-dark">
+                    {% trans 'edit' %}
+                  </a>
+                </td>
+                <td class="hidden-xs">
+                  <a href="#" class="btn btn-danger" data-href="{% url 'task_delete' task.id %}"
+                    data-toggle="modal" data-target="#confirm-delete">{% trans 'delete' %}</a>
+                </td>
+              {% endif %}
             </tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
-
-      <div class="text-center">
-        {% if tasks|length_is:"0"  %}
-        <h2>{% trans 'plsTask' %}</h2>
-        {% endif %}
-        <a class="btn btn-dark" href="{% url 'task_create' %}">{% trans 'create' %}</a>
-      </div>
+      {% if actor_is_admin or actor_is_executive or actor_is_projectManager%}
+        <div class="text-center">
+          {% if tasks|length_is:"0"  %}
+            <h2>{% trans 'plsTask' %}</h2>
+          {% endif %} 
+            <a class="btn btn-dark" href="{% url 'task_create' %}">{% trans 'create' %}</a>
+        </div>
+      {% endif %}
     </div>
   </div>
 </div>
@@ -83,6 +86,7 @@
 <!-- FIN TAREAS ACTIVAS -->
 
 <!-- TAREAS INACTIVAS -->
+{% if actor_is_admin or actor_is_executive %}
 {% if inactive|length > 0 %}
 <div class="row">
   <div class="col-xs-12">
@@ -151,6 +155,7 @@
     </div>
   </div>
 </div>
+{%endif%}
 <!-- FIN TAREAS INACTIVAS -->
 {% endif %}
 {% endblock %}
