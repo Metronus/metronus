@@ -18,9 +18,8 @@ def create(request):
     template:
     projectdepartment_create.html
     """
-
     admin = get_current_admin_or_403(request)
-
+    
     if request.method == 'POST':
         form = ProjectDepartmentForm(data=request.POST, user=admin)
 
@@ -96,9 +95,8 @@ def create_project_department(form, admin):
     project = form.cleaned_data['project_id']
     department = form.cleaned_data['department_id']
 
-    legal_form = same_company_or_403(admin,project) and same_company_or_403(admin,department)
-    if not legal_form:
-        raise PermissionDenied
+    same_company_or_403(admin,project) 
+    same_company_or_403(admin,department)
 
     return ProjectDepartment.objects.create(project_id=project, department_id=department)
 
