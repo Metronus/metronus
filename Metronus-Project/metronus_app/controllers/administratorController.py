@@ -58,12 +58,12 @@ def edit(request):
                 return HttpResponseRedirect('/company/view/')
             else:
                 return render(request, 'company/administrator_edit.html',
-                              {'form': form, 'errors': errors, 'pass_form': EmployeePasswordForm()})
+                              {'form': form, 'errors': errors, 'pass_form': EmployeePasswordForm(), 'picture': administrator.picture})
 
     else:
         raise PermissionDenied
 
-    return render(request, 'company/administrator_edit.html', {'form': form, 'pass_form': EmployeePasswordForm()})
+    return render(request, 'company/administrator_edit.html', {'form': form, 'pass_form': EmployeePasswordForm(), 'picture': administrator.picture})
 
 
 def update_password(request):

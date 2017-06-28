@@ -48,6 +48,10 @@
 
     <div class="x_content">
       <div class="dashboard-widget-content">
+        {% if admin.picture %}
+          <img src="{{ MEDIA_URL }}{{admin.picture}}" style="max-height: 120px; max-width: auto;" class="img-responsive center-block">
+        <hr>
+        {% endif %}
         <ul class="quick-list">
           <li><i class="fa fa-user"></i>{{admin.user.username}}</li>
           <li><i class="fa fa-at"></i>{{admin.user.email}}</li>

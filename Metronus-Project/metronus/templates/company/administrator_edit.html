@@ -171,6 +171,25 @@
         {% show_field form.phone        "666775899" %}
         {% show_field form.photo %}
 
+        <!-- MOSTRAR FOTO ACTUAL -->
+         <div class="form-group required form-class">
+           <label class="control-label col-sm-4" for="id_current_logo">{% trans 'current_employee_pic' %}</label>
+           <div class="col-sm-6">
+             {% if picture %}
+              <img src="{{ MEDIA_URL }}{{picture}}" style="max-height: 120px; max-width: auto;">
+             {% else %}
+              {% trans 'none' %}
+             {% endif %}
+           </div>
+         </div>
+
+          <div class="form-group required form-class">
+           <label class="control-label col-sm-4"></label>
+             <div class="col-sm-6">
+             {% trans 'change_pic_warning_admin' %}
+             </div>
+         </div>
+
         <div class="form-group control-buttons">
           <div class="text-center">
             <button type="submit" class="btn btn-success submit-button" >{% trans 'confirm' %}</button>

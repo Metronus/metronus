@@ -491,6 +491,8 @@ msgid "new_employee_pic"
 msgstr "Change picture"
 msgid "change_pic_warning"
 msgstr "The employee's picture will not be changed unless you upload a new one."
+msgid "change_pic_warning_admin"
+msgstr "Your picture will not be changed unless you upload a new one."
 
 msgid "registerEmployee"
 msgstr "Register new employee"
