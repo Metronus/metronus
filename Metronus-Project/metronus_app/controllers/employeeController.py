@@ -453,10 +453,9 @@ def ajax_productivity_per_task(request, username):
     #{"3": {"total_productivity": 0.7125, "expected_productivity": 2.0, "name": "Hacer cosas de front"}}
     """
     # Check that the user is logged in and it's an administrator or with permissions
-    try:
-        logged = get_authorized_or_403(request)
-    except PermissionDenied:
-        logged = get_current_employee_or_403(request)
+    
+    logged = get_authorized_or_403(request)
+    
     employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
 
     # Check the company is the same for logged and the searched employee
@@ -534,10 +533,8 @@ def ajax_productivity_per_task_and_date(request, username):
     end_date += " 00:00" + offset
 
     # Check that the user is logged in and it's an administrator or with permissions
-    try:
-        logged = get_authorized_or_403(request)
-    except PermissionDenied:
-        logged = get_current_employee_or_403(request)
+    logged = get_authorized_or_403(request)
+
     employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
 
     # Check the company is the same for logged and the searched employee

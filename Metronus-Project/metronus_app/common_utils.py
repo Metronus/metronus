@@ -14,7 +14,7 @@ from metronus_app.model.actor import Actor
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.task import Task
 from django.test import Client
-from django.contrib.auth.password_validation import validate_password, ValidationError,get_password_validators
+from django.contrib.auth.password_validation import validate_password, ValidationError as valerr,get_password_validators
 from PIL import Image
 from django.utils.translation import ugettext_lazy as _
 
@@ -41,7 +41,7 @@ def validate_pass(password):
     """
     try:
         validate_password(password,get_password_validators(AUTH_PASSWORD_VALIDATORS))
-    except ValidationError:
+    except valerr:
         return False
     return True
 

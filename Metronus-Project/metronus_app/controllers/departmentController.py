@@ -128,7 +128,7 @@ def view(request, department_id):
     template: department_view.html
     """
     department = get_object_or_404(Department, pk=department_id)
-    check_department_for_fiew(department, request, True)
+    check_department(department, request, True)
 
     coordinators = get_coordinator(department)
 
@@ -459,14 +459,8 @@ def recover_department(department):
     department.active = True
     department.save()
 
-def check_department(dep, request):
-    """
-    this check department is only for creating, modifying or deleting
-    """
-    return check_department_for_fiew(dep, request, False)
 
-
-def check_department_for_fiew(dep, request, for_view):
+def check_department(dep, request, for_view=False):
     """
     checks if the department belongs to the logged actor with appropiate roles
     Admin, manager or project manager
@@ -484,7 +478,7 @@ def check_department_for_fiew(dep, request, for_view):
         return actor
 
     # If it's for view, coordinators and greater can access too
-    if for_view and ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,projectDepartment_id__department_id=dep, role_id__tier__gte=30).count() > 0:
+    if for_view and ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,projectDepartment_id__department_id=dep, role_id__tier__gte=20).count() > 0:
         return actor
 
     # Otherwise GTFO
