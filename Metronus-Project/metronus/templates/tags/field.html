@@ -3,6 +3,7 @@
 {% load l10n %}
 
 
+
 <div class="form-group required form-class {% if field.errors %} has-error {% endif %}" id="div_{{field.name}}">
   <label class="control-label col-md-4 col-sm-4 col-xs-12" for="id_{{ field.name }}">{% trans field.name %} {{required}}</label>
   <div class="col-md-4 col-sm-5 col-xs-12">
@@ -11,7 +12,7 @@
         value="{{field.value|default_if_none:""}}" data-show-preview="false" multiple data-show-upload="false"
         data-allowed-file-extensions='["jpeg", "jpg", "png"]'>
     {% else %}
-    <input type="{{type}}" class="form-control" name="{{ field.name }}" id="id_{{ field.name }}" value="{{field.value|default_if_none:""}}" placeholder={{placeholder}}>
+    <input type="{{type}}" maxlength="{{field.field.max_length}}" class="form-control" name="{{ field.name }}" id="id_{{ field.name }}" value="{{field.value|default_if_none:""}}" placeholder={{placeholder}}>
     {% endif %}
     <div class="help-block with-errors" id="id_unique_message">{{ field.errors.0 }}</div>
     {% if custom_error_str %}

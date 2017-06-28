@@ -19,6 +19,10 @@ $(function() {
       else Cookies.set('lang', 'en-us');
       location.reload(true);
     });
+
+    $("input").on('input', function(){
+      $(this).parent().find(".ajax-error").hide();
+    });
 });
 
 function initAjax(field, field_str, url){
@@ -35,7 +39,7 @@ function ajaxValidation(field, field_str, url){
   var data = { };
 
   // If the field is incorrect by Bootstrap Validator or is empty, it is just incorrect
-  if(field.val() == "" || field.hasClass('has-error')){
+  if(field.val() == "" || field.hasClass('glyphicon-remove')){
     return;
   }
 
