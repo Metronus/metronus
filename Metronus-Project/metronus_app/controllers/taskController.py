@@ -57,6 +57,10 @@ def create(request):
             ppro = form.cleaned_data['project_id']
             pdep = form.cleaned_data['department_id']
             pdtuple = find_tuple(ppro.id, pdep.id, actor)
+            if ppro.deleted:
+                errors.append('task_creation_project_inactive')
+            if not pdep.active:
+                errors.append('task_creation_department_inactive')
             if pdtuple is None:
                 errors.append('task_creation_project_department_not_related')
             else:
@@ -118,6 +122,10 @@ def create_async(request):
             ppro = form.cleaned_data['project_id']
             pdep = form.cleaned_data['department_id']
             pdtuple = find_tuple(ppro.id, pdep.id, actor)
+            if ppro.deleted:
+                errors.append('task_creation_project_inactive')
+            if not pdep.active:
+                errors.append('task_creation_department_inactive')
             if pdtuple is None:
                 errors.append('task_creation_project_department_not_related')
             else:
@@ -244,9 +252,9 @@ def edit(request, task_id):
                                  "price_per_unit": task.price_per_unit if task.price_per_unit is not None else "",
                                  "price_per_hour": task.price_per_hour if task.price_per_hour is not None else ""})
     # The project
-    coll = find_collections(request)
+    
     return render(request, 'task/task_form.html', {'form': form, "errors": errors,
-                                              "departments": coll["departments"], "projects": coll["projects"]})
+                                              "departments": [task.projectDepartment_id.department_id], "projects": [task.projectDepartment_id.project_id]})
 
 
 def delete(request, task_id):

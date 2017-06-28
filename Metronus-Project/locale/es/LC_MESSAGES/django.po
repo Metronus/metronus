@@ -858,8 +858,11 @@ msgstr "¿Está seguro de restaurar la tarea? Se recuperará también todo lo re
 msgid "task_creation_project_department_not_related"
 msgstr "El proyecto y el departamento no están relacionados. Por favor, seleccione otra combinación"
 msgid "task_creation_error"
-msgstr "Error en el formulario. Por favor, revise que los campos estén rellenos correctamente."
-
+msgstr "Error en el formulario. Por favor, revise que los campos estén rellenos correctamente"
+msgid "task_creation_department_inactive"
+msgstr "El departamento está inactivo. Por favor, escoga uno activo"
+msgid "task_creation_project_inactive"
+msgstr "El proyecto está inactivo. Por favor, escoga uno activo"
 msgid "taskConfirm"
 msgstr "¿Está seguro de eliminar la tarea? Desaparecerán también los tiempos imputados"
 msgid "taskSaved"
