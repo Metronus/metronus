@@ -7,4 +7,10 @@
     <p>{% trans 'changepw_mail_greeting' %}, {{ employee_name}}.<p>
     <br/>
     <p>{% trans 'changepw_mail_body' %}</p>
+    <br/>
+    {% if notifynewpass %}
+        <p>{% trans 'changepw_mail_yes_notify' %}: {{ newpass }}</p>
+    {% else %}
+        <p>{% trans 'changepw_mail_no_notify' %}</p>
+    {% endif %}
 {% endblock %}

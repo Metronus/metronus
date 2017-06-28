@@ -601,7 +601,7 @@ class EmployeeTestCase(TestCase):
             "last_name": "NuevoApellido",
             "email": "nuevocorreo@empresa.com",
             "identifier": "nuevoid",
-            "phone": "nuevotelefono",
+            "phone": "654654654",
             "price_per_hour": "-4.0",
         })
         self.assertEquals(response.status_code, 200)
@@ -640,7 +640,7 @@ class EmployeeTestCase(TestCase):
             "last_name": "NuevoApellido",
             "email": "nuevocorreo@empresa.com",
             "identifier": "nuevoid",
-            "phone": "nuevotelefono",
+            "phone": "654654654",
             "price_per_hour": "4.0",
         })
 
@@ -648,7 +648,7 @@ class EmployeeTestCase(TestCase):
 
         final = Employee.objects.get(user__username="emp1")
         self.assertEquals(final.identifier, "nuevoid")
-        self.assertEquals(final.phone, "nuevotelefono")
+        self.assertEquals(final.phone, "654654654")
         self.assertEquals(final.user.first_name, "NuevoNombre")
         self.assertEquals(final.user.last_name, "NuevoApellido")
         self.assertEquals(final.user.email, "nuevocorreo@empresa.com")
