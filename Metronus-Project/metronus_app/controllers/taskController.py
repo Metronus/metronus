@@ -429,8 +429,8 @@ def ajax_profit_per_date(request, task_id):
                                 )["total_income"]
         income = income if income is not None else 0
 
-        data['expenses'].append(expenses)
-        data['income'].append(income)
+        data['expenses'].append(default_round(expenses))
+        data['income'].append(default_round(income))
         if index == 0:
             data['acumExpenses'].append(default_round(expenses))
             data['acumIncome'].append(default_round(income))
