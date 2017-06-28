@@ -16,7 +16,7 @@ def get_form_type(form_type):
         'PasswordInput': 'password',
         'EmailInput': 'email',
         'ClearableFileInput': 'file',
-        'FloatField' : 'number'
+        'NumberInput' : 'numeric'
     }.get(form_type, 'text')
 
 

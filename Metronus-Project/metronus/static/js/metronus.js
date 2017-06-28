@@ -22,7 +22,15 @@ $(function() {
 
   // Cuando el AJAX da error pero se cambia, se quita el error del ajax para limpiar
   $("input").on('input', function(){
-    $(this).parent().find(".ajax-error").hide();
+    if($(this).parent().find(".ajax-error").is(":visible")){
+      $(this).parent().find(".ajax-error").hide();
+      $(this).removeClass('glyphicon-remove')
+    }
+  });
+
+  //Lor numericos
+  $('.precio').each(function(i) {
+    $(this).val($(this).attr("value").replace(",", "."));
   });
 });
 
