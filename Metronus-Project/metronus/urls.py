@@ -132,7 +132,7 @@ urlpatterns += [  # i18n_patterns(
     # Company
     url(r'^company/edit/$', companyController.edit, name='company_edit'),
     url(r'^company/view/$', companyController.view, name='company_view'),
-    url(r'^company/delete/$', companyController.view, name='company_delete'),
+    #url(r'^company/delete/$', companyController.view, name='company_delete'),
 
     # Dashboard
     url(r'^dashboard/view$', dashboardController.view, name='dashboard_view'),

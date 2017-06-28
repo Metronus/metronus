@@ -11,6 +11,7 @@ from metronus_app.model.projectDepartment             import ProjectDepartment
 from metronus_app.model.goalEvolution             import GoalEvolution
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 from django.db                                        import transaction
+
 @transaction.atomic
 def basic_load():
     """

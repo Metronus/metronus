@@ -71,7 +71,7 @@ def create(request):
             if not errors:
                 actor = check_task(pro, request)
                 tid = create_task(form, pdtuple, actor)
-                return HttpResponseRedirect('/task/view/%d/' % tid)
+                return HttpResponseRedirect('/task/view/{0}/' .format( tid))
             else:  
                 errors.append('task_creation_error')
 
@@ -732,15 +732,18 @@ def check_metrics_authorized_for_task(user, task_id):
     if not user.is_authenticated():
         raise PermissionDenied
 
-    task = get_object_or_404(Task, id=task_id)
+    task = get_object_or_404(Task, pk=task_id)
     logged = user.actor
 
     # Check that the companies match
     if logged.company_id != task.projectDepartment_id.department_id.company_id:
         raise PermissionDenied
-
+    
+    # If it's not an admin, check that it has role coordinator (20) or higher for the projdept tuple
     if logged.user_type == 'E':
-        # If it's not an admin, check that it has role coordinator (20) or higher for the projdept tuple
-        if not ProjectDepartmentEmployeeRole.objects.filter(employee_id=logged, role_id__tier__gte=20,
+        is_executive = ProjectDepartmentEmployeeRole.objects.filter(employee_id=logged, role_id__tier=50)
+        res = is_executive.exists()
+
+        if not res and not ProjectDepartmentEmployeeRole.objects.filter(employee_id=logged, role_id__tier__gte=20,
                                                       projectDepartment_id=task.projectDepartment_id).exists():
             raise PermissionDenied

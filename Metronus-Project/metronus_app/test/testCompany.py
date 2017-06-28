@@ -77,6 +77,28 @@ class CompanyTestCase(TestCase):
         logs_after = Company.objects.all().count()
 
         self.assertEquals(logs_before + 1, logs_after)
+    def test_edit_company(self):
+        """
+        Edit  company
+        """
+        c = Client()
+        c.login(username="admin1", password="123456")
+        logs_before = Company.objects.all().count()
+
+        response = c.post(reverse("company_edit"), {
+            # Company
+            'visible_short_name':True,
+            'company_email': "compania@pes.es",
+            'company_phone': "932833777",
+        })
+    
+        self.assertEquals(response.status_code, 302)
+        self.assertRedirects(response, reverse("company_view"), fetch_redirect_response=False)
+        # Check that the department has been successfully created
+        self.assertEquals(Company.objects.get(cif="231231F").phone,"932833777")
+        self.assertEquals(Company.objects.get(cif="231231F").email,"compania@pes.es")
+        logs_after = Company.objects.all().count()
+
 
     def test_shortname_positive(self):
         """
@@ -128,12 +150,18 @@ class CompanyTestCase(TestCase):
         self.assertTrue(not data['is_taken'])
 
     def test_view_company_positive(self):
+        """
+        View company
+        """
         c = Client()
         c.login(username="admin1", password="123456")
         response = c.get("/company/view/")
         self.assertEquals(response.status_code, 200)
 
     def test_view_company_anonymous(self):
+        """
+        Try accessing company
+        """
         c = Client()
         response = c.get("/company/view/")
         self.assertEquals(response.status_code, 302)

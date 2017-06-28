@@ -283,7 +283,7 @@ def validate_username(request):
     """
     checks if the company administrator is registered
     """
-    username = request.GET.get('username', None)
+    username = request.GET.get('username')
 
     if not username:
         raise SuspiciousOperation
@@ -319,6 +319,6 @@ def validate_email(request):
     """
     checks whether the email is unique
     """
-    email = request.GET.get("email", None)
+    email = request.GET.get("email")
     is_taken = not (is_company_email_unique(email) and is_email_unique(email))
     return JsonResponse({'is_taken': is_taken})

@@ -402,7 +402,7 @@ def validate_name_ajax(request):
     """
     checks whether the department name is unique
     """
-    name = request.GET.get("name", None)
+    name = request.GET.get("name")
     is_taken = name and Department.objects.filter(name=name).exists()
     return JsonResponse({'is_taken': is_taken})
 
@@ -417,16 +417,19 @@ def check_metrics_authorized_for_department(user, dpmt_id):
     if not user.is_authenticated():
         raise PermissionDenied
 
-    department = get_object_or_404(Department, active=True, id=dpmt_id)
+    department = get_object_or_404(Department, pk=dpmt_id)
     logged = user.actor
 
     # Check that the companies match
     if logged.company_id != department.company_id:
         raise PermissionDenied
 
+    # If it's not an admin, check that it has role EXECUTIVE (50) or higher for any project in the department
     if logged.user_type == 'E':
-        # If it's not an admin, check that it has role EXECUTIVE (50) or higher for any project in the department
-        if not ProjectDepartmentEmployeeRole.objects.filter(employee_id=logged, role_id__tier__gte=20,
+        is_executive = ProjectDepartmentEmployeeRole.objects.filter(employee_id=logged, role_id__tier=50)
+        res = is_executive.exists()
+
+        if not res and not ProjectDepartmentEmployeeRole.objects.filter(employee_id=logged, role_id__tier__gte=20,
                                                       projectDepartment_id__department_id=department).exists():
             raise PermissionDenied
 

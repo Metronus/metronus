@@ -237,7 +237,7 @@ def validate_name_ajax(request):
     """
     checks whether the project name is unique
     """
-    name = request.GET.get("name", None)
+    name = request.GET.get("name")
     is_taken = name and Project.objects.filter(name=name).exists()
     return JsonResponse({'is_taken': is_taken})
 
@@ -457,7 +457,7 @@ def check_metrics_authorized_for_project(user, project_id):
     if not user.is_authenticated():
         raise PermissionDenied
 
-    project = get_object_or_404(Project, id=project_id)
+    project = get_object_or_404(Project, pk=project_id)
     logged = user.actor
 
     # Check that the companies match
@@ -467,12 +467,11 @@ def check_metrics_authorized_for_project(user, project_id):
     if logged.user_type == 'E':
         # If it's not an admin, check that it has role PROJECT_MANAGER (40) or higher
         is_executive = ProjectDepartmentEmployeeRole.objects.filter(employee_id=logged, role_id__tier=50)
-        res = is_executive.count() > 0
+        res = is_executive.exists()
 
-        if not res:
-            if not ProjectDepartmentEmployeeRole.objects.filter(employee_id=logged, role_id__tier__gte=40,
+        if not res and not ProjectDepartmentEmployeeRole.objects.filter(employee_id=logged, role_id__tier__gte=40,
                                                           projectDepartment_id__project_id=project).exists():
-                raise PermissionDenied
+            raise PermissionDenied
 
 
 def create_project(form, admin):

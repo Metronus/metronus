@@ -5,13 +5,19 @@ from metronus_app.model.employee import Employee
 from metronus_app.model.administrator import Administrator
 from django.contrib.auth.models import User
 from metronus_app.model.employeeLog import EmployeeLog
+from metronus_app.model.project                       import Project
+from metronus_app.model.department                    import Department
+from metronus_app.model.role                          import Role
+from metronus_app.model.projectDepartment             import ProjectDepartment
+from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 from django.urls import reverse
-
+from populate_database                  import populate_roles
 import json
 
 class EmployeeTestCase(TestCase):
     """This class provides a test case for employee management"""
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         """
         Loads the data to the database for tests to be done
         """
@@ -72,7 +78,7 @@ class EmployeeTestCase(TestCase):
         )
 
         # Employee 1
-        Employee.objects.create(
+        emp1=Employee.objects.create(
             user=employee1_user,
             user_type="E",
             identifier="emp01",
@@ -80,7 +86,7 @@ class EmployeeTestCase(TestCase):
             company_id=company1
         )
         # Employee 3
-        Employee.objects.create(
+        emp2=Employee.objects.create(
             user=employee3_user,
             user_type="E",
             identifier="emp03",
@@ -96,6 +102,47 @@ class EmployeeTestCase(TestCase):
             phone="666555444",
             company_id=company2
         )
+
+        proj1 = Project.objects.create(
+            name="Metronus",
+            deleted=False,
+            company_id=company1)
+
+        dep1 = Department.objects.create(
+            name="Backend",
+            active=True,company_id=company1)
+
+        dep2 = Department.objects.create(
+            name="Frontend",
+            active=True,
+            company_id=company1)
+
+        #Frontend
+        pd1 = ProjectDepartment.objects.create(
+            project_id = proj1,
+            department_id = dep1)
+
+        #Backend
+        pd2 = ProjectDepartment.objects.create(
+            project_id = proj1,
+            department_id = dep2)
+
+        populate_roles()
+
+        emp_role=Role.objects.get(name="EMPLOYEE")
+        coor_role=Role.objects.get(name="COORDINATOR")
+        pm_role=Role.objects.get(name="PROJECT_MANAGER")
+        team_role=Role.objects.get(name="TEAM_MANAGER")
+
+        ProjectDepartmentEmployeeRole.objects.create(
+            projectDepartment_id=pd1,
+            employee_id=emp1,
+            role_id= emp_role)
+        ProjectDepartmentEmployeeRole.objects.create(
+            projectDepartment_id=pd1,
+            employee_id=emp2,
+            role_id=pm_role)
+
     def test_create_form_view(self):
         """ Logged in as an administrator, get the form view"""
         c = Client()
@@ -504,7 +551,22 @@ class EmployeeTestCase(TestCase):
 
         logs_after = EmployeeLog.objects.all().count()
         self.assertEquals(logs_before, logs_after)
-
+    def test_create_employees_operation_not_allowed(self):
+        """
+        Invalid operation head
+        """
+        c = Client()
+        c.login(username="admin1", password="123456")        
+        response = c.head(reverse("employee_create"))
+        self.assertEquals(response.status_code, 403)
+    def test_edit_employees_operation_not_allowed(self):
+        """
+        Invalid operation head
+        """
+        c = Client()
+        c.login(username="admin1", password="123456")        
+        response = c.head(reverse("employee_edit",args=("emp1",)))
+        self.assertEquals(response.status_code, 403)
 ###------------List--------------#
     def test_list_employees_positive(self):
         """
@@ -534,7 +596,21 @@ class EmployeeTestCase(TestCase):
         c = Client()
         c.login(username="admin1", password="123456")
 
-        response = c.get("/employee/view/emp1/")
+        response = c.get(reverse("employee_view",args=("emp1",)))
+
+        self.assertEquals(response.status_code, 200)
+        employee = response.context["employee"]
+        self.assertTrue(employee)
+        self.assertEquals(employee.identifier, "emp01")
+        self.assertEquals(employee.user.first_name, "Álvaro")
+    def test_view_employee_positive_2(self):
+        """
+        As a role, view an employee profile with lower role
+        """
+        c = Client()
+        c.login(username="emp3", password="123456")
+
+        response = c.get(reverse("employee_view",args=("emp1",)))
 
         self.assertEquals(response.status_code, 200)
         employee = response.context["employee"]
