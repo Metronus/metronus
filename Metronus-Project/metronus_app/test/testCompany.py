@@ -419,7 +419,15 @@ class CompanyTestCase(TestCase):
 
         self.assertEquals(form.initial["company_email"], "us@gmail.com")
         self.assertEquals(form.initial["company_phone"], "123456789")
-
+    def test_edit_employees_operation_not_allowed(self):
+            """
+            Invalid operation head
+            """
+            c = Client()
+            c.login(username="admin1", password="123456")        
+            response = c.head(reverse("company_edit"))
+            self.assertEquals(response.status_code, 403)
+        
 
     def test_shortname_positive(self):
         """
@@ -454,6 +462,14 @@ class CompanyTestCase(TestCase):
         data = get_ajax("/ajax/validate_username/", {'username' : "ultra_random_string"})
         self.assertTrue(not data['is_taken'])
 
+    def test_admin_negative_2(self):
+        """
+        Checks if the AJAX method of checking an admin is correct
+        """
+        c = Client()
+        response = c.get("/ajax/validate_username/")
+        self.assertEquals(response.status_code, 400)
+
     def test_cif_positive(self):
         """
         Checks if the AJAX method of checking an admin is correct
@@ -486,3 +502,4 @@ class CompanyTestCase(TestCase):
         c = Client()
         response = c.get("/company/view/")
         self.assertEquals(response.status_code, 302)
+    
