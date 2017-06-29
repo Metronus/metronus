@@ -123,6 +123,7 @@ urlpatterns += [  # i18n_patterns(
     url(r'^roles/delete/(?P<role_id>.*)/$', roleController.delete, name='roles_delete'),
     url(r'^roles/availableDepartments', roleController.ajax_departments_from_projects, name='roles_dpmt_ajax'),
     url(r'^roles/availableRoles', roleController.ajax_roles_from_tuple, name='roles_role_ajax'),
+    url(r'^roles/info', roleController.display_info, name='roles_info'),
 
     # Administrator
     url(r'^administrator/edit/$', administratorController.edit, name='administrator_edit'),

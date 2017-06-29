@@ -185,6 +185,10 @@ def delete(request, role_id):
 
     return HttpResponseRedirect('/employee/view/' + employee_username)
 
+def display_info(request):
+    get_admin_executive_or_403(request)
+    return render(request, "role/role_info.html")
+
 
 ###########################################################################################
 

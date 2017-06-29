@@ -76,10 +76,13 @@
   <div class="col-lg-9 col-sm-8 col-xs-12">
     <div class="x_panel x_content">
 
-      {% if actor_is_executive %}
-      <div class="help-tooltip" style="margin: 10px;">
-        <p>{% trans 'role_help_tooltip_executives' %}</p>
-      </div>
+      {% if actor_is_executive or actor_is_admin %}
+        <div class="help-tooltip" style="margin: 10px;">
+          <p>{% trans 'role_help_tooltip_info_1' %} <a href="/roles/info" target="_blank" style="text-decoration: underline">{% trans 'role_help_tooltip_info_2' %}</a> {% trans 'role_help_tooltip_info_3' %}</p>
+          {% if actor_is_executive %}
+            <p>{% trans 'role_help_tooltip_executives' %}</p>
+          {% endif %}
+        </div>
       {% endif %}
 
       <div class="clearfix"></div>

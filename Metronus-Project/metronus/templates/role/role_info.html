@@ -1,0 +1,66 @@
+{% extends "anon_master.html" %}
+{% load i18n %}
+{% load l10n %}
+
+{% block title %}{% trans 'roles_info_page_title' %}{% endblock %}
+
+{% block content %}
+
+<body class="login">
+  <div>
+      <a href="/"><img class="img-responsive center-block" src="/static/img/metronus_logo_horizontal.png" alt="Metronus" style="width:40%; height:auto; margin-top:2%;"></a>
+      <h1 class="center-block" style="text-align: center; padding-bottom: 50px;">{% trans 'roles_info_page_title' %}</h1>
+
+      <div class="legaltext" style="font-size:200%;">{% trans 'NOROLE' %}</div>
+      <br>
+      <p class="legaltext">- {% trans 'roles_info_norole_1' %}</p>
+      <br>
+
+      <div class="legaltext" style="font-size:200%;">{% trans 'EMPLOYEE' %}</div>
+      <br>
+      <p class="legaltext">- {% trans 'roles_info_employee_1' %}</p>
+      <br>
+
+      <div class="legaltext" style="font-size:200%;">{% trans 'COORDINATOR' %}</div>
+      <br>
+      <p class="legaltext">- {% trans 'all_of_the_above' %}</p>
+      <p class="legaltext">- {% trans 'roles_info_coordinator_1' %}</p>
+      <p class="legaltext">- {% trans 'roles_info_coordinator_2' %}</p>
+      <p class="legaltext">- {% trans 'roles_info_coordinator_3' %}</p>
+      <p class="legaltext">- {% trans 'roles_info_coordinator_4' %}</p>
+      <p class="legaltext">- {% trans 'roles_info_coordinator_5' %}</p>
+      <br>
+
+      <div class="legaltext" style="font-size:200%;">{% trans 'TEAM_MANAGER' %}</div>
+      <br>
+      <p class="legaltext">- {% trans 'roles_info_tm_1' %}</p>
+      <p class="legaltext">- {% trans 'roles_info_tm_2' %}</p>
+      <br>
+
+      <div class="legaltext" style="font-size:200%;">{% trans 'PROJECT_MANAGER' %}</div>
+      <br>
+      <p class="legaltext">- {% trans 'all_of_the_above' %}</p>
+      <p class="legaltext">- {% trans 'roles_info_pm_1' %}</p>
+      <p class="legaltext">- {% trans 'roles_info_pm_2' %}</p>
+      <!--<p class="legaltext">- {% trans 'roles_info_pm_3' %}</p>-->
+      <p class="legaltext">- {% trans 'roles_info_pm_4' %}</p>
+      <br>
+
+      <div class="legaltext" style="font-size:200%;">{% trans 'EXECUTIVE' %}</div>
+      <br>
+      <p class="legaltext">- {% trans 'roles_info_executive_1' %}</p>
+      <p class="legaltext">- {% trans 'roles_info_executive_2' %}</p>
+      <br>
+
+      <div class="legaltext" style="font-size:200%;">{% trans 'ADMINISTRATOR_ROLE' %}</div>
+      <br>
+      <p class="legaltext">- {% trans 'roles_info_admin_1' %}</p>
+      <p class="legaltext">- {% trans 'roles_info_admin_2' %}</p>
+      <br>
+
+      <div>
+      <button style="margin-left: 50%;" type="button" class="btn btn-warning submit" onclick="window.history.back()">{% trans 'return_to_landingpage' %}</button>
+      </div>
+  </div>
+</body>
+{% endblock %}
