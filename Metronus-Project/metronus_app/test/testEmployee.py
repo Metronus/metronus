@@ -148,7 +148,7 @@ class EmployeeTestCase(TestCase):
         c = Client()
         c.login(username="admin1", password="123456")
 
-        response = c.post("/employee/create")
+        response = c.get("/employee/create")
 
         self.assertEquals(response.status_code, 200)
         self.assertTrue(response.context["form"] is not None)
@@ -224,7 +224,33 @@ class EmployeeTestCase(TestCase):
         logs_after = EmployeeLog.objects.all().count()
 
         self.assertEquals(logs_before + 1, logs_after)
+    def test_create_employee_password_invalid_negative(self):
+        """ Logged in as an administrator, try to create an employee"""
+        c = Client()
+        c.login(username="admin1", password="123456")
 
+        logs_before = EmployeeLog.objects.all().count()
+
+        response = c.post("/employee/create", {
+            "username": "employee_creating",
+            "password1": "iha",
+            "password2": "iha",
+            "first_name": "Francisco",
+            "last_name": "Romualdo",
+            "email": "frc@empresa.com",
+            "identifier": "frc01",
+            "phone": "654321987",
+            "price_per_hour": "2.0",
+        })
+
+        self.assertEquals(response.status_code, 200)
+        self.assertTrue('newPasswordInvalid' in response.context["errors"])
+
+        # Check that the employee has not been created
+
+        logs_after = EmployeeLog.objects.all().count()
+        self.assertEquals(logs_before, logs_after)
+    
     def test_create_employee_password_not_match_negative(self):
         """ Logged in as an administrator, try to create an employee"""
         c = Client()
@@ -394,7 +420,38 @@ class EmployeeTestCase(TestCase):
 
         self.assertEquals(logs_before + 1, logs_after)
 
-  
+    def test_create_employee_password_invalid_negative_async(self):
+        """ Logged in as an administrator, try to create an employee"""
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        logs_before = EmployeeLog.objects.all().count()
+
+        response = c.post(reverse("employee_create_async"), {
+            "username": "employee_creating",
+            "password1": "iha",
+            "password2": "iha",
+            "first_name": "Francisco",
+            "last_name": "Romualdo",
+            "email": "frc@empresa.com",
+            "identifier": "frc01",
+            "phone": "654321987",
+            "price_per_hour": "2.0",
+        })
+
+        self.assertEquals(response.status_code, 200)
+        # response in bytes must be decode to string
+        data = response.content.decode("utf-8")
+        # string to dict
+        data = json.loads(data)
+
+        self.assertTrue('newPasswordInvalid' in data["errors"])
+
+        # Check that the employee has not been created
+
+        logs_after = EmployeeLog.objects.all().count()
+        self.assertEquals(logs_before, logs_after)
+ 
     def test_create_employee_password_not_match_negative_async(self):
         """ Logged in as an administrator, try to create an employee"""
         c = Client()
@@ -686,6 +743,23 @@ class EmployeeTestCase(TestCase):
         self.assertEquals(form.initial["email"], "emp1@metronus.es")
         self.assertEquals(form.initial["identifier"], "emp01")
         self.assertEquals(form.initial["phone"], "666555444")
+    def test_edit_employee_invalid_email(self):
+        """
+        As an admin, edit an employee profile, with negative price
+        """
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        response = c.post("/employee/edit/emp1/", {
+            "first_name": "NuevoNombre",
+            "last_name": "NuevoApellido",
+            "email": "emp2@metronus.es",
+            "identifier": "nuevoid",
+            "phone": "654654654",
+            "price_per_hour": "4.0",
+        })
+        self.assertEquals(response.status_code, 200)
+        self.assertTrue('employeeCreation_emailNotUnique' in response.context["errors"])
 
     def test_edit_employee_negative_price(self):
         """
@@ -766,7 +840,7 @@ class EmployeeTestCase(TestCase):
 
         initialpass = User.objects.get(username="emp1").password
 
-        c.post("/employee/updatePassword/emp1/", {
+        response=c.post("/employee/updatePassword/emp1/", {
             "newpass1": "nuevapassword",
             "newpass2": "nuevapassword",
             "currentpass": "123456",
@@ -774,6 +848,36 @@ class EmployeeTestCase(TestCase):
 
         final = Employee.objects.get(user__username="emp1")
         self.assertTrue(final.user.password != initialpass)
+        
+        data = response.content.decode("utf-8")
+        # string to dict
+        data = json.loads(data)
+
+        self.assertTrue(data["success"])
+    def test_edit_employee_pass_negative_2(self):
+        """
+        As an admin, try editing an employee password when password invalid
+        """
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        initialpass = User.objects.get(username="emp1").password
+
+        response=c.post("/employee/updatePassword/emp1/", {
+            "newpass1": "nueva",
+            "newpass2": "nueva",
+            "currentpass": "123456",
+        })
+
+        final = Employee.objects.get(user__username="emp1")
+        self.assertTrue(final.user.password == initialpass)
+
+
+        data = response.content.decode("utf-8")
+        # string to dict
+        data = json.loads(data)
+
+        self.assertTrue('newPasswordInvalid' in data["errors"])
 
     def test_edit_employee_pass_negative(self):
         """
@@ -784,7 +888,7 @@ class EmployeeTestCase(TestCase):
 
         initialpass = User.objects.get(username="emp1").password
 
-        c.post("/employee/updatePassword/emp1/", {
+        response=c.post("/employee/updatePassword/emp1/", {
             "newpass1": "nuevapassword",
             "newpass2": "ojala morir",
             "currentpass": "123456",
@@ -793,6 +897,22 @@ class EmployeeTestCase(TestCase):
         final = Employee.objects.get(user__username="emp1")
         self.assertTrue(final.user.password == initialpass)
 
+
+        data = response.content.decode("utf-8")
+        # string to dict
+        data = json.loads(data)
+
+        self.assertTrue('employeeCreation_passwordsDontMatch' in data["errors"])
+
+    def test_edit_pass_operation_not_allowed(self):
+        """
+        Invalid operation head
+        """
+        c = Client()
+        c.login(username="admin1", password="123456")        
+        response = c.head("/employee/updatePassword/emp1/")
+        self.assertEquals(response.status_code, 400)
+    
     def test_edit_employee_not_allowed(self):
         """
         Try editing an employee from other company

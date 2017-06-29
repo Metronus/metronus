@@ -46,7 +46,7 @@ class TaskTestCase(TestCase):
 
         self.assertEquals(logs_before + 1, logs_after)
 
-    def test_create_task_positive_2(self):
+    def test_create_task_positive_async(self):
         """Logged in as an administrator, try to create a task"""
         c = Client()
         c.login(username="metronus", password="metronus")
@@ -159,6 +159,53 @@ class TaskTestCase(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertIn("task_creation_repeated_name",response.context["errors"])
         self.assertNotIn("task_creation_project_department_not_related",response.context["errors"])
+    def test_create_task_duplicate_async(self):
+        """
+        Logged in as an administrator, try to create an task with the name of an existing company
+        """
+        c = Client()
+        c.login(username="ddlsb", password="123456")
+
+        response = c.post("/task/createAsync", {
+            "task_id": "0",
+            "description":"alguno",
+            "name": "Hacer cosas",
+            "project_id":str(Project.objects.get(name="Metronus").id),
+            "department_id":str(Department.objects.get(name="Backend").id),
+            "price_per_hour":"1.0"
+        })
+
+        self.assertEquals(response.status_code, 200)
+        data=response.content.decode("utf-8")
+            #string to dict
+        data=json.loads(data)
+        self.assertIn("task_creation_repeated_name",data["errors"])
+        self.assertNotIn("task_creation_project_department_not_related",data["errors"])
+    
+    def test_create_task_project_department_not_related_async(self):
+        """
+        Logged in as an administrator, try to create an task with the name of an existing company
+        """
+        c = Client()
+        c.login(username="admin", password="admin")
+
+        response = c.post("/task/createAsync", {
+            "task_id": "0",
+            "description":"alguno",
+            "name": "Hacer cosas",
+            "project_id":str(Project.objects.get(name="Proust-Ligeti").id),
+            "department_id":str(Department.objects.get(name="dep3").id),
+            "price_per_hour":"3.0"
+        })
+        self.assertEquals(response.status_code, 200)
+        
+        data=response.content.decode("utf-8")
+            #string to dict
+        data=json.loads(data)
+            
+        self.assertNotIn("task_creation_repeated_name",data["errors"])
+        self.assertIn("task_creation_project_department_not_related",data["errors"])
+
 
     def test_create_task_project_department_not_related(self):
         """
@@ -589,7 +636,27 @@ class TaskTestCase(TestCase):
 
     def test_recover_task_positive(self):
         """
-        Delete a task with proper roles
+        Recover a task with proper roles
+        """
+        c = Client()
+        c.login(username="admin", password="123456")
+
+        response = c.get("/task/list")
+        dep_id=response.context["tasks"][0].id
+
+        response = c.get(reverse("task_delete",args=(dep_id,)))
+        self.assertRedirects(response, "/task/list", fetch_redirect_response=False)
+
+        self.assertFalse(Task.objects.get(pk=dep_id).active)
+
+
+        response = c.get(reverse("task_recover",args=(dep_id,)))
+        self.assertEquals(response.status_code, 200)
+        self.assertTrue(Task.objects.get(pk=dep_id).active)
+
+    def test_recover_task_positive(self):
+        """
+        Only admin or exec can recover
         """
         c = Client()
         c.login(username="ddlsb", password="123456")
@@ -601,7 +668,6 @@ class TaskTestCase(TestCase):
         self.assertRedirects(response, "/task/list", fetch_redirect_response=False)
 
         self.assertFalse(Task.objects.get(pk=dep_id).active)
-
 
         response = c.get(reverse("task_recover",args=(dep_id,)))
         self.assertEquals(response.status_code, 403)
