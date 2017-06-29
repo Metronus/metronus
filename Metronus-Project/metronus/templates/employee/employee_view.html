@@ -50,9 +50,11 @@
           <li>
             <strong>{% trans 'phone' %}</strong> <span class="pull-right">{{employee.phone}}</span>
           </li>
-          <li>
-            <strong>{% trans 'price_per_hour' %}</strong> <span class="pull-right">{{employee.price_per_hour|floatformat:2}} &euro;</span>
-          </li>
+          {% if actor_is_executive or actor_is_admin or actor_is_projectManager %}
+            <li>
+              <strong>{% trans 'price_per_hour' %}</strong> <span class="pull-right">{{employee.price_per_hour|floatformat:2}} &euro;</span>
+            </li>
+          {% endif %}
           <li style="text-align: center">
 
             <span>{% trans 'registryDate' %}: {{employee.registryDate}}</span>
@@ -149,6 +151,7 @@
 
   <div class="clearfix"></div>
 
+  {% if actor_is_executive or actor_is_admin or actor_is_projectManager %}
   <!-- Productivity graphics starts -->
   <div class="col-xs-12 col-md-12 col-lg-6">
     <div class="x_panel">
@@ -239,6 +242,7 @@
     </div>
   </div>
   <!-- Profit graphics ends -->
+  {% endif %}
 
 </div>
 

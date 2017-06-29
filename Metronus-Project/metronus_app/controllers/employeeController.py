@@ -432,6 +432,10 @@ def ajax_productivity_per_task(request, username):
     # Check that the user is logged in and it's an administrator or with permissions
     
     logged = get_authorized_or_403(request)
+
+    # Check that it's at least PM
+    if get_highest_role_tier(logged) < 40:
+        raise PermissionDenied
     
     employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
 
@@ -510,6 +514,10 @@ def ajax_productivity_per_task_and_date(request, username):
 
     # Check that the user is logged in and it's an administrator or with permissions
     logged = get_authorized_or_403(request)
+
+    # Check that it's at least PM
+    if get_highest_role_tier(logged) < 40:
+        raise PermissionDenied
 
     employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
 
@@ -602,6 +610,11 @@ def ajax_profit_per_date(request, employee_id):
     "expenses": [0, 1457.18015695298, 1614.1458826106, 1367.62026485911, 2026.87328274918, 1446.83842607798, 1878.80598163726, 1823.8647251497, 1879.3977160153, 1607.99448986952, 1615.72129910026, 1609.49391115067, 2513.94326680278, 2112.07014158364, 1360.67562490714, 1368.60590722518, 1603.92947753372, 1473.68308776497, 2343.40799525207, 1704.64596258349, 1938.38239104717, 1403.70478335668, 1372.6250345277, 1076.44946125988, 2353.7065671626, 1516.12119421768, 1611.60427318295, 1338.82219760799, 2525.26576799895, 1422.68356444232, 1765.66996904502]}  "expected_productivity": [9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 4.0, 4.0, 2.0, 2.0, 2.0]}}
     """
     logged = get_authorized_or_403(request)
+
+    # Check that it's at least PM
+    if get_highest_role_tier(logged) < 40:
+        raise PermissionDenied
+
     employee = get_object_or_404(Employee, pk=employee_id)
 
     # Check that the admin has permission to view that employee
@@ -694,6 +707,10 @@ def ajax_profit_per_date_in_project(request, employee_id, project_id):
     "expenses": [0, 1457.18015695298, 1614.1458826106, 1367.62026485911, 2026.87328274918, 1446.83842607798, 1878.80598163726, 1823.8647251497, 1879.3977160153, 1607.99448986952, 1615.72129910026, 1609.49391115067, 2513.94326680278, 2112.07014158364, 1360.67562490714, 1368.60590722518, 1603.92947753372, 1473.68308776497, 2343.40799525207, 1704.64596258349, 1938.38239104717, 1403.70478335668, 1372.6250345277, 1076.44946125988, 2353.7065671626, 1516.12119421768, 1611.60427318295, 1338.82219760799, 2525.26576799895, 1422.68356444232, 1765.66996904502]}  "expected_productivity": [9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 4.0, 4.0, 2.0, 2.0, 2.0]}}
     """
 
+    # Check that it's at least PM
+    if get_highest_role_tier(request.user.actor) < 40:
+        raise PermissionDenied
+
     # Get and parse the dates
     start_date = request.GET.get("start_date", str(date.today() - timedelta(days=30)))
     end_date = request.GET.get("end_date", str(date.today()))
@@ -774,6 +791,7 @@ def check_higher_roles(logged, employee):
 
     employee_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee)
 
+    """
     # Check the logged's roles are greater than this for at least one project
     if logged.user_type == "E":
         my_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=logged)
@@ -787,6 +805,7 @@ def check_higher_roles(logged, employee):
 
         if not authorized:
             raise PermissionDenied
+    """
     return employee_roles
 
 def check_metrics_authorized_for_employee_in_project(user, employee_id, project_id):
