@@ -13,6 +13,7 @@ from metronus_app.forms.employeePasswordForm import EmployeePasswordForm
 from metronus_app.model.employee import Employee
 from metronus_app.model.project import Project
 from metronus_app.model.projectDepartment import ProjectDepartment
+from metronus_app.model.department import Department
 from metronus_app.model.employeeLog import EmployeeLog
 from metronus_app.model.task import Task
 from metronus_app.model.goalEvolution import GoalEvolution
@@ -786,28 +787,42 @@ def ajax_get_employee_projects(employee_id):
 def check_higher_roles(logged, employee):
     """Raises 403 if the current actor has lower roles than the one to be shown"""
 
-    # Check that the user is active, unless it's an admin or exec
-    if not employee.user.is_active and not logged.user_type == "A" and not is_executive(logged):
+    highest=get_highest_role_tier(logged)
+    
+    employee_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee)    
+    
+    if highest>=50:
+        #admin or executive can do everything
+        return employee_roles
+    elif not employee.user.is_active:
+        #not admin nor executive, if inactive get out
         raise PermissionDenied
-
-    employee_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee)
-
-    """
-    # Check the logged's roles are greater than this for at least one project
-    if logged.user_type == "E":
-        my_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=logged)
+    else:
+        # Check the logged's roles are greater than this for at least one project
+        my_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=logged,role_id__tier__gte=20)
         authorized = False    
-        for role in my_roles:
-            if ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee,
-                                                            projectDepartment_id=role.projectDepartment_id,
-                                                            role_id__tier__lte=role.role_id.tier).exists():
+        for role in my_roles:      
+            if role.role_id.tier>=40:
+                involved_deps=Department.objects.filter(
+                    projectdepartment__project_id=role.projectDepartment_id.project_id
+                    ).distinct()
+                if ProjectDepartmentEmployeeRole.objects.filter(
+                            employee_id=employee,
+                            projectDepartment_id__department_id__in=involved_deps
+                            ).exists():
+                    authorized = True
+                    break
+            elif ProjectDepartmentEmployeeRole.objects.filter(
+                            employee_id=employee,
+                            projectDepartment_id__department_id=role.projectDepartment_id.department_id
+                            ).exists():
                 authorized = True
                 break
 
         if not authorized:
             raise PermissionDenied
-    """
-    return employee_roles
+    
+        return employee_roles
 
 def check_metrics_authorized_for_employee_in_project(user, employee_id, project_id):
     """
@@ -880,13 +895,7 @@ def get_list_for_role(request):
     actor=get_actor_or_403(request)
     highest=get_highest_role_tier(actor)
 
-    if highest < 20:
-        raise PermissionDenied
-    elif highest>=50:
+    if highest>=50:
         return Employee.objects.filter(company_id=actor.company_id).distinct().order_by("user__first_name","user__last_name")
     else:
-        my_roles = ProjectDepartment.objects.filter(projectdepartmentemployeerole__employee_id=actor).distinct()
-
-        return Employee.objects.filter(
-                        projectdepartmentemployeerole__projectDepartment_id__in=my_roles,
-                        projectdepartmentemployeerole__role_id__tier__lte=highest).distinct().order_by("user__first_name","user__last_name")
+        raise PermissionDenied
