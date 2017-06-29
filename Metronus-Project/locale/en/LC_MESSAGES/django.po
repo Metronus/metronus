@@ -122,6 +122,12 @@ msgid "cookies_popup_ok"
 msgstr "I understand"
 msgid "cookies_popup_link"
 msgstr "Learn more."
+msgid "grafana_popup_msg"
+msgstr "Did you know that Metronus uses Grafana to constantly monitorize the website status? You can access it at"
+msgid "grafana_popup_ok"
+msgstr "Okay"
+msgid "grafana_popup_link"
+msgstr "stats.metronus.es"
 
 #: Legal stuff
 msgid "cookies_title"
