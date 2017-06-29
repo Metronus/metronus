@@ -11,13 +11,13 @@ $(function() {
   $("#flag_es").click(function() {
     if(prod) Cookies.set('lang', 'es-es', {domain: '.metronus.es'});
     else Cookies.set('lang', 'es-es');
-    location.reload(true);
+    window.location.href = window.location.href;
   });
 
   $("#flag_en").click(function() {
     if(prod) Cookies.set('lang', 'en-us', {domain: '.metronus.es'});
     else Cookies.set('lang', 'en-us');
-    location.reload(true);
+    window.location.href = window.location.href;
   });
 
   // Cuando el AJAX da error pero se cambia, se quita el error del ajax para limpiar
