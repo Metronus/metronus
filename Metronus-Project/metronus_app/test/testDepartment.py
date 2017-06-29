@@ -232,10 +232,17 @@ class DepartmentTestCase(TestCase):
         c.login(username="admin1", password="123456")
 
         response = c.get("/department/list")
-        dep_id = response.context["departments"][0].id
+        department=response.context["departments"][0]
+        dep_id = department.id
         response = c.get("/department/view/"+str(dep_id)+"/")
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(len(response.context["employees"]), 1)
+        self.assertEquals(len(response.context["employees"]), 
+            Employee.objects.filter(user__is_active=True,
+            projectdepartmentemployeerole__projectDepartment_id__department_id=department,
+            projectdepartmentemployeerole__role_id__tier__lte=20).distinct().count())
+
+        
+
         self.assertEquals(len(response.context["tasks"]), 0)
         # self.assertEquals(response.context["employees"][0].department.id, dep_id)
         self.assertTrue(response.context["coordinators"] is not None)
