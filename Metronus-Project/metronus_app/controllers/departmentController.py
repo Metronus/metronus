@@ -137,7 +137,8 @@ def view(request, department_id):
 
     tasks = Task.objects.filter(active=True, projectDepartment_id__department_id__id=department_id).order_by("name")
     employees = Employee.objects.filter(user__is_active=True,
-        projectdepartmentemployeerole__projectDepartment_id__department_id=department).distinct().order_by("user__first_name", "user__last_name")
+        projectdepartmentemployeerole__projectDepartment_id__department_id=department,
+        projectdepartmentemployeerole__role_id__tier__lte=20).distinct().order_by("user__first_name", "user__last_name")
 
     return render(request, 'department/department_view.html', {'department': department, 'employees': employees,
                                                                'tasks': tasks, 'coordinators': coordinators})
