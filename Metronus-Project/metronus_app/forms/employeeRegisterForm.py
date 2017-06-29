@@ -15,7 +15,7 @@ class EmployeeRegisterForm(Form):
     email = forms.EmailField(label=_("email"), initial="")
 
     # Employee (Actor) data
-    phone = forms.CharField(label=_("phone"), max_length=15, initial="", validators=[phone_validator])
+    phone = forms.CharField(label=_("phone"), max_length=9, initial="", validators=[phone_validator])
     identifier = forms.CharField(label=_("identifier"), max_length=15, initial="")
     photo = forms.ImageField(label=_("photo"), required=False)
     price_per_hour = forms.FloatField(label=_("price_per_hour"), initial="1.0")
