@@ -99,9 +99,11 @@
               <div class="menu_section">
                 <h3>{% trans 'dashControlPanel' %}</h3>
                 <ul class="nav side-menu">
-                  {% if actor_is_admin %}
+                  {% if actor_is_admin or actor_is_executive %}
                   <li><a href="/dashboard/view"><em class="fa fa-home"></em>{% trans 'dashIndex' %}</span></a>
                   </li>
+                  {% endif %}
+                  {% if actor_is_admin %}
                   <li><a href="/company/view"><em class="fa fa-briefcase"></em>{% trans 'dashCompany' %}</span></a>
                   </li>
                   {% endif %}

@@ -1,4 +1,4 @@
-from metronus_app.common_utils import get_current_admin_or_403
+from metronus_app.common_utils import get_admin_executive_or_403
 from django.http import JsonResponse
 from django.db.models import Sum
 from django.shortcuts import render
@@ -18,7 +18,7 @@ def view(request):
     """
     Standard view for dashboard, is empty as all data will be requested through AJAX
     """
-    get_current_admin_or_403(request)
+    get_admin_executive_or_403(request)
 
     return render(request, 'dashboard.html')
 
@@ -33,7 +33,7 @@ def ajax_time_per_project(request):
 
     # Si se proporcionan pero no tienen el formato correcto se lanzará un error HTTP 400 Bad Request
     """
-    logged = get_current_admin_or_403(request)
+    logged = get_admin_executive_or_403(request)
 
     # Get and parse the dates
     start_date = request.GET.get("start_date", str(date.today() - timedelta(days=30)))
@@ -79,7 +79,7 @@ def ajax_employees_per_project(request):
     Gets the number of employees per project
     """
     
-    logged = get_current_admin_or_403(request)
+    logged = get_admin_executive_or_403(request)
     company_projects = Project.objects.filter(deleted=False, company_id=logged.company_id)
     data = {}
     for project in company_projects:
@@ -96,7 +96,7 @@ def ajax_departments_per_project(request):
     Gets the number of departments per project
     """
     
-    logged = get_current_admin_or_403(request)
+    logged = get_admin_executive_or_403(request)
     company_projects = Project.objects.filter(deleted=False, company_id=logged.company_id)
     data = {}
     for project in company_projects:
@@ -112,7 +112,7 @@ def ajax_tasks_per_project(request):
     Gets the number of tasks per project
     """
     
-    logged = get_current_admin_or_403(request)
+    logged = get_admin_executive_or_403(request)
     company_projects = Project.objects.filter(deleted=False, company_id=logged.company_id)
     data = {}
     for project in company_projects:
