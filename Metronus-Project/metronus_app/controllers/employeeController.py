@@ -890,5 +890,5 @@ def get_list_for_role(request):
         for role in my_roles:
             emp.append(list( Employee.objects.filter(
                         projectdepartmentemployeerole__projectDepartment_id=role.projectDepartment_id,
-                        role_id__tier__lte=role.role_id.tier).distinct().order_by("user__first_name","user__last_name")))
+                        projectdepartmentemployeerole__role_id__tier__lte=role.role_id.tier).distinct().order_by("user__first_name","user__last_name")))
         return emp
