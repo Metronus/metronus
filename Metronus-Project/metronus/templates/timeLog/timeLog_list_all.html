@@ -86,12 +86,16 @@
                 </div>
             </div>
         </div>
-        {% if form.errors %}
-            <p>{{ form.errors }}</p>
-        {% endif %}
+
         <div class="clearfix"></div>
         <div id="successDiv" class="alert alert-success" hidden='true'></div>
         <div id="errorDiv" class="alert alert-danger"  hidden='true'></div>
+
+        {% if form.errors %}
+            <div id="error2Div" class="alert alert-danger">
+                <strong>{% trans 'fail' %} | </strong>{% trans "formNotValid" %}
+            </div>
+        {% endif %}
 
         {% if  valid_production_units == False %}
 
@@ -127,16 +131,22 @@
                 <div class="x_content">
                     <form id="form" class="form-horizontal form-label-left"
                           novalidate method="POST" action="{% url 'timeLog_list_all' %}">{% csrf_token %}
+
                         {% for field in form.visible_fields %}
-                            <div class="{{ field.name }} form-group">
-                                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="{{ form.name.auto_id }}">
-                                    {{ field.label }} *
-                                </label>
-                                <div class="col-md-6 col-sm-6 col-xs-12">
-                                    {{ field }}
+                            {% if field.name != "produced_units" and field.name != "duration" %}
+                                <div class="{{ field.name }} form-group">
+                                    <label class="control-label col-md-4 col-sm-4 col-xs-12" for="{{ form.name.auto_id }}">
+                                        {{ field.label }}{% if field.name != "description" %} *{% endif %}
+                                    </label>
+                                    <div class="col-md-4 col-sm-5 col-xs-12">
+                                        {{ field }}
+                                    </div>
                                 </div>
-                            </div>
+                            {% endif %}
                         {% endfor %}
+
+                        {% show_field form.duration  %}
+                        {% show_field form.produced_units  %}
 
                         {% for field in form.hidden_fields %}{{ field }}{% endfor %}
                         <div class="ln_solid"></div>
@@ -299,13 +309,6 @@
                 validating: 'glyphicon glyphicon-refresh'
             },
             fields: {
-                name: {
-                    validators: {
-                        notEmpty: {
-                            message: "{% trans 'projectNameNotNull' %}"
-                        },
-                    }
-                },
                 project_id: {
                     validators: {
                         notEmpty: {
@@ -335,7 +338,7 @@
                             message: "{% trans 'invalid_number' %}",
                         },
                         notEmpty: {
-                            message: "{% trans 'fieldEmpty' %}"
+                            message: "{% trans 'invalid_number' %}"
                         }
                     }
                 },
