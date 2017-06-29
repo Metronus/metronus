@@ -12,6 +12,7 @@ from metronus_app.forms.employeeEditForm import EmployeeEditForm
 from metronus_app.forms.employeePasswordForm import EmployeePasswordForm
 from metronus_app.model.employee import Employee
 from metronus_app.model.project import Project
+from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.employeeLog import EmployeeLog
 from metronus_app.model.task import Task
 from metronus_app.model.goalEvolution import GoalEvolution
@@ -884,11 +885,8 @@ def get_list_for_role(request):
     elif highest>=50:
         return Employee.objects.filter(company_id=actor.company_id).distinct().order_by("user__first_name","user__last_name")
     else:
-        my_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor)
-        emp=[]
-        #For each role, check all employees below and add to list
-        for role in my_roles:
-            emp.append(list( Employee.objects.filter(
-                        projectdepartmentemployeerole__projectDepartment_id=role.projectDepartment_id,
-                        projectdepartmentemployeerole__role_id__tier__lte=role.role_id.tier).distinct().order_by("user__first_name","user__last_name")))
-        return emp
+        my_roles = ProjectDepartment.objects.filter(projectdepartmentemployeerole__employee_id=actor).distinct()
+
+        return Employee.objects.filter(
+                        projectdepartmentemployeerole__projectDepartment_id__in=my_roles,
+                        projectdepartmentemployeerole__role_id__tier__lte=highest).distinct().order_by("user__first_name","user__last_name")

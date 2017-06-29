@@ -580,7 +580,29 @@ class EmployeeTestCase(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertEquals(len(response.context["employees"]), 2)
         self.assertTrue(response.context["employees"][0].identifier== "emp01" or response.context["employees"][0].identifier== "emp03")
+    def test_list_employees_positive_2(self):
+        """
+        As an pm, list the employees
+        """
+        c = Client()
+        c.login(username="emp3", password="123456")
 
+        response = c.get("/employee/list")
+
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(len(response.context["employees"]), 2)
+        self.assertTrue(response.context["employees"][0].identifier== "emp01" or response.context["employees"][0].identifier== "emp03")
+    def test_list_employees_negative(self):
+        """
+        As an employee, list the employees
+        """
+        c = Client()
+        c.login(username="emp1", password="123456")
+
+        response = c.get("/employee/list")
+
+        self.assertEquals(response.status_code, 403)
+        
     def test_list_employees_not_logged(self):
         """
         Try listing the employees without authentication
