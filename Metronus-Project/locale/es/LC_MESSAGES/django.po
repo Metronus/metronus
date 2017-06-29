@@ -679,7 +679,8 @@ msgid "timeLogNot"
 msgstr "Todavía no has registrado el registro de tiempo"
 msgid "timeLogConfirm"
 msgstr "¿Está seguro de eliminar el registro de tiempo? Se eliminará también todo lo relacionado con el mismo"
-
+msgid "timelog_help_1"
+msgstr "Puedes borrar entradas de tiempos pulsando en ellas"
 #: Roles
 msgid "rol"
 msgstr "Rol"

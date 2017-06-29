@@ -670,6 +670,8 @@ msgid "no_goal"
 msgstr "No production goal"
 msgid "invalid_date"
 msgstr "The date is wrong"
+msgid "timelog_help_1"
+msgstr "You can delete time entries by clicking on them"
 
 msgid "createTimeLog"
 msgstr "Create Time Log"
