@@ -8,16 +8,25 @@ $(function() {
 
   var prod = window.location.hostname.indexOf("metronus.es") !== -1;
 
+  function custom_reload() {
+    var cur_href = window.location.href;
+    if(cur_href.endsWith("#")) {
+      window.location.href = cur_href.substring(0, cur_href.length - 1);
+    } else {
+      window.location.href = cur_href;
+    }
+  }
+
   $("#flag_es").click(function() {
     if(prod) Cookies.set('lang', 'es-es', {domain: '.metronus.es'});
     else Cookies.set('lang', 'es-es');
-    window.location.href = window.location.href;
+    custom_reload();
   });
 
   $("#flag_en").click(function() {
     if(prod) Cookies.set('lang', 'en-us', {domain: '.metronus.es'});
     else Cookies.set('lang', 'en-us');
-    window.location.href = window.location.href;
+    custom_reload();
   });
 
   // Cuando el AJAX da error pero se cambia, se quita el error del ajax para limpiar
