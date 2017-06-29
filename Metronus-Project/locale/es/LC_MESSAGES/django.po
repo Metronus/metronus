@@ -122,6 +122,12 @@ msgid "cookies_popup_ok"
 msgstr "De acuerdo"
 msgid "cookies_popup_link"
 msgstr "Saber más."
+msgid "grafana_popup_msg"
+msgstr "¿Sabía que Metronus usa Grafana para monitorear de manera constante el estado de la web? Puede acceder en"
+msgid "grafana_popup_ok"
+msgstr "De acuerdo"
+msgid "grafana_popup_link"
+msgstr "stats.metronus.es"
 
 #: Legal stuff
 msgid "cookies_title"
