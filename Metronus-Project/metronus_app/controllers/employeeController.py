@@ -22,7 +22,7 @@ from django.http import HttpResponse
 
 from metronus_app.common_utils import (is_role_updatable_by_user, check_image, get_current_employee_or_403, send_mail,
                                        is_email_unique, is_username_unique, get_authorized_or_403,default_round,
-                                       validate_pass, get_admin_executive_or_403, is_executive,same_company_or_403)
+                                       validate_pass,get_highest_role_tier,get_actor_or_403, get_admin_executive_or_403, is_executive,same_company_or_403)
 from datetime import date, timedelta, datetime
 import re
 
@@ -190,8 +190,7 @@ def list_employees(request):
     """
 
     # Check that the user is logged in and it's an administrator
-    admin = get_authorized_or_403(request)
-    employees = Employee.objects.filter(company_id=admin.company_id)
+    employees = get_list_for_role(request)
     active = employees.filter(user__is_active = True)
     inactive = employees.filter(user__is_active = False)
     return render(request, 'employee/employee_list.html',
@@ -778,14 +777,13 @@ def check_higher_roles(logged, employee):
     # Check the logged's roles are greater than this for at least one project
     if logged.user_type == "E":
         my_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=logged)
-        authorized = my_roles.exists()
-        if authorized:
-            for role in my_roles:
-                if ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee,
-                                                                projectDepartment_id=role.projectDepartment_id,
-                                                                role_id__tier__lt=role.role_id.tier).exists():
-                    authorized = True
-                    break
+        authorized = False    
+        for role in my_roles:
+            if ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee,
+                                                            projectDepartment_id=role.projectDepartment_id,
+                                                            role_id__tier__lte=role.role_id.tier).exists():
+                authorized = True
+                break
 
         if not authorized:
             raise PermissionDenied
@@ -853,3 +851,25 @@ def send_register_email(email, name):
     send_mail(ugettext_lazy("register_mail_subject"),
               "employee/employee_register_email.html", [email], "employee/employee_register_email.html",
               {'html': True, 'employee_name': name})
+
+def get_list_for_role(request):
+    """
+    Gets the list of employees according to the role tier of the logged user
+    """
+
+    actor=get_actor_or_403(request)
+    highest=get_highest_role_tier(actor)
+
+    if highest < 20:
+        raise PermissionDenied
+    elif highest>=50:
+        return Employee.objects.filter(company_id=actor.company_id).distinct().order_by("user__first_name","user__last_name")
+    else:
+        my_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor)
+        emp=[]
+        #For each role, check all employees below and add to list
+        for role in my_roles:
+            emp.append(list( Employee.objects.filter(
+                        projectdepartmentemployeerole__projectDepartment_id=role.projectDepartment_id,
+                        role_id__tier__lte=role.role_id.tier).distinct().order_by("user__first_name","user__last_name")))
+        return emp

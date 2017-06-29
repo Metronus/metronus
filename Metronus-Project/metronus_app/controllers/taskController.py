@@ -195,7 +195,8 @@ def view(request, task_id):
     same_company_or_403(actor,task.actor_id)
 
     goal_evolution = GoalEvolution.objects.filter(task_id=task.id)
-    employees = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__task=task.id).distinct()
+    employees = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__task=task.id,
+        projectdepartmentemployeerole__role_id__tier__lte=20).distinct()
 
     return render(request, "task/task_view.html", {"task": task, "goal_evolution": goal_evolution, "employees": employees})
 
