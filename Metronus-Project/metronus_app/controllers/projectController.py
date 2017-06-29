@@ -511,7 +511,7 @@ def get_list_for_role(request):
         # If it's for view, projectmanager and greater can access too
         return Project.objects.filter(
                     projectdepartment__projectdepartmentemployeerole__employee_id=actor,
-                    projectdepartment__projectdepartmentemployeerole__tier__gte=40,
+                    projectdepartment__projectdepartmentemployeerole__role_id__tier__gte=40,
                     company_id=actor.company_id, deleted=False).distinct().order_by("name")
 
     # Otherwise GTFO

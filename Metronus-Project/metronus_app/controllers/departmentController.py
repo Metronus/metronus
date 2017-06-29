@@ -497,7 +497,7 @@ def get_list_for_role(request):
 
         return Department.objects.filter(
                 projectdepartment__projectdepartmentemployeerole__employee_id=actor,
-                projectdepartment__projectdepartmentemployeerole__tier__gte=20,
+                projectdepartment__projectdepartmentemployeerole__role_id__tier__gte=20,
                 company_id=actor.company_id,active=True).distinct().order_by("name")
 
     # Otherwise GTFO
