@@ -119,7 +119,7 @@
 
 
 
-                  {% if actor_is_admin or actor_is_executive or actor_is_projectManager or actor_is_coordinator or actor_is_teamManager %}
+                  {% if actor_is_admin or actor_is_executive or actor_is_projectManager or actor_is_coordinator  %}
                   <li><a><em class="fa fa-group"></em>{% trans 'dashDepartments' %}<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/department/list">{% trans 'dashDepartmentsList' %}</a></li>
@@ -141,7 +141,7 @@
                   </li>
                   {% endif %}
 
-                  {% if actor_is_admin or actor_is_executive or actor_is_projectManager or actor_is_teamManager or actor_is_coordinator %}
+                  {% if actor_is_admin or actor_is_executive or actor_is_projectManager or  actor_is_coordinator %}
                   <li><a><em class="fa fa-tasks"></em>{% trans 'dashTasks' %}<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/task/list">{% trans 'dashTasksList' %}</a></li>
