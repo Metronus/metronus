@@ -99,9 +99,11 @@
               <div class="menu_section">
                 <h3>{% trans 'dashControlPanel' %}</h3>
                 <ul class="nav side-menu">
-                  {% if actor_is_admin %}
+                  {% if actor_is_admin or actor_is_executive %}
                   <li><a href="/dashboard/view"><em class="fa fa-home"></em>{% trans 'dashIndex' %}</span></a>
                   </li>
+                  {% endif %}
+                  {% if actor_is_admin %}
                   <li><a href="/company/view"><em class="fa fa-briefcase"></em>{% trans 'dashCompany' %}</span></a>
                   </li>
                   {% endif %}
@@ -120,7 +122,7 @@
 
 
 
-                  {% if actor_is_admin or actor_is_executive or actor_is_projectManager or actor_is_coordinator or actor_is_teamManager  %}
+                  {% if actor_is_admin or actor_is_executive or actor_is_projectManager or actor_is_coordinator   %}
                   <li><a><em class="fa fa-group"></em>{% trans 'dashDepartments' %}<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/department/list">{% trans 'dashDepartmentsList' %}</a></li>
@@ -131,18 +133,18 @@
                   </li>
                   {% endif %}
 
-                  {% if actor_is_admin or actor_is_executive or actor_is_projectManager or actor_is_coordinator or actor_is_teamManager %}
+                  {% if actor_is_admin or actor_is_executive %}
                   <li><a><em class="fa fa-user"></em>{% trans 'dashEmployees' %}<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/employee/list">{% trans 'dashEmployeesList' %}</a></li>
-                      {% if actor_is_admin or actor_is_executive %}
+                      
                       <li><a href="/employee/create">{% trans 'dashEmployeesCreate' %}</a></li>
-                      {% endif%}
+                      
                     </ul>
                   </li>
                   {% endif %}
 
-                  {% if actor_is_admin or actor_is_executive or actor_is_projectManager or actor_is_coordinator or actor_is_teamManager %}
+                  {% if actor_is_admin or actor_is_executive or actor_is_projectManager or actor_is_coordinator %}
                   <li><a><em class="fa fa-tasks"></em>{% trans 'dashTasks' %}<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/task/list">{% trans 'dashTasksList' %}</a></li>
@@ -190,7 +192,7 @@
                     <span class=" fa fa-angle-down"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-usermenu pull-right">
-                    {% if actor_is_executive or actor_is_projectManager or actor_is_coordinator or actor_is_teamManager  %}
+                    {% if actor_is_executive or actor_is_projectManager or actor_is_coordinator  %}
                       <li><a href="/employee/view/{{user.get_username}}/"><em class="fa fa-user pull-right"></em>{% trans 'profile' %}</a></li>
                     {% endif %}
                     <li><a href="/logout/"><em class="fa fa-sign-out pull-right"></em>{% trans 'dashLogout' %}</a></li>

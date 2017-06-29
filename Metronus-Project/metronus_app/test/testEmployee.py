@@ -76,6 +76,20 @@ class EmployeeTestCase(TestCase):
             first_name="Alberto",
             last_name="Bertoa"
         )
+        employee4_user = User.objects.create_user(
+            username="emp4",
+            password="123456",
+            email="emp4@metronus.es",
+            first_name="Albertona",
+            last_name="Bertona"
+        )
+        employee5_user = User.objects.create_user(
+            username="emp5",
+            password="123456",
+            email="emp5@metronus.es",
+            first_name="Alberna",
+            last_name="Berta"
+        )
 
         # Employee 1
         emp1=Employee.objects.create(
@@ -86,7 +100,7 @@ class EmployeeTestCase(TestCase):
             company_id=company1
         )
         # Employee 3
-        emp2=Employee.objects.create(
+        emp3=Employee.objects.create(
             user=employee3_user,
             user_type="E",
             identifier="emp03",
@@ -102,12 +116,30 @@ class EmployeeTestCase(TestCase):
             phone="666555444",
             company_id=company2
         )
-
+        # Employee 4
+        emp4=Employee.objects.create(
+            user=employee4_user,
+            user_type="E",
+            identifier="emp04",
+            phone="666555444",
+            company_id=company1
+        )
+        # Employee 4
+        emp5=Employee.objects.create(
+            user=employee5_user,
+            user_type="E",
+            identifier="emp05",
+            phone="666555845",
+            company_id=company1
+        )
         proj1 = Project.objects.create(
             name="Metronus",
             deleted=False,
             company_id=company1)
-
+        proj2 = Project.objects.create(
+                    name="Metronusu",
+                    deleted=False,
+                    company_id=company1)
         dep1 = Department.objects.create(
             name="Backend",
             active=True,company_id=company1)
@@ -126,6 +158,9 @@ class EmployeeTestCase(TestCase):
         pd2 = ProjectDepartment.objects.create(
             project_id = proj1,
             department_id = dep2)
+        pd3 = ProjectDepartment.objects.create(
+            project_id = proj2,
+            department_id = dep2)
 
         populate_roles()
 
@@ -140,8 +175,17 @@ class EmployeeTestCase(TestCase):
             role_id= emp_role)
         ProjectDepartmentEmployeeRole.objects.create(
             projectDepartment_id=pd1,
-            employee_id=emp2,
+            employee_id=emp3,
             role_id=pm_role)
+
+        ProjectDepartmentEmployeeRole.objects.create(
+            projectDepartment_id=pd2,
+            employee_id=emp4,
+            role_id=coor_role)
+        ProjectDepartmentEmployeeRole.objects.create(
+            projectDepartment_id=pd3,
+            employee_id=emp5,
+            role_id=coor_role)
 
     def test_create_form_view(self):
         """ Logged in as an administrator, get the form view"""
@@ -635,8 +679,10 @@ class EmployeeTestCase(TestCase):
         response = c.get("/employee/list")
 
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(len(response.context["employees"]), 2)
-        self.assertTrue(response.context["employees"][0].identifier== "emp01" or response.context["employees"][0].identifier== "emp03")
+        self.assertEquals(len(response.context["employees"]), 4)
+        iden=response.context["employees"][0].identifier
+        self.assertTrue(iden in [ "emp01" , "emp03","emp04","emp05"])
+    
     def test_list_employees_positive_2(self):
         """
         As an pm, list the employees
@@ -646,9 +692,8 @@ class EmployeeTestCase(TestCase):
 
         response = c.get("/employee/list")
 
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(len(response.context["employees"]), 2)
-        self.assertTrue(response.context["employees"][0].identifier== "emp01" or response.context["employees"][0].identifier== "emp03")
+        self.assertEquals(response.status_code, 403)
+    
     def test_list_employees_negative(self):
         """
         As an employee, list the employees
@@ -684,7 +729,7 @@ class EmployeeTestCase(TestCase):
         self.assertEquals(employee.user.first_name, "Álvaro")
     def test_view_employee_positive_2(self):
         """
-        As a role, view an employee profile with lower role
+        As a pm, view an employee profile with lower role
         """
         c = Client()
         c.login(username="emp3", password="123456")
@@ -696,6 +741,58 @@ class EmployeeTestCase(TestCase):
         self.assertTrue(employee)
         self.assertEquals(employee.identifier, "emp01")
         self.assertEquals(employee.user.first_name, "Álvaro")
+    
+    def test_view_employee_positive_4(self):
+        """
+        As a project manager, see coordinator in same project
+        """
+        c = Client()
+        c.login(username="emp3", password="123456")
+
+        response = c.get(reverse("employee_view",args=("emp4",)))
+
+        self.assertEquals(response.status_code, 200)
+        employee = response.context["employee"]
+        self.assertTrue(employee)
+        self.assertEquals(employee.identifier, "emp04")
+
+    
+    def test_view_employee_positive_5(self):
+        """
+        As a coordinator, view from sharing department and other project
+        """
+        c = Client()
+        c.login(username="emp4", password="123456")
+
+        response = c.get(reverse("employee_view",args=("emp5",)))
+
+        self.assertEquals(response.status_code, 200)
+        employee = response.context["employee"]
+        self.assertTrue(employee)
+        self.assertEquals(employee.identifier, "emp05")
+    
+    def test_view_employee_negative_not_related(self):
+        """
+        As a role, coordinator try view an employee from other department
+        """
+        c = Client()
+        c.login(username="emp4", password="123456")
+
+        response = c.get(reverse("employee_view",args=("emp3",)))
+
+        self.assertEquals(response.status_code, 403)
+
+    def test_view_employee_negative_not_related_2(self):
+        """
+        As a coord, view an employee profile with lower role
+        """
+        c = Client()
+        c.login(username="emp4", password="123456")
+
+        response = c.get(reverse("employee_view",args=("emp1",)))
+
+        self.assertEquals(response.status_code, 403)
+        
 
     def test_view_employee_not_allowed(self):
         """
