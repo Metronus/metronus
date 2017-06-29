@@ -160,6 +160,14 @@ def check_produced_units(form):
     """
     task = find_task(form.cleaned_data['task_id'])
     prod_units = form.cleaned_data['produced_units']
+
+    # If it's not empty, check that it's a number
+    if prod_units:
+        try:
+            float(prod_units)
+        except:
+            return False
+
     # both null or empty OR both not null or empty
     return (prod_units is not None and prod_units != "" and prod_units > 0 and task.production_goal is not None and task.production_goal != "") or \
            ((prod_units is None or prod_units == "") and (task.production_goal is None or task.production_goal == ""))
