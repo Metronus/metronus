@@ -11,4 +11,4 @@ class EmployeeLog(models.Model):
     price_per_hour = models.FloatField(default=1.0)
 
     def __unicode__(self):
-        return self.employee_id + "-" + self.event + "-" + self.event_date
+        return "{0} - {1} - {2}".format(self.employee_id , self.event , self.event_date)
