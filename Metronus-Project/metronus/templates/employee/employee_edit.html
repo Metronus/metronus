@@ -248,6 +248,7 @@
           if(data.success) {
             $("#form_cambiar_pass").data('bootstrapValidator').resetForm();
             $("#form_cambiar_pass").trigger("reset");
+            $("#form_cambiar_pass div").removeClass("checked");
             html = "<div class='alert alert-success alert-dismissable'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><strong>{% trans 'success' %} &nbsp;</strong> {% trans 'change_pass_success' %}</div>";
           } else {
             var msg = "";
