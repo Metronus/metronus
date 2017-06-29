@@ -239,7 +239,7 @@ class DepartmentTestCase(TestCase):
         self.assertEquals(len(response.context["employees"]), 
             Employee.objects.filter(user__is_active=True,
             projectdepartmentemployeerole__projectDepartment_id__department_id=department,
-            projectdepartmentemployeerole__role_id__tier__lte=20).distinct().count())
+            projectdepartmentemployeerole__role_id__tier__lte=40).distinct().count())
 
         
 
