@@ -13,7 +13,7 @@ from datetime import date, timedelta, datetime
 import re
 from metronus_app.common_utils import (get_admin_executive_or_403,default_round,
     get_actor_or_403, is_executive,same_company_or_403, get_highest_role_tier)
-
+from metronus_app.controllers.taskController import get_list_for_role as task_list
 def create(request):
     """
     parameters/returns:
@@ -135,7 +135,8 @@ def view(request, department_id):
 
     coordinators = get_coordinator(department)
 
-    tasks = Task.objects.filter(active=True, projectDepartment_id__department_id__id=department_id).order_by("name")
+    tasks = task_list(request).filter(projectDepartment_id__department_id__id=department_id)
+
     employees = Employee.objects.filter(user__is_active=True,
         projectdepartmentemployeerole__projectDepartment_id__department_id=department,
         projectdepartmentemployeerole__role_id__tier__lte=40).distinct().order_by("user__first_name", "user__last_name")

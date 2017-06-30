@@ -204,7 +204,7 @@
                   <tbody>
                     {% for tasks in department.projectdepartment_set.all %}
                     {% for task in  tasks.task_set.all%}
-                    {% if project.id == task.projectDepartment_id.project_id.id and  task.projectDepartment_id.department_id.id == department.id%}
+                    {% if task.active and project.id == task.projectDepartment_id.project_id.id and  task.projectDepartment_id.department_id.id == department.id%}
                     <tr data-href="{% url 'task_view' task.id %}" style="cursor: pointer;">
                       <td>{{task.name}}</td>
                       <td>{{task.registryDate}}</td>

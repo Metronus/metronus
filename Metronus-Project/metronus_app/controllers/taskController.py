@@ -626,37 +626,26 @@ def find_collections(request):
     Gets the projects and departments the logged user can create tasks for, depending to their roles
     """
     actor=get_actor_or_403(request)
-
-    if actor.user_type != 'A':
-        # not an admin
-        is_executive = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=50)
-        res = is_executive.count() > 0
-
-
-        if res:
-            # is executive
-            proyectos = Project.objects.filter(company_id=actor.company_id, deleted=False)
-            departamentos = Department.objects.filter(company_id=actor.company_id, active=True)
-        else:
-            # not an executive
-          
-            roles_dep = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=20)
-
-            if roles_dep.count() > 0:
-                # you're a project manager. Loading your projects
-                proyectos = Project.objects.filter(
-                    company_id=actor.company_id, deleted=False,
-                    projectdepartment__projectdepartmentemployeerole__employee_id=actor).distinct()
-                departamentos = Department.objects.filter(
-                    company_id=actor.company_id, active=True,
-                    projectdepartment__projectdepartmentemployeerole__employee_id=actor).distinct()
-            else:
-                # not any of this? get outta here!!
-                raise PermissionDenied
-    else:
-        # is admin
+    if actor.user_type == "A" or is_executive(actor):
         proyectos = Project.objects.filter(company_id=actor.company_id, deleted=False)
-        departamentos = Department.objects.filter(company_id=actor.company_id, active=True)
+        departamentos = Department.objects.filter(company_id=actor.company_id, active=True)    
+    else:
+        # not an executive
+      
+        roles_dep = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=20)
+
+        if roles_dep.count() > 0:
+            # you're a project manager. Loading your projects
+            proyectos = Project.objects.filter(
+                company_id=actor.company_id, deleted=False,
+                projectdepartment__projectdepartmentemployeerole__employee_id=actor).distinct()
+            departamentos = Department.objects.filter(
+                company_id=actor.company_id, active=True,
+                projectdepartment__projectdepartmentemployeerole__employee_id=actor).distinct()
+        else:
+            # not any of this? get outta here!!
+            raise PermissionDenied
+    
     return {"departments": departamentos, "projects": proyectos}
 
 
@@ -670,37 +659,27 @@ def find_departments(request):
     project_id = request.GET.get("project_id")
     
     actor=get_actor_or_403(request)
-    
-    if actor.user_type != 'A':
-        # not an admin
-        is_executive = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=50)
-        res = is_executive.count() > 0
-
-        if res:
-            # is executive
-            departamentos = Department.objects.filter(projectdepartment__project_id_id=project_id,company_id=actor.company_id, active=True)
-        else:
-            # not an executive
-            roles_dep = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=20,
-                projectDepartment_id__project_id__deleted=False,projectDepartment_id__department_id__active=True)
-
-            if roles_dep.count() > 0:
-                # you're a project manager or a coordinator. Loading your departments for the selected project
-                departamentos = Department.objects.filter(
-                    company_id=actor.company_id, active=True,
-                    projectdepartment__projectdepartmentemployeerole__employee_id=actor,
-                    projectdepartment__project_id_id=project_id).distinct()
-            else:
-                # not any of this? get outta here!!
-                raise PermissionDenied
+    if actor.user_type == "A" or is_executive(actor):
+        departamentos = Department.objects.filter(projectdepartment__project_id_id=project_id,company_id=actor.company_id, active=True)
     else:
-        # is admin
+    
+        # not an executive
+        roles_dep = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=20,
+            projectDepartment_id__project_id__deleted=False,projectDepartment_id__department_id__active=True)
 
-        departamentos = Department.objects.filter(company_id=actor.company_id,projectdepartment__project_id_id=project_id, active=True)
+        if roles_dep.count() > 0:
+            # you're a project manager or a coordinator. Loading your departments for the selected project
+            departamentos = Department.objects.filter(
+                company_id=actor.company_id, active=True,
+                projectdepartment__projectdepartmentemployeerole__employee_id=actor,
+                projectdepartment__project_id_id=project_id).distinct()
+        else:
+            # not any of this? get outta here!!
+            raise PermissionDenied
     return departamentos
 
 
-def check_task(request,task, for_edit=False, for_view=False):
+def check_task(request,task, for_view=False):
     """
     checks if the task belongs to the logged actor with appropiate roles
     """ 
