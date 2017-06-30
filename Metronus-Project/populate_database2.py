@@ -70,7 +70,7 @@ def create_employee_in_projdept(project, department, company):
     except ObjectDoesNotExist:
         pd = ProjectDepartment.objects.create(project_id=project, department_id=department)
 
-    role = Role.objects.get(tier=random.choice([10, 20, 30, 40, 50]))
+    role = Role.objects.get(tier=random.choice([10, 15, 20, 40, 50]))
     ProjectDepartmentEmployeeRole.objects.create(projectDepartment_id=pd, role_id=role, employee_id=employee)
 
     return employee
@@ -235,9 +235,9 @@ def populate_roles():
     Role.objects.create(name="EXECUTIVE", tier=50)
     # El jefe de proyecto
     Role.objects.create(name="PROJECT_MANAGER", tier=40)
-    # El jefe de equipo
-    Role.objects.create(name="TEAM_MANAGER", tier=15)
     # El coordinador del departamento
     Role.objects.create(name="COORDINATOR", tier=20)
+    # El jefe de equipo
+    Role.objects.create(name="TEAM_MANAGER", tier=15)
     # El empleado
     Role.objects.create(name="EMPLOYEE", tier=10)
