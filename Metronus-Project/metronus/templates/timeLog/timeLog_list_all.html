@@ -48,6 +48,7 @@
                     <div class="table-responsive">
                             <div class="help-tooltip">
                                 <p class="help-block">{% trans 'timelog_help_1' %}</p>
+                                <p class="help-block">{% trans 'timelog_help_2' %}</p>
                             </div>
                         <table class="table table-striped">
                              <thead class="thead-inverse">
@@ -193,12 +194,12 @@
 <script>
 
     $.urlParam = function(name){
-        var results = new RegExp('[\?&]' + name + '=(.*?)(?:&|$)').exec(window.location.href);
+        var results = new RegExp('[\?&]' + name + '=(.*?)(?:&|$|#)').exec(window.location.href);
         if (results==null){
            return null;
         }
         else{
-           return results[1] || 0;
+           return results[1] || 0; // No sé qué pinta aquí este || pero supongo que el de stackoverflow sí lo sabrá
         }
     }
 
