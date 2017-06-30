@@ -46,6 +46,9 @@
 
                 <div class="x_content">
                     <div class="table-responsive">
+                            <div class="help-tooltip">
+                                <p class="help-block">{% trans 'timelog_help_1' %}</p>
+                            </div>
                         <table class="table table-striped">
                              <thead class="thead-inverse">
                                 <tr>
@@ -67,6 +70,7 @@
                                                 <a {% if duration.0 != 0 %}
                                                         data-href="{% url 'timeLog_delete' duration.1 %}"
                                                         data-toggle="modal" data-target="#confirm-delete"
+                                                        style="cursor: pointer;"
                                                     {% endif %}>
 
                                                     {% converto_to_hours duration.0 %}
@@ -127,11 +131,7 @@
 
                     <div class="clearfix"></div>
                 </div>
-    
-            <div class="help-tooltip">
-                <p class="help-block">{% trans 'timelog_help_1' %}</p>
-            </div>
-                    
+
                  <div class="clearfix"></div>
 
                 <div class="x_content">
