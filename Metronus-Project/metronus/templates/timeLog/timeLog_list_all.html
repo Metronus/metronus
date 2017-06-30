@@ -21,13 +21,13 @@
             <div class="x_panel">
                 <div class="row x_title">
                     <div class="col-md-6 col-xs-12">
-                        <h2>{% trans 'dashTimeControlList' %}</h2>
+                        <h2 id="timelog_control_title">{% trans 'dashTimeControlList' %}</h2>
                     </div>
 
                     <div class="col-md-6 col-xs-12">
                         <div class="pull-right">
                             <fieldset>
-                              <legend>{% trans 'datePicker' %}</legend>
+                              <legend>{% trans 'datePicker_timelog' %}</legend>
                                 <div class="control-group">
                                     <div class="controls">
                                         <div class="input-prepend input-group">
@@ -191,6 +191,93 @@
 
 {% block javascript %}
 <script>
+
+    $.urlParam = function(name){
+        var results = new RegExp('[\?&]' + name + '=(.*?)(?:&|$)').exec(window.location.href);
+        if (results==null){
+           return null;
+        }
+        else{
+           return results[1] || 0;
+        }
+    }
+
+    // Poner en el header el mes actual to chulo
+    $(function() {
+        var title = $("#timelog_control_title");
+        title.append(" {% trans "for" %} ");
+
+        var curMonth, curYear;
+        var now = new Date();
+
+        var urlMonth = $.urlParam("currentMonth");
+        if(urlMonth) {
+            curMonth = urlMonth;
+        } else {
+            curMonth = now.getMonth() + 1;
+        }
+
+        var urlYear = $.urlParam("currentYear");
+        if(urlYear) {
+            curYear = urlYear;
+        } else {
+            curYear = now.getFullYear();
+        }
+
+        var curMonthStr;
+
+        switch(curMonth) {
+            case 1:
+            case "1":
+                curMonthStr = "{% trans "jan" %}";
+                break;
+            case 2:
+            case "2":
+                curMonthStr = "{% trans "feb" %}";
+                break;
+            case 3:
+            case "3":
+                curMonthStr = "{% trans "mar" %}";
+                break;
+            case 4:
+            case "4":
+                curMonthStr = "{% trans "apr" %}";
+                break;
+            case 5:
+            case "5":
+                curMonthStr = "{% trans "may" %}";
+                break;
+            case 6:
+            case "6":
+                curMonthStr = "{% trans "jun" %}";
+                break;
+            case 7:
+            case "7":
+                curMonthStr = "{% trans "jul" %}";
+                break;
+            case 8:
+            case "8":
+                curMonthStr = "{% trans "aug" %}";
+                break;
+            case 9:
+            case "9":
+                curMonthStr = "{% trans "sep" %}";
+                break;
+            case 10:
+            case "10":
+                curMonthStr = "{% trans "oct" %}";
+                break;
+            case 11:
+            case "11":
+                curMonthStr = "{% trans "nov" %}";
+                break;
+            case 12:
+            case "12":
+                curMonthStr = "{% trans "dec" %}";
+        }
+
+        title.append("<b>" + curMonthStr + " " + curYear + "</b>");
+    });
 
     $(document).ready(function() {
         $('input[name="date_field"]').daterangepicker({
