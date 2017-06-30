@@ -596,7 +596,7 @@ def get_list_for_role(request):
             projectDepartment_id__project_id__deleted=False,
             projectDepartment_id__department_id__active=True,
             projectDepartment_id__projectdepartmentemployeerole__role_id__tier__gte=20,
-            projectDepartment_id__projectdepartmentemployeerole__employee_id=actor).distinct().order_by("name")
+            projectDepartment_id__projectdepartmentemployeerole__employee_id=actor).distinct()
 
 
 def find_name(pname, project_department):
