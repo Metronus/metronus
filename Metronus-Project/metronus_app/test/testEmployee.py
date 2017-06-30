@@ -294,7 +294,6 @@ class EmployeeTestCase(TestCase):
 
         logs_after = EmployeeLog.objects.all().count()
         self.assertEquals(logs_before, logs_after)
-    
     def test_create_employee_password_not_match_negative(self):
         """ Logged in as an administrator, try to create an employee"""
         c = Client()

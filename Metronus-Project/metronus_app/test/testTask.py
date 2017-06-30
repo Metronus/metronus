@@ -291,22 +291,48 @@ class TaskTestCase(TestCase):
             self.assertTrue(form is not None)
             self.assertTrue(response.context["projects"].count()>0)
     def test_form_task_find_departments(self):
-            """
-            Get task creation form task  with proper roles (Backend department)
-            """
-            c = Client()
-            c.login(username="agubelu", password="123456")
-            
-            
-            response = c.get("/task/getdepartments?project_id={0}".format(Project.objects.get(name="Metronus").id))
-            self.assertEquals(response.status_code, 200)
-            #response in bytes must be decode to string
-            data=response.content.decode("utf-8")
-            #string to dict
-            data=json.loads(data)
-            self.assertTrue(len(data)>0)
-            self.assertTrue(data[0]['model'],'metronus_app_department')
-            
+        """
+        Get task creation form task  with proper roles (Backend department)
+        """
+        c = Client()
+        c.login(username="agubelu", password="123456")
+        
+        
+        response = c.get("/task/getdepartments?project_id={0}".format(Project.objects.get(name="Metronus").id))
+        self.assertEquals(response.status_code, 200)
+        #response in bytes must be decode to string
+        data=response.content.decode("utf-8")
+        #string to dict
+        data=json.loads(data)
+        self.assertTrue(len(data)>0)
+        self.assertTrue(data[0]['model'],'metronus_app_department')
+
+    def test_form_task_find_departments_2(self):
+        """
+        Get task creation form task  with proper roles (Admin)
+        """
+        c = Client()
+        c.login(username="metronus", password="metronus")
+        
+        
+        response = c.get("/task/getdepartments?project_id={0}".format(Project.objects.get(name="Metronus").id))
+        self.assertEquals(response.status_code, 200)
+        #response in bytes must be decode to string
+        data=response.content.decode("utf-8")
+        #string to dict
+        data=json.loads(data)
+        self.assertTrue(len(data)>0)
+        self.assertTrue(data[0]['model'],'metronus_app_department')
+    def test_form_task_find_departments_negative(self):
+        """
+        Get task creation form task without project_id proper roles (Admin)
+        """
+        c = Client()
+        c.login(username="admin1", password="123456")
+        
+        response = c.get("/task/getdepartments")
+        self.assertEquals(response.status_code, 400)
+              
 
 
     def test_view_task_positive(self):

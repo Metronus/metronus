@@ -4,7 +4,6 @@ from django.contrib.auth.models         import User
 from django.test                        import TestCase, Client
 from metronus_app.common_utils          import get_ajax
 from django.urls import reverse
-import json
 
 
 class CompanyTestCase(TestCase):
@@ -204,7 +203,7 @@ class CompanyTestCase(TestCase):
         })
     
         self.assertEquals(response.status_code, 200)
-        self.assertTrue('companyRegister_cifNotUnique' in response.context["errors"])   
+        self.assertTrue('companyRegister_cifNotUnique' in response.context["errors"])
     def test_create_company_negative_4(self):
         """
         Register new company, companyRegister_adminEmailNotUnique
@@ -236,7 +235,7 @@ class CompanyTestCase(TestCase):
         })
     
         self.assertEquals(response.status_code, 200)
-        self.assertTrue('companyRegister_adminEmailNotUnique' in response.context["errors"])   
+        self.assertTrue('companyRegister_adminEmailNotUnique' in response.context["errors"])
     
     def test_create_company_negative_5(self):
         """
@@ -269,8 +268,7 @@ class CompanyTestCase(TestCase):
         })
     
         self.assertEquals(response.status_code, 200)
-        self.assertTrue('companyRegister_companyEmailNotUnique' in response.context["errors"])   
-    
+        self.assertTrue('companyRegister_companyEmailNotUnique' in response.context["errors"])
 
     def test_create_company_negative_6(self):
         """
@@ -303,7 +301,7 @@ class CompanyTestCase(TestCase):
         })
     
         self.assertEquals(response.status_code, 200)
-        self.assertTrue('newPasswordInvalid' in response.context["errors"])   
+        self.assertTrue('newPasswordInvalid' in response.context["errors"])
     def test_create_company_negative_7(self):
         """
         Register new company, companyRegister_usernameNotUnique
@@ -389,7 +387,6 @@ class CompanyTestCase(TestCase):
         # Check that the department has been successfully created
         self.assertEquals(Company.objects.get(cif="231231F").phone,"932833777")
         self.assertEquals(Company.objects.get(cif="231231F").email,"compania@pes.es")
-        logs_after = Company.objects.all().count()
     def test_edit_company_negative(self):
         """
         Edit  company, negative email

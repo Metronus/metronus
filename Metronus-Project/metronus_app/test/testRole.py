@@ -171,7 +171,7 @@ class RoleTestCase(TestCase):
         Role.objects.create(name="PROJECT_MANAGER", tier=40)
 
         role_ex = Role.objects.create(name="EXECUTIVE", tier=50)
-        role_tm = Role.objects.create(name="TEAM_MANAGER", tier=30)
+        Role.objects.create(name="TEAM_MANAGER", tier=30)
         role_co = Role.objects.create(name="COORDINATOR", tier=20)
 
         # role_em

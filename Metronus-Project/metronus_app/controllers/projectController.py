@@ -6,9 +6,9 @@ from django.db.models import Sum, F, FloatField
 from metronus_app.forms.projectForm import ProjectForm
 from metronus_app.model.project import Project
 
-from metronus_app.common_utils import (get_actor_or_403,get_current_admin_or_403, 
-    get_authorized_or_403,get_admin_executive_or_403,
-    default_round,same_company_or_403,is_executive, get_highest_role_tier)
+from metronus_app.common_utils import (get_actor_or_403, 
+    get_admin_executive_or_403,
+    default_round,same_company_or_403, get_highest_role_tier)
 from metronus_app.model.employee import Employee
 from metronus_app.model.task import Task
 from metronus_app.model.timeLog import TimeLog

@@ -1,5 +1,4 @@
 from django.shortcuts import render, get_object_or_404
-from django.core.exceptions import PermissionDenied
 from metronus_app.forms.projectDepartmentForm import ProjectDepartmentForm
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.project import Project

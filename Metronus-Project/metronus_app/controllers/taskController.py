@@ -54,9 +54,7 @@ def create(request):
             pname = form.cleaned_data['name']
             ppro = form.cleaned_data['project_id']
             pdep = form.cleaned_data['department_id']
-            same_company_or_403(actor,ppro)
-            same_company_or_403(actor,pdep)
-            pdtuple = find_tuple(ppro.id, pdep.id, actor)
+            pdtuple = find_tuple(ppro, pdep, actor)
             if ppro.deleted:
                 errors.append('task_creation_project_inactive')
             if not pdep.active:
@@ -71,7 +69,7 @@ def create(request):
             if not errors:
                 tid = create_task(form, pdtuple, actor)
                 return HttpResponseRedirect('/task/view/{0}/' .format( tid))
-            else:  
+            else:
                 errors.append('task_creation_error')
 
     # if a GET (or any other method) we'll create a blank form
@@ -120,9 +118,8 @@ def create_async(request):
             pname = form.cleaned_data['name']
             ppro = form.cleaned_data['project_id']
             pdep = form.cleaned_data['department_id']
-            same_company_or_403(actor,ppro)
-            same_company_or_403(actor,pdep)
-            pdtuple = find_tuple(ppro.id, pdep.id, actor)
+            
+            pdtuple = find_tuple(ppro, pdep, actor)
             if ppro.deleted:
                 errors.append('task_creation_project_inactive')
             if not pdep.active:
@@ -609,15 +606,13 @@ def find_name(pname, project_department):
     return Task.objects.filter(name=pname, projectDepartment_id=project_department).first()
 
 
-def find_tuple(project_id, department_id, actor):
+def find_tuple(project, department, actor):
     """
     Returns a tuple project-department
     """
-    project = get_object_or_404(Project, pk=project_id)
-    department = get_object_or_404(Department, pk=department_id)
+    same_company_or_403(actor,project)
+    same_company_or_403(actor,department)
 
-    if project.company_id != department.company_id or project.company_id != actor.company_id:
-        raise PermissionDenied
     return ProjectDepartment.objects.filter(project_id=project, department_id=department).first()
 
 

@@ -211,7 +211,7 @@ class TimeLogTestCase(TestCase):
     def test_get_departments_no_project(self):
         """
         try get departments without project
-        """ 
+        """
         c = Client()
         c.login(username="anddonram", password="123456")
         

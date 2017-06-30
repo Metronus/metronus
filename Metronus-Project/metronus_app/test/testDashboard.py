@@ -2,13 +2,12 @@ from django.test import TestCase, Client
 from django.core.exceptions import ObjectDoesNotExist
 
 from metronus_app.model.employee import Employee
-from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.task import Task
 from metronus_app.model.timeLog import TimeLog
 from metronus_app.model.project import Project
 from metronus_app.model.administrator import Administrator
 from metronus_app.model.department import Department
-from metronus_app.common_utils import  ranstr,create_timelog_in_task,create_task_in_projdept
+from metronus_app.common_utils import  create_timelog_in_task,create_task_in_projdept
 import random
 from populate_database import populate_database
 

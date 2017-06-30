@@ -9,7 +9,7 @@ from metronus_app.model.company import Company
 from metronus_app.model.role import Role
 from metronus_app.model.administrator import Administrator
 from metronus_app.model.department import Department
-
+from metronus_app.model.timeLog import TimeLog
 
 # ################################# Party hard a partir de aquí ##################################
 
@@ -206,7 +206,7 @@ class TaskMetricsTestCase(TestCase):
             employee_id=employee4
         )
         # task1
-        Task.objects.create(
+        task1=Task.objects.create(
             name="Hacer cosas",
             description="meda",
             actor_id=employee1,
@@ -222,7 +222,7 @@ class TaskMetricsTestCase(TestCase):
         )
 
         # task3
-        Task.objects.create(
+        task3=Task.objects.create(
             name="Hacer cosas de front",
             description="nada",
             actor_id=employee4,
@@ -230,7 +230,21 @@ class TaskMetricsTestCase(TestCase):
             production_goal="2.0",
             goal_description="kgs"
         )
-
+        TimeLog.objects.create(
+        description = "he currado mucho",
+        workDate = "2017-01-02 10:00+00:00",
+        duration = 240,
+        task_id = task3,
+        employee_id = employee1,
+        produced_units=3
+        )
+        TimeLog.objects.create(
+        description = "he currado mucho",
+        workDate = "2017-01-02 10:00+00:00",
+        duration = 240,
+        task_id = task1,
+        employee_id = employee1
+        )
     def test_access_denied_not_logged_prod_task(self):
         """
         Without authentication, try getting the prod_per_task JSON

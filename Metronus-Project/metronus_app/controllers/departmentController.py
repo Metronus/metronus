@@ -128,7 +128,6 @@ def view(request, department_id):
 
     template: department_view.html
     """
-    
     department = get_object_or_404(Department, pk=department_id)
     actor=check_department(department, request)
     same_company_or_403(actor,department)
@@ -473,7 +472,7 @@ def check_department(department, request):
     elif not department.active:
         raise PermissionDenied
     elif ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-        projectDepartment_id__department_id=department, 
+        projectDepartment_id__department_id=department,
         role_id__tier__gte=20).exists():
         # If it's for view, coordinators and greater can access too
         return actor

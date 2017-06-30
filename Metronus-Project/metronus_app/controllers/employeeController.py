@@ -22,9 +22,9 @@ from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEm
 from django.core import serializers
 from django.http import HttpResponse
 
-from metronus_app.common_utils import (is_role_updatable_by_user, check_image, get_current_employee_or_403, send_mail,
+from metronus_app.common_utils import (is_role_updatable_by_user, check_image, send_mail,
                                        is_email_unique, is_username_unique, get_authorized_or_403,default_round,
-                                       validate_pass,get_highest_role_tier,get_actor_or_403, get_admin_executive_or_403, is_executive,same_company_or_403)
+                                       validate_pass,get_highest_role_tier,get_actor_or_403, get_admin_executive_or_403,same_company_or_403)
 from datetime import date, timedelta, datetime
 import re
 
