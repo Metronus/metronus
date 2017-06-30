@@ -59,7 +59,9 @@ def edit(request):
             else:
                 return render(request, 'company/administrator_edit.html',
                               {'form': form, 'errors': errors, 'pass_form': EmployeePasswordForm(), 'picture': administrator.picture})
-
+        else:
+             return render(request, 'company/administrator_edit.html',
+                              {'form': form, 'errors': ['formNotValid'], 'pass_form': EmployeePasswordForm(), 'picture': administrator.picture})
     else:
         raise PermissionDenied
 

@@ -244,9 +244,9 @@ class EmployeeMetricsTestCase(TestCase):
 
         response = c.get("/employee/ajaxProfit/{0}/" .format(Employee.objects.get(identifier="emp01").id))
         self.assertEquals(response.status_code, 200)
-    def test_access_ok_admin_profit(self):
+    def test_access_no_permissions_profit(self):
         """
-        As an admin, try getting the profit JSON
+        As an employee, try getting the profit JSON
         """
         c = Client()
         c.login(username="emp1", password="123456")

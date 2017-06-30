@@ -20,7 +20,7 @@ class URLAccessTestCase(TestCase):
     """
     Class for testing access
     """
-    def assertResponseCode(self, client, url, expected):
+    def assert_response_code(self, client, url, expected):
         """
         checks the code from accessing is expected
         """
@@ -412,88 +412,88 @@ class URLAccessTestCase(TestCase):
         c.login(username="admin1", password="aaaaaaaa")
 
         # Time control
-        self.assertResponseCode(c, "/timeLog/list_all/", GTFO)
+        self.assert_response_code(c, "/timeLog/list_all/", GTFO)
 
         # Dashboard
-        self.assertResponseCode(c, "/dashboard/view", OK)
+        self.assert_response_code(c, "/dashboard/view", OK)
 
         # Company view and edition
-        self.assertResponseCode(c, "/company/view/", OK)
-        self.assertResponseCode(c, "/company/edit/", OK)
-        self.assertResponseCode(c, "/administrator/edit/", OK)
+        self.assert_response_code(c, "/company/view/", OK)
+        self.assert_response_code(c, "/company/edit/", OK)
+        self.assert_response_code(c, "/administrator/edit/", OK)
 
         # Projects
-        self.assertResponseCode(c, "/project/list", OK)
-        self.assertResponseCode(c, "/project/create", OK)
-        self.assertResponseCode(c, "/project/view/{0}/".format(self.pro1.id), OK) # Active
-        self.assertResponseCode(c, "/project/view/{0}/".format(self.pro_inactive.id), OK) # Inactive
-        self.assertResponseCode(c, "/project/edit/{0}/".format(self.pro1.id), OK)  # Active
-        self.assertResponseCode(c, "/project/edit/{0}/".format(self.pro_inactive.id), OK)  # Inactive
-        self.assertResponseCode(c, "/project/delete/{0}/".format(self.pro1.id), MOVE)
-        self.assertResponseCode(c, "/project/delete/{0}/".format(self.pro1.id), NOTFOUND)
-        self.assertResponseCode(c, "/project/recover/{0}/".format(self.pro1.id), MOVE)
-        self.assertResponseCode(c, "/project/recover/{0}/".format(self.pro1.id), NOTFOUND)
+        self.assert_response_code(c, "/project/list", OK)
+        self.assert_response_code(c, "/project/create", OK)
+        self.assert_response_code(c, "/project/view/{0}/".format(self.pro1.id), OK) # Active
+        self.assert_response_code(c, "/project/view/{0}/".format(self.pro_inactive.id), OK) # Inactive
+        self.assert_response_code(c, "/project/edit/{0}/".format(self.pro1.id), OK)  # Active
+        self.assert_response_code(c, "/project/edit/{0}/".format(self.pro_inactive.id), OK)  # Inactive
+        self.assert_response_code(c, "/project/delete/{0}/".format(self.pro1.id), MOVE)
+        self.assert_response_code(c, "/project/delete/{0}/".format(self.pro1.id), NOTFOUND)
+        self.assert_response_code(c, "/project/recover/{0}/".format(self.pro1.id), MOVE)
+        self.assert_response_code(c, "/project/recover/{0}/".format(self.pro1.id), NOTFOUND)
         # Non-existent projects
-        self.assertResponseCode(c, "/project/view/929929/", NOTFOUND)
-        self.assertResponseCode(c, "/project/delete/929929/", NOTFOUND)
-        self.assertResponseCode(c, "/project/recover/929929/", NOTFOUND)
+        self.assert_response_code(c, "/project/view/929929/", NOTFOUND)
+        self.assert_response_code(c, "/project/delete/929929/", NOTFOUND)
+        self.assert_response_code(c, "/project/recover/929929/", NOTFOUND)
 
         # Departments
-        self.assertResponseCode(c, "/department/list", OK)
-        self.assertResponseCode(c, "/department/create", OK)
-        self.assertResponseCode(c, "/department/view/{0}/".format(self.dep1.id), OK)  # Active
-        self.assertResponseCode(c, "/department/view/{0}/".format(self.dep_inactive.id), OK)  # Inactive
-        self.assertResponseCode(c, "/department/edit/{0}/".format(self.dep1.id), OK)  # Active
-        self.assertResponseCode(c, "/department/edit/{0}/".format(self.dep_inactive.id), OK)  # Inactive
-        self.assertResponseCode(c, "/department/delete/{0}/".format(self.dep1.id), MOVE)
-        self.assertResponseCode(c, "/department/delete/{0}/".format(self.dep1.id), NOTFOUND)
-        self.assertResponseCode(c, "/department/recover/{0}/".format(self.dep1.id), MOVE)
-        self.assertResponseCode(c, "/department/recover/{0}/".format(self.dep1.id), NOTFOUND)
+        self.assert_response_code(c, "/department/list", OK)
+        self.assert_response_code(c, "/department/create", OK)
+        self.assert_response_code(c, "/department/view/{0}/".format(self.dep1.id), OK)  # Active
+        self.assert_response_code(c, "/department/view/{0}/".format(self.dep_inactive.id), OK)  # Inactive
+        self.assert_response_code(c, "/department/edit/{0}/".format(self.dep1.id), OK)  # Active
+        self.assert_response_code(c, "/department/edit/{0}/".format(self.dep_inactive.id), OK)  # Inactive
+        self.assert_response_code(c, "/department/delete/{0}/".format(self.dep1.id), MOVE)
+        self.assert_response_code(c, "/department/delete/{0}/".format(self.dep1.id), NOTFOUND)
+        self.assert_response_code(c, "/department/recover/{0}/".format(self.dep1.id), MOVE)
+        self.assert_response_code(c, "/department/recover/{0}/".format(self.dep1.id), NOTFOUND)
         # Non-existent departments
-        self.assertResponseCode(c, "/department/view/929929/", NOTFOUND)
-        self.assertResponseCode(c, "/department/delete/929929/", NOTFOUND)
-        self.assertResponseCode(c, "/department/recover/929929/", NOTFOUND)
+        self.assert_response_code(c, "/department/view/929929/", NOTFOUND)
+        self.assert_response_code(c, "/department/delete/929929/", NOTFOUND)
+        self.assert_response_code(c, "/department/recover/929929/", NOTFOUND)
 
         # Tasks
-        self.assertResponseCode(c, "/task/list", OK)
-        self.assertResponseCode(c, "/task/create", OK)
-        self.assertResponseCode(c, "/task/view/{0}/".format(self.task1.id), OK)  # Active
-        self.assertResponseCode(c, "/task/view/{0}/".format(self.task_inactive.id), OK)  # Inactive
-        self.assertResponseCode(c, "/task/edit/{0}/".format(self.task1.id), OK)  # Active
-        self.assertResponseCode(c, "/task/edit/{0}/".format(self.task_inactive.id), OK)  # Inactive
-        self.assertResponseCode(c, "/task/delete/{0}/".format(self.task1.id), MOVE)
-        self.assertResponseCode(c, "/task/delete/{0}/".format(self.task1.id), NOTFOUND)
-        self.assertResponseCode(c, "/task/recover/{0}/".format(self.task1.id), MOVE)
-        self.assertResponseCode(c, "/task/recover/{0}/".format(self.task1.id), NOTFOUND)
+        self.assert_response_code(c, "/task/list", OK)
+        self.assert_response_code(c, "/task/create", OK)
+        self.assert_response_code(c, "/task/view/{0}/".format(self.task1.id), OK)  # Active
+        self.assert_response_code(c, "/task/view/{0}/".format(self.task_inactive.id), OK)  # Inactive
+        self.assert_response_code(c, "/task/edit/{0}/".format(self.task1.id), OK)  # Active
+        self.assert_response_code(c, "/task/edit/{0}/".format(self.task_inactive.id), OK)  # Inactive
+        self.assert_response_code(c, "/task/delete/{0}/".format(self.task1.id), MOVE)
+        self.assert_response_code(c, "/task/delete/{0}/".format(self.task1.id), NOTFOUND)
+        self.assert_response_code(c, "/task/recover/{0}/".format(self.task1.id), MOVE)
+        self.assert_response_code(c, "/task/recover/{0}/".format(self.task1.id), NOTFOUND)
         # Non-existent tasks
-        self.assertResponseCode(c, "/task/view/929929/", NOTFOUND)
-        self.assertResponseCode(c, "/task/delete/929929/", NOTFOUND)
-        self.assertResponseCode(c, "/task/recover/929929/", NOTFOUND)
+        self.assert_response_code(c, "/task/view/929929/", NOTFOUND)
+        self.assert_response_code(c, "/task/delete/929929/", NOTFOUND)
+        self.assert_response_code(c, "/task/recover/929929/", NOTFOUND)
 
         # Employees
-        self.assertResponseCode(c, "/employee/list", OK)
-        self.assertResponseCode(c, "/employee/create", OK)
-        self.assertResponseCode(c, "/employee/view/{0}/".format(self.employee1.user.username), OK)  # Active
-        self.assertResponseCode(c, "/employee/view/{0}/".format(self.employee_inactive.user.username), OK)  # Inactive
-        self.assertResponseCode(c, "/employee/edit/{0}/".format(self.employee1.user.username), OK)  # Active
-        self.assertResponseCode(c, "/employee/edit/{0}/".format(self.employee_inactive.user.username), OK)  # Inactive
-        self.assertResponseCode(c, "/employee/delete/{0}/".format(self.employee1.user.username), MOVE)
-        self.assertResponseCode(c, "/employee/delete/{0}/".format(self.employee1.user.username), NOTFOUND)
-        self.assertResponseCode(c, "/employee/recover/{0}/".format(self.employee1.user.username), MOVE)
-        self.assertResponseCode(c, "/employee/recover/{0}/".format(self.employee1.user.username), NOTFOUND)
+        self.assert_response_code(c, "/employee/list", OK)
+        self.assert_response_code(c, "/employee/create", OK)
+        self.assert_response_code(c, "/employee/view/{0}/".format(self.employee1.user.username), OK)  # Active
+        self.assert_response_code(c, "/employee/view/{0}/".format(self.employee_inactive.user.username), OK)  # Inactive
+        self.assert_response_code(c, "/employee/edit/{0}/".format(self.employee1.user.username), OK)  # Active
+        self.assert_response_code(c, "/employee/edit/{0}/".format(self.employee_inactive.user.username), OK)  # Inactive
+        self.assert_response_code(c, "/employee/delete/{0}/".format(self.employee1.user.username), MOVE)
+        self.assert_response_code(c, "/employee/delete/{0}/".format(self.employee1.user.username), NOTFOUND)
+        self.assert_response_code(c, "/employee/recover/{0}/".format(self.employee1.user.username), MOVE)
+        self.assert_response_code(c, "/employee/recover/{0}/".format(self.employee1.user.username), NOTFOUND)
         # Non-existent employees
-        self.assertResponseCode(c, "/employee/view/aaaaa/", NOTFOUND)
-        self.assertResponseCode(c, "/employee/delete/aaaaa/", NOTFOUND)
-        self.assertResponseCode(c, "/employee/recover/aaaaa/", NOTFOUND)
+        self.assert_response_code(c, "/employee/view/aaaaa/", NOTFOUND)
+        self.assert_response_code(c, "/employee/delete/aaaaa/", NOTFOUND)
+        self.assert_response_code(c, "/employee/recover/aaaaa/", NOTFOUND)
 
         # Roles
-        self.assertResponseCode(c, "/roles/manage", WTF)
-        self.assertResponseCode(c, "/roles/manage?employee_id={0}".format(self.employee1.id), OK)
-        self.assertResponseCode(c, "/roles/manage?role_id={0}".format(self.pdrole_1.id), OK)
-        self.assertResponseCode(c, "/roles/info", OK)
+        self.assert_response_code(c, "/roles/manage", WTF)
+        self.assert_response_code(c, "/roles/manage?employee_id={0}".format(self.employee1.id), OK)
+        self.assert_response_code(c, "/roles/manage?role_id={0}".format(self.pdrole_1.id), OK)
+        self.assert_response_code(c, "/roles/info", OK)
         # Non-existent stuff
-        self.assertResponseCode(c, "/roles/manage?employee_id=49834", NOTFOUND)
-        self.assertResponseCode(c, "/roles/manage?role_id=49494", NOTFOUND)
+        self.assert_response_code(c, "/roles/manage?employee_id=49834", NOTFOUND)
+        self.assert_response_code(c, "/roles/manage?role_id=49494", NOTFOUND)
 
     
     def test_admin_other_company(self):
@@ -502,59 +502,59 @@ class URLAccessTestCase(TestCase):
         c.login(username="admin2", password="aaaaaaaa")
 
         # Time control
-        self.assertResponseCode(c, "/timeLog/list_all/", GTFO)
+        self.assert_response_code(c, "/timeLog/list_all/", GTFO)
 
         # Dashboard
-        self.assertResponseCode(c, "/dashboard/view", OK)
+        self.assert_response_code(c, "/dashboard/view", OK)
 
         # Company view and edition
-        self.assertResponseCode(c, "/company/view/", OK)
-        self.assertResponseCode(c, "/company/edit/", OK)
-        self.assertResponseCode(c, "/administrator/edit/", OK)
+        self.assert_response_code(c, "/company/view/", OK)
+        self.assert_response_code(c, "/company/edit/", OK)
+        self.assert_response_code(c, "/administrator/edit/", OK)
 
         # Projects
-        self.assertResponseCode(c, "/project/list", OK)
-        self.assertResponseCode(c, "/project/create", OK)
-        self.assertResponseCode(c, "/project/view/{0}/".format(self.pro1.id), GTFO) # Active
-        self.assertResponseCode(c, "/project/view/{0}/".format(self.pro_inactive.id), GTFO) # Inactive
-        self.assertResponseCode(c, "/project/edit/{0}/".format(self.pro1.id), GTFO)  # Active
-        self.assertResponseCode(c, "/project/edit/{0}/".format(self.pro_inactive.id), GTFO)  # Inactive
-        self.assertResponseCode(c, "/project/delete/{0}/".format(self.pro1.id), GTFO)
-        self.assertResponseCode(c, "/project/recover/{0}/".format(self.pro1.id), NOTFOUND)
+        self.assert_response_code(c, "/project/list", OK)
+        self.assert_response_code(c, "/project/create", OK)
+        self.assert_response_code(c, "/project/view/{0}/".format(self.pro1.id), GTFO) # Active
+        self.assert_response_code(c, "/project/view/{0}/".format(self.pro_inactive.id), GTFO) # Inactive
+        self.assert_response_code(c, "/project/edit/{0}/".format(self.pro1.id), GTFO)  # Active
+        self.assert_response_code(c, "/project/edit/{0}/".format(self.pro_inactive.id), GTFO)  # Inactive
+        self.assert_response_code(c, "/project/delete/{0}/".format(self.pro1.id), GTFO)
+        self.assert_response_code(c, "/project/recover/{0}/".format(self.pro1.id), NOTFOUND)
 
         # Departments
-        self.assertResponseCode(c, "/department/list", OK)
-        self.assertResponseCode(c, "/department/create", OK)
-        self.assertResponseCode(c, "/department/view/{0}/".format(self.dep1.id), GTFO)  # Active
-        self.assertResponseCode(c, "/department/view/{0}/".format(self.dep_inactive.id), GTFO)  # Inactive
-        self.assertResponseCode(c, "/department/edit/{0}/".format(self.dep1.id), GTFO)  # Active
-        self.assertResponseCode(c, "/department/edit/{0}/".format(self.dep_inactive.id), GTFO)  # Inactive
-        self.assertResponseCode(c, "/department/delete/{0}/".format(self.dep1.id), GTFO)
-        self.assertResponseCode(c, "/department/recover/{0}/".format(self.dep1.id), NOTFOUND)
+        self.assert_response_code(c, "/department/list", OK)
+        self.assert_response_code(c, "/department/create", OK)
+        self.assert_response_code(c, "/department/view/{0}/".format(self.dep1.id), GTFO)  # Active
+        self.assert_response_code(c, "/department/view/{0}/".format(self.dep_inactive.id), GTFO)  # Inactive
+        self.assert_response_code(c, "/department/edit/{0}/".format(self.dep1.id), GTFO)  # Active
+        self.assert_response_code(c, "/department/edit/{0}/".format(self.dep_inactive.id), GTFO)  # Inactive
+        self.assert_response_code(c, "/department/delete/{0}/".format(self.dep1.id), GTFO)
+        self.assert_response_code(c, "/department/recover/{0}/".format(self.dep1.id), NOTFOUND)
 
         # Tasks
-        self.assertResponseCode(c, "/task/list", OK)
-        self.assertResponseCode(c, "/task/create", OK)
-        self.assertResponseCode(c, "/task/view/{0}/".format(self.task1.id), GTFO)  # Active
-        self.assertResponseCode(c, "/task/view/{0}/".format(self.task_inactive.id), GTFO)  # Inactive
-        self.assertResponseCode(c, "/task/edit/{0}/".format(self.task1.id), GTFO)  # Active
-        self.assertResponseCode(c, "/task/edit/{0}/".format(self.task_inactive.id), GTFO)  # Inactive
-        self.assertResponseCode(c, "/task/delete/{0}/".format(self.task1.id), GTFO)
-        self.assertResponseCode(c, "/task/recover/{0}/".format(self.task1.id), NOTFOUND)
+        self.assert_response_code(c, "/task/list", OK)
+        self.assert_response_code(c, "/task/create", OK)
+        self.assert_response_code(c, "/task/view/{0}/".format(self.task1.id), GTFO)  # Active
+        self.assert_response_code(c, "/task/view/{0}/".format(self.task_inactive.id), GTFO)  # Inactive
+        self.assert_response_code(c, "/task/edit/{0}/".format(self.task1.id), GTFO)  # Active
+        self.assert_response_code(c, "/task/edit/{0}/".format(self.task_inactive.id), GTFO)  # Inactive
+        self.assert_response_code(c, "/task/delete/{0}/".format(self.task1.id), GTFO)
+        self.assert_response_code(c, "/task/recover/{0}/".format(self.task1.id), NOTFOUND)
 
         # Employees
-        self.assertResponseCode(c, "/employee/list", OK)
-        self.assertResponseCode(c, "/employee/create", OK)
-        self.assertResponseCode(c, "/employee/view/{0}/".format(self.employee1.user.username), GTFO)  # Active
-        self.assertResponseCode(c, "/employee/view/{0}/".format(self.employee_inactive.user.username), GTFO)  # Inactive
-        self.assertResponseCode(c, "/employee/edit/{0}/".format(self.employee1.user.username), GTFO)  # Active
-        self.assertResponseCode(c, "/employee/edit/{0}/".format(self.employee_inactive.user.username), GTFO)  # Inactive
-        self.assertResponseCode(c, "/employee/delete/{0}/".format(self.employee1.user.username), GTFO)
-        self.assertResponseCode(c, "/employee/recover/{0}/".format(self.employee1.user.username), NOTFOUND)
+        self.assert_response_code(c, "/employee/list", OK)
+        self.assert_response_code(c, "/employee/create", OK)
+        self.assert_response_code(c, "/employee/view/{0}/".format(self.employee1.user.username), GTFO)  # Active
+        self.assert_response_code(c, "/employee/view/{0}/".format(self.employee_inactive.user.username), GTFO)  # Inactive
+        self.assert_response_code(c, "/employee/edit/{0}/".format(self.employee1.user.username), GTFO)  # Active
+        self.assert_response_code(c, "/employee/edit/{0}/".format(self.employee_inactive.user.username), GTFO)  # Inactive
+        self.assert_response_code(c, "/employee/delete/{0}/".format(self.employee1.user.username), GTFO)
+        self.assert_response_code(c, "/employee/recover/{0}/".format(self.employee1.user.username), NOTFOUND)
 
         # Roles
-        self.assertResponseCode(c, "/roles/manage?employee_id={0}".format(self.employee1.id), NOTFOUND)
-        self.assertResponseCode(c, "/roles/manage?role_id={0}".format(self.pdrole_1.id), GTFO)
+        self.assert_response_code(c, "/roles/manage?employee_id={0}".format(self.employee1.id), NOTFOUND)
+        self.assert_response_code(c, "/roles/manage?role_id={0}".format(self.pdrole_1.id), GTFO)
 
     
     def test_executive(self):
@@ -563,89 +563,89 @@ class URLAccessTestCase(TestCase):
         c.login(username="emp5", password="aaaaaaaa")
 
         # Time control
-        self.assertResponseCode(c, "/timeLog/list_all/", OK)
+        self.assert_response_code(c, "/timeLog/list_all/", OK)
 
         # Dashboard
-        self.assertResponseCode(c, "/dashboard/view", OK)
+        self.assert_response_code(c, "/dashboard/view", OK)
 
         # Company view and edition
-        self.assertResponseCode(c, "/company/view/", GTFO)
-        self.assertResponseCode(c, "/company/edit/", GTFO)
-        self.assertResponseCode(c, "/administrator/edit/", GTFO)
+        self.assert_response_code(c, "/company/view/", GTFO)
+        self.assert_response_code(c, "/company/edit/", GTFO)
+        self.assert_response_code(c, "/administrator/edit/", GTFO)
 
         # Projects
-        self.assertResponseCode(c, "/project/list", OK)
-        self.assertResponseCode(c, "/project/create", OK)
-        self.assertResponseCode(c, "/project/view/{0}/".format(self.pro1.id), OK) # Active
-        self.assertResponseCode(c, "/project/view/{0}/".format(self.pro_inactive.id), OK) # Inactive
-        self.assertResponseCode(c, "/project/edit/{0}/".format(self.pro1.id), OK)  # Active
-        self.assertResponseCode(c, "/project/edit/{0}/".format(self.pro_inactive.id), OK)  # Inactive
-        self.assertResponseCode(c, "/project/delete/{0}/".format(self.pro1.id), MOVE)
-        self.assertResponseCode(c, "/project/delete/{0}/".format(self.pro1.id), NOTFOUND)
-        self.assertResponseCode(c, "/project/recover/{0}/".format(self.pro1.id), MOVE)
-        self.assertResponseCode(c, "/project/recover/{0}/".format(self.pro1.id), NOTFOUND)
+        self.assert_response_code(c, "/project/list", OK)
+        self.assert_response_code(c, "/project/create", OK)
+        self.assert_response_code(c, "/project/view/{0}/".format(self.pro1.id), OK) # Active
+        self.assert_response_code(c, "/project/view/{0}/".format(self.pro_inactive.id), OK) # Inactive
+        self.assert_response_code(c, "/project/edit/{0}/".format(self.pro1.id), OK)  # Active
+        self.assert_response_code(c, "/project/edit/{0}/".format(self.pro_inactive.id), OK)  # Inactive
+        self.assert_response_code(c, "/project/delete/{0}/".format(self.pro1.id), MOVE)
+        self.assert_response_code(c, "/project/delete/{0}/".format(self.pro1.id), NOTFOUND)
+        self.assert_response_code(c, "/project/recover/{0}/".format(self.pro1.id), MOVE)
+        self.assert_response_code(c, "/project/recover/{0}/".format(self.pro1.id), NOTFOUND)
         # Non-existent projects
-        self.assertResponseCode(c, "/project/view/929929/", NOTFOUND)
-        self.assertResponseCode(c, "/project/delete/929929/", NOTFOUND)
-        self.assertResponseCode(c, "/project/recover/929929/", NOTFOUND)
+        self.assert_response_code(c, "/project/view/929929/", NOTFOUND)
+        self.assert_response_code(c, "/project/delete/929929/", NOTFOUND)
+        self.assert_response_code(c, "/project/recover/929929/", NOTFOUND)
 
         # Departments
-        self.assertResponseCode(c, "/department/list", OK)
-        self.assertResponseCode(c, "/department/create", OK)
-        self.assertResponseCode(c, "/department/view/{0}/".format(self.dep1.id), OK)  # Active
-        self.assertResponseCode(c, "/department/view/{0}/".format(self.dep_inactive.id), OK)  # Inactive
-        self.assertResponseCode(c, "/department/edit/{0}/".format(self.dep1.id), OK)  # Active
-        self.assertResponseCode(c, "/department/edit/{0}/".format(self.dep_inactive.id), OK)  # Inactive
-        self.assertResponseCode(c, "/department/delete/{0}/".format(self.dep1.id), MOVE)
-        self.assertResponseCode(c, "/department/delete/{0}/".format(self.dep1.id), NOTFOUND)
-        self.assertResponseCode(c, "/department/recover/{0}/".format(self.dep1.id), MOVE)
-        self.assertResponseCode(c, "/department/recover/{0}/".format(self.dep1.id), NOTFOUND)
+        self.assert_response_code(c, "/department/list", OK)
+        self.assert_response_code(c, "/department/create", OK)
+        self.assert_response_code(c, "/department/view/{0}/".format(self.dep1.id), OK)  # Active
+        self.assert_response_code(c, "/department/view/{0}/".format(self.dep_inactive.id), OK)  # Inactive
+        self.assert_response_code(c, "/department/edit/{0}/".format(self.dep1.id), OK)  # Active
+        self.assert_response_code(c, "/department/edit/{0}/".format(self.dep_inactive.id), OK)  # Inactive
+        self.assert_response_code(c, "/department/delete/{0}/".format(self.dep1.id), MOVE)
+        self.assert_response_code(c, "/department/delete/{0}/".format(self.dep1.id), NOTFOUND)
+        self.assert_response_code(c, "/department/recover/{0}/".format(self.dep1.id), MOVE)
+        self.assert_response_code(c, "/department/recover/{0}/".format(self.dep1.id), NOTFOUND)
         # Non-existent departments
-        self.assertResponseCode(c, "/department/view/929929/", NOTFOUND)
-        self.assertResponseCode(c, "/department/delete/929929/", NOTFOUND)
-        self.assertResponseCode(c, "/department/recover/929929/", NOTFOUND)
+        self.assert_response_code(c, "/department/view/929929/", NOTFOUND)
+        self.assert_response_code(c, "/department/delete/929929/", NOTFOUND)
+        self.assert_response_code(c, "/department/recover/929929/", NOTFOUND)
 
         # Tasks
-        self.assertResponseCode(c, "/task/list", OK)
-        self.assertResponseCode(c, "/task/create", OK)
-        self.assertResponseCode(c, "/task/view/{0}/".format(self.task1.id), OK)  # Active
-        self.assertResponseCode(c, "/task/view/{0}/".format(self.task_inactive.id), OK)  # Inactive
-        self.assertResponseCode(c, "/task/edit/{0}/".format(self.task1.id), OK)  # Active
-        self.assertResponseCode(c, "/task/edit/{0}/".format(self.task_inactive.id), OK)  # Inactive
-        self.assertResponseCode(c, "/task/delete/{0}/".format(self.task1.id), MOVE)
-        self.assertResponseCode(c, "/task/delete/{0}/".format(self.task1.id), NOTFOUND)
-        self.assertResponseCode(c, "/task/recover/{0}/".format(self.task1.id), MOVE)
-        self.assertResponseCode(c, "/task/recover/{0}/".format(self.task1.id), NOTFOUND)
+        self.assert_response_code(c, "/task/list", OK)
+        self.assert_response_code(c, "/task/create", OK)
+        self.assert_response_code(c, "/task/view/{0}/".format(self.task1.id), OK)  # Active
+        self.assert_response_code(c, "/task/view/{0}/".format(self.task_inactive.id), OK)  # Inactive
+        self.assert_response_code(c, "/task/edit/{0}/".format(self.task1.id), OK)  # Active
+        self.assert_response_code(c, "/task/edit/{0}/".format(self.task_inactive.id), OK)  # Inactive
+        self.assert_response_code(c, "/task/delete/{0}/".format(self.task1.id), MOVE)
+        self.assert_response_code(c, "/task/delete/{0}/".format(self.task1.id), NOTFOUND)
+        self.assert_response_code(c, "/task/recover/{0}/".format(self.task1.id), MOVE)
+        self.assert_response_code(c, "/task/recover/{0}/".format(self.task1.id), NOTFOUND)
         # Non-existent tasks
-        self.assertResponseCode(c, "/task/view/929929/", NOTFOUND)
-        self.assertResponseCode(c, "/task/delete/929929/", NOTFOUND)
-        self.assertResponseCode(c, "/task/recover/929929/", NOTFOUND)
+        self.assert_response_code(c, "/task/view/929929/", NOTFOUND)
+        self.assert_response_code(c, "/task/delete/929929/", NOTFOUND)
+        self.assert_response_code(c, "/task/recover/929929/", NOTFOUND)
 
         # Employees
-        self.assertResponseCode(c, "/employee/list", OK)
-        self.assertResponseCode(c, "/employee/create", OK)
-        self.assertResponseCode(c, "/employee/view/{0}/".format(self.employee1.user.username), OK)  # Active
-        self.assertResponseCode(c, "/employee/view/{0}/".format(self.employee_inactive.user.username), OK)  # Inactive
-        self.assertResponseCode(c, "/employee/edit/{0}/".format(self.employee1.user.username), OK)  # Active
-        self.assertResponseCode(c, "/employee/edit/{0}/".format(self.employee_inactive.user.username), OK)  # Inactive
-        self.assertResponseCode(c, "/employee/delete/{0}/".format(self.employee1.user.username), MOVE)
-        self.assertResponseCode(c, "/employee/delete/{0}/".format(self.employee1.user.username), NOTFOUND)
-        self.assertResponseCode(c, "/employee/recover/{0}/".format(self.employee1.user.username), MOVE)
-        self.assertResponseCode(c, "/employee/recover/{0}/".format(self.employee1.user.username), NOTFOUND)
+        self.assert_response_code(c, "/employee/list", OK)
+        self.assert_response_code(c, "/employee/create", OK)
+        self.assert_response_code(c, "/employee/view/{0}/".format(self.employee1.user.username), OK)  # Active
+        self.assert_response_code(c, "/employee/view/{0}/".format(self.employee_inactive.user.username), OK)  # Inactive
+        self.assert_response_code(c, "/employee/edit/{0}/".format(self.employee1.user.username), OK)  # Active
+        self.assert_response_code(c, "/employee/edit/{0}/".format(self.employee_inactive.user.username), OK)  # Inactive
+        self.assert_response_code(c, "/employee/delete/{0}/".format(self.employee1.user.username), MOVE)
+        self.assert_response_code(c, "/employee/delete/{0}/".format(self.employee1.user.username), NOTFOUND)
+        self.assert_response_code(c, "/employee/recover/{0}/".format(self.employee1.user.username), MOVE)
+        self.assert_response_code(c, "/employee/recover/{0}/".format(self.employee1.user.username), NOTFOUND)
         # Non-existent employees
-        self.assertResponseCode(c, "/employee/view/aaaaa/", NOTFOUND)
-        self.assertResponseCode(c, "/employee/delete/aaaaa/", NOTFOUND)
-        self.assertResponseCode(c, "/employee/recover/aaaaa/", NOTFOUND)
+        self.assert_response_code(c, "/employee/view/aaaaa/", NOTFOUND)
+        self.assert_response_code(c, "/employee/delete/aaaaa/", NOTFOUND)
+        self.assert_response_code(c, "/employee/recover/aaaaa/", NOTFOUND)
 
         # Roles
-        self.assertResponseCode(c, "/roles/manage", WTF)
-        self.assertResponseCode(c, "/roles/manage?employee_id={0}".format(self.employee1.id), OK)
-        self.assertResponseCode(c, "/roles/manage?role_id={0}".format(self.pdrole_1.id), OK) # Random shitty role
-        self.assertResponseCode(c, "/roles/manage?role_id={0}".format(self.pdrole_5.id), GTFO) # Executive role
-        self.assertResponseCode(c, "/roles/info", OK)
+        self.assert_response_code(c, "/roles/manage", WTF)
+        self.assert_response_code(c, "/roles/manage?employee_id={0}".format(self.employee1.id), OK)
+        self.assert_response_code(c, "/roles/manage?role_id={0}".format(self.pdrole_1.id), OK) # Random shitty role
+        self.assert_response_code(c, "/roles/manage?role_id={0}".format(self.pdrole_5.id), GTFO) # Executive role
+        self.assert_response_code(c, "/roles/info", OK)
         # Non-existent stuff
-        self.assertResponseCode(c, "/roles/manage?employee_id=49393", NOTFOUND)
-        self.assertResponseCode(c, "/roles/manage?role_id=34848", NOTFOUND)
+        self.assert_response_code(c, "/roles/manage?employee_id=49393", NOTFOUND)
+        self.assert_response_code(c, "/roles/manage?role_id=34848", NOTFOUND)
 
     
     def test_project_manager(self):
@@ -654,95 +654,95 @@ class URLAccessTestCase(TestCase):
         c.login(username="emp4", password="aaaaaaaa")
 
         # Time control
-        self.assertResponseCode(c, "/timeLog/list_all/", OK)
+        self.assert_response_code(c, "/timeLog/list_all/", OK)
 
         # Dashboard
-        self.assertResponseCode(c, "/dashboard/view", GTFO)
+        self.assert_response_code(c, "/dashboard/view", GTFO)
 
         # Company view and edition
-        self.assertResponseCode(c, "/company/view/", GTFO)
-        self.assertResponseCode(c, "/company/edit/", GTFO)
-        self.assertResponseCode(c, "/administrator/edit/", GTFO)
+        self.assert_response_code(c, "/company/view/", GTFO)
+        self.assert_response_code(c, "/company/edit/", GTFO)
+        self.assert_response_code(c, "/administrator/edit/", GTFO)
 
         # Projects
-        self.assertResponseCode(c, "/project/list", OK)
-        self.assertResponseCode(c, "/project/create", GTFO)
-        self.assertResponseCode(c, "/project/view/{0}/".format(self.pro1.id), OK) # Their project
-        self.assertResponseCode(c, "/project/view/{0}/".format(self.pro_inactive.id), GTFO) # Their inactive project
-        self.assertResponseCode(c, "/project/view/{0}/".format(self.pro2.id), GTFO) # Not their project
-        self.assertResponseCode(c, "/project/edit/{0}/".format(self.pro1.id), GTFO)  # Their project
-        self.assertResponseCode(c, "/project/edit/{0}/".format(self.pro_inactive.id), GTFO)  # Their inactive project
-        self.assertResponseCode(c, "/project/edit/{0}/".format(self.pro2.id), GTFO)  # Not their project
-        self.assertResponseCode(c, "/project/delete/{0}/".format(self.pro1.id), GTFO)
-        self.assertResponseCode(c, "/project/recover/{0}/".format(self.pro1.id), GTFO)
+        self.assert_response_code(c, "/project/list", OK)
+        self.assert_response_code(c, "/project/create", GTFO)
+        self.assert_response_code(c, "/project/view/{0}/".format(self.pro1.id), OK) # Their project
+        self.assert_response_code(c, "/project/view/{0}/".format(self.pro_inactive.id), GTFO) # Their inactive project
+        self.assert_response_code(c, "/project/view/{0}/".format(self.pro2.id), GTFO) # Not their project
+        self.assert_response_code(c, "/project/edit/{0}/".format(self.pro1.id), GTFO)  # Their project
+        self.assert_response_code(c, "/project/edit/{0}/".format(self.pro_inactive.id), GTFO)  # Their inactive project
+        self.assert_response_code(c, "/project/edit/{0}/".format(self.pro2.id), GTFO)  # Not their project
+        self.assert_response_code(c, "/project/delete/{0}/".format(self.pro1.id), GTFO)
+        self.assert_response_code(c, "/project/recover/{0}/".format(self.pro1.id), GTFO)
 
         # Departments
-        self.assertResponseCode(c, "/department/list", OK)
-        self.assertResponseCode(c, "/department/create", GTFO)
-        self.assertResponseCode(c, "/department/view/{0}/".format(self.dep1.id), OK)  # Their department
-        self.assertResponseCode(c, "/department/view/{0}/".format(self.dep_inactive.id), GTFO)  # Their inactive department
-        self.assertResponseCode(c, "/department/view/{0}/".format(self.dep2.id), GTFO)  # Not their department
-        self.assertResponseCode(c, "/department/edit/{0}/".format(self.dep1.id), GTFO)  # Their department
-        self.assertResponseCode(c, "/department/edit/{0}/".format(self.dep_inactive.id), GTFO)  # Their inactive department
-        self.assertResponseCode(c, "/department/edit/{0}/".format(self.dep2.id), GTFO)  # Not their department
-        self.assertResponseCode(c, "/department/delete/{0}/".format(self.dep1.id), GTFO)
-        self.assertResponseCode(c, "/department/recover/{0}/".format(self.dep1.id), NOTFOUND)
+        self.assert_response_code(c, "/department/list", OK)
+        self.assert_response_code(c, "/department/create", GTFO)
+        self.assert_response_code(c, "/department/view/{0}/".format(self.dep1.id), OK)  # Their department
+        self.assert_response_code(c, "/department/view/{0}/".format(self.dep_inactive.id), GTFO)  # Their inactive department
+        self.assert_response_code(c, "/department/view/{0}/".format(self.dep2.id), GTFO)  # Not their department
+        self.assert_response_code(c, "/department/edit/{0}/".format(self.dep1.id), GTFO)  # Their department
+        self.assert_response_code(c, "/department/edit/{0}/".format(self.dep_inactive.id), GTFO)  # Their inactive department
+        self.assert_response_code(c, "/department/edit/{0}/".format(self.dep2.id), GTFO)  # Not their department
+        self.assert_response_code(c, "/department/delete/{0}/".format(self.dep1.id), GTFO)
+        self.assert_response_code(c, "/department/recover/{0}/".format(self.dep1.id), NOTFOUND)
 
         # Tasks
-        self.assertResponseCode(c, "/task/list", OK)
-        self.assertResponseCode(c, "/task/create", OK)
-        self.assertResponseCode(c, "/task/view/{0}/".format(self.task1.id), OK)  # Their task
-        self.assertResponseCode(c, "/task/view/{0}/".format(self.task_inactive.id), GTFO)  # Their inactive task
-        self.assertResponseCode(c, "/task/view/{0}/".format(self.task2.id), GTFO)  # Not their task
-        self.assertResponseCode(c, "/task/edit/{0}/".format(self.task1.id), OK)  # Their task
-        self.assertResponseCode(c, "/task/edit/{0}/".format(self.task_inactive.id), GTFO)  # Their inactive task
-        self.assertResponseCode(c, "/task/edit/{0}/".format(self.task2.id), GTFO)  # Not their task
-        self.assertResponseCode(c, "/task/delete/{0}/".format(self.task1.id), MOVE) # Their task
-        self.assertResponseCode(c, "/task/delete/{0}/".format(self.task1.id), NOTFOUND)
-        self.assertResponseCode(c, "/task/recover/{0}/".format(self.task1.id), GTFO)
+        self.assert_response_code(c, "/task/list", OK)
+        self.assert_response_code(c, "/task/create", OK)
+        self.assert_response_code(c, "/task/view/{0}/".format(self.task1.id), OK)  # Their task
+        self.assert_response_code(c, "/task/view/{0}/".format(self.task_inactive.id), GTFO)  # Their inactive task
+        self.assert_response_code(c, "/task/view/{0}/".format(self.task2.id), GTFO)  # Not their task
+        self.assert_response_code(c, "/task/edit/{0}/".format(self.task1.id), OK)  # Their task
+        self.assert_response_code(c, "/task/edit/{0}/".format(self.task_inactive.id), GTFO)  # Their inactive task
+        self.assert_response_code(c, "/task/edit/{0}/".format(self.task2.id), GTFO)  # Not their task
+        self.assert_response_code(c, "/task/delete/{0}/".format(self.task1.id), MOVE) # Their task
+        self.assert_response_code(c, "/task/delete/{0}/".format(self.task1.id), NOTFOUND)
+        self.assert_response_code(c, "/task/recover/{0}/".format(self.task1.id), GTFO)
         # Set it to active again
         self.task1.active = True
         self.task1.save()
-        self.assertResponseCode(c, "/task/delete/{0}/".format(self.task2.id), GTFO) # Not their task
-        self.assertResponseCode(c, "/task/recover/{0}/".format(self.task2.id), NOTFOUND)
+        self.assert_response_code(c, "/task/delete/{0}/".format(self.task2.id), GTFO) # Not their task
+        self.assert_response_code(c, "/task/recover/{0}/".format(self.task2.id), NOTFOUND)
 
         # Employees
-        self.assertResponseCode(c, "/employee/list", GTFO)
-        self.assertResponseCode(c, "/employee/create", GTFO)
+        self.assert_response_code(c, "/employee/list", GTFO)
+        self.assert_response_code(c, "/employee/create", GTFO)
 
-        self.assertResponseCode(c, "/employee/view/emp4/", OK)  # Their own profile
-        self.assertResponseCode(c, "/employee/view/{0}/".format(self.employee12.user.username), OK)  # User in their project but not their department
-        self.assertResponseCode(c, "/employee/view/{0}/".format(self.employee21.user.username), OK)  # User in their department but not their project
-        #self.assertResponseCode(c, "/employee/view/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
+        self.assert_response_code(c, "/employee/view/emp4/", OK)  # Their own profile
+        self.assert_response_code(c, "/employee/view/{0}/".format(self.employee12.user.username), OK)  # User in their project but not their department
+        self.assert_response_code(c, "/employee/view/{0}/".format(self.employee21.user.username), OK)  # User in their department but not their project
+        #self.assert_response_code(c, "/employee/view/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
         #TODO: Actually, a project manager can see all employees in the departments working on its project
         # A project manager can see all departments working on their projects, even without a role for each tuple
         # Department 2 works in project 1, so the employee can be accessed through its view
-        self.assertResponseCode(c, "/employee/view/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
+        self.assert_response_code(c, "/employee/view/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
 
-        self.assertResponseCode(c, "/employee/edit/emp4/", GTFO)  # Their own profile
-        self.assertResponseCode(c, "/employee/edit/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
-        self.assertResponseCode(c, "/employee/edit/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
-        self.assertResponseCode(c, "/employee/edit/{0}/".format(self.employee22.user.username),  GTFO)  # User not in their department or project
-        self.assertResponseCode(c, "/employee/edit/{0}/".format(self.employee_inactive.user.username),  GTFO)  # User in their dep and proj but inactive
+        self.assert_response_code(c, "/employee/edit/emp4/", GTFO)  # Their own profile
+        self.assert_response_code(c, "/employee/edit/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
+        self.assert_response_code(c, "/employee/edit/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
+        self.assert_response_code(c, "/employee/edit/{0}/".format(self.employee22.user.username),  GTFO)  # User not in their department or project
+        self.assert_response_code(c, "/employee/edit/{0}/".format(self.employee_inactive.user.username),  GTFO)  # User in their dep and proj but inactive
 
-        self.assertResponseCode(c, "/employee/delete/emp4/", GTFO)  # Their own profile
-        self.assertResponseCode(c, "/employee/delete/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
-        self.assertResponseCode(c, "/employee/delete/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
-        self.assertResponseCode(c, "/employee/delete/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
-        self.assertResponseCode(c, "/employee/delete/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
+        self.assert_response_code(c, "/employee/delete/emp4/", GTFO)  # Their own profile
+        self.assert_response_code(c, "/employee/delete/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
+        self.assert_response_code(c, "/employee/delete/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
+        self.assert_response_code(c, "/employee/delete/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
+        self.assert_response_code(c, "/employee/delete/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
 
-        self.assertResponseCode(c, "/employee/recover/emp4/", GTFO)  # Their own profile
-        self.assertResponseCode(c, "/employee/recover/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
-        self.assertResponseCode(c, "/employee/recover/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
-        self.assertResponseCode(c, "/employee/recover/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
-        self.assertResponseCode(c, "/employee/recover/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
+        self.assert_response_code(c, "/employee/recover/emp4/", GTFO)  # Their own profile
+        self.assert_response_code(c, "/employee/recover/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
+        self.assert_response_code(c, "/employee/recover/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
+        self.assert_response_code(c, "/employee/recover/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
+        self.assert_response_code(c, "/employee/recover/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
 
         # Roles
-        self.assertResponseCode(c, "/roles/manage", GTFO)
-        self.assertResponseCode(c, "/roles/manage?employee_id={0}".format(self.employee1.id), GTFO)
-        self.assertResponseCode(c, "/roles/manage?role_id={0}".format(self.pdrole_1.id), GTFO) # Random shitty role
-        self.assertResponseCode(c, "/roles/manage?role_id={0}".format(self.pdrole_5.id), GTFO) # Executive role
-        self.assertResponseCode(c, "/roles/info", GTFO)
+        self.assert_response_code(c, "/roles/manage", GTFO)
+        self.assert_response_code(c, "/roles/manage?employee_id={0}".format(self.employee1.id), GTFO)
+        self.assert_response_code(c, "/roles/manage?role_id={0}".format(self.pdrole_1.id), GTFO) # Random shitty role
+        self.assert_response_code(c, "/roles/manage?role_id={0}".format(self.pdrole_5.id), GTFO) # Executive role
+        self.assert_response_code(c, "/roles/info", GTFO)
 
     
     def test_coordinator(self):
@@ -751,92 +751,92 @@ class URLAccessTestCase(TestCase):
         c.login(username="emp3", password="aaaaaaaa")
 
         # Time control
-        self.assertResponseCode(c, "/timeLog/list_all/", OK)
+        self.assert_response_code(c, "/timeLog/list_all/", OK)
 
         # Dashboard
-        self.assertResponseCode(c, "/dashboard/view", GTFO)
+        self.assert_response_code(c, "/dashboard/view", GTFO)
 
         # Company view and edition
-        self.assertResponseCode(c, "/company/view/", GTFO)
-        self.assertResponseCode(c, "/company/edit/", GTFO)
-        self.assertResponseCode(c, "/administrator/edit/", GTFO)
+        self.assert_response_code(c, "/company/view/", GTFO)
+        self.assert_response_code(c, "/company/edit/", GTFO)
+        self.assert_response_code(c, "/administrator/edit/", GTFO)
 
         # Projects
-        self.assertResponseCode(c, "/project/list", GTFO)
-        self.assertResponseCode(c, "/project/create", GTFO)
-        self.assertResponseCode(c, "/project/view/{0}/".format(self.pro1.id), GTFO) # Their project
-        self.assertResponseCode(c, "/project/view/{0}/".format(self.pro_inactive.id), GTFO) # Their inactive project
-        self.assertResponseCode(c, "/project/view/{0}/".format(self.pro2.id), GTFO) # Not their project
-        self.assertResponseCode(c, "/project/edit/{0}/".format(self.pro1.id), GTFO)  # Their project
-        self.assertResponseCode(c, "/project/edit/{0}/".format(self.pro_inactive.id), GTFO)  # Their inactive project
-        self.assertResponseCode(c, "/project/edit/{0}/".format(self.pro2.id), GTFO)  # Not their project
-        self.assertResponseCode(c, "/project/delete/{0}/".format(self.pro1.id), GTFO)
-        self.assertResponseCode(c, "/project/recover/{0}/".format(self.pro1.id), GTFO)
+        self.assert_response_code(c, "/project/list", GTFO)
+        self.assert_response_code(c, "/project/create", GTFO)
+        self.assert_response_code(c, "/project/view/{0}/".format(self.pro1.id), GTFO) # Their project
+        self.assert_response_code(c, "/project/view/{0}/".format(self.pro_inactive.id), GTFO) # Their inactive project
+        self.assert_response_code(c, "/project/view/{0}/".format(self.pro2.id), GTFO) # Not their project
+        self.assert_response_code(c, "/project/edit/{0}/".format(self.pro1.id), GTFO)  # Their project
+        self.assert_response_code(c, "/project/edit/{0}/".format(self.pro_inactive.id), GTFO)  # Their inactive project
+        self.assert_response_code(c, "/project/edit/{0}/".format(self.pro2.id), GTFO)  # Not their project
+        self.assert_response_code(c, "/project/delete/{0}/".format(self.pro1.id), GTFO)
+        self.assert_response_code(c, "/project/recover/{0}/".format(self.pro1.id), GTFO)
 
         # Departments
-        self.assertResponseCode(c, "/department/list", OK)
-        self.assertResponseCode(c, "/department/create", GTFO)
-        self.assertResponseCode(c, "/department/view/{0}/".format(self.dep1.id), OK)  # Their department
-        self.assertResponseCode(c, "/department/view/{0}/".format(self.dep_inactive.id), GTFO)  # Their inactive department
-        self.assertResponseCode(c, "/department/view/{0}/".format(self.dep2.id), GTFO)  # Not their department
-        self.assertResponseCode(c, "/department/edit/{0}/".format(self.dep1.id), GTFO)  # Their department
-        self.assertResponseCode(c, "/department/edit/{0}/".format(self.dep_inactive.id), GTFO)  # Their inactive department
-        self.assertResponseCode(c, "/department/edit/{0}/".format(self.dep2.id), GTFO)  # Not their department
-        self.assertResponseCode(c, "/department/delete/{0}/".format(self.dep1.id), GTFO)
-        self.assertResponseCode(c, "/department/recover/{0}/".format(self.dep1.id), NOTFOUND)
+        self.assert_response_code(c, "/department/list", OK)
+        self.assert_response_code(c, "/department/create", GTFO)
+        self.assert_response_code(c, "/department/view/{0}/".format(self.dep1.id), OK)  # Their department
+        self.assert_response_code(c, "/department/view/{0}/".format(self.dep_inactive.id), GTFO)  # Their inactive department
+        self.assert_response_code(c, "/department/view/{0}/".format(self.dep2.id), GTFO)  # Not their department
+        self.assert_response_code(c, "/department/edit/{0}/".format(self.dep1.id), GTFO)  # Their department
+        self.assert_response_code(c, "/department/edit/{0}/".format(self.dep_inactive.id), GTFO)  # Their inactive department
+        self.assert_response_code(c, "/department/edit/{0}/".format(self.dep2.id), GTFO)  # Not their department
+        self.assert_response_code(c, "/department/delete/{0}/".format(self.dep1.id), GTFO)
+        self.assert_response_code(c, "/department/recover/{0}/".format(self.dep1.id), NOTFOUND)
 
         # Tasks
-        self.assertResponseCode(c, "/task/list", OK)
-        self.assertResponseCode(c, "/task/create", OK)
-        self.assertResponseCode(c, "/task/view/{0}/".format(self.task1.id), OK)  # Their task
-        self.assertResponseCode(c, "/task/view/{0}/".format(self.task_inactive.id), GTFO)  # Their inactive task
-        self.assertResponseCode(c, "/task/view/{0}/".format(self.task2.id), GTFO)  # Not their task
-        self.assertResponseCode(c, "/task/edit/{0}/".format(self.task1.id), OK)  # Their task
-        self.assertResponseCode(c, "/task/edit/{0}/".format(self.task_inactive.id), GTFO)  # Their inactive task
-        self.assertResponseCode(c, "/task/edit/{0}/".format(self.task2.id), GTFO)  # Not their task
-        self.assertResponseCode(c, "/task/delete/{0}/".format(self.task1.id), MOVE) # Their task
-        self.assertResponseCode(c, "/task/delete/{0}/".format(self.task1.id), NOTFOUND)
-        self.assertResponseCode(c, "/task/recover/{0}/".format(self.task1.id), GTFO)
+        self.assert_response_code(c, "/task/list", OK)
+        self.assert_response_code(c, "/task/create", OK)
+        self.assert_response_code(c, "/task/view/{0}/".format(self.task1.id), OK)  # Their task
+        self.assert_response_code(c, "/task/view/{0}/".format(self.task_inactive.id), GTFO)  # Their inactive task
+        self.assert_response_code(c, "/task/view/{0}/".format(self.task2.id), GTFO)  # Not their task
+        self.assert_response_code(c, "/task/edit/{0}/".format(self.task1.id), OK)  # Their task
+        self.assert_response_code(c, "/task/edit/{0}/".format(self.task_inactive.id), GTFO)  # Their inactive task
+        self.assert_response_code(c, "/task/edit/{0}/".format(self.task2.id), GTFO)  # Not their task
+        self.assert_response_code(c, "/task/delete/{0}/".format(self.task1.id), MOVE) # Their task
+        self.assert_response_code(c, "/task/delete/{0}/".format(self.task1.id), NOTFOUND)
+        self.assert_response_code(c, "/task/recover/{0}/".format(self.task1.id), GTFO)
         # Set it to active again
         self.task1.active = True
         self.task1.save()
-        self.assertResponseCode(c, "/task/delete/{0}/".format(self.task2.id), GTFO) # Not their task
-        self.assertResponseCode(c, "/task/recover/{0}/".format(self.task2.id), NOTFOUND)
+        self.assert_response_code(c, "/task/delete/{0}/".format(self.task2.id), GTFO) # Not their task
+        self.assert_response_code(c, "/task/recover/{0}/".format(self.task2.id), NOTFOUND)
 
         # Employees
-        self.assertResponseCode(c, "/employee/list", GTFO)
-        self.assertResponseCode(c, "/employee/create", GTFO)
+        self.assert_response_code(c, "/employee/list", GTFO)
+        self.assert_response_code(c, "/employee/create", GTFO)
 
-        self.assertResponseCode(c, "/employee/view/emp3/", OK)  # Their own profile
-        self.assertResponseCode(c, "/employee/view/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
-        self.assertResponseCode(c, "/employee/view/{0}/".format(self.employee21.user.username), OK)  # User in their department but not their project
-        self.assertResponseCode(c, "/employee/view/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
-        self.assertResponseCode(c, "/employee/view/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
+        self.assert_response_code(c, "/employee/view/emp3/", OK)  # Their own profile
+        self.assert_response_code(c, "/employee/view/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
+        self.assert_response_code(c, "/employee/view/{0}/".format(self.employee21.user.username), OK)  # User in their department but not their project
+        self.assert_response_code(c, "/employee/view/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
+        self.assert_response_code(c, "/employee/view/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
 
-        self.assertResponseCode(c, "/employee/edit/emp3/", GTFO)  # Their own profile
-        self.assertResponseCode(c, "/employee/edit/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
-        self.assertResponseCode(c, "/employee/edit/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
-        self.assertResponseCode(c, "/employee/edit/{0}/".format(self.employee22.user.username),  GTFO)  # User not in their department or project
-        self.assertResponseCode(c, "/employee/edit/{0}/".format(self.employee_inactive.user.username),  GTFO)  # User in their dep and proj but inactive
+        self.assert_response_code(c, "/employee/edit/emp3/", GTFO)  # Their own profile
+        self.assert_response_code(c, "/employee/edit/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
+        self.assert_response_code(c, "/employee/edit/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
+        self.assert_response_code(c, "/employee/edit/{0}/".format(self.employee22.user.username),  GTFO)  # User not in their department or project
+        self.assert_response_code(c, "/employee/edit/{0}/".format(self.employee_inactive.user.username),  GTFO)  # User in their dep and proj but inactive
 
-        self.assertResponseCode(c, "/employee/delete/emp3/", GTFO)  # Their own profile
-        self.assertResponseCode(c, "/employee/delete/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
-        self.assertResponseCode(c, "/employee/delete/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
-        self.assertResponseCode(c, "/employee/delete/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
-        self.assertResponseCode(c, "/employee/delete/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
+        self.assert_response_code(c, "/employee/delete/emp3/", GTFO)  # Their own profile
+        self.assert_response_code(c, "/employee/delete/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
+        self.assert_response_code(c, "/employee/delete/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
+        self.assert_response_code(c, "/employee/delete/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
+        self.assert_response_code(c, "/employee/delete/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
 
-        self.assertResponseCode(c, "/employee/recover/emp3/", GTFO)  # Their own profile
-        self.assertResponseCode(c, "/employee/recover/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
-        self.assertResponseCode(c, "/employee/recover/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
-        self.assertResponseCode(c, "/employee/recover/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
-        self.assertResponseCode(c, "/employee/recover/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
+        self.assert_response_code(c, "/employee/recover/emp3/", GTFO)  # Their own profile
+        self.assert_response_code(c, "/employee/recover/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
+        self.assert_response_code(c, "/employee/recover/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
+        self.assert_response_code(c, "/employee/recover/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
+        self.assert_response_code(c, "/employee/recover/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
 
         # Roles
-        self.assertResponseCode(c, "/roles/manage", GTFO)
-        self.assertResponseCode(c, "/roles/manage?employee_id={0}".format(self.employee1.id), GTFO)
-        self.assertResponseCode(c, "/roles/manage?role_id={0}".format(self.pdrole_1.id), GTFO) # Random shitty role
-        self.assertResponseCode(c, "/roles/manage?role_id={0}".format(self.pdrole_5.id), GTFO) # Executive role
-        self.assertResponseCode(c, "/roles/info", GTFO)
+        self.assert_response_code(c, "/roles/manage", GTFO)
+        self.assert_response_code(c, "/roles/manage?employee_id={0}".format(self.employee1.id), GTFO)
+        self.assert_response_code(c, "/roles/manage?role_id={0}".format(self.pdrole_1.id), GTFO) # Random shitty role
+        self.assert_response_code(c, "/roles/manage?role_id={0}".format(self.pdrole_5.id), GTFO) # Executive role
+        self.assert_response_code(c, "/roles/info", GTFO)
 
     
     def test_team_manager(self):
@@ -845,88 +845,88 @@ class URLAccessTestCase(TestCase):
         c.login(username="emp2", password="aaaaaaaa")
 
         # Time control
-        self.assertResponseCode(c, "/timeLog/list_all/", OK)
+        self.assert_response_code(c, "/timeLog/list_all/", OK)
 
         # Dashboard
-        self.assertResponseCode(c, "/dashboard/view", GTFO)
+        self.assert_response_code(c, "/dashboard/view", GTFO)
 
         # Company view and edition
-        self.assertResponseCode(c, "/company/view/", GTFO)
-        self.assertResponseCode(c, "/company/edit/", GTFO)
-        self.assertResponseCode(c, "/administrator/edit/", GTFO)
+        self.assert_response_code(c, "/company/view/", GTFO)
+        self.assert_response_code(c, "/company/edit/", GTFO)
+        self.assert_response_code(c, "/administrator/edit/", GTFO)
 
         # Projects
-        self.assertResponseCode(c, "/project/list", GTFO)
-        self.assertResponseCode(c, "/project/create", GTFO)
-        self.assertResponseCode(c, "/project/view/{0}/".format(self.pro1.id), GTFO)  # Their project
-        self.assertResponseCode(c, "/project/view/{0}/".format(self.pro_inactive.id), GTFO)  # Their inactive project
-        self.assertResponseCode(c, "/project/view/{0}/".format(self.pro2.id), GTFO)  # Not their project
-        self.assertResponseCode(c, "/project/edit/{0}/".format(self.pro1.id), GTFO)  # Their project
-        self.assertResponseCode(c, "/project/edit/{0}/".format(self.pro_inactive.id), GTFO)  # Their inactive project
-        self.assertResponseCode(c, "/project/edit/{0}/".format(self.pro2.id), GTFO)  # Not their project
-        self.assertResponseCode(c, "/project/delete/{0}/".format(self.pro1.id), GTFO)
-        self.assertResponseCode(c, "/project/recover/{0}/".format(self.pro1.id), GTFO)
+        self.assert_response_code(c, "/project/list", GTFO)
+        self.assert_response_code(c, "/project/create", GTFO)
+        self.assert_response_code(c, "/project/view/{0}/".format(self.pro1.id), GTFO)  # Their project
+        self.assert_response_code(c, "/project/view/{0}/".format(self.pro_inactive.id), GTFO)  # Their inactive project
+        self.assert_response_code(c, "/project/view/{0}/".format(self.pro2.id), GTFO)  # Not their project
+        self.assert_response_code(c, "/project/edit/{0}/".format(self.pro1.id), GTFO)  # Their project
+        self.assert_response_code(c, "/project/edit/{0}/".format(self.pro_inactive.id), GTFO)  # Their inactive project
+        self.assert_response_code(c, "/project/edit/{0}/".format(self.pro2.id), GTFO)  # Not their project
+        self.assert_response_code(c, "/project/delete/{0}/".format(self.pro1.id), GTFO)
+        self.assert_response_code(c, "/project/recover/{0}/".format(self.pro1.id), GTFO)
 
         # Departments
-        self.assertResponseCode(c, "/department/list", GTFO)
-        self.assertResponseCode(c, "/department/create", GTFO)
-        self.assertResponseCode(c, "/department/view/{0}/".format(self.dep1.id), GTFO)  # Their department
-        self.assertResponseCode(c, "/department/view/{0}/".format(self.dep_inactive.id), GTFO)  # Their inactive department
-        self.assertResponseCode(c, "/department/view/{0}/".format(self.dep2.id), GTFO)  # Not their department
-        self.assertResponseCode(c, "/department/edit/{0}/".format(self.dep1.id), GTFO)  # Their department
-        self.assertResponseCode(c, "/department/edit/{0}/".format(self.dep_inactive.id), GTFO)  # Their inactive department
-        self.assertResponseCode(c, "/department/edit/{0}/".format(self.dep2.id), GTFO)  # Not their department
-        self.assertResponseCode(c, "/department/delete/{0}/".format(self.dep1.id), GTFO)
-        self.assertResponseCode(c, "/department/recover/{0}/".format(self.dep1.id), NOTFOUND)
+        self.assert_response_code(c, "/department/list", GTFO)
+        self.assert_response_code(c, "/department/create", GTFO)
+        self.assert_response_code(c, "/department/view/{0}/".format(self.dep1.id), GTFO)  # Their department
+        self.assert_response_code(c, "/department/view/{0}/".format(self.dep_inactive.id), GTFO)  # Their inactive department
+        self.assert_response_code(c, "/department/view/{0}/".format(self.dep2.id), GTFO)  # Not their department
+        self.assert_response_code(c, "/department/edit/{0}/".format(self.dep1.id), GTFO)  # Their department
+        self.assert_response_code(c, "/department/edit/{0}/".format(self.dep_inactive.id), GTFO)  # Their inactive department
+        self.assert_response_code(c, "/department/edit/{0}/".format(self.dep2.id), GTFO)  # Not their department
+        self.assert_response_code(c, "/department/delete/{0}/".format(self.dep1.id), GTFO)
+        self.assert_response_code(c, "/department/recover/{0}/".format(self.dep1.id), NOTFOUND)
 
         # Tasks
-        self.assertResponseCode(c, "/task/list", GTFO)
-        self.assertResponseCode(c, "/task/create", GTFO)
-        self.assertResponseCode(c, "/task/view/{0}/".format(self.task1.id), GTFO)  # Their task
-        self.assertResponseCode(c, "/task/view/{0}/".format(self.task_inactive.id), GTFO)  # Their inactive task
-        self.assertResponseCode(c, "/task/view/{0}/".format(self.task2.id), GTFO)  # Not their task
-        self.assertResponseCode(c, "/task/edit/{0}/".format(self.task1.id), GTFO)  # Their task
-        self.assertResponseCode(c, "/task/edit/{0}/".format(self.task_inactive.id), GTFO)  # Their inactive task
-        self.assertResponseCode(c, "/task/edit/{0}/".format(self.task2.id), GTFO)  # Not their task
-        self.assertResponseCode(c, "/task/delete/{0}/".format(self.task1.id), GTFO)  # Their task
-        self.assertResponseCode(c, "/task/recover/{0}/".format(self.task1.id), NOTFOUND)
-        self.assertResponseCode(c, "/task/delete/{0}/".format(self.task2.id), GTFO)  # Not their task
-        self.assertResponseCode(c, "/task/recover/{0}/".format(self.task2.id), NOTFOUND)
+        self.assert_response_code(c, "/task/list", GTFO)
+        self.assert_response_code(c, "/task/create", GTFO)
+        self.assert_response_code(c, "/task/view/{0}/".format(self.task1.id), GTFO)  # Their task
+        self.assert_response_code(c, "/task/view/{0}/".format(self.task_inactive.id), GTFO)  # Their inactive task
+        self.assert_response_code(c, "/task/view/{0}/".format(self.task2.id), GTFO)  # Not their task
+        self.assert_response_code(c, "/task/edit/{0}/".format(self.task1.id), GTFO)  # Their task
+        self.assert_response_code(c, "/task/edit/{0}/".format(self.task_inactive.id), GTFO)  # Their inactive task
+        self.assert_response_code(c, "/task/edit/{0}/".format(self.task2.id), GTFO)  # Not their task
+        self.assert_response_code(c, "/task/delete/{0}/".format(self.task1.id), GTFO)  # Their task
+        self.assert_response_code(c, "/task/recover/{0}/".format(self.task1.id), NOTFOUND)
+        self.assert_response_code(c, "/task/delete/{0}/".format(self.task2.id), GTFO)  # Not their task
+        self.assert_response_code(c, "/task/recover/{0}/".format(self.task2.id), NOTFOUND)
 
         # Employees
-        self.assertResponseCode(c, "/employee/list", GTFO)
-        self.assertResponseCode(c, "/employee/create", GTFO)
+        self.assert_response_code(c, "/employee/list", GTFO)
+        self.assert_response_code(c, "/employee/create", GTFO)
 
-        self.assertResponseCode(c, "/employee/view/emp2/", GTFO)  # Their own profile
-        self.assertResponseCode(c, "/employee/view/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
-        self.assertResponseCode(c, "/employee/view/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
-        self.assertResponseCode(c, "/employee/view/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
-        self.assertResponseCode(c, "/employee/view/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
+        self.assert_response_code(c, "/employee/view/emp2/", GTFO)  # Their own profile
+        self.assert_response_code(c, "/employee/view/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
+        self.assert_response_code(c, "/employee/view/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
+        self.assert_response_code(c, "/employee/view/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
+        self.assert_response_code(c, "/employee/view/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
 
-        self.assertResponseCode(c, "/employee/edit/emp2/", GTFO)  # Their own profile
-        self.assertResponseCode(c, "/employee/edit/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
-        self.assertResponseCode(c, "/employee/edit/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
-        self.assertResponseCode(c, "/employee/edit/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
-        self.assertResponseCode(c, "/employee/edit/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
+        self.assert_response_code(c, "/employee/edit/emp2/", GTFO)  # Their own profile
+        self.assert_response_code(c, "/employee/edit/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
+        self.assert_response_code(c, "/employee/edit/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
+        self.assert_response_code(c, "/employee/edit/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
+        self.assert_response_code(c, "/employee/edit/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
 
-        self.assertResponseCode(c, "/employee/delete/emp2/", GTFO)  # Their own profile
-        self.assertResponseCode(c, "/employee/delete/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
-        self.assertResponseCode(c, "/employee/delete/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
-        self.assertResponseCode(c, "/employee/delete/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
-        self.assertResponseCode(c, "/employee/delete/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
+        self.assert_response_code(c, "/employee/delete/emp2/", GTFO)  # Their own profile
+        self.assert_response_code(c, "/employee/delete/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
+        self.assert_response_code(c, "/employee/delete/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
+        self.assert_response_code(c, "/employee/delete/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
+        self.assert_response_code(c, "/employee/delete/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
 
-        self.assertResponseCode(c, "/employee/recover/emp2/", GTFO)  # Their own profile
-        self.assertResponseCode(c, "/employee/recover/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
-        self.assertResponseCode(c, "/employee/recover/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
-        self.assertResponseCode(c, "/employee/recover/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
-        self.assertResponseCode(c, "/employee/recover/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
+        self.assert_response_code(c, "/employee/recover/emp2/", GTFO)  # Their own profile
+        self.assert_response_code(c, "/employee/recover/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
+        self.assert_response_code(c, "/employee/recover/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
+        self.assert_response_code(c, "/employee/recover/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
+        self.assert_response_code(c, "/employee/recover/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
 
         # Roles
-        self.assertResponseCode(c, "/roles/manage", GTFO)
-        self.assertResponseCode(c, "/roles/manage?employee_id={0}".format(self.employee1.id), GTFO)
-        self.assertResponseCode(c, "/roles/manage?role_id={0}".format(self.pdrole_1.id), GTFO)  # Random shitty role
-        self.assertResponseCode(c, "/roles/manage?role_id={0}".format(self.pdrole_5.id), GTFO)  # Executive role
-        self.assertResponseCode(c, "/roles/info", GTFO)
+        self.assert_response_code(c, "/roles/manage", GTFO)
+        self.assert_response_code(c, "/roles/manage?employee_id={0}".format(self.employee1.id), GTFO)
+        self.assert_response_code(c, "/roles/manage?role_id={0}".format(self.pdrole_1.id), GTFO)  # Random shitty role
+        self.assert_response_code(c, "/roles/manage?role_id={0}".format(self.pdrole_5.id), GTFO)  # Executive role
+        self.assert_response_code(c, "/roles/info", GTFO)
 
     
     def test_employee(self):
@@ -935,88 +935,88 @@ class URLAccessTestCase(TestCase):
         c.login(username="emp1", password="aaaaaaaa")
 
         # Time control
-        self.assertResponseCode(c, "/timeLog/list_all/", OK)
+        self.assert_response_code(c, "/timeLog/list_all/", OK)
 
         # Dashboard
-        self.assertResponseCode(c, "/dashboard/view", GTFO)
+        self.assert_response_code(c, "/dashboard/view", GTFO)
 
         # Company view and edition
-        self.assertResponseCode(c, "/company/view/", GTFO)
-        self.assertResponseCode(c, "/company/edit/", GTFO)
-        self.assertResponseCode(c, "/administrator/edit/", GTFO)
+        self.assert_response_code(c, "/company/view/", GTFO)
+        self.assert_response_code(c, "/company/edit/", GTFO)
+        self.assert_response_code(c, "/administrator/edit/", GTFO)
 
         # Projects
-        self.assertResponseCode(c, "/project/list", GTFO)
-        self.assertResponseCode(c, "/project/create", GTFO)
-        self.assertResponseCode(c, "/project/view/{0}/".format(self.pro1.id), GTFO)  # Their project
-        self.assertResponseCode(c, "/project/view/{0}/".format(self.pro_inactive.id), GTFO)  # Their inactive project
-        self.assertResponseCode(c, "/project/view/{0}/".format(self.pro2.id), GTFO)  # Not their project
-        self.assertResponseCode(c, "/project/edit/{0}/".format(self.pro1.id), GTFO)  # Their project
-        self.assertResponseCode(c, "/project/edit/{0}/".format(self.pro_inactive.id), GTFO)  # Their inactive project
-        self.assertResponseCode(c, "/project/edit/{0}/".format(self.pro2.id), GTFO)  # Not their project
-        self.assertResponseCode(c, "/project/delete/{0}/".format(self.pro1.id), GTFO)
-        self.assertResponseCode(c, "/project/recover/{0}/".format(self.pro1.id), GTFO)
+        self.assert_response_code(c, "/project/list", GTFO)
+        self.assert_response_code(c, "/project/create", GTFO)
+        self.assert_response_code(c, "/project/view/{0}/".format(self.pro1.id), GTFO)  # Their project
+        self.assert_response_code(c, "/project/view/{0}/".format(self.pro_inactive.id), GTFO)  # Their inactive project
+        self.assert_response_code(c, "/project/view/{0}/".format(self.pro2.id), GTFO)  # Not their project
+        self.assert_response_code(c, "/project/edit/{0}/".format(self.pro1.id), GTFO)  # Their project
+        self.assert_response_code(c, "/project/edit/{0}/".format(self.pro_inactive.id), GTFO)  # Their inactive project
+        self.assert_response_code(c, "/project/edit/{0}/".format(self.pro2.id), GTFO)  # Not their project
+        self.assert_response_code(c, "/project/delete/{0}/".format(self.pro1.id), GTFO)
+        self.assert_response_code(c, "/project/recover/{0}/".format(self.pro1.id), GTFO)
 
         # Departments
-        self.assertResponseCode(c, "/department/list", GTFO)
-        self.assertResponseCode(c, "/department/create", GTFO)
-        self.assertResponseCode(c, "/department/view/{0}/".format(self.dep1.id), GTFO)  # Their department
-        self.assertResponseCode(c, "/department/view/{0}/".format(self.dep_inactive.id), GTFO)  # Their inactive department
-        self.assertResponseCode(c, "/department/view/{0}/".format(self.dep2.id), GTFO)  # Not their department
-        self.assertResponseCode(c, "/department/edit/{0}/".format(self.dep1.id), GTFO)  # Their department
-        self.assertResponseCode(c, "/department/edit/{0}/".format(self.dep_inactive.id), GTFO)  # Their inactive department
-        self.assertResponseCode(c, "/department/edit/{0}/".format(self.dep2.id), GTFO)  # Not their department
-        self.assertResponseCode(c, "/department/delete/{0}/".format(self.dep1.id), GTFO)
-        self.assertResponseCode(c, "/department/recover/{0}/".format(self.dep1.id), NOTFOUND)
+        self.assert_response_code(c, "/department/list", GTFO)
+        self.assert_response_code(c, "/department/create", GTFO)
+        self.assert_response_code(c, "/department/view/{0}/".format(self.dep1.id), GTFO)  # Their department
+        self.assert_response_code(c, "/department/view/{0}/".format(self.dep_inactive.id), GTFO)  # Their inactive department
+        self.assert_response_code(c, "/department/view/{0}/".format(self.dep2.id), GTFO)  # Not their department
+        self.assert_response_code(c, "/department/edit/{0}/".format(self.dep1.id), GTFO)  # Their department
+        self.assert_response_code(c, "/department/edit/{0}/".format(self.dep_inactive.id), GTFO)  # Their inactive department
+        self.assert_response_code(c, "/department/edit/{0}/".format(self.dep2.id), GTFO)  # Not their department
+        self.assert_response_code(c, "/department/delete/{0}/".format(self.dep1.id), GTFO)
+        self.assert_response_code(c, "/department/recover/{0}/".format(self.dep1.id), NOTFOUND)
 
         # Tasks
-        self.assertResponseCode(c, "/task/list", GTFO)
-        self.assertResponseCode(c, "/task/create", GTFO)
-        self.assertResponseCode(c, "/task/view/{0}/".format(self.task1.id), GTFO)  # Their task
-        self.assertResponseCode(c, "/task/view/{0}/".format(self.task_inactive.id), GTFO)  # Their inactive task
-        self.assertResponseCode(c, "/task/view/{0}/".format(self.task2.id), GTFO)  # Not their task
-        self.assertResponseCode(c, "/task/edit/{0}/".format(self.task1.id), GTFO)  # Their task
-        self.assertResponseCode(c, "/task/edit/{0}/".format(self.task_inactive.id), GTFO)  # Their inactive task
-        self.assertResponseCode(c, "/task/edit/{0}/".format(self.task2.id), GTFO)  # Not their task
-        self.assertResponseCode(c, "/task/delete/{0}/".format(self.task1.id), GTFO)  # Their task
-        self.assertResponseCode(c, "/task/recover/{0}/".format(self.task1.id), NOTFOUND)
-        self.assertResponseCode(c, "/task/delete/{0}/".format(self.task2.id), GTFO)  # Not their task
-        self.assertResponseCode(c, "/task/recover/{0}/".format(self.task2.id), NOTFOUND)
+        self.assert_response_code(c, "/task/list", GTFO)
+        self.assert_response_code(c, "/task/create", GTFO)
+        self.assert_response_code(c, "/task/view/{0}/".format(self.task1.id), GTFO)  # Their task
+        self.assert_response_code(c, "/task/view/{0}/".format(self.task_inactive.id), GTFO)  # Their inactive task
+        self.assert_response_code(c, "/task/view/{0}/".format(self.task2.id), GTFO)  # Not their task
+        self.assert_response_code(c, "/task/edit/{0}/".format(self.task1.id), GTFO)  # Their task
+        self.assert_response_code(c, "/task/edit/{0}/".format(self.task_inactive.id), GTFO)  # Their inactive task
+        self.assert_response_code(c, "/task/edit/{0}/".format(self.task2.id), GTFO)  # Not their task
+        self.assert_response_code(c, "/task/delete/{0}/".format(self.task1.id), GTFO)  # Their task
+        self.assert_response_code(c, "/task/recover/{0}/".format(self.task1.id), NOTFOUND)
+        self.assert_response_code(c, "/task/delete/{0}/".format(self.task2.id), GTFO)  # Not their task
+        self.assert_response_code(c, "/task/recover/{0}/".format(self.task2.id), NOTFOUND)
 
         # Employees
-        self.assertResponseCode(c, "/employee/list", GTFO)
-        self.assertResponseCode(c, "/employee/create", GTFO)
+        self.assert_response_code(c, "/employee/list", GTFO)
+        self.assert_response_code(c, "/employee/create", GTFO)
 
-        self.assertResponseCode(c, "/employee/view/emp1/", GTFO)  # Their own profile
-        self.assertResponseCode(c, "/employee/view/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
-        self.assertResponseCode(c, "/employee/view/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
-        self.assertResponseCode(c, "/employee/view/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
-        self.assertResponseCode(c, "/employee/view/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
+        self.assert_response_code(c, "/employee/view/emp1/", GTFO)  # Their own profile
+        self.assert_response_code(c, "/employee/view/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
+        self.assert_response_code(c, "/employee/view/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
+        self.assert_response_code(c, "/employee/view/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
+        self.assert_response_code(c, "/employee/view/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
 
-        self.assertResponseCode(c, "/employee/edit/emp1/", GTFO)  # Their own profile
-        self.assertResponseCode(c, "/employee/edit/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
-        self.assertResponseCode(c, "/employee/edit/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
-        self.assertResponseCode(c, "/employee/edit/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
-        self.assertResponseCode(c, "/employee/edit/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
+        self.assert_response_code(c, "/employee/edit/emp1/", GTFO)  # Their own profile
+        self.assert_response_code(c, "/employee/edit/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
+        self.assert_response_code(c, "/employee/edit/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
+        self.assert_response_code(c, "/employee/edit/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
+        self.assert_response_code(c, "/employee/edit/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
 
-        self.assertResponseCode(c, "/employee/delete/emp1/", GTFO)  # Their own profile
-        self.assertResponseCode(c, "/employee/delete/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
-        self.assertResponseCode(c, "/employee/delete/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
-        self.assertResponseCode(c, "/employee/delete/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
-        self.assertResponseCode(c, "/employee/delete/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
+        self.assert_response_code(c, "/employee/delete/emp1/", GTFO)  # Their own profile
+        self.assert_response_code(c, "/employee/delete/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
+        self.assert_response_code(c, "/employee/delete/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
+        self.assert_response_code(c, "/employee/delete/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
+        self.assert_response_code(c, "/employee/delete/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
 
-        self.assertResponseCode(c, "/employee/recover/emp1/", GTFO)  # Their own profile
-        self.assertResponseCode(c, "/employee/recover/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
-        self.assertResponseCode(c, "/employee/recover/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
-        self.assertResponseCode(c, "/employee/recover/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
-        self.assertResponseCode(c, "/employee/recover/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
+        self.assert_response_code(c, "/employee/recover/emp1/", GTFO)  # Their own profile
+        self.assert_response_code(c, "/employee/recover/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
+        self.assert_response_code(c, "/employee/recover/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
+        self.assert_response_code(c, "/employee/recover/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
+        self.assert_response_code(c, "/employee/recover/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
 
         # Roles
-        self.assertResponseCode(c, "/roles/manage", GTFO)
-        self.assertResponseCode(c, "/roles/manage?employee_id={0}".format(self.employee1.id), GTFO)
-        self.assertResponseCode(c, "/roles/manage?role_id={0}".format(self.pdrole_1.id), GTFO)  # Random shitty role
-        self.assertResponseCode(c, "/roles/manage?role_id={0}".format(self.pdrole_5.id), GTFO)  # Executive role
-        self.assertResponseCode(c, "/roles/info", GTFO)
+        self.assert_response_code(c, "/roles/manage", GTFO)
+        self.assert_response_code(c, "/roles/manage?employee_id={0}".format(self.employee1.id), GTFO)
+        self.assert_response_code(c, "/roles/manage?role_id={0}".format(self.pdrole_1.id), GTFO)  # Random shitty role
+        self.assert_response_code(c, "/roles/manage?role_id={0}".format(self.pdrole_5.id), GTFO)  # Executive role
+        self.assert_response_code(c, "/roles/info", GTFO)
 
     
     def test_no_roles(self):
@@ -1025,87 +1025,87 @@ class URLAccessTestCase(TestCase):
         c.login(username="emp0", password="aaaaaaaa")
 
         # Time control
-        self.assertResponseCode(c, "/timeLog/list_all/", OK)
+        self.assert_response_code(c, "/timeLog/list_all/", OK)
 
         # Dashboard
-        self.assertResponseCode(c, "/dashboard/view", GTFO)
+        self.assert_response_code(c, "/dashboard/view", GTFO)
 
         # Company view and edition
-        self.assertResponseCode(c, "/company/view/", GTFO)
-        self.assertResponseCode(c, "/company/edit/", GTFO)
-        self.assertResponseCode(c, "/administrator/edit/", GTFO)
+        self.assert_response_code(c, "/company/view/", GTFO)
+        self.assert_response_code(c, "/company/edit/", GTFO)
+        self.assert_response_code(c, "/administrator/edit/", GTFO)
 
         # Projects
-        self.assertResponseCode(c, "/project/list", GTFO)
-        self.assertResponseCode(c, "/project/create", GTFO)
-        self.assertResponseCode(c, "/project/view/{0}/".format(self.pro1.id), GTFO)  # Their project
-        self.assertResponseCode(c, "/project/view/{0}/".format(self.pro_inactive.id), GTFO)  # Their inactive project
-        self.assertResponseCode(c, "/project/view/{0}/".format(self.pro2.id), GTFO)  # Not their project
-        self.assertResponseCode(c, "/project/edit/{0}/".format(self.pro1.id), GTFO)  # Their project
-        self.assertResponseCode(c, "/project/edit/{0}/".format(self.pro_inactive.id), GTFO)  # Their inactive project
-        self.assertResponseCode(c, "/project/edit/{0}/".format(self.pro2.id), GTFO)  # Not their project
-        self.assertResponseCode(c, "/project/delete/{0}/".format(self.pro1.id), GTFO)
-        self.assertResponseCode(c, "/project/recover/{0}/".format(self.pro1.id), GTFO)
+        self.assert_response_code(c, "/project/list", GTFO)
+        self.assert_response_code(c, "/project/create", GTFO)
+        self.assert_response_code(c, "/project/view/{0}/".format(self.pro1.id), GTFO)  # Their project
+        self.assert_response_code(c, "/project/view/{0}/".format(self.pro_inactive.id), GTFO)  # Their inactive project
+        self.assert_response_code(c, "/project/view/{0}/".format(self.pro2.id), GTFO)  # Not their project
+        self.assert_response_code(c, "/project/edit/{0}/".format(self.pro1.id), GTFO)  # Their project
+        self.assert_response_code(c, "/project/edit/{0}/".format(self.pro_inactive.id), GTFO)  # Their inactive project
+        self.assert_response_code(c, "/project/edit/{0}/".format(self.pro2.id), GTFO)  # Not their project
+        self.assert_response_code(c, "/project/delete/{0}/".format(self.pro1.id), GTFO)
+        self.assert_response_code(c, "/project/recover/{0}/".format(self.pro1.id), GTFO)
 
         # Departments
-        self.assertResponseCode(c, "/department/list", GTFO)
-        self.assertResponseCode(c, "/department/create", GTFO)
-        self.assertResponseCode(c, "/department/view/{0}/".format(self.dep1.id), GTFO)  # Their department
-        self.assertResponseCode(c, "/department/view/{0}/".format(self.dep_inactive.id), GTFO)  # Their inactive department
-        self.assertResponseCode(c, "/department/view/{0}/".format(self.dep2.id), GTFO)  # Not their department
-        self.assertResponseCode(c, "/department/edit/{0}/".format(self.dep1.id), GTFO)  # Their department
-        self.assertResponseCode(c, "/department/edit/{0}/".format(self.dep_inactive.id), GTFO)  # Their inactive department
-        self.assertResponseCode(c, "/department/edit/{0}/".format(self.dep2.id), GTFO)  # Not their department
-        self.assertResponseCode(c, "/department/delete/{0}/".format(self.dep1.id), GTFO)
-        self.assertResponseCode(c, "/department/recover/{0}/".format(self.dep1.id), NOTFOUND)
+        self.assert_response_code(c, "/department/list", GTFO)
+        self.assert_response_code(c, "/department/create", GTFO)
+        self.assert_response_code(c, "/department/view/{0}/".format(self.dep1.id), GTFO)  # Their department
+        self.assert_response_code(c, "/department/view/{0}/".format(self.dep_inactive.id), GTFO)  # Their inactive department
+        self.assert_response_code(c, "/department/view/{0}/".format(self.dep2.id), GTFO)  # Not their department
+        self.assert_response_code(c, "/department/edit/{0}/".format(self.dep1.id), GTFO)  # Their department
+        self.assert_response_code(c, "/department/edit/{0}/".format(self.dep_inactive.id), GTFO)  # Their inactive department
+        self.assert_response_code(c, "/department/edit/{0}/".format(self.dep2.id), GTFO)  # Not their department
+        self.assert_response_code(c, "/department/delete/{0}/".format(self.dep1.id), GTFO)
+        self.assert_response_code(c, "/department/recover/{0}/".format(self.dep1.id), NOTFOUND)
 
         # Tasks
-        self.assertResponseCode(c, "/task/list", GTFO)
-        self.assertResponseCode(c, "/task/create", GTFO)
-        self.assertResponseCode(c, "/task/view/{0}/".format(self.task1.id), GTFO)  # Their task
-        self.assertResponseCode(c, "/task/view/{0}/".format(self.task_inactive.id), GTFO)  # Their inactive task
-        self.assertResponseCode(c, "/task/view/{0}/".format(self.task2.id), GTFO)  # Not their task
-        self.assertResponseCode(c, "/task/edit/{0}/".format(self.task1.id), GTFO)  # Their task
-        self.assertResponseCode(c, "/task/edit/{0}/".format(self.task_inactive.id), GTFO)  # Their inactive task
-        self.assertResponseCode(c, "/task/edit/{0}/".format(self.task2.id), GTFO)  # Not their task
-        self.assertResponseCode(c, "/task/delete/{0}/".format(self.task1.id), GTFO)  # Their task
-        self.assertResponseCode(c, "/task/recover/{0}/".format(self.task1.id), NOTFOUND)
-        self.assertResponseCode(c, "/task/delete/{0}/".format(self.task2.id), GTFO)  # Not their task
-        self.assertResponseCode(c, "/task/recover/{0}/".format(self.task2.id), NOTFOUND)
+        self.assert_response_code(c, "/task/list", GTFO)
+        self.assert_response_code(c, "/task/create", GTFO)
+        self.assert_response_code(c, "/task/view/{0}/".format(self.task1.id), GTFO)  # Their task
+        self.assert_response_code(c, "/task/view/{0}/".format(self.task_inactive.id), GTFO)  # Their inactive task
+        self.assert_response_code(c, "/task/view/{0}/".format(self.task2.id), GTFO)  # Not their task
+        self.assert_response_code(c, "/task/edit/{0}/".format(self.task1.id), GTFO)  # Their task
+        self.assert_response_code(c, "/task/edit/{0}/".format(self.task_inactive.id), GTFO)  # Their inactive task
+        self.assert_response_code(c, "/task/edit/{0}/".format(self.task2.id), GTFO)  # Not their task
+        self.assert_response_code(c, "/task/delete/{0}/".format(self.task1.id), GTFO)  # Their task
+        self.assert_response_code(c, "/task/recover/{0}/".format(self.task1.id), NOTFOUND)
+        self.assert_response_code(c, "/task/delete/{0}/".format(self.task2.id), GTFO)  # Not their task
+        self.assert_response_code(c, "/task/recover/{0}/".format(self.task2.id), NOTFOUND)
 
         # Employees
-        self.assertResponseCode(c, "/employee/list", GTFO)
-        self.assertResponseCode(c, "/employee/create", GTFO)
+        self.assert_response_code(c, "/employee/list", GTFO)
+        self.assert_response_code(c, "/employee/create", GTFO)
 
-        self.assertResponseCode(c, "/employee/view/emp0/", GTFO)  # Their own profile
-        self.assertResponseCode(c, "/employee/view/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
-        self.assertResponseCode(c, "/employee/view/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
-        self.assertResponseCode(c, "/employee/view/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
-        self.assertResponseCode(c, "/employee/view/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
+        self.assert_response_code(c, "/employee/view/emp0/", GTFO)  # Their own profile
+        self.assert_response_code(c, "/employee/view/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
+        self.assert_response_code(c, "/employee/view/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
+        self.assert_response_code(c, "/employee/view/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
+        self.assert_response_code(c, "/employee/view/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
 
-        self.assertResponseCode(c, "/employee/edit/emp0/", GTFO)  # Their own profile
-        self.assertResponseCode(c, "/employee/edit/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
-        self.assertResponseCode(c, "/employee/edit/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
-        self.assertResponseCode(c, "/employee/edit/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
-        self.assertResponseCode(c, "/employee/edit/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
+        self.assert_response_code(c, "/employee/edit/emp0/", GTFO)  # Their own profile
+        self.assert_response_code(c, "/employee/edit/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
+        self.assert_response_code(c, "/employee/edit/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
+        self.assert_response_code(c, "/employee/edit/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
+        self.assert_response_code(c, "/employee/edit/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
 
-        self.assertResponseCode(c, "/employee/delete/emp0/", GTFO)  # Their own profile
-        self.assertResponseCode(c, "/employee/delete/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
-        self.assertResponseCode(c, "/employee/delete/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
-        self.assertResponseCode(c, "/employee/delete/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
-        self.assertResponseCode(c, "/employee/delete/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
+        self.assert_response_code(c, "/employee/delete/emp0/", GTFO)  # Their own profile
+        self.assert_response_code(c, "/employee/delete/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
+        self.assert_response_code(c, "/employee/delete/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
+        self.assert_response_code(c, "/employee/delete/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
+        self.assert_response_code(c, "/employee/delete/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
 
-        self.assertResponseCode(c, "/employee/recover/emp0/", GTFO)  # Their own profile
-        self.assertResponseCode(c, "/employee/recover/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
-        self.assertResponseCode(c, "/employee/recover/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
-        self.assertResponseCode(c, "/employee/recover/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
-        self.assertResponseCode(c, "/employee/recover/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
+        self.assert_response_code(c, "/employee/recover/emp0/", GTFO)  # Their own profile
+        self.assert_response_code(c, "/employee/recover/{0}/".format(self.employee12.user.username), GTFO)  # User in their project but not their department
+        self.assert_response_code(c, "/employee/recover/{0}/".format(self.employee21.user.username), GTFO)  # User in their department but not their project
+        self.assert_response_code(c, "/employee/recover/{0}/".format(self.employee22.user.username), GTFO)  # User not in their department or project
+        self.assert_response_code(c, "/employee/recover/{0}/".format(self.employee_inactive.user.username), GTFO)  # User in their dep and proj but inactive
 
         # Roles
-        self.assertResponseCode(c, "/roles/manage", GTFO)
-        self.assertResponseCode(c, "/roles/manage?employee_id={0}".format(self.employee1.id), GTFO)
-        self.assertResponseCode(c, "/roles/manage?role_id={0}".format(self.pdrole_1.id), GTFO)  # Random shitty role
-        self.assertResponseCode(c, "/roles/manage?role_id={0}".format(self.pdrole_5.id), GTFO)  # Executive role
-        self.assertResponseCode(c, "/roles/info", GTFO)
+        self.assert_response_code(c, "/roles/manage", GTFO)
+        self.assert_response_code(c, "/roles/manage?employee_id={0}".format(self.employee1.id), GTFO)
+        self.assert_response_code(c, "/roles/manage?role_id={0}".format(self.pdrole_1.id), GTFO)  # Random shitty role
+        self.assert_response_code(c, "/roles/manage?role_id={0}".format(self.pdrole_5.id), GTFO)  # Executive role
+        self.assert_response_code(c, "/roles/info", GTFO)
 
 

@@ -5,6 +5,7 @@ from metronus_app.model.project                       import Project
 from metronus_app.model.department                    import Department
 from django.contrib.auth.models                       import User
 from metronus_app.model.administrator                 import Administrator
+from metronus_app.model.actor                         import Actor
 from metronus_app.model.task                          import Task
 from metronus_app.model.timeLog                       import TimeLog
 from metronus_app.model.employeeLog                       import EmployeeLog
@@ -116,3 +117,4 @@ class ModelStringTestCase(TestCase):
         do_test(EmployeeLog,"{0} - A - {1}".format(Employee.objects.first(),
             EmployeeLog.objects.first().event_date))
         do_test(CompanyLog,"A12345678-comp")
+        do_test(Actor,"12345")
