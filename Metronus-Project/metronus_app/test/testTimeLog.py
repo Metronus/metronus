@@ -1,10 +1,12 @@
 from metronus_app.model.task import Task
 from metronus_app.model.timeLog import TimeLog
+from metronus_app.model.project                       import Project
+from metronus_app.model.department                    import Department
 from django.test import TestCase, Client
 from populate_database import populate_database
 from datetime import datetime,timedelta
 from django.utils import timezone
-
+import json
 
 class TimeLogTestCase(TestCase):
     """This class provides a test case for using and managing employee timelogs"""
@@ -205,6 +207,64 @@ class TimeLogTestCase(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertEquals(response.context["valid_production_units"], False)
         self.assertEquals(response.context['over_day_limit'], False)
+    
+    def test_get_departments_no_project(self):
+        """
+        try get departments without project
+        """ 
+        c = Client()
+        c.login(username="anddonram", password="123456")
+        
+        kwargs = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+        response = c.post("/timeLog/list_all/", {
+              "department":Department.objects.get(name="Backend").id,
+              },**kwargs)
+        self.assertEquals(response.status_code, 400)
+        
+    def test_get_departments(self):
+        """
+        get departments for select options in project
+        """  
+        c = Client()
+        c.login(username="anddonram", password="123456")
+        
+        kwargs = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+        response = c.post("/timeLog/list_all/", {
+            "project":Project.objects.get(name="Metronus").id,
+              },**kwargs)
+        self.assertEquals(response.status_code, 200)
+        # response in bytes must be decode to string
+        data = response.content.decode("utf-8")
+        # string to dict
+        data = json.loads(data)
+        names=[]
+        for dep in data:
+            names.append(dep['fields']['name'])
+        self.assertIn("Backend",names)
+        self.assertNotIn("Frontend",names)
+
+    def test_get_tasks(self):
+        """
+        get tasks for select options
+        """  
+        c = Client()
+        c.login(username="anddonram", password="123456")
+        
+        kwargs = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+        response = c.post("/timeLog/list_all/", {
+            "project":Project.objects.get(name="Metronus").id,
+            "department":Department.objects.get(name="Backend").id,
+              },**kwargs)
+        self.assertEquals(response.status_code, 200)
+        # response in bytes must be decode to string
+        data = response.content.decode("utf-8")
+        # string to dict
+        data = json.loads(data)
+        names=[]
+        for task in data:
+            names.append(task['fields']['name'])
+        self.assertIn("Hacer cosas",names)
+        self.assertNotIn("Hacer cosas de cua",names)
 
     def test_create_timelog_negative_2(self):
         """ Creates a timelog with production goals when the task does not need it"""

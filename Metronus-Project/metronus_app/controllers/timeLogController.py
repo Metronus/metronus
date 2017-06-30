@@ -6,7 +6,7 @@ from metronus_app.common_utils import get_current_employee_or_403
 from metronus_app.model.timeLog import TimeLog
 from metronus_app.model.department import Department
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied,SuspiciousOperation
 
 from datetime import date, datetime
 from django.http import HttpResponse
@@ -47,25 +47,26 @@ def list_all(request):
         current_year = today.year
 
     if request.method == 'POST' and request.is_ajax():
+        if "project" not in request.POST:
+            raise SuspiciousOperation
+
         project = request.POST.get("project")
         department = request.POST.get("department")
+ 
+        if department is None:
+            departments = Department.objects.filter(company_id=employee.company_id,
+                                                    projectdepartment__project_id=project,
+                                                    projectdepartment__projectdepartmentemployeerole__employee_id=employee, 
+                                                    active=True).distinct()
 
-        if project == '':
-            return
+            data = serializers.serialize('json', departments, fields=('id', 'name',))
+
+            return HttpResponse(data)
         else:
-            if department is None:
-                departments = Department.objects.filter(company_id=employee.company_id,
-                                                        projectdepartment__project_id=project,
-                                                        projectdepartment__projectdepartmentemployeerole__employee_id=employee, active=True).distinct()
-
-                data = serializers.serialize('json', departments, fields=('id', 'name',))
-
-                return HttpResponse(data)
-            else:
-                tasks = Task.objects.filter(projectDepartment_id__department_id=department,
-                                            projectDepartment_id__project_id=project, active=True).distinct()
-                data = serializers.serialize('json', tasks, fields=('id', 'name', 'goal_description'))
-                return HttpResponse(data)
+            tasks = Task.objects.filter(projectDepartment_id__department_id=department,
+                                        projectDepartment_id__project_id=project, active=True).distinct()
+            data = serializers.serialize('json', tasks, fields=('id', 'name', 'goal_description'))
+            return HttpResponse(data)
 
     if request.method == 'POST':
         form = TimeLog2Form(employee, request.POST)
@@ -110,15 +111,11 @@ def delete(request, time_log_id):
     """
     employee = get_current_employee_or_403(request)
     time_log = find_time_log(time_log_id)
-    if employee.id == time_log.employee_id.id:
-        if check_time_log_overtime(time_log):
+    if employee.id == time_log.employee_id.id and check_time_log_overtime(time_log):
             time_log.delete()
             return redirect('timeLog_list_all')
-        else:
-            raise PermissionDenied
-    else:
-        raise PermissionDenied
-    return redirect('timeLog_list_all')
+
+    raise PermissionDenied
 
 
 def find_task(task_id):
@@ -161,13 +158,6 @@ def check_produced_units(form):
     task = find_task(form.cleaned_data['task_id'])
     prod_units = form.cleaned_data['produced_units']
 
-    # If it's not empty, check that it's a number
-    if prod_units:
-        try:
-            float(prod_units)
-        except:
-            return False
-
     # both null or empty OR both not null or empty
     return (prod_units is not None and prod_units != "" and prod_units > 0 and task.production_goal is not None and task.production_goal != "") or \
            ((prod_units is None or prod_units == "") and (task.production_goal is None or task.production_goal == ""))
@@ -189,22 +179,6 @@ def check_permission_for_task(employee, task):
         res= has_role.count() > 0
     return res
 
-
-def check_role_for_task(employee, task):
-    """Comprobacion para saber si el empleado es un mando superior y
-    tiene acceso a todas las imputaciones de una tarea"""
-
-    is_executive = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee,
-                                                                   role_id__tier=50)
-    res = is_executive.count() > 0
-    if not res:
-        roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee,
-                projectDepartment_id__project_id__deleted=False,
-                projectDepartment_id__department_id__active=True,
-                projectDepartment_id=task.projectDepartment_id,
-                role_id__tier__gte= 20)
-        res = roles.count() > 0
-    return res
 
 
 # Método auxiliar para encontrar un registro
