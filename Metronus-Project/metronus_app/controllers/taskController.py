@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum, F, FloatField
+from django.db.models import Sum, F, FloatField, Q
 from django.core import serializers
 
 from metronus_app.forms.taskForm import TaskForm
@@ -191,7 +191,7 @@ def view(request, task_id):
     """
 
     task = get_object_or_404(Task, pk=task_id)
-    actor=check_task(request,task)
+    actor=check_task(request,task, for_view=True)
     same_company_or_403(actor,task.actor_id)
 
     goal_evolution = GoalEvolution.objects.filter(task_id=task.id)
@@ -327,7 +327,7 @@ def ajax_productivity_per_task(request):
 
     task_id = request.GET["task_id"]
     task=get_object_or_404(Task, pk=task_id)
-    actor=check_task(request,task)
+    actor=check_task(request,task,for_view=True)
     same_company_or_403(actor,task.actor_id)
     
     # Get and parse the dates and the offset
@@ -429,7 +429,7 @@ def ajax_profit_per_date(request, task_id):
     "expenses": [0, 1457.18015695298, 1614.1458826106, 1367.62026485911, 2026.87328274918, 1446.83842607798, 1878.80598163726, 1823.8647251497, 1879.3977160153, 1607.99448986952, 1615.72129910026, 1609.49391115067, 2513.94326680278, 2112.07014158364, 1360.67562490714, 1368.60590722518, 1603.92947753372, 1473.68308776497, 2343.40799525207, 1704.64596258349, 1938.38239104717, 1403.70478335668, 1372.6250345277, 1076.44946125988, 2353.7065671626, 1516.12119421768, 1611.60427318295, 1338.82219760799, 2525.26576799895, 1422.68356444232, 1765.66996904502]}  "expected_productivity": [9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 4.0, 4.0, 2.0, 2.0, 2.0]}}
     """
     task=get_object_or_404(Task, pk=task_id)
-    actor=check_task(request,task)
+    actor=check_task(request,task,for_view=True)
     same_company_or_403(actor,task.actor_id)
     
     # Get and parse the dates
@@ -700,7 +700,7 @@ def find_departments(request):
     return departamentos
 
 
-def check_task(request,task, for_edit=False):
+def check_task(request,task, for_edit=False, for_view=False):
     """
     checks if the task belongs to the logged actor with appropiate roles
     """ 
@@ -713,6 +713,13 @@ def check_task(request,task, for_edit=False):
     elif task:
         if not task.active:
             raise PermissionDenied
+        # If it's for view, project managers can see tasks in their projects but not their departments
+        elif for_view and highest >= 40 and ProjectDepartmentEmployeeRole.objects.filter(
+            Q(employee_id=actor),
+            Q(role_id__tier__gte=40),
+            (Q(projectDepartment_id__department_id=task.projectDepartment_id.department_id) | Q(projectDepartment_id__project_id=task.projectDepartment_id.project_id))) \
+                .exists():
+            return actor
         elif ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
             projectDepartment_id=task.projectDepartment_id, 
             role_id__tier__gte=20).exists():
