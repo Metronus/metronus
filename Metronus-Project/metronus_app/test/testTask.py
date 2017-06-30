@@ -639,7 +639,7 @@ class TaskTestCase(TestCase):
         Recover a task with proper roles
         """
         c = Client()
-        c.login(username="admin", password="123456")
+        c.login(username="metronus", password="metronus")
 
         response = c.get("/task/list")
         dep_id=response.context["tasks"][0].id
@@ -651,10 +651,12 @@ class TaskTestCase(TestCase):
 
 
         response = c.get(reverse("task_recover",args=(dep_id,)))
-        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response.status_code, 302)
+        self.assertRedirects(response, "/task/list", fetch_redirect_response=False)
+
         self.assertTrue(Task.objects.get(pk=dep_id).active)
 
-    def test_recover_task_positive(self):
+    def test_recover_task_negative(self):
         """
         Only admin or exec can recover
         """

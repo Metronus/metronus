@@ -1,5 +1,6 @@
 from django.test import TestCase, Client
 from django.core.exceptions import ObjectDoesNotExist
+from django.urls import reverse
 
 from metronus_app.model.employee import Employee
 from metronus_app.model.role import Role
@@ -11,6 +12,7 @@ from django.contrib.auth.models import User
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 from metronus_app.model.projectDepartment import ProjectDepartment
 
+import json
 
 class RoleTestCase(TestCase):
     """This class provides a test case for using and managing roles"""
@@ -116,11 +118,11 @@ class RoleTestCase(TestCase):
             company_id=company1
         )
 
-        project1 = Project.objects.create(
+        self.project1 = Project.objects.create(
             company_id=company1,
             name="proyecto 1",
         )
-
+        project1=self.project1
         project2 = Project.objects.create(
             company_id=company1,
             name="proyecto 2",
@@ -132,11 +134,11 @@ class RoleTestCase(TestCase):
             name="proyecto 3",
         )
 
-        department1 = Department.objects.create(
+        self.department1 = Department.objects.create(
             company_id=company1,
             name="departamento 1",
         )
-
+        department1 =self.department1
         department2 = Department.objects.create(
             company_id=company1,
             name="departamento 2",
@@ -328,13 +330,12 @@ class RoleTestCase(TestCase):
         self.assertEquals(employeeroles_before + 1, employeeroles_after)
 
         # Check that the role has been successfully created
-        try:
-            ProjectDepartmentEmployeeRole.objects.get(employee_id=employee, role_id=role,
-                                                      projectDepartment_id__project_id=project,
-                                                      projectDepartment_id__department_id=department)
-        except ObjectDoesNotExist:
-            self.fail("The role was not successfully created")
-
+        self.assertTrue(
+            ProjectDepartmentEmployeeRole.objects.filter(
+              employee_id=employee, role_id=role,
+              projectDepartment_id__project_id=project,
+              projectDepartment_id__department_id=department).exists()
+        )
     def test_post_new_role_user_positive(self):
         """
         With proper roles, add a new role to an employee
@@ -368,12 +369,12 @@ class RoleTestCase(TestCase):
         self.assertEquals(employeeroles_before + 1, employeeroles_after)
 
         # Check that the role has been successfully created
-        try:
-            ProjectDepartmentEmployeeRole.objects.get(employee_id=employee, role_id=role,
-                                                      projectDepartment_id__project_id=project,
-                                                      projectDepartment_id__department_id=department)
-        except ObjectDoesNotExist:
-            self.fail("The role was not successfully created")
+        self.assertTrue(
+            ProjectDepartmentEmployeeRole.objects.filter(
+              employee_id=employee, role_id=role,
+              projectDepartment_id__project_id=project,
+              projectDepartment_id__department_id=department).exists()
+        )
     def test_post_new_role_user_async_positive(self):
         """
         With proper roles, add a new role to an employee
@@ -406,12 +407,49 @@ class RoleTestCase(TestCase):
         self.assertEquals(employeeroles_before + 1, employeeroles_after)
 
         # Check that the role has been successfully created
-        try:
-            ProjectDepartmentEmployeeRole.objects.get(employee_id=employee, role_id=role,
-                                                      projectDepartment_id__project_id=project,
-                                                      projectDepartment_id__department_id=department)
-        except ObjectDoesNotExist:
-            self.fail("The role was not successfully created")
+        self.assertTrue(
+            ProjectDepartmentEmployeeRole.objects.filter(
+              employee_id=employee, role_id=role,
+              projectDepartment_id__project_id=project,
+              projectDepartment_id__department_id=department).exists()
+        )
+    def test_post_new_role_user_async_negative(self):
+        """
+        Use get method for async
+        """
+        c = Client()
+        c.login(username="emp1", password="123456")
+
+        response = c.get("/roles/manageAsync")
+
+        self.assertEquals(response.status_code,400)
+        
+    def test_post_new_role_user_async_not_valid(self):
+        """
+        Use async manage with some fields not filled
+        """
+        c = Client()
+        c.login(username="emp1", password="123456")
+
+        employee = Employee.objects.get(identifier="emp02")
+        department = Department.objects.get(name="departamento 1")
+        project = Project.objects.get(name="proyecto 1")
+        role = Role.objects.get(name="COORDINATOR")
+
+
+        response = c.post("/roles/manageAsync", {
+            'employee_id': employee.id,
+            'project_id': project.id,
+            'employeeRole_id': 0,
+            'role_id': role.id,
+        })
+
+        self.assertEquals(response.status_code,200)
+        # response in bytes must be decode to string
+        data = response.content.decode("utf-8")
+        # string to dict
+        data = json.loads(data)
+        self.assertTrue('roleCreation_formNotValid' in data["errors"])
 
     def test_post_new_role_user_form_not_valid(self):
         """
@@ -611,14 +649,12 @@ class RoleTestCase(TestCase):
 
         self.assertRedirects(response, "/employee/view/{0}/" .format(employee.user.username),
                              fetch_redirect_response=False)
-
-        try:
-            ProjectDepartmentEmployeeRole.objects.get(employee_id=employee, role_id=role,
-                                                      projectDepartment_id__project_id=project,
-                                                      projectDepartment_id__department_id=department)
-        except ObjectDoesNotExist:
-            self.fail("The role was not successfully created")
-
+        self.assertTrue(
+            ProjectDepartmentEmployeeRole.objects.filter(
+              employee_id=employee, role_id=role,
+              projectDepartment_id__project_id=project,
+              projectDepartment_id__department_id=department).exists()
+        )
     def test_error_codes_404(self):
         """
         Forces all types of errores in each case
@@ -683,3 +719,76 @@ class RoleTestCase(TestCase):
         self.assertEquals(employeeroles_before, employeeroles_after + 1)
         self.assertRedirects(response, "/employee/view/{0}" .format(employee.user.username),
                              fetch_redirect_response=False)
+    
+    def test_get_available_departments(self):
+        """
+        Get the list of departments for a project
+        """
+        c = Client()
+        c.login(username="emp1", password="123456")
+
+        response = c.get(reverse("roles_dpmt_ajax"),{'project_id':self.project1.id})
+        self.assertEquals(response.status_code , 200)
+        # response in bytes must be decode to string
+        data = response.content.decode("utf-8")
+        # string to dict
+        data = json.loads(data)
+        self.assertIn({'name':self.department1.name,'id':self.department1.id},data)
+
+    def test_get_available_roles(self):
+        """
+        Get the list of roles for a tuple, as executive(that role not available)
+        """
+        c = Client()
+        c.login(username="emp1", password="123456")
+
+        response = c.get(reverse("roles_role_ajax"),{'department_id':self.department1.id,'project_id':self.project1.id})
+        # response in bytes must be decode to string
+        self.assertEquals(response.status_code , 200)
+        data = response.content.decode("utf-8")
+        # string to dict
+        data = json.loads(data)
+        rol_c=Role.objects.get(name="COORDINATOR")
+        self.assertIn({'name':rol_c.name,'id':rol_c.id},data)
+        rol_c=Role.objects.get(name="EXECUTIVE")
+        self.assertNotIn({'name':rol_c.name,'id':rol_c.id},data)
+    def test_get_available_roles_2(self):
+        """
+        Get the list of roles for a tuple, as admin (executive available)
+        """
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        response = c.get(reverse("roles_role_ajax"),{'department_id':self.department1.id,'project_id':self.project1.id})
+        # response in bytes must be decode to string
+        self.assertEquals(response.status_code , 200)
+        data = response.content.decode("utf-8")
+        # string to dict
+        data = json.loads(data)
+        rol_c=Role.objects.get(name="COORDINATOR")
+        self.assertIn({'name':rol_c.name,'id':rol_c.id},data)
+        rol_c=Role.objects.get(name="EXECUTIVE")
+        self.assertIn({'name':rol_c.name,'id':rol_c.id},data)
+
+    def test_get_available_departments_negative(self):
+        """
+        Get the list of departments for a project without providing ids
+        """
+        c = Client()
+        c.login(username="emp1", password="123456")
+
+        response = c.get(reverse("roles_dpmt_ajax"))
+        self.assertEquals(response.status_code , 400)
+        
+
+    def test_get_available_roles_negative(self):
+        """
+        Get the list of roles for a tuple without providing ids
+        """
+        c = Client()
+        c.login(username="emp1", password="123456")
+
+        response = c.get(reverse("roles_role_ajax"),{'project_id':0})
+        self.assertEquals(response.status_code , 400)
+    
+

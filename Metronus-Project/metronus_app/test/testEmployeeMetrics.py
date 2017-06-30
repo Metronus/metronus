@@ -172,7 +172,7 @@ class EmployeeMetricsTestCase(TestCase):
         goal_description="kgs",
         price_per_unit=7.0
         )
-        Task.objects.create(
+        task2=Task.objects.create(
         name  ="Hacer cosas 2",
         description  = "meda",
         actor_id = employee1,
@@ -184,7 +184,16 @@ class EmployeeMetricsTestCase(TestCase):
         workDate = "2017-01-02 10:00+00:00",
         duration = 240,
         task_id = task1,
+        employee_id = employee1,
+        produced_units=3
+        )
+        TimeLog.objects.create(
+        description = "he currado mucho",
+        workDate = "2017-01-02 10:00+00:00",
+        duration = 240,
+        task_id = task2,
         employee_id = employee1
+
     )
     def test_access_denied_not_logged_prod_task(self):
         """

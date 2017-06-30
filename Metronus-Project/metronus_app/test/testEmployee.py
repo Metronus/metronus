@@ -1000,6 +1000,29 @@ class EmployeeTestCase(TestCase):
         data = json.loads(data)
 
         self.assertTrue('employeeCreation_passwordsDontMatch' in data["errors"])
+    def test_edit_employee_pass_negative_3(self):
+        """
+        As an admin, try editing an employee password without filling the form
+        """
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        initialpass = User.objects.get(username="emp1").password
+
+        response=c.post("/employee/updatePassword/emp1/", {
+            "newpass2": "ojala morir",
+            "currentpass": "123456",
+        })
+
+        final = Employee.objects.get(user__username="emp1")
+        self.assertTrue(final.user.password == initialpass)
+
+
+        data = response.content.decode("utf-8")
+        # string to dict
+        data = json.loads(data)
+
+        self.assertTrue('employeeCreation_formNotValid' in data["errors"])
 
     def test_edit_pass_operation_not_allowed(self):
         """
