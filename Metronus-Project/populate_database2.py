@@ -148,6 +148,17 @@ def create_timelog_in_task(task, duration, date, employee):
     """
     creates a timelog for an employee involving a task during a specific date
     """
+
+    # Check that there isn't a timelog for the same employee, task and day
+    if TimeLog.objects.filter(
+        workDate__year=date.year,
+        workDate__month=date.month,
+        workDate__day=date.day,
+        task_id=task,
+        employee_id=employee
+    ).exists():
+        return
+
     if task.production_goal is not None and task.production_goal != "":
         punits = random.uniform(0.5, 1.5)*duration/60*task.production_goal
     else:
@@ -187,10 +198,10 @@ def random_load():
         phone="123456789",
         company_id=company)
     # create departments
-    for _ in range(random.randint(4, 8)):
+    for _ in range(random.randint(5, 8)):
         create_departments(company)
     # create projects
-    for _ in range(random.randint(3, 7)):
+    for _ in range(random.randint(4, 7)):
         create_projects(company)
 
     # get projects and departments
