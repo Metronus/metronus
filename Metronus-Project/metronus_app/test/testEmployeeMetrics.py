@@ -11,8 +11,6 @@ from metronus_app.model.timeLog import TimeLog
 from metronus_app.model.administrator import Administrator
 from metronus_app.model.department import Department
 
-
-
 class EmployeeMetricsTestCase(TestCase):
     """This class provides a test case for accessing employee-related metrics"""
     def setUp(self):

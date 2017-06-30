@@ -134,7 +134,12 @@ def view(request, department_id):
 
     coordinators = get_coordinator(department)
 
-    tasks = task_list(request).filter(projectDepartment_id__department_id__id=department_id)
+    tasks = Task.objects.filter(actor_id__company_id=actor.company_id,
+            projectDepartment_id__project_id__deleted=False,
+            projectDepartment_id__department_id__active=True,
+            projectDepartment_id__projectdepartmentemployeerole__role_id__tier__gte=20,
+            projectDepartment_id__projectdepartmentemployeerole__employee_id=actor,
+            projectDepartment_id__department_id__id=department_id).distinct().order_by("name")
 
     employees = Employee.objects.filter(user__is_active=True,
         projectdepartmentemployeerole__projectDepartment_id__department_id=department,
