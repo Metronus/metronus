@@ -201,7 +201,7 @@ def random_load():
     for _ in range(random.randint(5, 8)):
         create_departments(company)
     # create projects
-    for _ in range(random.randint(4, 7)):
+    for _ in range(random.randint(5, 7)):
         create_projects(company)
 
     # get projects and departments
@@ -215,10 +215,8 @@ def random_load():
     for i in range(30):
         dates.append(d1 - timedelta(days=i))
 
-    for i in range(len(departments)-1):
-        dpmt = departments[i]
-        for j in range(len(projects)-1):
-            project = projects[j]
+    for dpmt in departments:
+        for project in projects:
             # Create between 2 and 7 employees for each department and project
             for _ in range(random.randint(2, 7)):
                 create_employee_in_projdept(project, dpmt, company)
