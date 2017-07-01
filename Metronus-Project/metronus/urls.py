@@ -54,6 +54,7 @@ urlpatterns += [  # i18n_patterns(
     url(r'^department/createAsync$', departmentController.create_async,name='department_create_async'),
     url(r'^department/recover/(?P<department_id>.*)/$', departmentController.recover, name='department_recover'),
     url(r'^department/list$', departmentController.list_departments, name='department_list'),
+    url(r'^department/search/(?P<name>.*)/$', departmentController.list_departments_search, name='department_search'),
     url(r'^department/edit/(?P<department_id>.*)/$', departmentController.edit, name='department_edit'),
     url(r'^department/view/(?P<department_id>.*)/$', departmentController.view, name='department_view'),
     url(r'^department/delete/(?P<department_id>.*)/$', departmentController.delete, name='department_delete'),

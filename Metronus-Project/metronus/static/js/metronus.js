@@ -95,7 +95,31 @@ function autocollapse() {
       collapse_buttons.last().click();
   }
 }
+//Hace una busqueda al modelo(project,department,etc.) con el valor del buscador
+function search_list(modelo){
+  //get value
+  var buscador=document.getElementById("searcher");
+  var cadena=buscador.value;
+  //do search
+  $.get({url:"/"+modelo+"/search/"+cadena+"/",
+    success: function(data){ 
+      
+      $('#table_search').html($.parseHTML(data.trim()));
+      
+      simpletext = new RegExp("(" + cadena + ")","gi");
 
+      //those with searchable class should contain only text,
+      //otherwise magic will happen
+      //not good magic, you know
+      $('.searchable').each(function(i,el){
+        
+        var html=$(el).html();
+        //highlight matches
+        $(el).html(html.replace(simpletext,"<strong>$1</strong>"))
+        
+      });
+    }});
+}
 // Añadir el icono de info a los tooltips de información
 $(function() {
   $("div.help-tooltip > p").first().prepend("<span class='glyphicon glyphicon-info-sign'></span>&nbsp;");

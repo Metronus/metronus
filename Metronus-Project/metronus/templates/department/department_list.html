@@ -2,7 +2,6 @@
 
 {% load i18n %}
 {% load l10n %}
-
 {% block title %}{% trans 'departmentList' %}{% endblock %}
 
 {% block content %}
@@ -19,6 +18,8 @@
       </div>
 
       <div class="x_content">
+      <!-- searcher -->
+      <input id="searcher"/>
         <table class="table table-striped table-hover">
           <thead>
             <tr>
@@ -29,7 +30,9 @@
             </tr>
           </thead>
 
-          <tbody>
+          <tbody id="table_search">
+          <!-- Copy this block inside x_search.html -->
+          <!-- Remember to add searchable class to the fields td you want to highlight -->
             {% for department in departments %}
             <tr>
               <td>{{department.name}}</td>
@@ -55,6 +58,7 @@
                {% endif %}
             </tr>
             {% endfor %}
+            <!-- End of block copy inside x_search.html -->
           </tbody>
         </table>
       </div>
@@ -164,8 +168,12 @@
     $('#confirm-recover').on('show.bs.modal', function(e) {
       $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
     });
-
+    //search function
+    $('#searcher').keyup(function(event) {
+      search_list('department');
+    });
     autocollapse();
   });
+  
 </script>
 {% endblock %}

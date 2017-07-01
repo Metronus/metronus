@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404
+from django.template.loader import render_to_string
 from django.http import HttpResponseRedirect, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, SuspiciousOperation
 from django.db.models import Sum, F, FloatField
@@ -96,9 +97,7 @@ def create_async(request):
     data['success'] = False
     return JsonResponse(data)
 
-
 def list_departments(request):
-
     """
     returns:
     departments: lista de departamentos de la compañía logeada
@@ -113,6 +112,21 @@ def list_departments(request):
     deleted = lista.filter(active=False)
     return render(request, "department/department_list.html",
         {"departments": departments,"deleted":deleted})
+
+def list_departments_search(request,name):
+    """
+    returns:
+    departments: lista de departamentos de la compañía logeada
+
+    template:
+    department_list.html
+    """
+
+    # Check that the current user has permissions
+    lista = get_list_for_role(request).filter(name__icontains=name)
+    departments = lista.filter(active=True)
+    return render(request, "department/department_search.html",
+        {"departments": departments})
 
 def view(request, department_id):
     """
