@@ -214,6 +214,15 @@ class DepartmentTestCase(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertEquals(len(response.context["departments"]), 2)
         self.assertEquals(response.context["departments"][0].name, "dep1")
+    def test_list_departments_positive_search(self):
+        """As an admin, search the departments """
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        response = c.get("/department/search/p2/")
+
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response.context["departments"][0].name, "dep2")
 
     def test_list_departments_positive_2(self):
         """As an employee with proper roles, try to list the departments """
