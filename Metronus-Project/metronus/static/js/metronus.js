@@ -41,6 +41,12 @@ $(function() {
   $('.precio').each(function(i) {
     $(this).val($(this).attr("value").replace(",", "."));
   });
+
+  //search event
+  $('#searcher').change(function() {
+    var modelo=$('#searcher_model').val();
+    search_list(modelo);
+  });
 });
 
 function initAjax(field, field_str, url){

@@ -38,6 +38,10 @@ def team_item(name, img_name, role):
 def show_ajax_errors():
     return {}
 
+@register.inclusion_tag('tags/search_form.html')
+def show_search_form(model):
+    return {'model':model}
+
 
 @register.simple_tag
 def converto_to_hours(amount):

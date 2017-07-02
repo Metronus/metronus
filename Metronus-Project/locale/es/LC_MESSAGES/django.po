@@ -359,6 +359,8 @@ msgid "password1"
 msgstr "Contraseña"
 msgid "password2"
 msgstr "Repetir contraseña"
+msgid "filter"
+msgstr "Filtrar por nombre"
 
 # Password recover
 msgid "recover_password_instructions"

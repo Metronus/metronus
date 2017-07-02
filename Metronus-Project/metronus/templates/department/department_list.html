@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load l10n %}
+{% load custom_tags %}
 {% block title %}{% trans 'departmentList' %}{% endblock %}
 
 {% block content %}
@@ -18,8 +19,7 @@
       </div>
 
       <div class="x_content">
-      <!-- searcher -->
-      <input id="searcher"/>
+      {% show_search_form 'department' %}
         <table class="table table-striped table-hover">
           <thead>
             <tr>
@@ -168,10 +168,7 @@
     $('#confirm-recover').on('show.bs.modal', function(e) {
       $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
     });
-    //search function
-    $('#searcher').keyup(function(event) {
-      search_list('department');
-    });
+
     autocollapse();
   });
   
