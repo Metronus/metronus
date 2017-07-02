@@ -9,12 +9,13 @@ from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEm
 from metronus_app.model.employee import Employee
 from metronus_app.model.actor import Actor
 from metronus_app.model.task import Task
+from metronus_app.model.project import Project
 from metronus_app.model.timeLog import TimeLog
 from datetime import date, timedelta, datetime
 import re
 from metronus_app.common_utils import (get_admin_executive_or_403,default_round,
-    get_actor_or_403, is_executive,same_company_or_403, get_highest_role_tier)
-from metronus_app.controllers.taskController import get_list_for_role as task_list
+    get_actor_or_403, is_executive,same_company_or_403, get_highest_role_tier,get_task_list,get_department_list)
+
 def create(request):
     """
     parameters/returns:
@@ -107,7 +108,7 @@ def list_departments(request):
     """
 
     # Check that the current user has permissions
-    lista = get_list_for_role(request)
+    lista = get_department_list(request)
     departments = lista.filter(active=True)
     deleted = lista.filter(active=False)
     return render(request, "department/department_list.html",
@@ -119,11 +120,11 @@ def list_departments_search(request,name):
     departments: lista de departamentos de la compañía logeada
 
     template:
-    department_list.html
+    department_search.html
     """
 
     # Check that the current user has permissions
-    lista = get_list_for_role(request).filter(name__icontains=name)
+    lista = get_department_list(request).filter(name__icontains=name)
     departments = lista.filter(active=True)
     return render(request, "department/department_search.html",
         {"departments": departments})
@@ -148,7 +149,7 @@ def view(request, department_id):
 
     coordinators = get_coordinator(department)
     # DO NOT ORDER the tasks, otherwise, by some random reason, it wont filter properly
-    tasks = task_list(request).filter(projectDepartment_id__department_id=department).distinct()
+    tasks = get_task_list(request).filter(projectDepartment_id__department_id=department).distinct()
 
     employees = Employee.objects.filter(user__is_active=True,
         projectdepartmentemployeerole__projectDepartment_id__department_id=department,
@@ -485,35 +486,17 @@ def check_department(department, request):
         return actor
     elif not department.active:
         raise PermissionDenied
-    elif ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-        projectDepartment_id__department_id=department,
-        role_id__tier__gte=20).exists():
+    elif ProjectDepartmentEmployeeRole.objects.filter(
+            employee_id=actor,
+            projectDepartment_id__department_id=department,
+            role_id__tier__gte=20).exists() or\
+        Project.objects.filter(
+            projectdepartment__department_id=department,
+            projectdepartment__projectdepartmentemployeerole__employee_id=actor,
+            projectdepartment__projectdepartmentemployeerole__role_id__tier__gte=40,
+                ).exists():
         # If it's for view, coordinators and greater can access too
         return actor
-
-    # Otherwise GTFO
-    raise PermissionDenied
-
-
-def get_list_for_role(request):
-    """
-    Gets the list of departments according to the role tier of the logged user
-    """
-    actor=get_actor_or_403(request)
-
-    # Admins and executives can do everything
-    
-    if actor.user_type == "A" or is_executive(actor):
-        return Department.objects.filter(company_id=actor.company_id).distinct().order_by("name")
-    
-    # If it's for view, coordinators and greater can access too
-    if ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-        role_id__tier__gte=20).exists():
-
-        return Department.objects.filter(
-                projectdepartment__projectdepartmentemployeerole__employee_id=actor,
-                projectdepartment__projectdepartmentemployeerole__role_id__tier__gte=20,
-                company_id=actor.company_id,active=True).distinct().order_by("name")
 
     # Otherwise GTFO
     raise PermissionDenied

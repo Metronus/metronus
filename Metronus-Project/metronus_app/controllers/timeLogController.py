@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from metronus_app.forms.timeLog2Form import TimeLog2Form
 from metronus_app.model.task import Task
 from django.shortcuts import get_object_or_404
-from metronus_app.common_utils import get_current_employee_or_403
+from metronus_app.common_utils import get_current_employee_or_403,get_department_list
 from metronus_app.model.timeLog import TimeLog
 from metronus_app.model.department import Department
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
@@ -54,10 +54,7 @@ def list_all(request):
         department = request.POST.get("department")
  
         if department is None:
-            departments = Department.objects.filter(company_id=employee.company_id,
-                                                    projectdepartment__project_id=project,
-                                                    projectdepartment__projectdepartmentemployeerole__employee_id=employee, 
-                                                    active=True).distinct()
+            departments = get_department_list(request).filter(projectdepartment__project_id_id=project_id)
 
             data = serializers.serialize('json', departments, fields=('id', 'name',))
 

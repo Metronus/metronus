@@ -14,7 +14,8 @@ from metronus_app.model.department import Department
 from metronus_app.model.goalEvolution import GoalEvolution
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
-from metronus_app.common_utils import default_round,get_actor_or_403,same_company_or_403,is_executive, get_highest_role_tier
+from metronus_app.common_utils import (default_round,get_actor_or_403,same_company_or_403,
+                                    is_executive, get_highest_role_tier,get_department_list,get_task_list)
 
 
 from datetime import date, timedelta, datetime
@@ -75,9 +76,9 @@ def create(request):
     # if a GET (or any other method) we'll create a blank form
     else:
         form = TaskForm()
-    coll = find_collections(request)
+    coll = find_projects(request)
     return render(request, 'task/task_form.html', {'form': form, 'errors': errors,
-                                              "departments": coll["departments"], "projects": coll["projects"]})
+                                              "projects": coll})
 
 
 def create_async(request):
@@ -166,7 +167,7 @@ def list_tasks(request):
     task_list.html
     """
     # Check that the user is logged in
-    tasks = get_list_for_role(request)
+    tasks = get_task_list(request)
     active = tasks.filter(active=True)
     inactive = tasks.filter(active=False)
     return render(request, "task/task_list.html",
@@ -580,25 +581,6 @@ def recover_task(task):
     task.active = True
     task.save()
 
-def get_list_for_role(request):
-    """
-    Gets the list of tasks according to the role tier of the logged user
-    """
-    actor=get_actor_or_403(request)
-    highest=get_highest_role_tier(actor)
-
-    if highest < 20:
-        raise PermissionDenied
-    elif highest>=50:
-        return Task.objects.filter(actor_id__company_id=actor.company_id).distinct().order_by("name")
-    else:
-        return Task.objects.filter(actor_id__company_id=actor.company_id,
-            projectDepartment_id__project_id__deleted=False,
-            projectDepartment_id__department_id__active=True,
-            projectDepartment_id__projectdepartmentemployeerole__role_id__tier__gte=20,
-            projectDepartment_id__projectdepartmentemployeerole__employee_id=actor).distinct()
-
-
 def find_name(pname, project_department):
     """
     Returns whether there is already a task with the tuple project-department
@@ -616,32 +598,26 @@ def find_tuple(project, department, actor):
     return ProjectDepartment.objects.filter(project_id=project, department_id=department).first()
 
 
-def find_collections(request):
+def find_projects(request):
     """
     Gets the projects and departments the logged user can create tasks for, depending to their roles
     """
     actor=get_actor_or_403(request)
     if actor.user_type == "A" or is_executive(actor):
         proyectos = Project.objects.filter(company_id=actor.company_id, deleted=False)
-        departamentos = Department.objects.filter(company_id=actor.company_id, active=True)    
-    else:
+    elif ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=20).exists():
         # not an executive
-      
-        roles_dep = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=20)
-
-        if roles_dep.count() > 0:
-            # you're a project manager. Loading your projects
-            proyectos = Project.objects.filter(
-                company_id=actor.company_id, deleted=False,
-                projectdepartment__projectdepartmentemployeerole__employee_id=actor).distinct()
-            departamentos = Department.objects.filter(
-                company_id=actor.company_id, active=True,
-                projectdepartment__projectdepartmentemployeerole__employee_id=actor).distinct()
-        else:
-            # not any of this? get outta here!!
-            raise PermissionDenied
+        proyectos = Project.objects.filter(
+            company_id=actor.company_id, deleted=False,
+            projectdepartment__projectdepartmentemployeerole__role_id__tier__gte=20,
+            projectdepartment__projectdepartmentemployeerole__employee_id=actor
+            ).distinct()
     
-    return {"departments": departamentos, "projects": proyectos}
+    else:
+        # not any of this? get outta here!!
+        raise PermissionDenied
+    
+    return proyectos
 
 
 def find_departments(request):
@@ -652,27 +628,8 @@ def find_departments(request):
         raise SuspiciousOperation
 
     project_id = request.GET.get("project_id")
+    return get_department_list(request).filter(projectdepartment__project_id_id=project_id)
     
-    actor=get_actor_or_403(request)
-    if actor.user_type == "A" or is_executive(actor):
-        departamentos = Department.objects.filter(projectdepartment__project_id_id=project_id,company_id=actor.company_id, active=True)
-    else:
-    
-        # not an executive
-        roles_dep = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=20,
-            projectDepartment_id__project_id__deleted=False,projectDepartment_id__department_id__active=True)
-
-        if roles_dep.count() > 0:
-            # you're a project manager or a coordinator. Loading your departments for the selected project
-            departamentos = Department.objects.filter(
-                company_id=actor.company_id, active=True,
-                projectdepartment__projectdepartmentemployeerole__employee_id=actor,
-                projectdepartment__project_id_id=project_id).distinct()
-        else:
-            # not any of this? get outta here!!
-            raise PermissionDenied
-    return departamentos
-
 
 def check_task(request,task, for_view=False):
     """

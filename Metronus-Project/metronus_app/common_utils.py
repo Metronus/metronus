@@ -2,16 +2,18 @@ from django.core.exceptions import PermissionDenied
 from metronus_app.model.administrator import Administrator
 from metronus_app.model.employee import Employee
 from metronus.settings import DEFAULT_FROM_EMAIL,AUTH_PASSWORD_VALIDATORS
-from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 from django.template import loader
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth.models import User
 from metronus_app.model.timeLog import TimeLog
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from metronus_app.model.company import Company
+from metronus_app.model.department import Department
 from metronus_app.model.role import Role
 from metronus_app.model.actor import Actor
+from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 from metronus_app.model.projectDepartment import ProjectDepartment
+from metronus_app.model.project import Project
 from metronus_app.model.task import Task
 from django.test import Client
 from django.contrib.auth.password_validation import validate_password, ValidationError as valerr,get_password_validators
@@ -372,3 +374,59 @@ def is_role_updatable_by_user(logged, pdrole_id):
     # Because only executives and administrator can manage roles, then execs can edit anything below their level
     else:
         return pdrole.role_id.tier < 50
+
+
+#### GET LIST METHODS ######
+def get_task_list(request):
+    """
+    Gets the list of tasks according to the role tier of the logged user
+    """
+    actor=get_actor_or_403(request)
+    highest=get_highest_role_tier(actor)
+
+    if highest < 20:
+        raise PermissionDenied
+    elif highest>=50:
+        return Task.objects.filter(actor_id__company_id=actor.company_id).distinct().order_by("name")
+    else:
+        return Task.objects.filter(actor_id__company_id=actor.company_id,
+            projectDepartment_id__project_id__deleted=False,
+            projectDepartment_id__department_id__active=True,
+            projectDepartment_id__projectdepartmentemployeerole__role_id__tier__gte=20,
+            projectDepartment_id__projectdepartmentemployeerole__employee_id=actor).distinct()
+
+def get_department_list(request, for_employee=False):
+    """
+    Gets the list of departments according to the role tier of the logged user
+    """
+    actor=get_actor_or_403(request)
+
+    # Admins and executives can do everything
+    
+    if actor.user_type == "A" or is_executive(actor):
+        return Department.objects.filter(company_id=actor.company_id).distinct().order_by("name")
+    
+    # If it's for view, coordinators and greater can access too
+    if ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+        role_id__tier__gte=20).exists():
+        
+        return (Department.objects.filter(
+                    projectdepartment__projectdepartmentemployeerole__employee_id=actor,
+                    projectdepartment__projectdepartmentemployeerole__role_id__tier__gte=20,
+                    company_id=actor.company_id,active=True)|
+                Department.objects.filter(
+                    projectdepartment__project_id__in=Project.objects.filter(
+                        projectdepartment__projectdepartmentemployeerole__employee_id=actor,
+                        projectdepartment__projectdepartmentemployeerole__role_id__tier__gte=40
+                        ),
+                    company_id=actor.company_id,active=True)
+                ).order_by("name").distinct()
+    elif for_employee:
+        return Department.objects.filter(
+                    projectdepartment__projectdepartmentemployeerole__employee_id=actor,
+                    company_id=actor.company_id,active=True
+                    ).order_by("name").distinct()
+    # Otherwise GTFO
+    raise PermissionDenied
+
+
