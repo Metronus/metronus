@@ -1,0 +1,37 @@
+{% load i18n %}
+{% load l10n %}
+
+{% block content %}
+    {% for employee in employees %}
+            <tr>
+              <td >
+                {% if employee.picture %}
+                <img src="{{ MEDIA_URL }}{{employee.picture}}" alt="{{user.get_username}}" class="avatar" alt="IMG">
+                {% else %}
+                <img src="/static/avatar.png" alt="{{user.get_username}}" class="avatar" alt="IMG">
+                {% endif %}
+                &nbsp;
+                <span class="searchable">
+                {{employee.user.first_name }} {{employee.user.last_name}}
+                </span>
+              </td>
+              <td>{{employee.user.email}}</td>
+              <td>{{employee.phone}}</td>
+              <td class="hidden-xs">{{employee.registryDate}}</td>
+              <td>
+                <a href="{% url 'employee_view' employee.user.username %}" type="button" class="btn btn-success">{% trans 'details' %}</a>
+              </td>
+              <td class="hidden-xs">
+                {% if actor_is_admin or actor_is_executive %}
+                  <a href="{% url 'employee_edit' employee.user.username %}" type="button" class="btn btn-dark">{% trans 'update' %}</a>
+                {% endif %}
+              </td>
+              <td class="hidden-xs">
+                {% if actor_is_admin or actor_is_executive %}
+                  <a href="#" class="btn btn-danger" data-href="{% url 'employee_delete' employee.user.username %}"
+                  data-toggle="modal" data-target="#confirm-delete">{% trans 'fire' %}</a>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+{% endblock %}
