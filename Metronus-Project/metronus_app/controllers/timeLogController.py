@@ -54,7 +54,7 @@ def list_all(request):
         department = request.POST.get("department")
  
         if department is None:
-            departments = get_department_list(request,for_employee=True).filter(projectdepartment__project_id=project)
+            departments = get_department_list(request).filter(projectdepartment__project_id_id=project_id)
 
             data = serializers.serialize('json', departments, fields=('id', 'name',))
 
