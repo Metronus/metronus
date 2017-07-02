@@ -69,6 +69,7 @@ urlpatterns += [  # i18n_patterns(
     url(r'^task/createAsync$', taskController.create_async,name='task_create_async'),
     url(r'^task/recover/(?P<task_id>.*)/$', taskController.recover, name='task_recover'),
     url(r'^task/list$', taskController.list_tasks, name='task_list'),
+    url(r'^task/search/(?P<name>.*)/$', taskController.list_tasks_search, name='task_search'),
     url(r'^task/view/(?P<task_id>.*)/$', taskController.view, name='task_view'),
     url(r'^task/edit/(?P<task_id>.*)/$', taskController.edit, name='task_edit'),
     url(r'^task/delete/(?P<task_id>.*)/$', taskController.delete, name='task_delete'),
@@ -78,6 +79,7 @@ urlpatterns += [  # i18n_patterns(
 
     # Project
     url(r'^project/list$', projectController.list_projects, name='project_list'),
+    url(r'^project/search/(?P<name>.*)/$', projectController.list_projects_search, name='project_search'),
     url(r'^project/recover/(?P<project_id>.*)/$', projectController.recover, name='project_recover'),
     url(r'^project/edit/(?P<project_id>.*)/$', projectController.edit, name='project_edit'),
     url(r'^project/view/(?P<project_id>.*)/$', projectController.show, name='project_view'),
@@ -101,6 +103,7 @@ urlpatterns += [  # i18n_patterns(
     url(r'^employee/create$', employeeController.create, name='employee_create'),
     url(r'^employee/createAsync$', employeeController.create_async, name='employee_create_async'),
     url(r'^employee/list$', employeeController.list_employees, name='employee_list'),
+    url(r'^employee/search/(?P<name>.*)/$', employeeController.list_employees_search, name='employee_search'),
     url(r'^employee/view/(?P<username>.*)/$', employeeController.view, name='employee_view'),
     url(r'^employee/edit/(?P<username>.*)/$', employeeController.edit, name='employee_edit'),
     url(r'^employee/recover/(?P<username>.*)/$', employeeController.recover, name='employee_recover'),

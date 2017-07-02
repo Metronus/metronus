@@ -105,7 +105,7 @@ def create_async(request):
 def list_projects(request):
     """
     returns:
-    projectos: lista de proyectos de la compañía logeada
+    projects: lista de proyectos de la compañía logeada
 
     template:
     project_list.html
@@ -116,6 +116,20 @@ def list_projects(request):
     active = projects.filter(deleted=False)
     return render(request, "project/project_list.html", {"projects": active, "deleted":deleted})
 
+def list_projects_search(request,name):
+    """
+    returns:
+    projects: lista de proyectos de la compañía logeada
+
+    template:
+    project_list.html
+    """
+
+    # Check that the current user has permissions
+    lista = get_list_for_role(request).filter(name__icontains=name)
+    projects = lista.filter(deleted=False)
+    return render(request, "project/project_search.html",
+        {"projects": projects})
 
 def show(request, project_id):
     """

@@ -360,6 +360,8 @@ msgid "password2"
 msgstr "Repeat password"
 msgid "filter"
 msgstr "Filter by name"
+msgid "search"
+msgstr "Search"
 
 # Password recover
 msgid "recover_password_instructions"

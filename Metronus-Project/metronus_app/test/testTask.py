@@ -244,6 +244,15 @@ class TaskTestCase(TestCase):
         response = c.get("/task/create")
         self.assertEquals(response.status_code, 403)
 
+    def test_list_tasks_positive_search(self):
+        """As an admin, search the tasks """
+        c = Client()
+        c.login(username="metronus", password="metronus")
+
+        response = c.get(reverse("task_search",args=("front",)))
+
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response.context["tasks"][0].name, "Hacer cosas de front")
 
     def test_list_tasks_positive(self):
         """
@@ -325,10 +334,10 @@ class TaskTestCase(TestCase):
         self.assertTrue(data[0]['model'],'metronus_app_department')
     def test_form_task_find_departments_negative(self):
         """
-        Get task creation form task without project_id proper roles (Admin)
+        Get task creation form task without project_id proper roles
         """
         c = Client()
-        c.login(username="admin1", password="123456")
+        c.login(username="admin", password="123456")
         
         response = c.get("/task/getdepartments")
         self.assertEquals(response.status_code, 400)

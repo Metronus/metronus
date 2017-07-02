@@ -668,6 +668,16 @@ class EmployeeTestCase(TestCase):
         response = c.head(reverse("employee_edit",args=("emp1",)))
         self.assertEquals(response.status_code, 403)
 ###------------List--------------#
+    def test_list_employees_positive_search(self):
+        """As an admin, search the departments """
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        response = c.get(reverse("employee_search",args=("var",)))
+
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response.context["employees"][0].user.last_name, "Varo")
+
     def test_list_employees_positive(self):
         """
         As an admin, list the employees

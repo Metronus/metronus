@@ -361,7 +361,8 @@ msgid "password2"
 msgstr "Repetir contraseña"
 msgid "filter"
 msgstr "Filtrar por nombre"
-
+msgid "search"
+msgstr "Buscar"
 # Password recover
 msgid "recover_password_instructions"
 msgstr "Introduza el email asociado a su cuenta. Le mandaremos un correo con un link para reestablecer su contraseña"

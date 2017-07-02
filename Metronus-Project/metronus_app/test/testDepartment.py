@@ -219,7 +219,7 @@ class DepartmentTestCase(TestCase):
         c = Client()
         c.login(username="admin1", password="123456")
 
-        response = c.get("/department/search/p2/")
+        response = c.get(reverse("department_search",args=("p2",)))
 
         self.assertEquals(response.status_code, 200)
         self.assertEquals(response.context["departments"][0].name, "dep2")

@@ -43,7 +43,12 @@ $(function() {
   });
 
   //search event
-  $('#searcher').change(function() {
+  $('#searcher').on('keyup',function() {
+    var modelo=$('#searcher_model').val();
+    search_list(modelo);
+  });
+  //search event
+  $('#search_button').on('click',function() {
     var modelo=$('#searcher_model').val();
     search_list(modelo);
   });
@@ -121,7 +126,7 @@ function search_list(modelo){
         
         var html=$(el).html();
         //highlight matches
-        $(el).html(html.replace(simpletext,"<strong>$1</strong>"))
+        $(el).hide().html(html.replace(simpletext,"<strong>$1</strong>")).fadeIn();
         
       });
     }});

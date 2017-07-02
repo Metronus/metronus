@@ -172,6 +172,20 @@ def list_tasks(request):
     return render(request, "task/task_list.html",
             {"tasks": active, "inactive":inactive})
 
+def list_tasks_search(request,name):
+    """
+    returns:
+    tasks: lista de tareas del actor logeado
+
+    template:
+    task_list.html
+    """
+
+    # Check that the current user has permissions
+    lista = get_list_for_role(request).filter(name__icontains=name)
+    tasks = lista.filter(active=True)
+    return render(request, "task/task_search.html",
+        {"tasks": tasks})
 
 def view(request, task_id):
     """

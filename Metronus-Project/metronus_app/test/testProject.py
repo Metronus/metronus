@@ -191,6 +191,16 @@ class ProjectTestCase(TestCase):
         c.login(username="emp1", password="123456")
         response = c.get("/project/create")
         self.assertEquals(response.status_code, 403)
+    
+    def test_list_projects_positive_search(self):
+        """As an admin, search the projects """
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        response = c.get(reverse("project_search",args=("O2",)))
+
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response.context["projects"][0].name, "pro2")
 
     def test_list_projects_positive(self):
         """ List the projects as an admin """

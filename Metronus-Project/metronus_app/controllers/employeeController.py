@@ -4,9 +4,9 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect, JsonResponse
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.utils.translation import ugettext_lazy
-from django.db.models import Sum, F, FloatField
+from django.db.models import Sum, F, FloatField, Q, Value as V
 from django.contrib.auth.decorators import login_required
-
+from django.db.models.functions import Concat
 from metronus_app.forms.employeeRegisterForm import EmployeeRegisterForm
 from metronus_app.forms.employeeEditForm import EmployeeEditForm
 from metronus_app.forms.employeePasswordForm import EmployeePasswordForm
@@ -197,6 +197,25 @@ def list_employees(request):
     inactive = employees.filter(user__is_active = False)
     return render(request, 'employee/employee_list.html',
             {'employees': active, 'inactive' : inactive})
+def list_employees_search(request,name):
+    """
+    parameters/returns:
+    employees: lista de objetos employee a los que tiene acceso el administrador (los que están en su empresa)
+
+    template: employee_list.html
+    """
+
+    # Check that the current user has permissions
+    lista = get_list_for_role(request)
+    if name:
+        #little opt just if not empty
+        lista=lista.annotate(
+                search_name=Concat('user__first_name', V(' '), 'user__last_name')
+                ).filter(search_name__icontains=name)
+    employees = lista.filter(user__is_active=True)
+    
+    return render(request, "employee/employee_search.html",
+        {"employees": employees})
 
 
 def view(request, username):
