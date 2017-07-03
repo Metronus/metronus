@@ -22,9 +22,9 @@
           <thead>
             <tr>
               <th>{% trans 'task' %}</th>
-              <th>{% trans 'projectDeparment' %}</th>
-              <th>{% trans 'creator' %}</th>
-              <th>{% trans 'creationDate' %}</th>
+              <th class="hidden-xs">{% trans 'projectDeparment' %}</th>
+              <th class="hidden-xs">{% trans 'creator' %}</th>
+              <th class="hidden-xs">{% trans 'creationDate' %}</th>
               <th>{% trans 'actions' %}</th>
               <th class="hidden-xs"></th>
               <th class="hidden-xs"></th>
@@ -35,9 +35,9 @@
             {% for task in tasks %}
             <tr>
               <td>{{task.name}}</td>
-              <td>{{task.projectDepartment_id.project_id.name}} / {{task.projectDepartment_id.department_id.name}}</td>
-              <td>{{task.actor_id.user.first_name}} {{task.actor_id.user.last_name}}</td>
-              <td>{{task.registryDate}}</td>
+              <td class="hidden-xs">{{task.projectDepartment_id.project_id.name}} / {{task.projectDepartment_id.department_id.name}}</td>
+              <td class="hidden-xs">{{task.actor_id.user.first_name}} {{task.actor_id.user.last_name}}</td>
+              <td class="hidden-xs">{{task.registryDate}}</td>
               <td>
                 <a href="{% url 'task_view' task.id %}" type="button" class="btn btn-success">
                   {% trans 'details' %}
@@ -63,7 +63,7 @@
         <div class="text-center">
           {% if tasks|length_is:"0"  %}
             <h2>{% trans 'plsTask' %}</h2>
-          {% endif %} 
+          {% endif %}
             <a class="btn btn-dark" href="{% url 'task_create' %}">{% trans 'create' %}</a>
         </div>
       {% endif %}

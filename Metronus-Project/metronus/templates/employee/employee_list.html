@@ -25,8 +25,8 @@
           <thead>
             <tr>
               <th>{% trans 'username' %}</th>
-              <th>{% trans 'email' %}</th>
-              <th>{% trans 'phone' %}</th>
+              <th class="hidden-xs">{% trans 'email' %}</th>
+              <th class="hidden-xs">{% trans 'phone' %}</th>
               <th class="hidden-xs">{% trans 'registryDate' %}</th>
               <th>{% trans 'actions' %}</th>
               <th class="hidden-xs"></th>
@@ -46,8 +46,8 @@
                 &nbsp;
                 {{employee.user.first_name }} {{employee.user.last_name}}
               </td>
-              <td>{{employee.user.email}}</td>
-              <td>{{employee.phone}}</td>
+              <td class="hidden-xs">{{employee.user.email}}</td>
+              <td class="hidden-xs">{{employee.phone}}</td>
               <td class="hidden-xs">{{employee.registryDate}}</td>
               <td>
                 <a href="{% url 'employee_view' employee.user.username %}" type="button" class="btn btn-success">{% trans 'details' %}</a>
