@@ -64,10 +64,11 @@ function initAjax(field, field_str, url){
 function ajaxValidation(field, field_str, url){
   var div = $(field).parent().parent();
   var msg_div = $(field).parent().find(".ajax-error");
+  var indicator = $(field).next("i");
   var data = { };
 
   // If the field is incorrect by Bootstrap Validator or is empty, it is just incorrect
-  if(field.val() == "" || field.hasClass('glyphicon-remove')){
+  if(field.val() == "" || indicator.hasClass('glyphicon-remove')){
     return;
   }
 
@@ -113,21 +114,21 @@ function search_list(modelo){
   var cadena=buscador.value;
   //do search
   $.get({url:"/"+modelo+"/search/"+cadena+"/",
-    success: function(data){ 
-      
+    success: function(data){
+
       $('#table_search').html($.parseHTML(data.trim()));
-      
+
       simpletext = new RegExp("(" + cadena + ")","gi");
 
       //those with searchable class should contain only text,
       //otherwise magic will happen
       //not good magic, you know
       $('.searchable').each(function(i,el){
-        
+
         var html=$(el).html();
         //highlight matches
         $(el).hide().html(html.replace(simpletext,"<strong>$1</strong>")).fadeIn();
-        
+
       });
     }});
 }
