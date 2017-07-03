@@ -536,6 +536,8 @@ msgstr "El precio por hora no puede estar vacío"
 
 msgid "identifier_not_empty"
 msgstr "El identificador no puede estar vacío"
+msgid "cif_valid"
+msgstr "Introduzca un CIF válido"
 msgid "phone_valid"
 msgstr "Introduzca un teléfono válido"
 msgid "phone_not_empty"

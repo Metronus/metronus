@@ -1,14 +1,13 @@
 from django import forms
 from django.forms import Form
 from django.utils.translation import ugettext_lazy as _
-from metronus_app.common_utils import phone_validator
-from django.core.validators import RegexValidator
+from metronus_app.common_utils import phone_validator, cif_validator
 
 
 class RegistrationForm(Form):
     """Form for Company signing up to Metronus"""
     # Company
-    cif = forms.CharField(label=_("cif"), max_length=9, validators=[RegexValidator("/^[a-zA-Z]\d{8}$/ig", _("cif_error#2"))])
+    cif = forms.CharField(label=_("cif"), max_length=9, validators=[cif_validator])
     company_name = forms.CharField(label=_("company_name"), max_length=100)
     short_name = forms.CharField(label=_("short_name"), max_length=50)
     company_email = forms.EmailField(label=_("company_email"))

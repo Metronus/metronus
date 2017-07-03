@@ -537,6 +537,8 @@ msgstr "Inactive employees"
 
 msgid "identifier_not_empty"
 msgstr "Employee's ID can't be empty"
+msgid "cif_valid"
+msgstr "Provide a valid CIF"
 msgid "phone_valid"
 msgstr "Provide a valid phone"
 msgid "phone_not_empty"

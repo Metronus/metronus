@@ -43,6 +43,10 @@ def get_highest_role_tier(actor):
     except:
         return 0
 
+def cif_validator(text):
+    if not re.compile("^[A-Za-z]\d{8}$").match(text):
+        raise ValidationError(_("cif_valid"))
+
 def phone_validator(text):
     if not re.compile("^\d{9}$").match(text):
         raise ValidationError(_("phone_valid"))
