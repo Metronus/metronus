@@ -73,7 +73,7 @@ def is_admin(actor):
 def has_role(actor):
     if actor.user_type == 'E' or actor.user_type == 'A':
         try:
-            return ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor.id).count() > 0
+            return ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor.id).exists()
         except:
             return False
     else:

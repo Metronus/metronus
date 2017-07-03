@@ -38,7 +38,7 @@ def create(request):
     task_form.html
     """
     # Check that the user is logged in
-    actor = check_task(request,None, True)
+    actor = check_task(request,None)
     errors = []
 
     # if this is a POST request we need to process the form data
@@ -99,7 +99,7 @@ def create_async(request):
     task_form.html
     """
     # Check that the user is logged in
-    actor = check_task(request,None,True)
+    actor = check_task(request,None)
 
     errors = []
     data = {
@@ -233,7 +233,7 @@ def edit(request, task_id):
     """
     # Check that the user is logged in
     task = get_object_or_404(Task, pk=task_id)
-    actor=check_task(request,task,True)
+    actor=check_task(request,task)
     same_company_or_403(actor,task.actor_id)
 
     errors = []
@@ -287,7 +287,7 @@ def delete(request, task_id):
     """
     # Check that the user is logged in
     task = get_object_or_404(Task, pk=task_id, active=True)
-    actor=check_task(request,task,True)
+    actor=check_task(request,task)
     same_company_or_403(actor,task.actor_id)
 
     delete_task(task)
@@ -307,7 +307,7 @@ def recover(request, task_id):
     """
     # Check that the user is logged in
     task = get_object_or_404(Task, pk=task_id, active=False)
-    actor=check_task(request,task,True)
+    actor=check_task(request,task)
     same_company_or_403(actor,task.actor_id)
 
     recover_task(task)
@@ -705,12 +705,17 @@ def check_task(request,task, for_view=False):
         if not task.active:
             raise PermissionDenied
         # If it's for view, project managers can see tasks in their projects but not their departments
-        elif for_view and highest >= 40 and ProjectDepartmentEmployeeRole.objects.filter(
-            Q(employee_id=actor),
-            Q(role_id__tier__gte=40),
-            (Q(projectDepartment_id__department_id=task.projectDepartment_id.department_id) | Q(projectDepartment_id__project_id=task.projectDepartment_id.project_id))) \
-                .exists():
-            return actor
+        elif for_view and highest>=20: 
+            if highest >= 40 and ProjectDepartmentEmployeeRole.objects.filter(
+                Q(employee_id=actor),
+                Q(role_id__tier__gte=40),
+                (Q(projectDepartment_id__department_id=task.projectDepartment_id.department_id) | Q(projectDepartment_id__project_id=task.projectDepartment_id.project_id))) \
+                    .exists():
+                return actor
+            elif ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+                projectDepartment_id=task.projectDepartment_id,
+                role_id__tier__gte=20).exists():
+                return actor
         elif ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
             projectDepartment_id=task.projectDepartment_id,
             role_id__tier__gte=20).exists():
