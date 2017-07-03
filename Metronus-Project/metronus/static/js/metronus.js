@@ -54,6 +54,7 @@ $(function() {
   });
 });
 
+
 function initAjax(field, field_str, url){
   field.change(function(){
     ajaxValidation($(this), field_str, url);

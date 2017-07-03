@@ -6,7 +6,7 @@ from django.db.models import Sum, F, FloatField
 from metronus_app.forms.projectForm import ProjectForm
 from metronus_app.model.project import Project
 
-from metronus_app.common_utils import (get_actor_or_403, 
+from metronus_app.common_utils import (get_actor_or_403,
     get_admin_executive_or_403,
     default_round,same_company_or_403, get_highest_role_tier)
 from metronus_app.model.employee import Employee
@@ -126,8 +126,11 @@ def list_projects_search(request,name):
     """
 
     # Check that the current user has permissions
-    lista = get_list_for_role(request).filter(name__icontains=name)
-    projects = lista.filter(deleted=False)
+    projects = get_list_for_role(request).filter(deleted=False)
+
+    if name:
+        projects.filter(name__icontains=name)
+
     return render(request, "project/project_search.html",
         {"projects": projects})
 
@@ -157,11 +160,11 @@ def show(request, project_id):
     project_managers = Employee.objects.filter(
         projectdepartmentemployeerole__projectDepartment_id__project_id=project,
         projectdepartmentemployeerole__role_id__tier=40).distinct().order_by("user__first_name","user__last_name")
-    
+
     employees = Employee.objects.filter(user__is_active=True,
         projectdepartmentemployeerole__projectDepartment_id__project_id=project,
         projectdepartmentemployeerole__role_id__tier__lte=40).distinct().order_by("user__first_name","user__last_name")
-    
+
     departments = Department.objects.filter(active=True, projectdepartment__project_id__id=project_id).order_by("name")
     return render(request, "project/project_view.html", {"project": project, "employees": employees,
                                                          "departments": departments,
@@ -180,7 +183,7 @@ def edit(request, project_id):
     admin = get_admin_executive_or_403(request)
     project = get_object_or_404(Project, pk=project_id)
     same_company_or_403(admin, project)
-    
+
     repeated_name = False
     error = False
     # if this is a POST request we need to process the form data
@@ -272,7 +275,7 @@ def ajax_employees_per_department(request):
     project = get_object_or_404(Project, pk=project_id)
     logged=check_project(request, project)
     same_company_or_403(logged, project)
-    
+
     company_departments = Department.objects.filter(active=True, company_id=logged.company_id)
 
 
@@ -302,7 +305,7 @@ def ajax_tasks_per_department(request):
     same_company_or_403(logged, project)
 
     company_departments = Department.objects.filter(active=True, company_id=logged.company_id)
-   
+
     data = {'names': [], 'values': []}
 
     for dpmt in company_departments:
@@ -476,13 +479,13 @@ def check_project(request,project):
     elif project.deleted:
         raise PermissionDenied
     elif ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-        projectDepartment_id__project_id=project, 
+        projectDepartment_id__project_id=project,
         role_id__tier__gte=40).exists():
         return actor
 
     # Otherwise GTFO
     raise PermissionDenied
-    
+
 def create_project(form, admin):
     """Creates a new project supposing the data in the form is OK"""
     pname = form.cleaned_data['name']
@@ -515,10 +518,10 @@ def get_list_for_role(request):
     """
     Gets the list of projects according to the role tier of the logged user
     """
-    actor=get_actor_or_403(request)        
-    
+    actor=get_actor_or_403(request)
+
     highest=get_highest_role_tier(actor)
-    
+
     if highest < 40:
         raise PermissionDenied
     elif highest>=50:

@@ -97,7 +97,7 @@ def create(request):
                 send_register_email(form.cleaned_data["email"], form.cleaned_data["first_name"])
 
                 return HttpResponseRedirect('/employee/view/' + form.cleaned_data["username"] + '/')
-   
+
             else:
                 # There are errors
                 return render(request, 'employee/employee_register.html', {'form': form, 'errors': errors})
@@ -144,11 +144,11 @@ def create_async(request):
             # Check that the passwords match
             if not check_passwords(form):
                 errors.append('employeeCreation_passwordsDontMatch')
-            
+
             #Check password validation
             if not validate_pass(form.cleaned_data["password1"]):
                 errors.append('newPasswordInvalid')
-            
+
             # Check that the username is unique
             if not is_username_unique(form.cleaned_data["username"]):
                 errors.append('employeeCreation_usernameNotUnique')
@@ -177,8 +177,8 @@ def create_async(request):
         # Form is not valid
         else:
             errors.append('employeeCreation_formNotValid')
-       
-    
+
+
     data['success'] = False
     data['errors'] = errors
     return JsonResponse(data)
@@ -197,6 +197,7 @@ def list_employees(request):
     inactive = employees.filter(user__is_active = False)
     return render(request, 'employee/employee_list.html',
             {'employees': active, 'inactive' : inactive})
+
 def list_employees_search(request,name):
     """
     parameters/returns:
@@ -213,10 +214,9 @@ def list_employees_search(request,name):
                 search_name=Concat('user__first_name', V(' '), 'user__last_name')
                 ).filter(search_name__icontains=name)
     employees = lista.filter(user__is_active=True)
-    
+
     return render(request, "employee/employee_search.html",
         {"employees": employees})
-
 
 def view(request, username):
     """
@@ -451,13 +451,13 @@ def ajax_productivity_per_task(request, username):
     #{"3": {"total_productivity": 0.7125, "expected_productivity": 2.0, "name": "Hacer cosas de front"}}
     """
     # Check that the user is logged in and it's an administrator or with permissions
-    
+
     logged = get_authorized_or_403(request)
 
     # Check that it's at least PM
     if get_highest_role_tier(logged) < 40:
         raise PermissionDenied
-    
+
     employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
 
      # Check that the admin has permission to view that employee
@@ -642,7 +642,7 @@ def ajax_profit_per_date(request, employee_id):
     same_company_or_403(employee, logged)
 
     check_higher_roles(logged, employee)
-    
+
     # Get and parse the dates
     start_date = request.GET.get("start_date", str(date.today() - timedelta(days=30)))
     end_date = request.GET.get("end_date", str(date.today()))
@@ -807,9 +807,9 @@ def check_higher_roles(logged, employee):
     """Raises 403 if the current actor has lower roles than the one to be shown"""
 
     highest=get_highest_role_tier(logged)
-    
-    employee_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee)    
-    
+
+    employee_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee)
+
     if highest>=50:
         #admin or executive can do everything
         return employee_roles
@@ -819,8 +819,8 @@ def check_higher_roles(logged, employee):
     else:
         # Check the logged's roles are greater than this for at least one project
         my_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=logged,role_id__tier__gte=20)
-        authorized = False    
-        for role in my_roles:      
+        authorized = False
+        for role in my_roles:
             if role.role_id.tier>=40:
                 involved_deps=Department.objects.filter(
                     projectdepartment__project_id=role.projectDepartment_id.project_id
@@ -840,7 +840,7 @@ def check_higher_roles(logged, employee):
 
         if not authorized:
             raise PermissionDenied
-    
+
         return employee_roles
 
 def check_metrics_authorized_for_employee_in_project(user, employee_id, project_id):

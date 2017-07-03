@@ -123,8 +123,11 @@ def list_departments_search(request,name):
     """
 
     # Check that the current user has permissions
-    lista = get_list_for_role(request).filter(name__icontains=name)
-    departments = lista.filter(active=True)
+    departments = get_list_for_role(request).filter(active=True)
+
+    if name:
+        departments.filter(name__icontains=name)
+
     return render(request, "department/department_search.html",
         {"departments": departments})
 
@@ -186,7 +189,7 @@ def edit(request, department_id):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-            
+
 
             dep = find_name(form.cleaned_data['name'], admin)
             # dep does not exists or it's the same
@@ -299,7 +302,7 @@ def ajax_time_per_task(request):
         raise SuspiciousOperation
 
     department_id = request.GET["department_id"]
-    
+
     department = get_object_or_404(Department, pk=department_id)
     actor=check_department(department, request)
     same_company_or_403(actor,department)
@@ -502,10 +505,10 @@ def get_list_for_role(request):
     actor=get_actor_or_403(request)
 
     # Admins and executives can do everything
-    
+
     if actor.user_type == "A" or is_executive(actor):
         return Department.objects.filter(company_id=actor.company_id).distinct().order_by("name")
-    
+
     # If it's for view, coordinators and greater can access too
     if ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
         role_id__tier__gte=20).exists():

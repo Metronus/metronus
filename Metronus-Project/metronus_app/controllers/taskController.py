@@ -118,7 +118,7 @@ def create_async(request):
             pname = form.cleaned_data['name']
             ppro = form.cleaned_data['project_id']
             pdep = form.cleaned_data['department_id']
-            
+
             pdtuple = find_tuple(ppro, pdep, actor)
             if ppro.deleted:
                 errors.append('task_creation_project_inactive')
@@ -182,8 +182,11 @@ def list_tasks_search(request,name):
     """
 
     # Check that the current user has permissions
-    lista = get_list_for_role(request).filter(name__icontains=name)
-    tasks = lista.filter(active=True)
+    tasks = get_list_for_role(request).filter(active=True)
+
+    if name:
+        lista.filter(name__icontains=name)
+        
     return render(request, "task/task_search.html",
         {"tasks": tasks})
 
@@ -232,7 +235,7 @@ def edit(request, task_id):
     task = get_object_or_404(Task, pk=task_id)
     actor=check_task(request,task,True)
     same_company_or_403(actor,task.actor_id)
-    
+
     errors = []
 
     # if this is a POST request we need to process the form data
@@ -266,7 +269,7 @@ def edit(request, task_id):
                                  "price_per_unit": task.price_per_unit if task.price_per_unit is not None else "",
                                  "price_per_hour": task.price_per_hour if task.price_per_hour is not None else ""})
     # The project
-    
+
     return render(request, 'task/task_form.html', {'form': form, "errors": errors,
                                               "departments": [task.projectDepartment_id.department_id], "projects": [task.projectDepartment_id.project_id]})
 
@@ -286,7 +289,7 @@ def delete(request, task_id):
     task = get_object_or_404(Task, pk=task_id, active=True)
     actor=check_task(request,task,True)
     same_company_or_403(actor,task.actor_id)
-    
+
     delete_task(task)
 
     return HttpResponseRedirect('/task/list')
@@ -306,7 +309,7 @@ def recover(request, task_id):
     task = get_object_or_404(Task, pk=task_id, active=False)
     actor=check_task(request,task,True)
     same_company_or_403(actor,task.actor_id)
-    
+
     recover_task(task)
 
     return HttpResponseRedirect('/task/list')
@@ -340,7 +343,7 @@ def ajax_productivity_per_task(request):
     task=get_object_or_404(Task, pk=task_id)
     actor=check_task(request,task,for_view=True)
     same_company_or_403(actor,task.actor_id)
-    
+
     # Get and parse the dates and the offset
     start_date = request.GET.get("start_date", str(date.today() - timedelta(days=30)))
     end_date = request.GET.get("end_date", str(date.today()))
@@ -411,8 +414,8 @@ def ajax_productivity_per_task(request):
 
         data["production"].append(default_round(total_productivity))
         data["goal_evolution"].append(default_round(expected_productivity))
-    
-    
+
+
     return JsonResponse(data)
 
 
@@ -442,7 +445,7 @@ def ajax_profit_per_date(request, task_id):
     task=get_object_or_404(Task, pk=task_id)
     actor=check_task(request,task,for_view=True)
     same_company_or_403(actor,task.actor_id)
-    
+
     # Get and parse the dates
     start_date = request.GET.get("start_date", str(date.today() - timedelta(days=30)))
     end_date = request.GET.get("end_date", str(date.today()))
@@ -637,10 +640,10 @@ def find_collections(request):
     actor=get_actor_or_403(request)
     if actor.user_type == "A" or is_executive(actor):
         proyectos = Project.objects.filter(company_id=actor.company_id, deleted=False)
-        departamentos = Department.objects.filter(company_id=actor.company_id, active=True)    
+        departamentos = Department.objects.filter(company_id=actor.company_id, active=True)
     else:
         # not an executive
-      
+
         roles_dep = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=20)
 
         if roles_dep.count() > 0:
@@ -654,7 +657,7 @@ def find_collections(request):
         else:
             # not any of this? get outta here!!
             raise PermissionDenied
-    
+
     return {"departments": departamentos, "projects": proyectos}
 
 
@@ -666,12 +669,12 @@ def find_departments(request):
         raise SuspiciousOperation
 
     project_id = request.GET.get("project_id")
-    
+
     actor=get_actor_or_403(request)
     if actor.user_type == "A" or is_executive(actor):
         departamentos = Department.objects.filter(projectdepartment__project_id_id=project_id,company_id=actor.company_id, active=True)
     else:
-    
+
         # not an executive
         roles_dep = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=20,
             projectDepartment_id__project_id__deleted=False,projectDepartment_id__department_id__active=True)
@@ -691,10 +694,10 @@ def find_departments(request):
 def check_task(request,task, for_view=False):
     """
     checks if the task belongs to the logged actor with appropiate roles
-    """ 
+    """
     actor=get_actor_or_403(request)
     highest=get_highest_role_tier(actor)
-    
+
     if highest>=50:
         # Admins and executives can do everything
         return actor
@@ -709,12 +712,12 @@ def check_task(request,task, for_view=False):
                 .exists():
             return actor
         elif ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-            projectDepartment_id=task.projectDepartment_id, 
+            projectDepartment_id=task.projectDepartment_id,
             role_id__tier__gte=20).exists():
             # If it's for view, coordinators and greater can access too
             return actor
     elif highest>=20:
-        # If it's for creation, task is None    
+        # If it's for creation, task is None
         return actor
 
     # Otherwise GTFO
