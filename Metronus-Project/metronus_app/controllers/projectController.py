@@ -129,7 +129,7 @@ def list_projects_search(request,name):
     projects = get_list_for_role(request).filter(deleted=False)
 
     if name:
-        projects.filter(name__icontains=name)
+        projects = projects.filter(name__icontains=name)
 
     return render(request, "project/project_search.html",
         {"projects": projects})

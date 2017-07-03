@@ -126,7 +126,7 @@ def list_departments_search(request,name):
     departments = get_list_for_role(request).filter(active=True)
 
     if name:
-        departments.filter(name__icontains=name)
+        departments = departments.filter(name__icontains=name)
 
     return render(request, "department/department_search.html",
         {"departments": departments})

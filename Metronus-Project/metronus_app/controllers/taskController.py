@@ -185,8 +185,8 @@ def list_tasks_search(request,name):
     tasks = get_list_for_role(request).filter(active=True)
 
     if name:
-        lista.filter(name__icontains=name)
-        
+        tasks = tasks.filter(name__icontains=name)
+
     return render(request, "task/task_search.html",
         {"tasks": tasks})
 
