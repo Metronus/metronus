@@ -101,8 +101,8 @@
                             <thead>
                                 <tr>
                                     <th>{% trans 'username' %}</th>
-                                    <th>{% trans 'identifier' %}</th>
-                                    <th>{% trans 'phone' %}</th>
+                                    <th class="hidden-xs">{% trans 'identifier' %}</th>
+                                    <th class="hidden-xs">{% trans 'phone' %}</th>
                                     <th class="hidden-xs">{% trans 'registryDate' %}</th>
                                     <th>{% trans 'actions' %}</th>
                                 </tr>
@@ -119,8 +119,8 @@
                                             {{employee.user}}
                                         </td>
 
-                                        <td>{{employee.identifier}}</td>
-                                        <td>{{employee.phone}}</td>
+                                        <td class="hidden-xs">{{employee.identifier}}</td>
+                                        <td class="hidden-xs">{{employee.phone}}</td>
                                         <td class="hidden-xs">{{employee.registryDate}}</td>
 
 

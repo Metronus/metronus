@@ -40,8 +40,8 @@
           <thead>
             <tr>
               <th>{% trans 'username' %}</th>
-              <th>{% trans 'phone' %}</th>
-              <th>{% trans 'email' %}</th>
+              <th class="hidden-xs">{% trans 'phone' %}</th>
+              <th class="hidden-xs">{% trans 'email' %}</th>
             </tr>
           </thead>
 
@@ -53,8 +53,8 @@
               {% else %}
               <td><img src="{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
               {% endif %}
-              <td>{{employee.phone}}</td>
-              <td>{{employee.user.email}}</td>
+              <td class="hidden-xs">{{employee.phone}}</td>
+              <td class="hidden-xs">{{employee.user.email}}</td>
               <td><a href="{% url 'employee_view' employee.user %}" type="button" class="btn btn-success">{% trans 'details' %}</a></td>
             </tr>
             {% endfor %}
@@ -156,9 +156,9 @@
         <thead>
           <tr>
             <th>{% trans 'task' %}</th>
-            <th>{% trans 'project' %}</th>
-            <th>{% trans 'goal_description' %}</th>
-            <th>{% trans 'creator' %}</th>
+            <th class="hidden-xs">{% trans 'project' %}</th>
+            <th class="hidden-xs">{% trans 'goal_description' %}</th>
+            <th class="hidden-xs">{% trans 'creator' %}</th>
           </tr>
         </thead>
 
@@ -166,9 +166,9 @@
           {% for task in tasks %}
           <tr>
             <td>{{task.name}}</td>
-            <td>{{task.projectDepartment_id.project_id.name}}</td>
-            <td>{{task.goal_description}}</td>
-            <td>{{task.actor_id.user.get_username}}</td>
+            <td class="hidden-xs">{{task.projectDepartment_id.project_id.name}}</td>
+            <td class="hidden-xs">{{task.goal_description}}</td>
+            <td class="hidden-xs">{{task.actor_id.user.get_username}}</td>
             <td><a href="{% url 'task_view' task.id %}" type="button" class="btn btn-success">{% trans 'details' %}</a></td>
           </tr>
           {% endfor %}
@@ -194,8 +194,8 @@
               <thead>
                 <tr>
                   <th>{% trans 'username' %}</th>
-                  <th>{% trans 'phone' %}</th>
-                  <th>{% trans 'email' %}</th>
+                  <th class="hidden-xs">{% trans 'phone' %}</th>
+                  <th class="hidden-xs">{% trans 'email' %}</th>
                 </tr>
               </thead>
               <tbody>
@@ -206,8 +206,8 @@
                   {% else %}
                   <td><img src="{{employee.picture}}" class="avatar" alt="IMG">&nbsp;{{employee.user}}</td>
                   {% endif %}
-                  <td>{{employee.phone}}</td>
-                  <td>{{employee.user.email}}</td>
+                  <td class="hidden-xs">{{employee.phone}}</td>
+                  <td class="hidden-xs">{{employee.user.email}}</td>
                   <td><a href="{% url 'employee_view' employee.user %}" type="button" class="btn btn-success">{% trans 'details' %}</a></td>
                 </tr>
                 {% endfor %}
