@@ -96,6 +96,11 @@ function setValidationState(error, div, message){
     div.find("input").removeClass().addClass(ok_input_icon);
     div.find("i").removeClass("glyphicon-remove").addClass("glyphicon-ok");
     message.hide();
+
+    // If everything is OK, hide all help-block.with-errors
+    div.find(".help-block.with-errors").each(function(){
+      $(this).hide();
+    });
   }
   div.find("input").removeClass("glyphicon");
 }
