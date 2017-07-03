@@ -36,7 +36,7 @@ class CompanyTestCase(TestCase):
             company_id=company1
         )
         company2 = Company.objects.create(
-            cif="231232F",
+            cif="F23123222",
             company_name="Universidad de Sevilla2",
             short_name="us2",
             email="us2@gmail.com",
@@ -180,7 +180,7 @@ class CompanyTestCase(TestCase):
 
         response = c.post(reverse("register"), {
             # Company
-            "cif" :"231231F",
+            "cif" :"F23123222",
             "company_name" :"comapniadejuego",
             "short_name" :"cdj",
             "company_email" :"emaildeemp@es.es",
