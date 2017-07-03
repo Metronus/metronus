@@ -603,6 +603,11 @@ msgstr "Expected"
 msgid "graphReal"
 msgstr "Actual"
 
+msgid "min_salary"
+msgstr "Minimum price per hour is 1.0"
+msgid "max_salary"
+msgstr "Maximum price per hour is 1000000.0"
+
 #: Project
 msgid "project"
 msgstr "Project"
