@@ -165,7 +165,7 @@ def show(request, project_id):
         projectdepartmentemployeerole__projectDepartment_id__project_id=project,
         projectdepartmentemployeerole__role_id__tier__lte=40).distinct().order_by("user__first_name","user__last_name")
 
-    departments = Department.objects.filter(active=True, projectdepartment__project_id__id=project_id).order_by("name")
+    departments = Department.objects.filter(active=True, projectdepartment__project_id__id=project_id).order_by("name").distinct()
     return render(request, "project/project_view.html", {"project": project, "employees": employees,
                                                          "departments": departments,
                                                          "project_managers": project_managers})

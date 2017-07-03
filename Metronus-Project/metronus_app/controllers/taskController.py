@@ -650,15 +650,15 @@ def find_collections(request):
             # you're a project manager. Loading your projects
             proyectos = Project.objects.filter(
                 company_id=actor.company_id, deleted=False,
-                projectdepartment__projectdepartmentemployeerole__employee_id=actor).distinct()
+                projectdepartment__projectdepartmentemployeerole__employee_id=actor)
             departamentos = Department.objects.filter(
                 company_id=actor.company_id, active=True,
-                projectdepartment__projectdepartmentemployeerole__employee_id=actor).distinct()
+                projectdepartment__projectdepartmentemployeerole__employee_id=actor)
         else:
             # not any of this? get outta here!!
             raise PermissionDenied
 
-    return {"departments": departamentos, "projects": proyectos}
+    return {"departments": departamentos.distinct(), "projects": proyectos.distinct()}
 
 
 def find_departments(request):
@@ -684,11 +684,11 @@ def find_departments(request):
             departamentos = Department.objects.filter(
                 company_id=actor.company_id, active=True,
                 projectdepartment__projectdepartmentemployeerole__employee_id=actor,
-                projectdepartment__project_id_id=project_id).distinct()
+                projectdepartment__project_id_id=project_id)
         else:
             # not any of this? get outta here!!
             raise PermissionDenied
-    return departamentos
+    return departamentos.distinct()
 
 
 def check_task(request,task, for_view=False):
