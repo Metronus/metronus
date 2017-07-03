@@ -43,10 +43,10 @@ $(function() {
   });
 
   //search event
-  $('#searcher').on('keyup',function() {
+  $('#searcher').on('keyup',$.debounce(250, false, function() {
     var modelo=$('#searcher_model').val();
     search_list(modelo);
-  });
+  }));
   //search event
   $('#search_button').on('click',function() {
     var modelo=$('#searcher_model').val();
