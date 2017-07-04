@@ -466,7 +466,7 @@
             },
             saveAsImage: {
               show: true,
-              title: "Save Image"
+              title: '{% trans 'saveImage' %}'
             }
           }
         },
@@ -539,11 +539,14 @@
           data:['Expenses and income']
         },
         toolbox: {
-          show : true,
-          feature : {
-            saveAsImage : {show: true}
-          }
-        },
+            show: true,
+              feature: {
+                saveAsImage: {
+                    show: true,
+                    title: '{% trans 'saveImage' %}'
+                }
+              }
+          },
         calculable : true,
         xAxis : [{
           type : 'category',

@@ -110,11 +110,14 @@
 				formatter: "{a} <br/>{b} : {c} ({d}%)"
 			},
 			toolbox: {
-				show : true,
-				feature : {
-					saveAsImage : {show: true}
-				}
-			},
+	        	show: true,
+	          	feature: {
+            		saveAsImage: {
+              			show: true,
+              			title: '{% trans 'saveImage' %}'
+            		}
+          		}
+        	},
 			calculable : true,
 			series : [
 			{
@@ -142,11 +145,14 @@
 				x : 'center',
 			},
 			toolbox: {
-				show : true,
-				feature : {
-					saveAsImage : {show: true}
-				}
-			},
+	        	show: true,
+	          	feature: {
+            		saveAsImage: {
+              			show: true,
+              			title: '{% trans 'saveImage' %}'
+            		}
+          		}
+        	},
 			calculable : true,
 			xAxis : [
 			{

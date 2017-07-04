@@ -259,11 +259,28 @@
           data:['Expenses and income']
         },
         toolbox: {
-          show : true,
-          feature : {
-            saveAsImage : {show: true}
-          }
-        },
+                show: true,
+                feature: {
+                    magicType: {
+                        show: true,
+                        title: {
+                            line: '{% trans 'line' %}',
+                            bar: '{% trans 'bar' %}',
+                            stack: '{% trans  'stack' %}',
+                            tiled: '{% trans 'tiled' %}'
+                        },
+                        type: ['line', 'bar', 'stack', 'tiled']
+                    },
+                    restore: {
+                        show: false,
+                        title: '{% trans 'restore' %}'
+                    },
+                    saveAsImage: {
+                        show: true,
+                        title: '{% trans 'saveImage' %}'
+                    }
+                }
+            },
         calculable : true,
         xAxis : [
         {
