@@ -208,7 +208,7 @@ def list_employees_search(request,name):
 
     # Check that the current user has permissions
     lista = get_list_for_role(request)
-    if name:
+    if name != "all_true":
         #little opt just if not empty
         lista=lista.annotate(
                 search_name=Concat('user__first_name', V(' '), 'user__last_name')

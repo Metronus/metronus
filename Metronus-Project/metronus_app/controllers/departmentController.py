@@ -125,7 +125,7 @@ def list_departments_search(request,name):
     # Check that the current user has permissions
     departments = get_list_for_role(request).filter(active=True)
 
-    if name:
+    if name != "all_true":
         departments = departments.filter(name__icontains=name)
 
     return render(request, "department/department_search.html",

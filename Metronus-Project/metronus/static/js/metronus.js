@@ -119,6 +119,12 @@ function search_list(modelo){
   var buscador=document.getElementById("searcher");
   var cadena=buscador.value;
   //do search
+
+  if(cadena == ""){
+    cadena="all_true";
+  }
+
+
   $.get({url:"/"+modelo+"/search/"+cadena+"/",
     success: function(data){
 
@@ -129,8 +135,8 @@ function search_list(modelo){
       //those with searchable class should contain only text,
       //otherwise magic will happen
       //not good magic, you know
-      $('.searchable').each(function(i,el){
 
+      $('.searchable').each(function(i,el){
         var html=$(el).html();
         //highlight matches
         $(el).hide().html(html.replace(simpletext,"<strong>$1</strong>")).fadeIn();

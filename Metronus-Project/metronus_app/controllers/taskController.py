@@ -184,7 +184,7 @@ def list_tasks_search(request,name):
     # Check that the current user has permissions
     tasks = get_list_for_role(request).filter(active=True)
 
-    if name:
+    if name != "all_true":
         tasks = tasks.filter(name__icontains=name)
 
     return render(request, "task/task_search.html",

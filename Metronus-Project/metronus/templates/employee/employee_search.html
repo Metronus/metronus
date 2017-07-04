@@ -1,7 +1,18 @@
 {% load i18n %}
 {% load l10n %}
+{% load custom_tags %}
 
 {% block content %}
+  
+  {% is_admin user.actor as actor_is_admin %}
+  {% is_executive user.actor as actor_is_executive %}
+  {% is_project_manager user.actor as actor_is_projectManager %}
+  {% is_coordinator user.actor as actor_is_coordinator %}
+  {% is_team_manager user.actor as actor_is_teamManager %}
+  {% is_employee user.actor as actor_is_employee %}
+  {% has_role user.actor as actor_has_role %}
+
+  
     {% for employee in employees %}
             <tr>
               <td >
@@ -34,4 +45,5 @@
               </td>
             </tr>
             {% endfor %}
+  }
 {% endblock %}
