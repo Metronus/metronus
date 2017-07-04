@@ -143,3 +143,78 @@ def is_team_manager(actor):
 @register.filter
 def getval(dic, key):
     return dic[key]
+
+@register.filter
+def checkAdmin(actor):
+    return actor.user_type == 'A'
+
+
+@register.filter
+def checkRole(actor):
+    if actor.user_type == 'E' or actor.user_type == 'A':
+        try:
+            return ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor.id).exists()
+        except:
+            return False
+    else:
+        return False
+
+
+@register.filter
+def checkEmployee(actor):
+    if actor.user_type == 'A' or not has_role(actor):
+        return False
+
+    for role in ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor.id):
+        if role.role_id.name == 'EMPLOYEE':
+            return True
+
+    return False
+
+
+@register.filter
+def checkProjectManager(actor):
+    if actor.user_type == 'A' or not has_role(actor):
+        return False
+
+    for role in ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor.id):
+        if role.role_id.name == 'PROJECT_MANAGER':
+            return True
+
+    return False
+
+
+@register.filter
+def checkCoordinator(actor):
+    if actor.user_type == 'A' or not has_role(actor):
+        return False
+
+    for role in ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor.id):
+        if role.role_id.name == 'COORDINATOR':
+            return True
+
+    return False
+
+
+@register.filter
+def checkExecutive(actor):
+    if actor.user_type == 'A' or not has_role(actor):
+        return False
+
+    for role in ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor.id):
+        if role.role_id.name == 'EXECUTIVE':
+            return True
+
+    return False
+
+
+@register.filter
+def checkTeamManager(actor):
+    if actor.user_type == 'A' or not has_role(actor):
+        return False
+
+    for role in ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor.id):
+        if role.role_id.name == 'TEAM_MANAGER':
+            return True
+
+    return False
