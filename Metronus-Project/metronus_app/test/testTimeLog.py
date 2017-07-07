@@ -220,7 +220,19 @@ class TimeLogTestCase(TestCase):
               "department":Department.objects.get(name="Backend").id,
               },**kwargs)
         self.assertEquals(response.status_code, 400)
+    def test_get_departments_no_project_2(self):
+        """
+        try get departments without project, blank string
+        """
+        c = Client()
+        c.login(username="anddonram", password="123456")
         
+        kwargs = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+        response = c.post("/timeLog/list_all/", {"project":"",
+              "department":Department.objects.get(name="Backend").id,
+              },**kwargs)
+        self.assertEquals(response.status_code, 400)
+            
     def test_get_departments(self):
         """
         get departments for select options in project
@@ -230,6 +242,27 @@ class TimeLogTestCase(TestCase):
         
         kwargs = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
         response = c.post("/timeLog/list_all/", {
+            "project":Project.objects.get(name="Metronus").id,
+              },**kwargs)
+        self.assertEquals(response.status_code, 200)
+        # response in bytes must be decode to string
+        data = response.content.decode("utf-8")
+        # string to dict
+        data = json.loads(data)
+        names=[]
+        for dep in data:
+            names.append(dep['fields']['name'])
+        self.assertIn("Backend",names)
+        self.assertNotIn("Frontend",names)
+    def test_get_departments_2(self):
+        """
+        get departments for select options in project, department as blank string
+        """  
+        c = Client()
+        c.login(username="anddonram", password="123456")
+        
+        kwargs = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+        response = c.post("/timeLog/list_all/", {"department":"",
             "project":Project.objects.get(name="Metronus").id,
               },**kwargs)
         self.assertEquals(response.status_code, 200)
@@ -265,7 +298,19 @@ class TimeLogTestCase(TestCase):
             names.append(task['fields']['name'])
         self.assertIn("Hacer cosas",names)
         self.assertNotIn("Hacer cosas de cua",names)
-
+    def test_get_tasks_negative_no_project(self):
+        """
+        get tasks for select options, blank project
+        """  
+        c = Client()
+        c.login(username="anddonram", password="123456")
+        
+        kwargs = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+        response = c.post("/timeLog/list_all/", {
+            "project":"",
+            "department":Department.objects.get(name="Backend").id,
+              },**kwargs)
+        self.assertEquals(response.status_code, 400)
     def test_create_timelog_negative_2(self):
         """ Creates a timelog with production goals when the task does not need it"""
         c = Client()

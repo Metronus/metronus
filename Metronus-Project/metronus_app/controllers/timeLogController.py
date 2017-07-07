@@ -51,9 +51,11 @@ def list_all(request):
             raise SuspiciousOperation
 
         project = request.POST.get("project")
+        if not project:
+            raise SuspiciousOperation
         department = request.POST.get("department")
  
-        if department is None:
+        if not department:
             departments = Department.objects.filter(company_id=employee.company_id,
                                                     projectdepartment__project_id=project,
                                                     projectdepartment__projectdepartmentemployeerole__employee_id=employee, 
