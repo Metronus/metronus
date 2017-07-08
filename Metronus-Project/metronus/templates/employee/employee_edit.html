@@ -1,119 +1,278 @@
 {% extends "layout_base.html" %}
 {% load i18n %}
 {% load l10n %}
+{% load static %}
+{% load custom_tags %}
 
-{% block title %}
-    {% trans 'editEmployee' %}
-{% endblock %}
-{% block contentTitle %}
-    {% trans 'editEmployee' %}
+{% block title %}{% trans 'editEmployee' %}{% endblock %}
+{% block contentTitle %}{% trans 'editEmployee' %}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-12 col-sm-12 col-xs-12">
+    <div class="x_panel">
+      <div class="x_title">
+        <h1 align="center"> {% trans 'editEmployee' %} </h1></br>
+        <div class="clearfix"></div>
+      </div>
+
+      <div class="x_content">
+        <!-- FORM ERRORS -->
+        {% for err in errors%}
+            <p class="alert alert-danger">{% trans err %}</p>
+        {% endfor %}
+        <form id="register_form" method="POST" action="" class="form-horizontal" enctype="multipart/form-data">
+         {% csrf_token %}
+
+         {% show_field form.first_name      "John" %}
+         {% show_field form.last_name       "Doe" %}
+         {% show_field form.email           "johndoe@metronus.es"   "invalidEmail" %}
+         {% show_field form.identifier      "j_doe" %}
+         {% show_field form.phone           "666775899" %}
+         {% show_field form.price_per_hour  "9.8" %}
+         {% show_field form.photo %}
+
+         <div class="form-group required form-class">
+           <label class="control-label col-sm-4"></label>
+             <div class="col-sm-6">
+             {% trans 'change_pic_warning' %}
+             </div>
+         </div>
+
+         <!-- MOSTRAR FOTO ACTUAL -->
+         <div class="form-group required form-class">
+           <label class="control-label col-sm-4" for="id_current_picture">{% trans 'current_employee_pic' %}</label>
+           <div class="col-sm-6">
+             {% if picture %}
+              <img src="{{ MEDIA_URL }}{{picture}}" style="max-height: 120px; max-width: auto;">
+             {% else %}
+              {% trans 'none' %}
+             {% endif %}
+           </div>
+         </div>
+
+         <div class="form-group control-buttons">
+           <div class="text-center">
+             {% if username %}
+               <a class="btn btn-danger" href="{% url 'employee_view' username %}">{% trans 'cancel' %}</a>
+              {% else %}
+                <a class="btn btn-danger" href="{% url 'employee_list' %}">{% trans 'cancel' %}</a>
+              {% endif %}
+
+
+             <button type="submit" class="btn btn-success submit-button" >{% trans 'confirm' %}</button>
+           </div>
+         </div>
+            </form>
+
+      {% if active %}
+          <hr>
+        <h1 align="center"> {% trans 'change_pass_employee_title' %} </h1>
+        </br>
+
+        <form id="form_cambiar_pass" method="POST"  class="form-horizontal" data-toggle="validator" role="form">
+        {% csrf_token %}
+
+        {% show_field pass_form.newpass1 %}
+        {% show_field pass_form.newpass2 %}
+        <input type="hidden" name="currentpass" value="lol">
+
+        <!-- Código precioso para los checkboxes -->
+
+        <div class="form-group required form-class">
+        <label class="control-label  col-md-4 col-sm-4 col-xs-12" for="id_send_password_notification">
+          {% trans 'send_password_notification' %}
+        </label>
+        <div class="col-md-4 col-sm-5 col-xs-12 text-center align-middle">
+          <div class="checkbox">
+            <label class="">
+              <div class="icheckbox_flat-green" style="position: relative;">
+                <input type="checkbox" class="flat" id="id_send_password_notification" name="send_password_notification">
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+    <div class="form-group required form-class">
+        <label class="control-label  col-md-4 col-sm-4 col-xs-12" for="id_notify_new_pass">
+          {% trans 'notify_new_pass' %}<br>{% trans 'notify_new_pass_2' %}
+        </label>
+        <div class="col-md-4 col-sm-5 col-xs-12 text-center align-middle">
+          <div class="checkbox">
+            <label class="">
+              <div class="icheckbox_flat-green" style="position: relative;">
+                <input type="checkbox" class="flat" id="id_notify_new_pass" name="notify_new_pass">
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+        <div class="form-group">
+          <div class="text-center">
+            <button type="button" id="enviar_pass" class="btn btn-success" >{% trans 'confirm' %}</button>
+          </div>
+        </div>
+      </form>
+
+      <div id="res_passchange"></div>
+
+      {% endif %}
+
+    </div>
+   </div>
+ </div>
 {% endblock %}
 
 {% block javascript %}
 <script>
-$(function() {
-    $(':input[type="number"]').each(function(i) {
-        $(this).val($(this).attr("value").replace(",", "."));
-    });
-});
-</script>
-{% endblock %}
-
-{% load static }
-
-{% block content %}
-    <div class="row">
-
-<div class="col-md-12 col-sm-12 col-xs-12">
-  <div class="x_panel">
-    <div class="x_title">
-            <h1 align="center"> {% trans 'editEmployee' %} </h1></br>
-      <div class="clearfix"></div>
-    </div>
-    <div class="x_content">
-
+  $(function() {
+    $(".btn-file span").text("{% trans 'browseFile' %}");
     
-   <form id="register_form" method="POST" action="" class="form-horizontal" enctype="multipart/form-data">
-       {% csrf_token %}
-   {% if  errors %}
-        <div id="errorDiv2" class="alert alert-error alert-dismissible" role="alert">
-        <a class="close" data-dismiss="alert">x</a>
-        {% for error in errors %}
-          {% trans error %}
-        {% endfor %}
-        </div>
-    {% endif %}
+    $(':input[type="number"]').each(function(i) {
+      $(this).val($(this).attr("value").replace(",", "."));
+    });
+  });
 
-    {% csrf_token %}
+  $(function() {
+          $('#register_form').bootstrapValidator({
+          feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+          },
+          fields: {
+            first_name: {
+              validators: {
+                notEmpty: {
+                  message: "{% trans 'name_not_empty'%}"
+                },
+              },
+            },
+            last_name: {
+              validators: {
+                notEmpty: {
+                  message: "{% trans 'surname_not_empty'%}"
+                },
+              },
+            },
+            email: {
+              validators: {
+                notEmpty: {
+                  message: "{% trans 'email_not_empty' %}"
+                },
+                emailAddress: {
+                  message: "{% trans 'email_valid' %}"
+                }
+              }
+            },
+            phone: {
+              validators: {
+                notEmpty: {
+                  message: "{% trans 'phone_not_empty' %}"
+                },
+                regexp:{
+                  regexp: /^\d{9}$/ig,
+                  message: '{% trans 'admin_phone_error#2' %}'
+                }
+              }
+            },
+            identifier: {
+              validators: {
+                notEmpty: {
+                  message: "{% trans 'identifier_not_empty' %}"
+                }
+              }
+            },
+            price_per_hour: {
+                validators: {
+                    numeric: {
+                        thousandsSeparator: '',
+                        decimalSeparator: '.',
+                        message: "{% trans 'invalid_number' %}",
+                    },
+                    notEmpty: {
+                        message: "{% trans 'price_per_hour_not_empty' %}"
+                    }
+                }
+            }
+          }
+        });
 
-        <div class="col-md-6 col-md-offset-2 collapse in" >
+      initAjax($("#id_email"), 'email', '/ajax/validate_email_unique/');
 
-        <div class="form-group required form-class">
-          
-          <label class="control-label col-sm-4" for="id_{{ form.first_name.name }}">{{ form.first_name.label }}</label>
-            <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.first_name.name }}" id="id_{{ form.first_name.name }}" value="{{ form.first_name.value }}" required />
-            </div>
-        </div>
-        <div class="form-group required form-class">
-          
-          <label class="control-label col-sm-4" for="id_{{ form.last_name.name }}">{{ form.last_name.label }}</label>
-            <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.last_name.name }}" id="id_{{ form.last_name.name }}" value="{{ form.last_name.value }}" required />
-            </div>
-        </div>
-        <div class="form-group required form-class">
-          
-          <label class="control-label col-sm-4" for="id_{{ form.email.name }}">{{ form.email.label }}</label>
-            <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.email.name }}" id="id_{{ form.email.name }}" value="{{ form.email.value }}" required />
-            </div>
-        </div>
-        <div class="form-group required form-class">
-          
-          <label class="control-label col-sm-4" for="id_{{ form.identifier.name }}">{{ form.identifier.label }}</label>
-            <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.identifier.name }}" id="id_{{ form.identifier.name }}" value="{{ form.identifier.value }}" required />
-            </div>
-        </div>
-        <div class="form-group required form-class">
-          
-          <label class="control-label col-sm-4" for="id_{{ form.phone.name }}">{{ form.phone.label }}</label>
-            <div class="col-sm-6">
-              <input type="text" class="form-control col-md-6" name="{{ form.phone.name }}" id="id_{{ form.phone.name }}" value="{{ form.phone.value }}" required />
-            </div>
-        </div>
-        <div class="form-group required form-class">
-          
-          <label class="control-label col-sm-4" for="id_{{ form.price_per_hour.name }}">{{ form.price_per_hour.label }}</label>
-            <div class="col-sm-6">
-              <input type="number" min="0" step="0.01" class="form-control col-md-6" name="{{ form.price_per_hour.name }}" id="id_{{ form.price_per_hour.name }}" value="{{ form.price_per_hour.value |unlocalize}}" required />
-            </div>
-        </div>
+      $('#form_cambiar_pass').bootstrapValidator({
+          feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+          },
+          fields: {
+            newpass1: {
+              validators: {
+                notEmpty: {
+                  message: "{% trans 'password_not_empty' %}"
+                },
+                regexp:{
+                    regexp: /(?!^\d+$)^.{8,}$/,
+                    message: '{% trans 'password_format_help' %}'
+                }
+              }
+            },
+            newpass2: {
+              validators: {
+                notEmpty: {
+                  message: "{% trans 'password_not_empty' %}"
+                },
+                callback: {
+                  message: "{% trans 'passwords_must_match'%}",
+                  callback: function(value, validator, $field) {
+                    return value == $("#id_newpass1").val()
+                  }
+                }
+              }
+            },
+          }
+        });
 
-        <div class="form-group required form-class">
-          <label class="control-label col-sm-4" for="id_{{ form.photo.name }}">{% trans 'photo' %}</label>
-            <div class="col-sm-6">
-            <input type="file" accept="image/*" class="" name="{{ form.photo.name }}" id="id_{{ form.photo.label }}" value="{{ form.photo.value }}" >
-            </div>
-        </div>
+    // Esto pa enviar el form de contraseñas con ajax
+    $("#enviar_pass").click(function(e) {
+      $.ajax({
+        type: "POST",
+        url: "/employee/updatePassword/{{ username }}/",
+        data: $("#form_cambiar_pass").serialize(),
+        success: function(data) {
+            $('html, body').animate({ scrollTop: $(document).height() }, 'fast');
+          var html = "";
+          if(data.success) {
+            $("#form_cambiar_pass").data('bootstrapValidator').resetForm();
+            $("#form_cambiar_pass").trigger("reset");
+            $("#form_cambiar_pass div").removeClass("checked");
+            html = "<div class='alert alert-success alert-dismissable'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><strong>{% trans 'success' %} &nbsp;</strong> {% trans 'change_pass_success' %}</div>";
+          } else {
+            var msg = "";
+            switch(data.errors[0]){
+              case "employeeCreation_passwordsDontMatch":
+                msg = '{% trans "employeeCreation_passwordsDontMatch" %}';
+                break;
+              case "newPasswordInvalid":
+                msg = '{% trans "newPasswordInvalid" %}';
+                break;
+              case "employeeCreation_formNotValid":
+                msg = '{% trans "employeeCreation_formNotValid" %}';
+                break;
+            }
 
-        
-        <div class="form-group control-buttons">
-            <div class="col-sm-offset-4 col-sm-10">
+            html = '<div class="alert alert-danger alert-dismissable"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>{% trans "fail" %} &nbsp;</strong>' + msg + '</div>';
+          }
 
-            <button type="submit" class="btn btn-success submit-button" >{% trans 'confirm' %}</button>
-            
+          $("#res_passchange").hide().html(html).fadeIn();
+        }
+      });
+    });
 
-            </div>
-          
-        </div>
-        </div>
+  });
 
-    </form>
- </div>
- </div>
- </div>
- </div>
-
+</script>
 {% endblock %}

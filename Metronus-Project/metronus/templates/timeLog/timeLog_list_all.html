@@ -13,7 +13,7 @@
             <h3>{% trans 'timeLogList' %}</h3>
         </div>
     </div>
-
+    
     <div class="clearfix"></div><br>
 
     <div class="row">
@@ -21,12 +21,13 @@
             <div class="x_panel">
                 <div class="row x_title">
                     <div class="col-md-6 col-xs-12">
-                        <h2>{% trans 'dashTimeControlList' %}</h2>
+                        <h2 id="timelog_control_title">{% trans 'dashTimeControlList' %}</h2>
                     </div>
+
                     <div class="col-md-6 col-xs-12">
                         <div class="pull-right">
                             <fieldset>
-                              <legend>{% trans 'datePicker' %}</legend>
+                              <legend>{% trans 'datePicker_timelog' %}</legend>
                                 <div class="control-group">
                                     <div class="controls">
                                         <div class="input-prepend input-group">
@@ -45,6 +46,9 @@
 
                 <div class="x_content">
                     <div class="table-responsive">
+                            <div class="help-tooltip">
+                                <p class="help-block">{% trans 'timelog_help_1' %}</p>
+                            </div>
                         <table class="table table-striped">
                              <thead class="thead-inverse">
                                 <tr>
@@ -66,6 +70,7 @@
                                                 <a {% if duration.0 != 0 %}
                                                         data-href="{% url 'timeLog_delete' duration.1 %}"
                                                         data-toggle="modal" data-target="#confirm-delete"
+                                                        style="cursor: pointer;"
                                                     {% endif %}>
 
                                                     {% converto_to_hours duration.0 %}
@@ -86,12 +91,16 @@
                 </div>
             </div>
         </div>
-        {% if form.errors %}
-            <p>{{ form.errors }}</p>
-        {% endif %}
+
         <div class="clearfix"></div>
         <div id="successDiv" class="alert alert-success" hidden='true'></div>
         <div id="errorDiv" class="alert alert-danger"  hidden='true'></div>
+
+        {% if form.errors %}
+            <div id="error2Div" class="alert alert-danger">
+                <strong>{% trans 'fail' %} | </strong>{% trans "formNotValid" %}
+            </div>
+        {% endif %}
 
         {% if  valid_production_units == False %}
 
@@ -119,6 +128,7 @@
             <div class="x_panel">
                 <div class="x_title">
                     <h2>{% trans 'dashTimeControlCreate' %}</h2>
+
                     <div class="clearfix"></div>
                 </div>
 
@@ -127,16 +137,22 @@
                 <div class="x_content">
                     <form id="form" class="form-horizontal form-label-left"
                           novalidate method="POST" action="{% url 'timeLog_list_all' %}">{% csrf_token %}
+
                         {% for field in form.visible_fields %}
-                            <div class="{{ field.name }} form-group">
-                                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="{{ form.name.auto_id }}">
-                                    {{ field.label }} *
-                                </label>
-                                <div class="col-md-6 col-sm-6 col-xs-12">
-                                    {{ field }}
+                            {% if field.name != "produced_units" and field.name != "duration" %}
+                                <div class="{{ field.name }} form-group">
+                                    <label class="control-label col-md-4 col-sm-4 col-xs-12" for="{{ form.name.auto_id }}">
+                                        {{ field.label }}{% if field.name != "description" %} *{% endif %}
+                                    </label>
+                                    <div class="col-md-4 col-sm-5 col-xs-12">
+                                        {{ field }}
+                                    </div>
                                 </div>
-                            </div>
+                            {% endif %}
                         {% endfor %}
+
+                        {% show_field form.duration  %}
+                        {% show_field form.produced_units  %}
 
                         {% for field in form.hidden_fields %}{{ field }}{% endfor %}
                         <div class="ln_solid"></div>
@@ -175,6 +191,93 @@
 
 {% block javascript %}
 <script>
+
+    $.urlParam = function(name){
+        var results = new RegExp('[\?&]' + name + '=(.*?)(?:&|$|#)').exec(window.location.href);
+        if (results==null){
+           return null;
+        }
+        else{
+           return results[1] || 0; // No sé qué pinta aquí este || pero supongo que el de stackoverflow sí lo sabrá
+        }
+    }
+
+    // Poner en el header el mes actual to chulo
+    $(function() {
+        var title = $("#timelog_control_title");
+        title.append(" {% trans "for" %} ");
+
+        var curMonth, curYear;
+        var now = new Date();
+
+        var urlMonth = $.urlParam("currentMonth");
+        if(urlMonth) {
+            curMonth = urlMonth;
+        } else {
+            curMonth = now.getMonth() + 1;
+        }
+
+        var urlYear = $.urlParam("currentYear");
+        if(urlYear) {
+            curYear = urlYear;
+        } else {
+            curYear = now.getFullYear();
+        }
+
+        var curMonthStr;
+
+        switch(curMonth) {
+            case 1:
+            case "1":
+                curMonthStr = "{% trans "jan" %}";
+                break;
+            case 2:
+            case "2":
+                curMonthStr = "{% trans "feb" %}";
+                break;
+            case 3:
+            case "3":
+                curMonthStr = "{% trans "mar" %}";
+                break;
+            case 4:
+            case "4":
+                curMonthStr = "{% trans "apr" %}";
+                break;
+            case 5:
+            case "5":
+                curMonthStr = "{% trans "may" %}";
+                break;
+            case 6:
+            case "6":
+                curMonthStr = "{% trans "jun" %}";
+                break;
+            case 7:
+            case "7":
+                curMonthStr = "{% trans "jul" %}";
+                break;
+            case 8:
+            case "8":
+                curMonthStr = "{% trans "aug" %}";
+                break;
+            case 9:
+            case "9":
+                curMonthStr = "{% trans "sep" %}";
+                break;
+            case 10:
+            case "10":
+                curMonthStr = "{% trans "oct" %}";
+                break;
+            case 11:
+            case "11":
+                curMonthStr = "{% trans "nov" %}";
+                break;
+            case 12:
+            case "12":
+                curMonthStr = "{% trans "dec" %}";
+        }
+
+        title.append("<b>" + curMonthStr + " " + curYear + "</b>");
+    });
 
     $(document).ready(function() {
         $('input[name="date_field"]').daterangepicker({
@@ -276,10 +379,10 @@
                     $.each($.parseJSON(resp), function(key,value){
                         taskname=value.fields['name']
                         if(value.fields['goal_description'] != null && value.fields['goal_description'] != ""){
-                            taskname+="("+value.fields['goal_description']+")"
+                            taskname+=" ("+value.fields['goal_description']+")"
                         }
                         else{
-                            taskname+="("+'{% trans 'no_goal' %}'+")"
+                            taskname+=" ("+'{% trans 'no_goal' %}'+")"
                         }
                         select.options.add(new Option(taskname,value.pk));
                     });
@@ -299,15 +402,48 @@
                 validating: 'glyphicon glyphicon-refresh'
             },
             fields: {
-                name: {
+                project_id: {
                     validators: {
                         notEmpty: {
-                            message: "{% trans 'projectNameNotNull' %}"
+                            message: "{% trans 'pls_select_project' %}"
                         },
                     }
                 },
-
-
+                department_id: {
+                    validators: {
+                        notEmpty: {
+                            message: "{% trans 'pls_select_department' %}"
+                        },
+                    }
+                },
+                task_id: {
+                    validators: {
+                        notEmpty: {
+                            message: "{% trans 'pls_select_task' %}"
+                        },
+                    }
+                },
+                duration: {
+                    validators: {
+                        numeric: {
+                            thousandsSeparator: '',
+                            decimalSeparator: '.',
+                            message: "{% trans 'invalid_number' %}",
+                        },
+                        notEmpty: {
+                            message: "{% trans 'invalid_number' %}"
+                        }
+                    }
+                },
+                produced_units: {
+                    validators: {
+                        numeric: {
+                            thousandsSeparator: '',
+                            decimalSeparator: '.',
+                            message: "{% trans 'invalid_number' %}",
+                        },
+                    }
+                },
             },
         });
     });

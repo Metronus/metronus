@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponseRedirect, JsonResponse, HttpResponseBadRequest
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.template.loader import render_to_string
+from django.http import HttpResponseRedirect, JsonResponse
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, SuspiciousOperation
 from django.db.models import Sum, F, FloatField
 from metronus_app.forms.departmentForm import DepartmentForm
 from metronus_app.model.department import Department
@@ -11,8 +12,9 @@ from metronus_app.model.task import Task
 from metronus_app.model.timeLog import TimeLog
 from datetime import date, timedelta, datetime
 import re
-
-
+from metronus_app.common_utils import (get_admin_executive_or_403,default_round,
+    get_actor_or_403, is_executive,same_company_or_403, get_highest_role_tier)
+from metronus_app.controllers.taskController import get_list_for_role as task_list
 def create(request):
     """
     parameters/returns:
@@ -24,7 +26,7 @@ def create(request):
     """
 
     # Check that the current user is an administrator
-    admin = check_department(None, request)
+    admin = get_admin_executive_or_403(request)
     repeated_name = False
 
     # if this is a POST request we need to process the form data
@@ -39,12 +41,7 @@ def create(request):
             dname = form.cleaned_data['name']
             dep = find_name(dname, admin)
             if dep is not None:
-                if not dep.active:
-                    dep.active = True
-                    dep.save()
-                    return HttpResponseRedirect('/department/view/'+str(dep.id)+"/")
-                else:
-                    repeated_name = True
+                repeated_name = True
             else:
                 department = create_department(form, admin)
                 return HttpResponseRedirect('/department/view/'+str(department.id)+"/")
@@ -69,7 +66,7 @@ def create_async(request):
     """
 
     # Check that the current user is an administrator
-    admin = check_department(None, request)
+    admin = get_admin_executive_or_403(request)
 
     data = {
         'repeated_name': False,
@@ -88,12 +85,7 @@ def create_async(request):
             dname = form.cleaned_data['name']
             dep = find_name(dname, admin)
             if dep is not None:
-                if not dep.active:
-                    dep.active = True
-                    dep.save()
-                    return JsonResponse(data)
-                else:
-                    data['repeated_name'] = True
+                data['repeated_name'] = True
             else:
                 create_department(form, admin)
                 return JsonResponse(data)
@@ -105,9 +97,7 @@ def create_async(request):
     data['success'] = False
     return JsonResponse(data)
 
-
 def list_departments(request):
-
     """
     returns:
     departments: lista de departamentos de la compañía logeada
@@ -118,8 +108,28 @@ def list_departments(request):
 
     # Check that the current user has permissions
     lista = get_list_for_role(request)
-    return render(request, "department/department_list.html", {"departments": lista})
+    departments = lista.filter(active=True)
+    deleted = lista.filter(active=False)
+    return render(request, "department/department_list.html",
+        {"departments": departments,"deleted":deleted})
 
+def list_departments_search(request,name):
+    """
+    returns:
+    departments: lista de departamentos de la compañía logeada
+
+    template:
+    department_list.html
+    """
+
+    # Check that the current user has permissions
+    departments = get_list_for_role(request).filter(active=True)
+
+    if name != "all_true":
+        departments = departments.filter(name__icontains=name)
+
+    return render(request, "department/department_search.html",
+        {"departments": departments})
 
 def view(request, department_id):
     """
@@ -136,15 +146,19 @@ def view(request, department_id):
     template: department_view.html
     """
     department = get_object_or_404(Department, pk=department_id)
-    check_department_for_fiew(department, request, True)
+    actor=check_department(department, request)
+    same_company_or_403(actor,department)
 
-    coordinator = get_coordinator(department)
-    tasks = Task.objects.filter(active=True, projectDepartment_id__department_id__id=department_id)
-    employees = Employee.objects.filter(
-        projectdepartmentemployeerole__projectDepartment_id__department_id=department).distinct()
+    coordinators = get_coordinator(department)
+    # DO NOT ORDER the tasks, otherwise, by some random reason, it wont filter properly
+    tasks = task_list(request).filter(projectDepartment_id__department_id=department).distinct()
+
+    employees = Employee.objects.filter(user__is_active=True,
+        projectdepartmentemployeerole__projectDepartment_id__department_id=department,
+        projectdepartmentemployeerole__role_id__tier__lte=40).distinct().order_by("user__first_name", "user__last_name")
 
     return render(request, 'department/department_view.html', {'department': department, 'employees': employees,
-                                                               'tasks': tasks, 'coordinator': coordinator})
+                                                               'tasks': tasks, 'coordinators': coordinators})
 
 
 def edit(request, department_id):
@@ -159,8 +173,11 @@ def edit(request, department_id):
     department_form.html
     """
 
-    # Check that the current user is an administrator
-    admin = check_department(None, request)
+    # Check that the current user is an administrator or executive
+    department = get_object_or_404(Department, pk=department_id)
+    admin = get_admin_executive_or_403(request)
+    same_company_or_403(admin,department)
+
     repeated_name = False
 
     # if this is a POST request we need to process the form data
@@ -172,7 +189,7 @@ def edit(request, department_id):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-            department = get_object_or_404(Department, pk=form.cleaned_data['department_id'])
+
 
             dep = find_name(form.cleaned_data['name'], admin)
             # dep does not exists or it's the same
@@ -180,8 +197,7 @@ def edit(request, department_id):
                 edit_department(department, form)
                 return HttpResponseRedirect('/department/view/'+str(department.id)+"/")
             else:
-                if dep.active:
-                    repeated_name = True
+                repeated_name = True
     # if a GET (or any other method) we'll create a blank form
     else:
         department = get_object_or_404(Department, pk=department_id)
@@ -202,11 +218,33 @@ def delete(request, department_id):
     template:
     deparment_list.html
     """
-    department = get_object_or_404(Department, pk=department_id)
+    department = get_object_or_404(Department, pk=department_id,active=True)
+    # Check that the current user is an administrator or executive
+    admin = get_admin_executive_or_403(request)
+    same_company_or_403(admin,department)
 
-    # Check that the current user is an administrator
-    check_department(department, request)
     delete_department(department)
+
+    return HttpResponseRedirect('/department/list')
+
+def recover(request, department_id):
+    """
+    url = department/recover/(department_id)/
+    parameters:
+    department_id: the department id to recover
+
+    returns:
+    nothing
+
+    template:
+    deparment_list.html
+    """
+    department = get_object_or_404(Department, pk=department_id,active=False)
+    # Check that the current user is an administrator or executive
+    admin = get_admin_executive_or_403(request)
+    same_company_or_403(admin,department)
+
+    recover_department(department)
 
     return HttpResponseRedirect('/department/list')
 
@@ -224,10 +262,13 @@ def ajax_employees_per_task(request):
     # department_id - ID del departamento
     """
     if "department_id" not in request.GET:
-        return HttpResponseBadRequest()
+        raise SuspiciousOperation
 
     department_id = request.GET["department_id"]
-    check_metrics_authorized_for_department(request.user, department_id)
+
+    department = get_object_or_404(Department, pk=department_id)
+    actor=check_department(department, request)
+    same_company_or_403(actor,department)
 
     dpmt_tasks = Task.objects.filter(active=True, projectDepartment_id__department_id__id=department_id)
 
@@ -258,10 +299,14 @@ def ajax_time_per_task(request):
     # Si se proporcionan pero no tienen el formato correcto se lanzará un error HTTP 400 Bad Request
     """
     if "department_id" not in request.GET:
-        return HttpResponseBadRequest()
+        raise SuspiciousOperation
 
     department_id = request.GET["department_id"]
-    check_metrics_authorized_for_department(request.user, department_id)
+
+    department = get_object_or_404(Department, pk=department_id)
+    actor=check_department(department, request)
+    same_company_or_403(actor,department)
+
 
     # Get and parse the dates and the offset
     start_date = request.GET.get("start_date", str(date.today() - timedelta(days=30)))
@@ -269,13 +314,13 @@ def ajax_time_per_task(request):
     date_regex = re.compile("^\d{4}-\d{2}-\d{2}$")
 
     if date_regex.match(start_date) is None or date_regex.match(end_date) is None:
-        return HttpResponseBadRequest("Start/end date are not valid")
+        raise SuspiciousOperation("Start/end date are not valid")
 
     offset = request.GET.get("offset", "+00:00")
     offset_regex = re.compile("^(\+|-)\d{2}:\d{2}$")
 
     if offset_regex.match(offset) is None:
-        return HttpResponseBadRequest("Time offset is not valid")
+        raise SuspiciousOperation("Time offset is not valid")
 
     # Append time offsets
     start_date += " 00:00" + offset
@@ -329,25 +374,27 @@ def ajax_profit_per_date(request, department_id):
     "expenses": [0, 1457.18015695298, 1614.1458826106, 1367.62026485911, 2026.87328274918, 1446.83842607798, 1878.80598163726, 1823.8647251497, 1879.3977160153, 1607.99448986952, 1615.72129910026, 1609.49391115067, 2513.94326680278, 2112.07014158364, 1360.67562490714, 1368.60590722518, 1603.92947753372, 1473.68308776497, 2343.40799525207, 1704.64596258349, 1938.38239104717, 1403.70478335668, 1372.6250345277, 1076.44946125988, 2353.7065671626, 1516.12119421768, 1611.60427318295, 1338.82219760799, 2525.26576799895, 1422.68356444232, 1765.66996904502]}  "expected_productivity": [9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 4.0, 4.0, 2.0, 2.0, 2.0]}}
     """
 
+    department = get_object_or_404(Department, pk=department_id)
+    actor=check_department(department, request)
+    same_company_or_403(actor,department)
+
     # Get and parse the dates
     start_date = request.GET.get("start_date", str(date.today() - timedelta(days=30)))
     end_date = request.GET.get("end_date", str(date.today()))
     date_regex = re.compile("^\d{4}-\d{2}-\d{2}$")
 
     if date_regex.match(start_date) is None or date_regex.match(end_date) is None:
-        return HttpResponseBadRequest("Start/end date are not valid")
+        raise SuspiciousOperation("Start/end date are not valid")
 
     offset = request.GET.get("offset", "+00:00")
     offset_regex = re.compile("^(\+|-)\d{2}:\d{2}$")
 
     if offset_regex.match(offset) is None:
-        return HttpResponseBadRequest("Time offset is not valid")
+        raise SuspiciousOperation("Time offset is not valid")
 
     # Append time offsets
     start_date += " 00:00" + offset
     end_date += " 00:00" + offset
-
-    check_metrics_authorized_for_department(request.user, department_id)
 
     # Get all dates between start and end
     dates = []
@@ -374,42 +421,29 @@ def ajax_profit_per_date(request, department_id):
         income = logs.aggregate(total_income=Sum(F("task_id__price_per_unit")*F("produced_units")))["total_income"]
         income = income if income is not None else 0
 
-        data['expenses'].append(expenses)
-        data['income'].append(income)
+        data['expenses'].append(default_round(expenses))
+        data['income'].append(default_round(income))
         if index == 0:
-            data['acumExpenses'].append(expenses)
-            data['acumIncome'].append(income)
+            data['acumExpenses'].append(default_round(expenses))
+            data['acumIncome'].append(default_round(income))
         else:
-            data['acumExpenses'].append(data['acumExpenses'][index-1]+expenses)
-            data['acumIncome'].append(data['acumIncome'][index-1]+income)
+            data['acumExpenses'].append(default_round(data['acumExpenses'][index-1]+expenses))
+            data['acumIncome'].append(default_round(data['acumIncome'][index-1]+income))
         index += 1
     return JsonResponse(data)
+
+def validate_name_ajax(request):
+    """
+    checks whether the department name is unique
+    """
+    name = request.GET.get("name")
+    is_taken = name and Department.objects.filter(name=name).exists()
+    return JsonResponse({'is_taken': is_taken})
 
 
 ##################################################################################################################
 # Auxiliar methods, containing the operation logic
 ##################################################################################################################
-
-
-def check_metrics_authorized_for_department(user, dpmt_id):
-    """Raises 403 if the current actor is not allowed to obtain metrics for the department"""
-    if not user.is_authenticated():
-        raise PermissionDenied
-
-    department = get_object_or_404(Department, active=True, id=dpmt_id)
-    logged = user.actor
-
-    # Check that the companies match
-    if logged.company_id != department.company_id:
-        raise PermissionDenied
-
-    if logged.user_type == 'E':
-        # If it's not an admin, check that it has role EXECUTIVE (50) or higher for any project in the department
-        try:
-            ProjectDepartmentEmployeeRole.objects.get(employee_id=logged, role_id__tier__gte=30,
-                                                      projectDepartment_id__department_id=department)
-        except ObjectDoesNotExist:
-            raise PermissionDenied
 
 
 def find_name(dname, admin):
@@ -435,104 +469,62 @@ def delete_department(department):
     department.active = False
     department.save()
 
-
-def check_department(dep, request):
-    """
-    this check department is only for creating, modifying or deleting
-    """
-    return check_department_for_fiew(dep, request, False)
+def recover_department(department):
+    """Recover a department"""
+    department.active = True
+    department.save()
 
 
-def check_department_for_fiew(dep, request, for_view):
+def check_department(department, request):
     """
     checks if the department belongs to the logged actor with appropiate roles
     Admin, manager or project manager
-    if forView is true, the coordinator has access too
     """
-    if not request.user.is_authenticated():
+
+    actor=get_actor_or_403(request)
+    highest=get_highest_role_tier(actor)
+    if highest>=50:
+        # Admins and executives can do everything
+        return actor
+    elif not department.active:
         raise PermissionDenied
-    try:
-        actor = Actor.objects.get(user=request.user)
-    except ObjectDoesNotExist:
-        raise PermissionDenied
+    elif ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+        projectDepartment_id__department_id=department,
+        role_id__tier__gte=20).exists():
+        # If it's for view, coordinators and greater can access too
+        return actor
 
-    # Check that the actor has permission to view the dep
-    if dep is not None and (dep.company_id != actor.company_id or not dep.active):
-        raise PermissionDenied
-
-    if actor.user_type != 'A':
-        is_team_manager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                                                                       role_id__tier=30)
-        res = is_team_manager.count() > 0
-
-        if not res:
-            if for_view:
-                roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                                                                     role_id__tier__in=[50, 40, 20])
-            else:
-                roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                                                                     role_id__tier__gte=40)
-            res = roles.count() > 0
-        if not res:
-            raise PermissionDenied
-
-    return actor
-
-
-def check_company_department_session(department, admin):
-    """
-    checks if the department belongs to the logged company
-    """
-    return check_company_department(department, admin.company_id)
-
-
-def check_company_department(department, company_id):
-    """
-    checks if the department belongs to the specified company
-    """
-    res = department is not None and company_id == department.company_id
-    if not res:
-        raise PermissionDenied
-    return res
+    # Otherwise GTFO
+    raise PermissionDenied
 
 
 def get_list_for_role(request):
     """
     Gets the list of departments according to the role tier of the logged user
     """
-    if not request.user.is_authenticated():
-        raise PermissionDenied
-    try:
-        actor = Actor.objects.get(user=request.user)
-    except ObjectDoesNotExist:
-        raise PermissionDenied
+    actor=get_actor_or_403(request)
 
-    if actor.user_type != 'A':
-        is_team_manager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                                                                       role_id__tier=30)
-        res = is_team_manager.count() > 0
+    # Admins and executives can do everything
 
-        if not res:
-            roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
-                                                                 role_id__tier__in=[50, 40, 20])
-            res = roles.count() > 0
-            if not res:
-                raise PermissionDenied
-            else:
-                departments = Department.objects.filter(
-                    projectdepartment__projectdepartmentemployeerole__employee_id=actor,
-                    company_id=actor.company_id, active=True)
-        else:
-            departments = Department.objects.filter(company_id=actor.company_id, active=True)
-    else:
-        departments = Department.objects.filter(company_id=actor.company_id, active=True)
+    if actor.user_type == "A" or is_executive(actor):
+        return Department.objects.filter(company_id=actor.company_id).distinct().order_by("name")
 
-    return departments
+    # If it's for view, coordinators and greater can access too
+    if ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+        role_id__tier__gte=20).exists():
+
+        return Department.objects.filter(
+                projectdepartment__projectdepartmentemployeerole__employee_id=actor,
+                projectdepartment__projectdepartmentemployeerole__role_id__tier__gte=20,
+                company_id=actor.company_id,active=True).distinct().order_by("name")
+
+    # Otherwise GTFO
+    raise PermissionDenied
 
 
 def get_coordinator(department):
     """
-    Gets the coordinator from a department(the first of them if there is many)
+    Gets the coordinators from a department
     """
     return Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__department_id=department,
-                                   projectdepartmentemployeerole__role_id__tier=20).first()
+                                   projectdepartmentemployeerole__role_id__tier=20).distinct().order_by("user__first_name","user__last_name")

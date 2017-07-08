@@ -36,7 +36,7 @@ class TimeLog2Form(forms.Form):
     workDate = forms.DateTimeField(label=_("workdate"), widget=forms.widgets.DateTimeInput(
                 attrs={'class': 'form-control'}))
     duration = forms.IntegerField(label=_("duration"), validators=[MinValueValidator(0)],
-                                  widget=forms.NumberInput(attrs={'class': 'form-control'}))
+                                  widget=forms.NumberInput(attrs={'class': 'form-control', 'step': 1}))
 
     timeLog_id = forms.IntegerField(widget=forms.HiddenInput())
 

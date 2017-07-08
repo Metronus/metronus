@@ -4,91 +4,194 @@
 {% load l10n %}
 
 {% block title %}{% trans 'employeeList' %}{% endblock %}
+{% load custom_tags %}
 
 {% block content %}
+<!-- EMPLEADOS ACTIVOS -->
 <div class="row">
-    <div class="col-xs-12">
-        <div class="x_panel">
-            <div class="x_title">
-                <h2>{% trans 'employeeList' %}</h2>
-                <div class="clearfix"></div>
-            </div>
-            <div class="x_content">
+  <div class="col-xs-12">
+    <div class="x_panel">
+      <div class="x_title">
+        <h2>{% trans 'employeeList' %}</h2>
+        <ul class="nav navbar-right panel_toolbox">
+          <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+        </ul>
+        <div class="clearfix"></div>
+      </div>
 
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th>{% trans 'username' %}</th>
-                            <th>{% trans 'identifier' %}</th>
-                            <th>{% trans 'phone' %}</th>
-                            <th class="hidden-xs">{% trans 'registryDate' %}</th>
-                            <th>{% trans 'actions' %}</th>
-                            <th class="hidden-xs"></th>
-                            <th class="hidden-xs"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for employee in employees %}
-                            <tr>
-                                <td>
-                                    {% if employee.picture %}
-                                        <img src="{{ MEDIA_URL }}{{employee.picture}}" alt="{{user.get_username}}" class="avatar" alt="IMG">
-                                    {% else %}
-                                        <img src="/static/avatar.png" alt="{{user.get_username}}" class="avatar" alt="IMG">
-                                    {% endif %}
-                                    {{employee.user}}
-                                </td>
-                                <td>{{employee.identifier}}</td>
-                                <td>{{employee.phone}}</td>
-                                <td class="hidden-xs">{{employee.registryDate}}</td>
+      <div class="x_content">
+      {% show_search_form 'employee' %}
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>{% trans 'username' %}</th>
+              <th class="hidden-xs">{% trans 'email' %}</th>
+              <th class="hidden-xs">{% trans 'phone' %}</th>
+              <th class="hidden-xs">{% trans 'registryDate' %}</th>
+              <th>{% trans 'actions' %}</th>
+              <th class="hidden-xs"></th>
+              <th class="hidden-xs"></th>
+            </tr>
+          </thead>
 
+          <tbody id="table_search">
+            {% for employee in employees %}
+            <tr>
+              <td>
+                {% if employee.picture %}
+                <img src="{{ MEDIA_URL }}{{employee.picture}}" alt="{{user.get_username}}" class="avatar" alt="IMG">
+                {% else %}
+                <img src="/static/avatar.png" alt="{{user.get_username}}" class="avatar" alt="IMG">
+                {% endif %}
+                &nbsp;
+                {{employee.user.first_name }} {{employee.user.last_name}}
+              </td>
+              <td class="hidden-xs">{{employee.user.email}}</td>
+              <td class="hidden-xs">{{employee.phone}}</td>
+              <td class="hidden-xs">{{employee.registryDate}}</td>
+              <td>
+                <a href="{% url 'employee_view' employee.user.username %}" type="button" class="btn btn-success">{% trans 'details' %}</a>
+              </td>
+              <td class="hidden-xs">
+                {% if actor_is_admin or actor_is_executive %}
+                  <a href="{% url 'employee_edit' employee.user.username %}" type="button" class="btn btn-dark">{% trans 'update' %}</a>
+                {% endif %}
+              </td>
+              <td class="hidden-xs">
+                {% if actor_is_admin or actor_is_executive %}
+                  <a href="#" class="btn btn-danger" data-href="{% url 'employee_delete' employee.user.username %}"
+                  data-toggle="modal" data-target="#confirm-delete">{% trans 'fire' %}</a>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
 
-                                <td>
-                                    <a href="{% url 'employee_view' employee.user.username %}" type="button" class="btn btn-success">
-                                    {% trans 'details' %}</a>
-                                </td>
-                                <td class="hidden-xs">
-                                    <a href="{% url 'employee_edit' employee.user.username %}" type="button" class="btn btn-dark">
-                                        {% trans 'update' %}</a>
-                                </td>
-                                <td class="hidden-xs">
-                                    <a href="#" class="btn btn-default" data-href="{% url 'employee_delete' employee.user.username %}"
-                                       data-toggle="modal" data-target="#confirm-delete">{% trans 'fire' %}</a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <div class="text-center">
-                <a class="btn btn-dark" href="{% url 'employee_create' %}">{% trans 'create' %}</a>
-            </div>
-        </div>
+      <div class="text-center">
+        {% if employees|length_is:"0"  %}
+        <h2>{% trans 'plsEmployee' %}</h2>
+        </br>
+        {% endif %}
+
+        {% if actor_is_admin or actor_is_executive %}
+          <a class="btn btn-dark" href="{% url 'employee_create' %}">{% trans 'create' %}</a>
+        {% endif %}
+      </div>
     </div>
+  </div>
 </div>
-
-
 
 <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">{% trans 'delete' %}</div>
-            <div class="modal-body">{% trans 'employeeConfirm' %}</div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'cancel' %}</button>
-                <a class="btn btn-danger btn-ok">{% trans 'delete' %}</a>
-            </div>
-        </div>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">{% trans 'delete' %}</div>
+      <div class="modal-body">{% trans 'employeeConfirm' %}</div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'cancel' %}</button>
+        <a class="btn btn-danger btn-ok">{% trans 'fire' %}</a>
+      </div>
     </div>
+  </div>
+</div>
+<!-- FIN EMPLEADOS ACTIVOS -->
+
+<!-- EMPLEADOS INACTIVOS -->
+{% if actor_is_admin or actor_is_executive %}
+{% if inactive|length > 0 %}
+<div class="row">
+  <div class="col-xs-12">
+    <div class="x_panel">
+      <div class="x_title">
+        <h2>{% trans 'employeeListInactive' %}</h2>
+        <ul class="nav navbar-right panel_toolbox">
+          <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+        </ul>
+        <div class="clearfix"></div>
+      </div>
+
+      <div class="x_content">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>{% trans 'username' %}</th>
+              <th>{% trans 'email' %}</th>
+              <th>{% trans 'phone' %}</th>
+              <th class="hidden-xs">{% trans 'registryDate' %}</th>
+              <th>{% trans 'actions' %}</th>
+              <th class="hidden-xs"></th>
+              <th class="hidden-xs"></th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for employee in inactive %}
+            <tr>
+              <td>
+                {% if employee.picture %}
+                <img src="{{ MEDIA_URL }}{{employee.picture}}" alt="{{user.get_username}}" class="avatar" alt="IMG">
+                {% else %}
+                <img src="/static/avatar.png" alt="{{user.get_username}}" class="avatar" alt="IMG">
+                {% endif %}
+                &nbsp;
+                {{employee.user.first_name }} {{employee.user.last_name}}
+              </td>
+              <td>{{employee.user.email}}</td>
+              <td>{{employee.phone}}</td>
+              <td class="hidden-xs">{{employee.registryDate}}</td>
+              <td>
+                  <a href="{% url 'employee_view' employee.user.username %}" type="button" class="btn btn-success">
+                  {% trans 'details' %}</a>
+              </td>
+              <td class="hidden-xs">
+                <a href="{% url 'employee_edit' employee.user.username %}" type="button" class="btn btn-dark">
+                  {% trans 'update' %}
+                </a>
+              </td>
+              <td class="hidden-xs">
+                <a href="#" class="btn btn-default" data-href="{% url 'employee_recover' employee.user.username %}"
+                  data-toggle="modal" data-target="#confirm-recover">{% trans 'recover' %}</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
 
-
+<div class="modal fade" id="confirm-recover" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">{% trans 'recover' %}</div>
+      <div class="modal-body">{% trans 'employeeRecoverConfirm' %}</div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'cancel' %}</button>
+        <a class="btn btn-danger btn-ok">{% trans 'recover' %}</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endif %}
+<!-- FIN EMPLEADOS INACTIVOS -->
 {% endblock %}
 
 {% block javascript %}
 <script>
-    $('#confirm-delete').on('show.bs.modal', function(e) {
-        $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
-    });
+$(function() {
+  $('#confirm-delete').on('show.bs.modal', function(e) {
+    $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+  });
+
+  $('#confirm-recover').on('show.bs.modal', function(e) {
+    $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+  });
+
+  autocollapse();
+});
+
 </script>
 {% endblock %}

@@ -11,6 +11,7 @@ from metronus_app.model.projectDepartment             import ProjectDepartment
 from metronus_app.model.goalEvolution             import GoalEvolution
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 from django.db                                        import transaction
+
 @transaction.atomic
 def basic_load():
     """
@@ -302,7 +303,7 @@ def populate_roles():
     # El jefe de proyecto
     Role.objects.create(name="PROJECT_MANAGER", tier=40)
     # El jefe de equipo
-    Role.objects.create(name="TEAM_MANAGER", tier=30)
+    Role.objects.create(name="TEAM_MANAGER", tier=15)
     # El coordinador del departamento
     Role.objects.create(name="COORDINATOR", tier=20)
     # El empleado

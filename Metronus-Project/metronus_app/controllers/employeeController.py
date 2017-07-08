@@ -1,17 +1,19 @@
 from django.contrib.auth.models import User
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
-from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseRedirect, JsonResponse
+from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.utils.translation import ugettext_lazy
-from django.db.models import Sum, F, FloatField
+from django.db.models import Sum, F, FloatField, Q, Value as V
 from django.contrib.auth.decorators import login_required
-
+from django.db.models.functions import Concat
 from metronus_app.forms.employeeRegisterForm import EmployeeRegisterForm
 from metronus_app.forms.employeeEditForm import EmployeeEditForm
 from metronus_app.forms.employeePasswordForm import EmployeePasswordForm
 from metronus_app.model.employee import Employee
 from metronus_app.model.project import Project
+from metronus_app.model.projectDepartment import ProjectDepartment
+from metronus_app.model.department import Department
 from metronus_app.model.employeeLog import EmployeeLog
 from metronus_app.model.task import Task
 from metronus_app.model.goalEvolution import GoalEvolution
@@ -20,8 +22,9 @@ from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEm
 from django.core import serializers
 from django.http import HttpResponse
 
-from metronus_app.common_utils import (get_current_admin_or_403, check_image, get_current_employee_or_403, send_mail,
-                                       is_email_unique, is_username_unique, get_authorized_or_403)
+from metronus_app.common_utils import (is_role_updatable_by_user, check_image, send_mail,
+                                       is_email_unique, is_username_unique, get_authorized_or_403,default_round,
+                                       validate_pass,get_highest_role_tier,get_actor_or_403, get_admin_executive_or_403,same_company_or_403)
 from datetime import date, timedelta, datetime
 import re
 
@@ -48,7 +51,7 @@ def create(request):
     """
 
     # Check that the user is logged in and it's an administrator
-    admin = get_authorized_or_403(request)
+    admin = get_admin_executive_or_403(request)
 
     # If it's a GET request, return an empty form
     if request.method == "GET":
@@ -65,6 +68,10 @@ def create(request):
             # Check that the passwords match
             if not check_passwords(form):
                 errors.append('employeeCreation_passwordsDontMatch')
+
+            #Check password validation
+            if not validate_pass(form.cleaned_data["password1"]):
+                errors.append('newPasswordInvalid')
 
             # Check that the username is unique
             if not is_username_unique(form.cleaned_data["username"]):
@@ -89,11 +96,8 @@ def create(request):
                 EmployeeLog.objects.create(employee_id=employee, event="A", price_per_hour=employee.price_per_hour)
                 send_register_email(form.cleaned_data["email"], form.cleaned_data["first_name"])
 
-                if "redirect" in request.GET:  # Redirect to the created employee
-                    return HttpResponseRedirect('/employee/view/' + form.cleaned_data["username"] + '/')
-                else:  # Return a new form
-                    return render(request, 'employee/employee_register.html',
-                                  {'form': EmployeeRegisterForm(), 'success': True})
+                return HttpResponseRedirect('/employee/view/' + form.cleaned_data["username"] + '/')
+
             else:
                 # There are errors
                 return render(request, 'employee/employee_register.html', {'form': form, 'errors': errors})
@@ -106,6 +110,78 @@ def create(request):
         # Another request method
         raise PermissionDenied
 
+def create_async(request):
+    """
+    parameters:
+        redirect: opcional, incluir en la URL de la petición si se quiere redirigir a la página del empleado creado
+    returns:
+        form: formulario con los datos necesarios para el registro del empleado
+        success: opcional, si se ha tenido éxito al crear un empleado
+        errors: opcional, array de mensajes de error si ha habido algún error
+
+    errores: (todos empiezan por employeeCreation_)
+        passwordsDontMatch: las contraseñas no coinciden
+        usernameNotUnique: el nombre de usuario ya existe
+        imageNotValid: la imagen no es válida por formato y/o tamaño
+        formNotValid: el formulario contiene errores
+        priceNotValid: el precio debe ser mayor que 0
+        emailNotUnique:si el correo no es úinco
+
+    template:
+        employee_register.html
+    """
+
+    # Check that the user is logged in and it's an administrator
+    admin = get_admin_executive_or_403(request)
+    errors = []
+    data = {
+        'success': True
+    }
+    if request.method == "POST":
+        # We are serving a POST request
+        form = EmployeeRegisterForm(request.POST, request.FILES)
+        if form.is_valid():
+            # Check that the passwords match
+            if not check_passwords(form):
+                errors.append('employeeCreation_passwordsDontMatch')
+
+            #Check password validation
+            if not validate_pass(form.cleaned_data["password1"]):
+                errors.append('newPasswordInvalid')
+
+            # Check that the username is unique
+            if not is_username_unique(form.cleaned_data["username"]):
+                errors.append('employeeCreation_usernameNotUnique')
+
+            # Check that the email is unique
+            if not is_email_unique(form.cleaned_data["email"]):
+                errors.append('employeeCreation_emailNotUnique')
+
+            # Check that the image is OK
+            if not check_image(form, 'photo'):
+                errors.append('employeeCreation_imageNotValid')
+
+            # Check that the price is OK
+            if form.cleaned_data['price_per_hour'] <= 0:
+                errors.append('employeeCreation_priceNotValid')
+
+            if not errors:
+                # Everything is OK, create the employee
+                employee_user = create_employee_user(form)
+                employee = create_employee(employee_user, admin, form)
+                EmployeeLog.objects.create(employee_id=employee, event="A", price_per_hour=employee.price_per_hour)
+                send_register_email(form.cleaned_data["email"], form.cleaned_data["first_name"])
+
+                return JsonResponse(data)
+
+        # Form is not valid
+        else:
+            errors.append('employeeCreation_formNotValid')
+
+
+    data['success'] = False
+    data['errors'] = errors
+    return JsonResponse(data)
 
 def list_employees(request):
     """
@@ -116,10 +192,31 @@ def list_employees(request):
     """
 
     # Check that the user is logged in and it's an administrator
-    admin = get_authorized_or_403(request)
-    employees = Employee.objects.filter(company_id=admin.company_id, user__is_active=True)
-    return render(request, 'employee/employee_list.html', {'employees': employees})
+    employees = get_list_for_role(request)
+    active = employees.filter(user__is_active = True)
+    inactive = employees.filter(user__is_active = False)
+    return render(request, 'employee/employee_list.html',
+            {'employees': active, 'inactive' : inactive})
 
+def list_employees_search(request,name):
+    """
+    parameters/returns:
+    employees: lista de objetos employee a los que tiene acceso el administrador (los que están en su empresa)
+
+    template: employee_list.html
+    """
+
+    # Check that the current user has permissions
+    lista = get_list_for_role(request)
+    if name != "all_true":
+        #little opt just if not empty
+        lista=lista.annotate(
+                search_name=Concat('user__first_name', V(' '), 'user__last_name')
+                ).filter(search_name__icontains=name)
+    employees = lista.filter(user__is_active=True)
+
+    return render(request, "employee/employee_search.html",
+        {"employees": employees})
 
 def view(request, username):
     """
@@ -133,32 +230,17 @@ def view(request, username):
     """
 
     # Check that the user is logged in and it's an administrator
-    try:
-        logged = get_current_admin_or_403(request)
-    except PermissionDenied:
-        logged = get_current_employee_or_403(request)
-    employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
+    logged = get_authorized_or_403(request)
+    employee = get_object_or_404(Employee, user__username=username)
 
     # Check that the admin has permission to view that employee
-    if employee.company_id != logged.company_id:
-        raise PermissionDenied
+    same_company_or_403(employee, logged)
 
-    employee_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee)
+    employee_roles=check_higher_roles(logged,employee)
 
-    #Check the logged's roles are greater than this for at least one project
-    if logged.user_type=="E":
-        my_roles=ProjectDepartmentEmployeeRole.objects.filter(employee_id=logged)
-        authorized=my_roles.exists()
-        if authorized:
-            for role in my_roles:
-                if ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee,
-                  projectDepartment_id=role.projectDepartment_id, role_id__tier__lt=role.role_id.tier).exists():
-                    authorized=True
-                    break
+    is_editable_role = {role.id: is_role_updatable_by_user(logged, role.id) for role in employee_roles}
 
-        if not authorized:
-            raise PermissionDenied
-    return render(request, 'employee/employee_view.html', {'employee': employee, 'employee_roles': employee_roles})
+    return render(request, 'employee/employee_view.html', {'employee': employee, 'employee_roles': employee_roles, 'is_editable_role': is_editable_role})
 
 
 def edit(request, username):
@@ -175,12 +257,11 @@ def edit(request, username):
     """
 
     # Check that the user is logged in and it's an administrator
-    admin = get_authorized_or_403(request)
-    employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
+    admin = get_admin_executive_or_403(request)
+    employee = get_object_or_404(Employee, user__username=username)
 
     # Check that the admin has permission to view that employee
-    if employee.company_id != admin.company_id:
-        raise PermissionDenied
+    same_company_or_403(admin, employee)
 
     if request.method == "GET":
         # Return a form filled with the employee's data
@@ -193,7 +274,7 @@ def edit(request, username):
             'price_per_hour': employee.price_per_hour
         })
 
-        return render(request, 'employee/employee_edit.html', {'form': form})
+        return render(request, 'employee/employee_edit.html', {'form': form, 'picture': employee.picture,'username':username, 'pass_form': EmployeePasswordForm(), 'active':employee.user.is_active})
 
     elif request.method == "POST":
         # Process the received form
@@ -208,6 +289,10 @@ def edit(request, username):
             # Check that the image is OK
             if not check_image(form, 'photo'):
                 errors.append('employeeCreation_imageNotValid')
+
+            # Check that the email is unique
+            if not is_email_unique(form.cleaned_data["email"]) and employee.user.email != form.cleaned_data["email"]:
+                errors.append('employeeCreation_emailNotUnique')
 
             if not errors:
                 # Update employee data
@@ -236,12 +321,14 @@ def edit(request, username):
                 return HttpResponseRedirect('/employee/view/' + username + '/')
             else:
                 # There are errors
-                return render(request, 'employee/employee_edit.html', {'form': form, 'errors': errors})
+                return render(request, 'employee/employee_edit.html', {'form': form, 'errors': errors, 'picture': employee.picture,'username':username,
+                                                                       'pass_form': EmployeePasswordForm(), 'active':employee.user.is_active})
 
         else:
             # Form is not valid
-            return render(request, 'employee/employee_edit.html', {'form': form,
-                                                                   'errors': ['employeeCreation_formNotValid']})
+            return render(request, 'employee/employee_edit.html', {'form': form, 'picture': employee.picture,
+                                                                   'errors': ['employeeCreation_formNotValid'],'username':username,
+                                                                    'pass_form': EmployeePasswordForm(), 'active':employee.user.is_active})
     else:
         raise PermissionDenied
 
@@ -265,12 +352,11 @@ def update_password(request, username):
     """
 
     # Check that the user is logged in and it's an administrator
-    admin = get_authorized_or_403(request)
+    admin = get_admin_executive_or_403(request)
     employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
 
     # Check that the admin has permission to view that employee
-    if employee.company_id != admin.company_id:
-        raise PermissionDenied
+    same_company_or_403(admin, employee)
 
     if request.method == 'POST':
         # Process the form
@@ -280,18 +366,27 @@ def update_password(request, username):
             pass1 = form.cleaned_data["newpass1"]
             pass2 = form.cleaned_data["newpass2"]
 
+            # Check password validation
+            if not validate_pass(pass1):
+                return JsonResponse({'success': False, 'errors': ['newPasswordInvalid']})
+
             if pass1 != pass2:
                 return JsonResponse({'success': False, 'errors': ['employeeCreation_passwordsDontMatch']})
 
             user = employee.user
             user.set_password(pass1)
             user.save()
-            notify_password_change(user.email, user.first_name)
+
+            if form.cleaned_data["send_password_notification"]:
+                notify_password_change(user.email, user.first_name, newpass=pass1, notifynewpass=form.cleaned_data["notify_new_pass"])
 
             return JsonResponse({'success': True, 'errors': []})
         else:
             # Invalid form
             return JsonResponse({'success': False, 'errors': ['employeeCreation_formNotValid']})
+    else:
+        # Invalid HTTP operation
+        raise SuspiciousOperation
 
 
 def delete(request, username):
@@ -304,18 +399,40 @@ def delete(request, username):
     template: ninguna
     """
 
-    admin = get_authorized_or_403(request)
+    admin = get_admin_executive_or_403(request)
     employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
 
-    # Check that the admin has permission to edit that employee
-    if employee.company_id != admin.company_id:
-        raise PermissionDenied
+    # Check that the admin has permission to view that employee
+    same_company_or_403(admin, employee)
 
     employee_user = employee.user
     employee_user.is_active = False
     employee_user.save()
 
     EmployeeLog.objects.create(employee_id=employee, event="B", price_per_hour=employee.price_per_hour)
+    return HttpResponseRedirect('/employee/list')
+
+def recover(request, username):
+    """
+    url = employee/recover/<username>
+
+    parameters/returns:
+    Nada, redirecciona a la vista de listado de empleados
+
+    template: ninguna
+    """
+
+    admin = get_admin_executive_or_403(request)
+    employee = get_object_or_404(Employee, user__username=username, user__is_active=False)
+
+     # Check that the admin has permission to view that employee
+    same_company_or_403(admin, employee)
+
+    employee_user = employee.user
+    employee_user.is_active = True
+    employee_user.save()
+
+    EmployeeLog.objects.create(employee_id=employee, event="A", price_per_hour=employee.price_per_hour)
     return HttpResponseRedirect('/employee/list')
 
 
@@ -334,15 +451,17 @@ def ajax_productivity_per_task(request, username):
     #{"3": {"total_productivity": 0.7125, "expected_productivity": 2.0, "name": "Hacer cosas de front"}}
     """
     # Check that the user is logged in and it's an administrator or with permissions
-    try:
-        logged = get_authorized_or_403(request)
-    except PermissionDenied:
-        logged = get_current_employee_or_403(request)
+
+    logged = get_authorized_or_403(request)
+
+    # Check that it's at least PM
+    if get_highest_role_tier(logged) < 40:
+        raise PermissionDenied
+
     employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
 
-    # Check the company is the same for logged and the searched employee
-    if employee.company_id != logged.company_id:
-        raise PermissionDenied
+     # Check that the admin has permission to view that employee
+    same_company_or_403(logged, employee)
 
     # Find tasks with timelog in date range and annotate the sum of the production and time
     tasks = Task.objects.filter(active=True, projectDepartment_id__projectdepartmentemployeerole__employee_id=employee,
@@ -402,28 +521,29 @@ def ajax_productivity_per_task_and_date(request, username):
     date_regex = re.compile("^\d{4}-\d{2}-\d{2}$")
 
     if date_regex.match(start_date) is None or date_regex.match(end_date) is None:
-        return HttpResponseBadRequest("Start/end date are not valid")
+        raise SuspiciousOperation("Start/end date are not valid")
 
     offset = request.GET.get("offset", "+00:00")
     offset_regex = re.compile("^(\+|-)\d{2}:\d{2}$")
 
     if offset_regex.match(offset) is None:
-        return HttpResponseBadRequest("Time offset is not valid")
+        raise SuspiciousOperation("Time offset is not valid")
 
     # Append time offsets
     start_date += " 00:00" + offset
     end_date += " 00:00" + offset
 
     # Check that the user is logged in and it's an administrator or with permissions
-    try:
-        logged = get_authorized_or_403(request)
-    except PermissionDenied:
-        logged = get_current_employee_or_403(request)
+    logged = get_authorized_or_403(request)
+
+    # Check that it's at least PM
+    if get_highest_role_tier(logged) < 40:
+        raise PermissionDenied
+
     employee = get_object_or_404(Employee, user__username=username, user__is_active=True)
 
-    # Check the company is the same for logged and the searched employee
-    if employee.company_id != logged.company_id:
-        raise PermissionDenied
+     # Check that the admin has permission to view that employee
+    same_company_or_403(logged, employee)
 
     task_id = request.GET.get("task_id")
     # Find task with id requested
@@ -431,7 +551,7 @@ def ajax_productivity_per_task_and_date(request, username):
                                projectDepartment_id__projectdepartmentemployeerole__employee_id=employee,
                                production_goal__isnull=False).distinct().first()
     if task is None:
-        return HttpResponseBadRequest("The task could not be found")
+        raise SuspiciousOperation("The task could not be found")
 
     # Get all dates between start and end
     dates = []
@@ -455,6 +575,7 @@ def ajax_productivity_per_task_and_date(request, username):
         if log is None:
             # He did not work that day
             total_productivity = 0
+            total_duration=0
         else:
             total_produced_units = log.produced_units
             total_duration = log.duration
@@ -469,13 +590,16 @@ def ajax_productivity_per_task_and_date(request, username):
                                                              registryDate__gte=log_date).first()
 
         # If we do not find the goal or if the date is after the last task update, it may be the current task goal
-        if expected_productivity is None or task.registryDate <= log_date:
-            expected_productivity = task.production_goal
+        if total_duration==0:
+            expected_productivity=0
         else:
-            expected_productivity = expected_productivity.production_goal
+            if expected_productivity is None or task.registryDate <= log_date:
+                expected_productivity = task.production_goal
+            else:
+                expected_productivity = expected_productivity.production_goal
 
-        data["task"]["real_productivity"].append(total_productivity)
-        data["task"]["expected_productivity"].append(expected_productivity)
+        data["task"]["real_productivity"].append(default_round(total_productivity))
+        data["task"]["expected_productivity"].append(default_round(expected_productivity))
 
     return JsonResponse(data)
 
@@ -506,6 +630,18 @@ def ajax_profit_per_date(request, employee_id):
     "income": [0, 155861.848663544, 106596.060817813, 133996.946277026, 176182.618433908, 130780.529090679, 185712.238665422, 168691.006425482, 201528.027548702, 133961.680656505, 146130.652317868, 160978.773806858, 254646.651869028, 232419.619341417, 113043.655527752, 128847.7293944, 186411.255163309, 126824.943128807, 261600.084774754, 200811.161504088, 158938.293244699, 188362.131387002, 166524.276102895, 114811.676076952, 210347.838939301, 115268.666410966, 126145.268594169, 131910.452677469, 274896.663475654, 127528.492837469, 177974.319716889],
     "expenses": [0, 1457.18015695298, 1614.1458826106, 1367.62026485911, 2026.87328274918, 1446.83842607798, 1878.80598163726, 1823.8647251497, 1879.3977160153, 1607.99448986952, 1615.72129910026, 1609.49391115067, 2513.94326680278, 2112.07014158364, 1360.67562490714, 1368.60590722518, 1603.92947753372, 1473.68308776497, 2343.40799525207, 1704.64596258349, 1938.38239104717, 1403.70478335668, 1372.6250345277, 1076.44946125988, 2353.7065671626, 1516.12119421768, 1611.60427318295, 1338.82219760799, 2525.26576799895, 1422.68356444232, 1765.66996904502]}  "expected_productivity": [9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 4.0, 4.0, 2.0, 2.0, 2.0]}}
     """
+    logged = get_authorized_or_403(request)
+
+    # Check that it's at least PM
+    if get_highest_role_tier(logged) < 40:
+        raise PermissionDenied
+
+    employee = get_object_or_404(Employee, pk=employee_id)
+
+    # Check that the admin has permission to view that employee
+    same_company_or_403(employee, logged)
+
+    check_higher_roles(logged, employee)
 
     # Get and parse the dates
     start_date = request.GET.get("start_date", str(date.today() - timedelta(days=30)))
@@ -513,19 +649,18 @@ def ajax_profit_per_date(request, employee_id):
     date_regex = re.compile("^\d{4}-\d{2}-\d{2}$")
 
     if date_regex.match(start_date) is None or date_regex.match(end_date) is None:
-        return HttpResponseBadRequest("Start/end date are not valid")
+        raise SuspiciousOperation("Start/end date are not valid")
 
     offset = request.GET.get("offset", "+00:00")
     offset_regex = re.compile("^(\+|-)\d{2}:\d{2}$")
 
     if offset_regex.match(offset) is None:
-        return HttpResponseBadRequest("Time offset is not valid")
+        raise SuspiciousOperation("Time offset is not valid")
 
     # Append time offsets
     start_date += " 00:00" + offset
     end_date += " 00:00" + offset
 
-    check_metrics_authorized_for_employee(request.user, employee_id)
     # Get all dates between start and end
     dates = []
     str_dates = []
@@ -554,14 +689,14 @@ def ajax_profit_per_date(request, employee_id):
                                 )["total_income"]
         income = income if income is not None else 0
 
-        data['expenses'].append(expenses)
-        data['income'].append(income)
+        data['expenses'].append(default_round(expenses))
+        data['income'].append(default_round(income))
         if index == 0:
-            data['acumExpenses'].append(expenses)
-            data['acumIncome'].append(income)
+            data['acumExpenses'].append(default_round(expenses))
+            data['acumIncome'].append(default_round(income))
         else:
-            data['acumExpenses'].append(data['acumExpenses'][index - 1] + expenses)
-            data['acumIncome'].append(data['acumIncome'][index - 1] + income)
+            data['acumExpenses'].append(default_round(data['acumExpenses'][index - 1] + expenses))
+            data['acumIncome'].append(default_round(data['acumIncome'][index - 1] + income))
         index += 1
     return JsonResponse(data)
 
@@ -593,19 +728,23 @@ def ajax_profit_per_date_in_project(request, employee_id, project_id):
     "expenses": [0, 1457.18015695298, 1614.1458826106, 1367.62026485911, 2026.87328274918, 1446.83842607798, 1878.80598163726, 1823.8647251497, 1879.3977160153, 1607.99448986952, 1615.72129910026, 1609.49391115067, 2513.94326680278, 2112.07014158364, 1360.67562490714, 1368.60590722518, 1603.92947753372, 1473.68308776497, 2343.40799525207, 1704.64596258349, 1938.38239104717, 1403.70478335668, 1372.6250345277, 1076.44946125988, 2353.7065671626, 1516.12119421768, 1611.60427318295, 1338.82219760799, 2525.26576799895, 1422.68356444232, 1765.66996904502]}  "expected_productivity": [9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 4.0, 4.0, 2.0, 2.0, 2.0]}}
     """
 
+    # Check that it's at least PM
+    if get_highest_role_tier(request.user.actor) < 40:
+        raise PermissionDenied
+
     # Get and parse the dates
     start_date = request.GET.get("start_date", str(date.today() - timedelta(days=30)))
     end_date = request.GET.get("end_date", str(date.today()))
     date_regex = re.compile("^\d{4}-\d{2}-\d{2}$")
 
     if date_regex.match(start_date) is None or date_regex.match(end_date) is None:
-        return HttpResponseBadRequest("Start/end date are not valid")
+        raise SuspiciousOperation("Start/end date are not valid")
 
     offset = request.GET.get("offset", "+00:00")
     offset_regex = re.compile("^(\+|-)\d{2}:\d{2}$")
 
     if offset_regex.match(offset) is None:
-        return HttpResponseBadRequest("Time offset is not valid")
+        raise SuspiciousOperation("Time offset is not valid")
 
     # Append time offsets
     start_date += " 00:00" + offset
@@ -641,11 +780,11 @@ def ajax_profit_per_date_in_project(request, employee_id, project_id):
                                 )["total_income"]
         income = income if income is not None else 0
 
-        data['expenses'].append(expenses)
-        data['income'].append(income)
+        data['expenses'].append(default_round(expenses))
+        data['income'].append(default_round(income))
         if index == 0:
-            data['acumExpenses'].append(expenses)
-            data['acumIncome'].append(income)
+            data['acumExpenses'].append(default_round(expenses))
+            data['acumIncome'].append(default_round(income))
         else:
             data['acumExpenses'].append(data['acumExpenses'][index - 1] + expenses)
             data['acumIncome'].append(data['acumIncome'][index - 1] + income)
@@ -664,30 +803,50 @@ def ajax_get_employee_projects(employee_id):
 ########################################################################################################################
 ########################################################################################################################
 
-def check_metrics_authorized_for_employee(user, employee_id):
-    """Raises 403 if the current actor is not allowed to obtain metrics for the department"""
-    if not user.is_authenticated():
+def check_higher_roles(logged, employee):
+    """Raises 403 if the current actor has lower roles than the one to be shown"""
+
+    highest=get_highest_role_tier(logged)
+
+    employee_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee)
+
+    if highest>=50:
+        #admin or executive can do everything
+        return employee_roles
+    elif not employee.user.is_active:
+        #not admin nor executive, if inactive get out
         raise PermissionDenied
+    else:
+        # Check the logged's roles are greater than this for at least one project
+        my_roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=logged,role_id__tier__gte=20)
+        authorized = False
+        for role in my_roles:
+            if role.role_id.tier>=40:
+                involved_deps=Department.objects.filter(
+                    projectdepartment__project_id=role.projectDepartment_id.project_id
+                    ).distinct()
+                if ProjectDepartmentEmployeeRole.objects.filter(
+                            employee_id=employee,
+                            projectDepartment_id__department_id__in=involved_deps
+                            ).exists():
+                    authorized = True
+                    break
+            elif ProjectDepartmentEmployeeRole.objects.filter(
+                            employee_id=employee,
+                            projectDepartment_id__department_id=role.projectDepartment_id.department_id
+                            ).exists():
+                authorized = True
+                break
 
-    employee = get_object_or_404(Employee, id=employee_id)
-    logged = user.actor
+        if not authorized:
+            raise PermissionDenied
 
-    # Check that the companies match
-    if logged.company_id != employee.company_id:
-        raise PermissionDenied
-
+        return employee_roles
 
 def check_metrics_authorized_for_employee_in_project(user, employee_id, project_id):
     """
     Raises 403 if the current actor is not allowed to obtain metrics for the department
 
-    Optional at the end:
-    if logged.user_type == 'E'
-        If it's not an admin, check that it has role EXECUTIVE (50) or higher for any project in the department
-        try
-            ProjectDepartmentEmployeeRole.objects.get(employee_id=logged, role_id__tier__gte=50, projectDepartment_id__project_id=project)
-        except ObjectDoesNotExist:
-            raise PermissionDenied
     """
     if not user.is_authenticated():
         raise PermissionDenied
@@ -696,15 +855,11 @@ def check_metrics_authorized_for_employee_in_project(user, employee_id, project_
     project = get_object_or_404(Project, id=project_id)
     logged = user.actor
 
-    # Check that the companies match
-    if logged.company_id != employee.company_id:
-        raise PermissionDenied
+     # Check that the admin has permission to view that employee
+    same_company_or_403(logged, employee)
 
-    if logged.company_id != project.company_id:
-        raise PermissionDenied
-
-    if employee.company_id != project.company_id:
-        raise PermissionDenied
+     # Check that the admin has permission to view that employee
+    same_company_or_403(logged, project)
 
 
 def create_employee_user(form):
@@ -738,11 +893,11 @@ def check_passwords(form):
     return form.cleaned_data['password1'] == form.cleaned_data['password2']
 
 
-def notify_password_change(email, name):
+def notify_password_change(email, name, newpass=None, notifynewpass=False):
     """Notifies a password change to someone by sending them an email"""
-    send_mail(ugettext_lazy("register_changepw_subject"),
+    send_mail(ugettext_lazy("changepw_mail_subject"),
               "employee/employee_changepw_email.html", [email], "employee/employee_changepw_email.html",
-              {'html': True, 'employee_name': name})
+              {'html': True, 'employee_name': name, 'newpass': newpass, 'notifynewpass': notifynewpass})
 
 
 def send_register_email(email, name):
@@ -750,3 +905,16 @@ def send_register_email(email, name):
     send_mail(ugettext_lazy("register_mail_subject"),
               "employee/employee_register_email.html", [email], "employee/employee_register_email.html",
               {'html': True, 'employee_name': name})
+
+def get_list_for_role(request):
+    """
+    Gets the list of employees according to the role tier of the logged user
+    """
+
+    actor=get_actor_or_403(request)
+    highest=get_highest_role_tier(actor)
+
+    if highest>=50:
+        return Employee.objects.filter(company_id=actor.company_id).distinct().order_by("user__first_name","user__last_name")
+    else:
+        raise PermissionDenied

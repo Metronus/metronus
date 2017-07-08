@@ -14,9 +14,8 @@ from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from metronus_app.common_utils import (get_current_admin_or_403, check_image, send_mail, is_email_unique,
-                                       get_or_none, is_username_unique, is_cif_unique)
-from django.core.exceptions import PermissionDenied
-
+                                       get_or_none, is_username_unique, is_cif_unique, is_company_email_unique,validate_pass)
+from django.core.exceptions import PermissionDenied, SuspiciousOperation
 
 def create(request,
            email_template_name='company/company_register_email.html',
@@ -38,11 +37,20 @@ def create(request,
 
             # Check that the passwords match
             if not check_passwords(form):
-                errors.append('companyRegister_passwordsDontMatch')
+                errors.append('passwordsDontMatch')
 
             # Check that the username is unique
             if not is_username_unique(form.cleaned_data["username"]):
                 errors.append('companyRegister_usernameNotUnique')
+            
+            #Check password validation
+            if not validate_pass(form.cleaned_data["password"]):
+                errors.append('newPasswordInvalid')
+
+
+            # Check that the admin email is unique
+            if Company.objects.filter(email=form.cleaned_data["company_email"]).exists():
+                errors.append('companyRegister_companyEmailNotUnique')
 
             # Check that the admin email is unique
             if not is_email_unique(form.cleaned_data["admin_email"]):
@@ -52,9 +60,16 @@ def create(request,
             if not is_cif_unique(form.cleaned_data["cif"]):
                 errors.append('companyRegister_cifNotUnique')
 
+            # Check that the short name is unique
+            if get_or_none(Company, short_name=form.cleaned_data["short_name"]):
+                errors.append('company_short_name_duplicate')
+
             # Check that the image is OK
             if not check_image(form, 'logo'):
-                errors.append('companyRegister_imageNotValid')
+                errors.append('company_imageNotValid')
+
+            if not form.cleaned_data["terms_agree"]:
+                errors.append("agree_terms_error")
 
             if not errors:
                 # process the data in form.cleaned_data as required
@@ -110,7 +125,7 @@ def edit(request):
 
     # Check that the user is logged in and it's an administrator
     admin = get_current_admin_or_403(request)
-    company = get_object_or_404(Company, cif=admin.company_id.cif)
+    company = admin.company_id
 
     if request.method == "GET":
         # Return a form filled with the employee's data
@@ -124,7 +139,16 @@ def edit(request):
 
         form = CompanyForm(request.POST, request.FILES)
         if form.is_valid():
-            if check_image(form, 'logo'):
+            errors = []
+
+            # Check that the image is OK
+            if not check_image(form, 'logo'):
+                errors.append('company_imageNotValid')
+            # Check that the company email is unique
+            if Company.objects.filter(email=form.cleaned_data["company_email"]).exists() and company.email!=form.cleaned_data["company_email"]:
+                errors.append('companyRegister_companyEmailNotUnique')
+
+            if not errors:
                 # Company data
                 company.visible_short_name = form.cleaned_data["visible_short_name"]
                 company.email = form.cleaned_data["company_email"]
@@ -139,12 +163,12 @@ def edit(request):
 
                 return HttpResponseRedirect('/company/view/')
             else:
-                return render(request, 'company/company_edit.html', {'form': form, 'errors': ['error.imageNotValid']})
+                return render(request, 'company/company_edit.html', {'form': form, 'errors': errors, 'logo': company.logo})
 
     else:
         raise PermissionDenied
 
-    return render(request, 'company/company_edit.html', {'form': form})
+    return render(request, 'company/company_edit.html', {'form': form, 'logo': company.logo})
 
 
 @login_required
@@ -162,7 +186,7 @@ def view(request):
 
     # Check that the user is logged in and it's an administrator
     admin = get_current_admin_or_403(request)
-    company = get_object_or_404(Company, cif=admin.company_id.cif)
+    company = admin.company_id
 
     return render(request, 'company/company_view.html', {'company': company, 'admin': admin})
 
@@ -179,7 +203,7 @@ def delete(request):
     """
     # Check that the user is logged in and it's an administrator
     admin = get_current_admin_or_403(request)
-    company = get_object_or_404(Company, pk=admin.company_id)
+    company = admin.company_id
 
     # Check that the admin has permission to view that company
     if company.pk != admin.company_id:
@@ -211,7 +235,7 @@ def create_company(form):
 
 def register_administrator(form, company):
     """
-    Tegisters an administrator for a company, supposing the data provided by the form is OK
+    Registers an administrator for a company, supposing the data provided by the form is OK
     """
     username = form.cleaned_data['username']
     password = form.cleaned_data['password']
@@ -255,21 +279,21 @@ def validate_cif(request):
     return JsonResponse(data)
 
 
-def validate_admin(request):
+def validate_username(request):
     """
     checks if the company administrator is registered
     """
-    admin = request.GET.get('admin')
+    username = request.GET.get('username')
 
-    check = get_or_none(Administrator, user__username=admin)
-    if check is not None:
-        check = check.user.username
+    if not username:
+        raise SuspiciousOperation
 
     data = {
-        'is_taken': admin == check
+        'is_taken': bool(get_or_none(User, username=username))
     }
     if data['is_taken']:
         data['error_message'] = 'ERROR'
+
     return JsonResponse(data)
 
 
@@ -289,3 +313,12 @@ def validate_short_name(request):
     if data['is_taken']:
         data['error_message'] = 'ERROR'
     return JsonResponse(data)
+
+
+def validate_email(request):
+    """
+    checks whether the email is unique
+    """
+    email = request.GET.get("email")
+    is_taken = not (is_company_email_unique(email) and is_email_unique(email))
+    return JsonResponse({'is_taken': is_taken})

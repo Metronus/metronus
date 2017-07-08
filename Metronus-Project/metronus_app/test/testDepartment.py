@@ -8,7 +8,7 @@ from metronus_app.model.administrator import Administrator
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 from django.test import TestCase, Client
-
+from django.urls import reverse
 import json
 
 
@@ -131,7 +131,7 @@ class DepartmentTestCase(TestCase):
 
         logs_before = Department.objects.all().count()
 
-        response = c.post("/department/createAsync", {
+        response = c.post(reverse("department_create_async"), {
             "department_id": "0",
             "name": "dep4",
         })
@@ -154,6 +154,26 @@ class DepartmentTestCase(TestCase):
         logs_after = Department.objects.all().count()
 
         self.assertEquals(logs_before + 1, logs_after)
+    def test_create_department_duplicate_async(self):
+        """ Logged in as an administrator, try to create an department with the name of an existing company"""
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        # ??????????????????? Again
+        # logs_before = Department.objects.all().count()
+
+        response = c.post(reverse("department_create_async"), {
+            "department_id": "0",
+            "name": "dep1",
+        })
+
+        self.assertEquals(response.status_code, 200)
+        # response in bytes must be decode to string
+        data = response.content.decode("utf-8")
+        # string to dict
+        data = json.loads(data)
+        self.assertEquals(data["repeated_name"], True)
+        self.assertEquals(data["success"], False)
 
     def test_create_department_duplicate(self):
         """ Logged in as an administrator, try to create an department with the name of an existing company"""
@@ -194,6 +214,15 @@ class DepartmentTestCase(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertEquals(len(response.context["departments"]), 2)
         self.assertEquals(response.context["departments"][0].name, "dep1")
+    def test_list_departments_positive_search(self):
+        """As an admin, search the departments """
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        response = c.get(reverse("department_search",args=("p2",)))
+
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response.context["departments"][0].name, "dep2")
 
     def test_list_departments_positive_2(self):
         """As an employee with proper roles, try to list the departments """
@@ -212,13 +241,20 @@ class DepartmentTestCase(TestCase):
         c.login(username="admin1", password="123456")
 
         response = c.get("/department/list")
-        dep_id = response.context["departments"][0].id
+        department=response.context["departments"][0]
+        dep_id = department.id
         response = c.get("/department/view/"+str(dep_id)+"/")
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(len(response.context["employees"]), 1)
+        self.assertEquals(len(response.context["employees"]), 
+            Employee.objects.filter(user__is_active=True,
+            projectdepartmentemployeerole__projectDepartment_id__department_id=department,
+            projectdepartmentemployeerole__role_id__tier__lte=40).distinct().count())
+
+        
+
         self.assertEquals(len(response.context["tasks"]), 0)
         # self.assertEquals(response.context["employees"][0].department.id, dep_id)
-        self.assertEquals(response.context["coordinator"], None)
+        self.assertTrue(response.context["coordinators"] is not None)
 
     def test_view_department_not_allowed(self):
         """Without proper roles, try to view a department """
@@ -277,7 +313,7 @@ class DepartmentTestCase(TestCase):
                   })
 
             self.assertEquals(response.status_code, 302)
-            
+
             pro_up=Department.objects.get(pk=pro.id)
 
             self.assertEquals(pro_up.name, "Metronosa")
@@ -314,4 +350,17 @@ class DepartmentTestCase(TestCase):
 
         dep_id = Department.objects.get(active=False).id
         response = c.get("/department/delete/"+str(dep_id)+"/")
-        self.assertEquals(response.status_code, 403)
+        self.assertEquals(response.status_code, 404)
+
+    def test_recover_department_positive(self):
+        """As an admin, recover a department"""
+        c = Client()
+        c.login(username="admin1", password="123456")
+
+        response = c.get("/department/list")
+        dep_id = Department.objects.get(active=False).id
+
+        response = c.get(reverse("department_recover",args=(dep_id,)))
+        self.assertRedirects(response, "/department/list", fetch_redirect_response=False)
+
+        self.assertTrue(Department.objects.get(pk=dep_id).active)

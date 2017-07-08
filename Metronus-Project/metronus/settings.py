@@ -55,7 +55,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    #estas tres siguientes tienen que ir en este orden, para que la localización furule
+    # estas tres siguientes tienen que ir en este orden, para que la localización furule
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -73,8 +73,8 @@ if production or heroku:
     TEMPLATES = [
         {
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [os.path.join(PROJECT_PATH,'templates'),],
-            #'APP_DIRS': True,
+            'DIRS': [os.path.join(PROJECT_PATH, 'templates'), ],
+            # 'APP_DIRS': True,
             'OPTIONS': {
                 'context_processors': [
                     'django.template.context_processors.i18n',
@@ -105,8 +105,8 @@ else:
     TEMPLATES = [
         {
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [os.path.join(PROJECT_PATH,'templates'),],
-            #'APP_DIRS': True,
+            'DIRS': [os.path.join(PROJECT_PATH, 'templates'), ],
+            # 'APP_DIRS': True,
             'OPTIONS': {
                 'context_processors': [
                     'django.template.context_processors.i18n',
@@ -120,22 +120,19 @@ else:
         },
     ]
 
-
-
 WSGI_APPLICATION = 'metronus.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
 DATABASES = {
-	    'default': {
-		'ENGINE': 'django.db.backends.postgresql',
-		'NAME': os.environ["METRONUS_DB_NAME"],
-		'USER': os.environ["METRONUS_DB_USER"],
-		'PASSWORD': os.environ["METRONUS_DB_PASS"],
-		'HOST': os.environ["METRONUS_DB_HOST"] if heroku else 'localhost',
-		'PORT': os.environ["METRONUS_DB_PORT"] if heroku else '5432',
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ["METRONUS_DB_NAME"],
+        'USER': os.environ["METRONUS_DB_USER"],
+        'PASSWORD': os.environ["METRONUS_DB_PASS"],
+        'HOST': os.environ["METRONUS_DB_HOST"] if heroku else 'localhost',
+        'PORT': os.environ["METRONUS_DB_PORT"] if heroku else '5432',
     }
 }
 
@@ -143,20 +140,19 @@ DATABASES = {
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
+#    {
+#        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+#    },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
+#    {
+#        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+#    },
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
@@ -167,7 +163,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
@@ -199,7 +194,6 @@ MEDIA_ROOT = (
 # https://warehouse.python.org/project/whitenoise/
 
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
-
 
 # Mail configuration
 EMAIL_HOST = os.environ["METRONUS_MAIL_HOST"]

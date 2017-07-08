@@ -1,0 +1,57 @@
+{% extends "anon_master.html" %}
+{% load i18n %}
+{% load l10n %}
+
+{% block title %}{% trans 'terms_title' %}{% endblock %}
+
+{% block content %}
+
+<body class="login">
+  <div>
+      <a href="/"><img class="img-responsive center-block" src="/static/img/metronus_logo_horizontal.png" alt="Metronus" style="width:40%; height:auto; margin-top:2%;"></a>
+      <h1 class="center-block" style="text-align: center; padding-bottom: 50px;">{% trans 'terms_title' %}</h1>
+
+      <div class="legaltext" style="font-size:200%;">{% trans 'terms_1_title' %}</div>
+      <br>
+      <div class="legaltext">{% trans 'terms_1_text' %}</div>
+      <br>
+      <div class="legaltext" style="font-size:200%;">{% trans 'terms_2_title' %}</div>
+      <br>
+      <div class="legaltext">{% trans 'terms_2_text' %}</div>
+      <br>
+      <div class="legaltext" style="font-size:200%;">{% trans 'terms_3_title' %}</div>
+      <br>
+      <div class="legaltext">{% trans 'terms_3_text' %}</div>
+      <br>
+      <div class="legaltext" style="font-size:200%;">{% trans 'terms_4_title' %}</div>
+      <br>
+      <div class="legaltext">{% trans 'terms_4_text' %}</div>
+      <br>
+      <div class="legaltext" style="font-size:200%;">{% trans 'terms_5_title' %}</div>
+      <br>
+      <div class="legaltext">{% trans 'terms_5_text' %}</div>
+      <br>
+      <div class="legaltext" style="font-size:200%;">{% trans 'terms_6_title' %}</div>
+      <br>
+      <div class="legaltext">{% trans 'terms_6_text' %}</div>
+      <br>
+      <div class="legaltext" style="font-size:200%;">{% trans 'terms_7_title' %}</div>
+      <br>
+      <div class="legaltext">{% trans 'terms_7_text' %}</div>
+      <br>
+      <div class="legaltext" style="font-size:200%;">{% trans 'terms_8_title' %}</div>
+      <br>
+      <div class="legaltext">{% trans 'terms_8_text' %}</div>
+      <br>
+      <div class="legaltext" style="font-size:200%;">{% trans 'terms_9_title' %}</div>
+      <br>
+      <div class="legaltext">{% trans 'terms_9_text' %}</div>
+      <br>
+
+
+      <div>
+      <button style="margin-left: 50%;" type="button" class="btn btn-warning submit" onclick="window.location.href='/'">{% trans 'return_to_landingpage' %}</button>
+      </div>
+  </div>
+</body>
+{% endblock %}

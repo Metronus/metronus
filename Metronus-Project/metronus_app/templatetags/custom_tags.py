@@ -15,7 +15,8 @@ def get_form_type(form_type):
         'TextInput': 'text',
         'PasswordInput': 'password',
         'EmailInput': 'email',
-        'ClearableFileInput': 'file'
+        'ClearableFileInput': 'file',
+        'NumberInput' : 'numeric'
     }.get(form_type, 'text')
 
 
@@ -23,15 +24,23 @@ def get_form_type(form_type):
 def show_form(form):
     return {'form': form}
 
-
 @register.inclusion_tag('tags/field.html')
-def show_field(field, required=True):
-    return {'field': field, 'required': "required" if required else "", 'type': get_form_type(get_type(field))}
+def show_field(field, placeholder="", error_code=None):
+    return {'field': field, 'required': "*" if field.field.required else "",
+            'type': get_form_type(get_type(field)), 'placeholder':placeholder,
+            'custom_error_str':error_code}
 
+@register.inclusion_tag('tags/team_item.html')
+def team_item(name, img_name, role):
+    return {'name': name,'img_name': img_name,'role' : role}
 
 @register.inclusion_tag('tags/ajaxErrors.html')
 def show_ajax_errors():
     return {}
+
+@register.inclusion_tag('tags/search_form.html')
+def show_search_form(model):
+    return {'model':model}
 
 
 @register.simple_tag
@@ -64,7 +73,7 @@ def is_admin(actor):
 def has_role(actor):
     if actor.user_type == 'E' or actor.user_type == 'A':
         try:
-            return ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor.id).count() > 0
+            return ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor.id).exists()
         except:
             return False
     else:
@@ -121,6 +130,86 @@ def is_executive(actor):
 
 @register.assignment_tag
 def is_team_manager(actor):
+    if actor.user_type == 'A' or not has_role(actor):
+        return False
+
+    for role in ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor.id):
+        if role.role_id.name == 'TEAM_MANAGER':
+            return True
+
+    return False
+
+
+@register.filter
+def getval(dic, key):
+    return dic[key]
+
+@register.filter
+def checkAdmin(actor):
+    return actor.user_type == 'A'
+
+
+@register.filter
+def checkRole(actor):
+    if actor.user_type == 'E' or actor.user_type == 'A':
+        try:
+            return ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor.id).exists()
+        except:
+            return False
+    else:
+        return False
+
+
+@register.filter
+def checkEmployee(actor):
+    if actor.user_type == 'A' or not has_role(actor):
+        return False
+
+    for role in ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor.id):
+        if role.role_id.name == 'EMPLOYEE':
+            return True
+
+    return False
+
+
+@register.filter
+def checkProjectManager(actor):
+    if actor.user_type == 'A' or not has_role(actor):
+        return False
+
+    for role in ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor.id):
+        if role.role_id.name == 'PROJECT_MANAGER':
+            return True
+
+    return False
+
+
+@register.filter
+def checkCoordinator(actor):
+    if actor.user_type == 'A' or not has_role(actor):
+        return False
+
+    for role in ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor.id):
+        if role.role_id.name == 'COORDINATOR':
+            return True
+
+    return False
+
+
+@register.filter
+def checkExecutive(actor):
+    if actor.user_type == 'A' or not has_role(actor):
+        return False
+
+    for role in ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor.id):
+        if role.role_id.name == 'EXECUTIVE':
+            return True
+
+    return False
+
+
+@register.filter
+def checkTeamManager(actor):
     if actor.user_type == 'A' or not has_role(actor):
         return False
 

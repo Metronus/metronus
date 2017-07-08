@@ -1,87 +1,122 @@
 {% extends "layout_base.html" %}
 {% load i18n %}
 {% load l10n %}
-
-{% block title %}
-    {% trans 'editCompany' %}
-{% endblock %}
-{% block contentTitle %}
-    {% trans 'editCompany' %}
-{% endblock %}
-
 {% load static }
+{% load custom_tags %}
+
+{% block title %}{% trans 'editCompany' %}{% endblock %}
+{% block contentTitle %}{% trans 'editCompany' %}{% endblock %}
 
 {% block content %}
-    <div class="row">
+<div class="row">
+  <div class="col-md-12 col-sm-12 col-xs-12">
+    <div class="x_panel">
+      <div class="x_title">
+        <h1 align="center"> {% trans 'editCompany' %} </h1></br>
+        <div class="clearfix"></div>
+      </div>
 
-<div class="col-md-12 col-sm-12 col-xs-12">
-  <div class="x_panel">
-    <div class="x_title">
-            <h1 align="center"> {% trans 'editCompany' %} </h1></br>
-      <div class="clearfix"></div>
-    </div>
-    <div class="x_content">
-	{% if  errors %}
+      <div class="x_content">
+        {% if  errors %}
         <div id="errorDiv2" class="alert alert-error alert-dismissible" role="alert">
-        <a class="close" data-dismiss="alert">x</a>
-        {% for error in errors %}
-            {% if error == "error.imageNotValid" %}
-                {% trans 'company_imageNotValid' %}
-            {% else %}
-                {% trans error %}
-            {% endif %}
-        {% endfor %}
+          <a class="close" data-dismiss="alert">x</a>
+          {% for error in errors %}
+            {% trans error %}
+          {% endfor %}
         </div>
-    {% endif %}
-    
-   <form id="form" method="POST" class="form-horizontal" data-toggle="validator" role="form" action="" enctype="multipart/form-data">{% csrf_token %}
-   
+        {% endif %}
 
-        <div class="form-group required company_class form-class">
-          <label class="control-label col-sm-3" for="id_{{ form.company_email.name }}">{% trans 'company_email' %}</label>
-            <div class="col-sm-6">
-              <input type="email" class="form-control col-md-6" name="{{ form.company_email.name }}" id="id_{{ form.company_email.label }}" value="{{form.company_email.value|default_if_none:""}}" placeholder="info@metronus.com">
-              <div class="help-block with-errors" id="id_unique_message" style="color:#a94442;">{{ form.company_email.errors }}</div>
+        <form id="form" method="POST" class="form-horizontal" data-toggle="validator" role="form" action="" enctype="multipart/form-data">
+          {% csrf_token %}
 
+          {% show_field form.company_email  "info@metronus.com"  "companyRegister_companyEmailNotUnique" %}
+          {% show_field form.company_phone  "954547639" %}
+
+          <div class="form-group required form-class">
+            <label class="control-label  col-md-4 col-sm-4 col-xs-12" for="id_{{ form.visible_short_name.name }}">
+              {% trans 'visible_short_name' %}
+            </label>
+            <div class="col-md-4 col-sm-5 col-xs-12 text-center align-middle">
+              <div class="checkbox">
+                <label class="">
+                  <div class="icheckbox_flat-green" style="position: relative;">
+                    <input type="checkbox" class="flat" id="id_{{ form.visible_short_name.label }}" name="{{ form.visible_short_name.name }}" {% if form.visible_short_name.value %} checked {% endif %}>
+                  </div>
+                </label>
+              </div>
             </div>
-        </div>
+          </div>
 
-        <div class="form-group required company_class form-class">
-          <label class="control-label col-sm-3" for="id_{{ form.company_phone.name }}">{% trans 'company_phone' %}</label>
-            <div class="col-sm-6">
-            <input type="text" class="form-control col-md-6" name="{{ form.company_phone.name }}" id="id_{{ form.company_phone.label }}" value="{{form.company_phone.value|default_if_none:""}}" placeholder="954547639">
-            <div class="help-block with-errors" id="id_unique_message" style="color:#a94442;">{{ form.company_phone.errors }}</div>
+          {% show_field form.logo %}
 
+         <!-- MOSTRAR FOTO ACTUAL -->
+         <div class="form-group required form-class">
+           <label class="control-label col-sm-4" for="id_current_logo">{% trans 'current_logo' %}</label>
+           <div class="col-sm-6">
+             {% if logo %}
+              <img src="{{ MEDIA_URL }}{{logo}}" style="max-height: 120px; max-width: auto;">
+             {% else %}
+              {% trans 'none' %}
+             {% endif %}
+           </div>
+         </div>
+
+          <div class="form-group required form-class">
+           <label class="control-label col-sm-4"></label>
+             <div class="col-sm-6">
+             {% trans 'change_logo_warn' %}
+             </div>
+         </div>
+
+          <div class="form-group control-buttons">
+            <div class="text-center">
+              <button type="submit" class="btn btn-success submit-button" >{% trans 'confirm' %}</button>
+              <button type="button" class="btn btn-warning submit" onclick="window.location.href='/company/view/'">{% trans 'cancel' %}</button>
             </div>
-        </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
 
-       <div class="form-group company_class form-class">
-          <label class="control-label col-sm-3" for="id_{{ form.logo.name }}">{% trans 'logo' %}</label>
-            <div class="col-sm-6">
-              <input id="id_{{ form.logo.label }}" name="{{ form.logo.name }}" multiple type="file" value="{{form.logo.value}}" >
-            </div>
-        </div>
-        
-         <div class="form-group company_class form-class">
-          <label class="control-label col-sm-3" for="id_{{ form.visible_short_name.name }}">{% trans 'visible_short_name' %}</label>
-            <div class="col-sm-6">
-              <input id="id_{{ form.visible_short_name.label }}" name="{{ form.visible_short_name.name }}" type="checkbox" class="form-control col-md-6 checkbox-inline"
-                     style="width:auto; box-shadow:none;" {% if form.visible_short_name.value %} checked {% endif %}>
-            </div>
-        </div>
+{% block javascript %}
+<script>
+$(function() {
+  $(".btn-file span").text("{% trans 'browseFile' %}");
+  initAjax($("#id_company_email"), 'email', '/ajax/validate_email_unique/');
+});
 
-        <div class="form-group control-buttons">
-            <div class="col-sm-offset-4 col-sm-10">
-
-            <button type="submit" class="btn btn-success submit-button" >{% trans 'confirm' %}</button>
-                <button type="button" class="btn btn-warning submit" onclick="window.location.href='/company/view/'">{% trans 'cancel' %}</button>
-
-            </div>
-        </div>
-    </form>
- </div>
- </div>
- </div>
- </div>
-
+$('#form').bootstrapValidator({
+  feedbackIcons: {
+    valid: 'glyphicon glyphicon-ok',
+    invalid: 'glyphicon glyphicon-remove',
+    validating: 'glyphicon glyphicon-refresh'
+  },
+  fields: {
+    company_phone: {
+      validators: {
+        notEmpty: {
+          message: '{% trans 'company_phone_error#1' %}'
+        },
+        regexp:{
+          regexp: /^\d{9}$/ig,
+          message: '{% trans 'company_phone_error#2' %}'
+        },
+      }
+    },
+    company_email: {
+      validators: {
+        notEmpty: {
+          message: '{% trans 'company_email_error#1' %}'
+        },
+        emailAddress: {
+          message: '{% trans 'company_email_error#2' %}'
+        }
+      }
+    }
+  }
+});
+</script>
 {% endblock %}

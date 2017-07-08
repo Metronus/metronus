@@ -1,0 +1,29 @@
+{% load i18n %}
+{% load l10n %}
+{% load custom_tags %}
+
+{% block content %}
+
+
+   {% for project in projects %}
+            <tr>
+              <td class="searchable">{{project.name}}</td>
+              <td>
+                <a href="{% url 'project_view' project.id %}" type="button" class="btn btn-success">
+                  {% trans 'details' %}
+                </a>
+              </td>
+              {% if user.actor|checkAdmin or user.actor|checkExecutive %}
+              <td class="hidden-xs">
+                <a href="{% url 'project_edit' project.id %}" type="button" class="btn btn-dark">
+                  {% trans 'update' %}
+                </a>
+              </td>
+              <td class="hidden-xs">
+                <a href="#" class="btn btn-danger" data-href="{% url 'project_delete' project.id %}" data-toggle="modal" data-target="#confirm-delete">{% trans 'delete' %}</a>
+              </td>
+              {% endif %}
+            </tr>
+            {% endfor %}
+         
+{% endblock %}

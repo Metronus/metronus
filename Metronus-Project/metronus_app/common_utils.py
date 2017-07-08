@@ -1,25 +1,30 @@
 from django.core.exceptions import PermissionDenied
 from metronus_app.model.administrator import Administrator
 from metronus_app.model.employee import Employee
-from metronus.settings import DEFAULT_FROM_EMAIL
+from metronus.settings import DEFAULT_FROM_EMAIL,AUTH_PASSWORD_VALIDATORS
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
 from django.template import loader
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth.models import User
 from metronus_app.model.timeLog import TimeLog
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from metronus_app.model.company import Company
 from metronus_app.model.role import Role
+from metronus_app.model.actor import Actor
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.task import Task
 from django.test import Client
-
+from django.contrib.auth.password_validation import validate_password, ValidationError as valerr,get_password_validators
 from PIL import Image
+from django.utils.translation import ugettext_lazy as _
+
+from django.db.models import Max
 
 import sys
 import string
 import random
 import json
+import re
 
 
 # Image limit parameters
@@ -28,6 +33,39 @@ HEIGHT = 256
 WIDTH = 256
 VALID_FORMATS = ['JPEG', 'JPG', 'PNG']
 
+def get_highest_role_tier(actor):
+    if actor.user_type == "A":
+        return 50
+
+    try:
+        res = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor).aggregate(Max('role_id__tier'))["role_id__tier__max"]
+        return res if res else 0
+    except:
+        return 0
+
+def cif_validator(text):
+    if not re.compile("^[A-Za-z]\d{8}$").match(text):
+        raise ValidationError(_("cif_valid"))
+
+def phone_validator(text):
+    if not re.compile("^\d{9}$").match(text):
+        raise ValidationError(_("phone_valid"))
+
+def validate_pass(password):
+    """
+    checks if the password is valid
+    """
+    try:
+        validate_password(password,get_password_validators(AUTH_PASSWORD_VALIDATORS))
+    except valerr:
+        return False
+    return True
+
+def default_round(val,dig=2):
+    """
+    rounds to two decimal digits
+    """
+    return None if val is None else round(val,dig)
 
 def get_current_admin_or_403(request):
     """
@@ -43,7 +81,7 @@ def get_current_admin_or_403(request):
 
 def get_current_employee_or_403(request):
     """
-    Returns employee admin or 403 if not logged or logged is not an employee
+    Returns employee or 403 if not logged or logged is not an employee
     """
 
     if not request.user.is_authenticated():
@@ -53,6 +91,15 @@ def get_current_employee_or_403(request):
     except ObjectDoesNotExist:
         raise PermissionDenied
 
+def get_actor_or_403(request):
+    """
+    Returns employee or admin or 403 if not logged
+    """
+    if not request.user.is_authenticated():
+        raise PermissionDenied
+    
+    return request.user.actor
+    
 
 def get_authorized_or_403(request):
     """
@@ -67,7 +114,7 @@ def get_authorized_or_403(request):
     except PermissionDenied:
         # The user is authenticated and it's not an admin
         cur_user = Employee.objects.get(user=request.user)
-        if ProjectDepartmentEmployeeRole.objects.filter(employee_id=cur_user, role_id__tier__gt=10).count() > 0:
+        if ProjectDepartmentEmployeeRole.objects.filter(employee_id=cur_user, role_id__tier__gt=10).exists():
             return cur_user
         else:
             raise PermissionDenied
@@ -84,10 +131,25 @@ def get_admin_executive_or_403(request):
     except PermissionDenied:
         # The user is authenticated and it's not an admin
         cur_user = Employee.objects.get(user=request.user)
-        if ProjectDepartmentEmployeeRole.objects.filter(employee_id=cur_user, role_id__tier__gte=50).count() > 0:
+        if ProjectDepartmentEmployeeRole.objects.filter(employee_id=cur_user, role_id__tier__gte=50).exists():
             return cur_user
         else:
             raise PermissionDenied
+
+def same_company_or_403(actor,thing):
+    """
+    Checks the user and whatever we are CRUDing shares the same company
+    """
+    if actor.company_id!=thing.company_id:
+        raise PermissionDenied
+
+def is_executive(employee):
+    """
+    Returns true if the employee has an executive role
+    """
+    if employee.user_type != "E":
+        return False
+    return ProjectDepartmentEmployeeRole.objects.filter(employee_id=employee, role_id__tier__gte=50).exists()
 
 
 def get_or_none(model, *args, **kwargs):
@@ -168,12 +230,23 @@ def is_username_unique(username):
     """
     return User.objects.filter(username=username).count() == 0
 
+def email_in_use_logged(email, user):
+    """ Checks if a email is used by a user who is not me """
+    return User.objects.filter(email=email).exclude(pk=user.pk).count() == 0
 
 def is_email_unique(email):
     """
     Checks the email is unique and does not exists in the database
     """
     return User.objects.filter(email=email).count() == 0
+
+
+def is_company_email_unique(email):
+    """
+    Checks the company email is unique and does not exists in the database
+    """
+    return Company.objects.filter(email=email).count() == 0
+
 
 def is_cif_unique(cif):
     """
@@ -276,3 +349,30 @@ def get_ajax(url, data = None):
     c = Client()
     response = c.get(url, data)
     return json.loads(response.content.decode("utf-8"))
+
+
+def is_role_updatable_by_user(logged, pdrole_id):
+    """
+    Determines whether the provided user can update/delete the role with the given ID
+    """
+    pdrole = get_or_none(ProjectDepartmentEmployeeRole, id=pdrole_id)
+
+    # Check that it exists and belongs to the logged user's company
+    if not pdrole or pdrole.employee_id.company_id != logged.company_id:
+        return False
+
+    # Admins can always do whatever the fuck they want
+    if logged.user_type == "A":
+        return True
+
+    # Only admins and executives can edit role
+    if not is_executive(logged):
+        return False
+
+    # If it belongs to the same user, check that it's not their highest role
+    if pdrole.employee_id == logged:
+        return ProjectDepartmentEmployeeRole.objects.filter(employee_id=logged, role_id__tier__gt=pdrole.role_id.tier).exists()
+    # If it belongs to someone else, check that the role they're trying to edit is not Executive
+    # Because only executives and administrator can manage roles, then execs can edit anything below their level
+    else:
+        return pdrole.role_id.tier < 50

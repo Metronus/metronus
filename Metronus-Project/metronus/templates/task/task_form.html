@@ -3,65 +3,73 @@
 {% load l10n %}
 
 {% block title %}
-    {% if  request.path == '/task/create'%}{% trans 'createTask' %}{% endif %}{% if  request.path == '/task/edit'%}{% trans 'editTask' %}{% endif %}
+    {% if  request.path == '/task/create'%}{% trans 'createTask' %}{% else %}
+    {% trans 'editTask' %}{% endif %}
 {% endblock %}
 {% block contentTitle %}
-    {% if  request.path == '/task/create'%}{% trans 'createTask' %}{% endif %}{% if  request.path == '/task/edit'%}{% trans 'editTask' %}{% endif %}
+    {% if  request.path == '/task/create'%}{% trans 'createTask' %}{% else %}
+   {% trans 'editTask' %}{% endif %}
 {% endblock %}
 
 {% load static }
+{% load custom_tags %}
 
 {% block javascript %}
-
 <script>
 
   //Esto es para validar en cliente de forma bonita con bootstrap :)
 
   $(document).ready(function() {
-    
-    var dep_select = $("#id_{{ form.department_id.name }}")
-    {% if  form.department_id.value is not None %}
-    var p_id=0
-    {% if  form.project_id.value is not None %}
-        p_id={{form.project_id.value }}
-    {% endif %}
+    {% if  request.path == '/task/create'%}
+        var dep_select = $("#id_{{ form.department_id.name }}")
+        {% if  form.department_id.value is not None %}
+            var p_id=
+            {% if  form.project_id.value is not None %}
+               {{form.project_id.value }}
+            {% else %}
+                  0
+            {% endif %};
 
-        $.get({
-            url: "/task/getdepartments",
-            data: {project_id: p_id},
-            success: function ( data )  {
-                console.log(JSON.stringify(data))
-                dep_select.empty()
-                dep_select.append($('<option value="" selected>{% trans "selectDepartment" %}</option>)'))
-                data.forEach(function (department) {
-                    console.log(department.pk+", "+'{{form.department_id.value}}')
-                    dep_select.append($('<option value="'+department.pk+'">'+department.fields.name+'</option>'))
+                $.get({
+                    url: "/task/getdepartments",
+                    data: {project_id: p_id},
+                    success: function ( data )  {
+                        console.log(JSON.stringify(data))
+                        dep_select.empty()
+                        dep_select.append($('<option value="" selected>{% trans "selectDepartment" %}</option>)'))
+                        data.forEach(function (department) {
+                            console.log(department.pk+", "+'{{form.department_id.value}}')
+                            dep_select.append($('<option value="'+department.pk+'">'+department.fields.name+'</option>'))
 
-                })
-                dep_select.val("{{ form.department_id.value }}").attr('selected','selected')
+                        })
+                        dep_select.val("{{ form.department_id.value }}").attr('selected','selected')
+                    }
+                });
+        {% endif %}
+
+        // Carga el select de departamentos con los correspondientes al proyecto seleccionado
+        var proj_select = $("#id_{{ form.project_id.name }}")
+
+        proj_select.change(function () {
+            if(proj_select.val() === "") {
+                dep_select.empty();
+                dep_select.append($("<option value='' selected>{% trans 'selectDepartment' %}</option>"));
+                return;
             }
-        });
-    {% endif %}
-
-    // Carga el select de departamentos con los correspondientes al proyecto seleccionado
-    var proj_select = $("#id_{{ form.project_id.name }}")
-
-    proj_select.change(function () {
-        console.log(proj_select.val())
-        $.get({
-            url: "/task/getdepartments",
-            data: {project_id: proj_select.val()},
-            success: function ( data )  {
-                console.log(JSON.stringify(data))
-                dep_select.empty()
-                dep_select.append($("<option value='' selected>{% trans 'selectDepartment' %}</option>"))
-                data.forEach(function (department) {
-                    dep_select.append($('<option value="'+department.pk+'">'+department.fields.name+'</option>'))
-                })                
-            }
+            $.get({
+                url: "/task/getdepartments",
+                data: {project_id: proj_select.val()},
+                success: function ( data )  {
+                    dep_select.empty();
+                    dep_select.append($("<option value='' selected>{% trans 'selectDepartment' %}</option>"));
+                    dep_select.trigger("change");
+                    data.forEach(function (department) {
+                        dep_select.append($('<option value="'+department.pk+'">'+department.fields.name+'</option>'));
+                    })                
+                }
+            })
         })
-    })
-
+    {% endif %}
     $('#register_form').bootstrapValidator({
         feedbackIcons: {
             valid: 'glyphicon glyphicon-ok',
@@ -83,11 +91,26 @@
                     }
                 }
             },
+            project_id: {
+                validators: {
+                    notEmpty: {
+                        message: "{% trans 'pls_select_project' %}"
+                    }
+                }
+            },
+            department_id: {
+                validators: {
+                    notEmpty: {
+                        message: "{% trans 'pls_select_department' %}"
+                    }
+                }
+            },
             price_per_hour: {
                 validators: {
                     numeric: {
                         thousandsSeparator: '',
-                        decimalSeparator: '.'
+                        decimalSeparator: '.',
+                        message: "{% trans 'invalid_number' %}",
                     }
                 }
             },
@@ -95,7 +118,8 @@
                 validators: {
                     numeric: {
                         thousandsSeparator: '',
-                        decimalSeparator: '.'
+                        decimalSeparator: '.',
+                        message: "{% trans 'invalid_number' %}",
                     }
                 }
             },
@@ -103,7 +127,8 @@
                 validators: {
                     numeric: {
                         thousandsSeparator: '',
-                        decimalSeparator: '.'
+                        decimalSeparator: '.',
+                        message: "{% trans 'invalid_number' %}",
                     }
                 }
             }
@@ -113,29 +138,37 @@
   });
   function ajax(){
     $.post('/task/createAsync', $('#register_form').serialize(), function(data, status){
-        console.log(data)
+        $('html, body').animate({ scrollTop: 0 }, 'fast');
         if(data['success']){
             document.getElementById('register_form').reset();
             $("#register_form").data('bootstrapValidator').resetForm();
-            $('#errorDiv').attr('hidden', true);
-            
-            $('#successDiv').attr('hidden', false).html("<strong>{% trans 'success' %} | </strong>{% trans 'taskSaved' %}");
+            $('#errorDiv').hide();
+            $('#successDiv').hide();
+            $('#successDiv').fadeIn().html("<strong>{% trans 'success' %} | </strong>{% trans 'taskSaved' %}");
         }else{
-            $('#successDiv').attr('hidden', true)
-            $('#errorDiv').attr('hidden', false).html("")
+            $('#errorDiv').hide();
+            $('#successDiv').hide();
+            $('#errorDiv').fadeIn().html("");
             for(var i=0;i<data['errors'].length;i++){
-                err=data['errors'][i]
+                var err = data['errors'][i];
                 
                 //cannot pass the errors the directly, so we must check each one
                 if(err=='task_creation_invalid_goal'){
-                    $('#errorDiv').append("<p><strong>{% trans 'fail' %} |</strong>{% trans 'task_creation_invalid_goal' %}</p>"); 
+                    $('#errorDiv').append("<p><strong>{% trans 'fail' %} | </strong>{% trans 'task_creation_invalid_goal' %}</p>");
                 }else if(err=='task_creation_invalid_price'){
-                    $('#errorDiv').append("<p><strong>{% trans 'fail' %} |</strong>{% trans 'task_creation_invalid_price' %}</p>"); 
+                    $('#errorDiv').append("<p><strong>{% trans 'fail' %} | </strong>{% trans 'task_creation_invalid_price' %}</p>");
                 }else if(err=='task_creation_project_department_not_related'){
-                    $('#errorDiv').append("<p><strong>{% trans 'fail' %} |</strong>{% trans 'task_creation_project_department_not_related' %}</p>"); 
+                    $('#errorDiv').append("<p><strong>{% trans 'fail' %} | </strong>{% trans 'task_creation_project_department_not_related' %}</p>");
                 }else if(err=='task_creation_repeated_name'){
-                    $('#errorDiv').append("<p><strong>{% trans 'fail' %} |</strong>{% trans 'task_creation_repeated_name' %}</p>"); 
-
+                    $('#errorDiv').append("<p><strong>{% trans 'fail' %} | </strong>{% trans 'task_creation_repeated_name' %}</p>");
+                } else if (err == 'task_creation_error') {
+                    $('#errorDiv').append("<p><strong>{% trans 'fail' %} | </strong>{% trans 'task_creation_error' %}</p>");
+                }
+                else if (err == 'task_creation_project_inactive') {
+                    $('#errorDiv').append("<p><strong>{% trans 'fail' %} | </strong>{% trans 'task_creation_project_inactive' %}</p>");
+                }
+                else if (err == 'task_creation_department_inactive') {
+                    $('#errorDiv').append("<p><strong>{% trans 'fail' %} | </strong>{% trans 'task_creation_department_inactive' %}</p>");
                 }
             }
 
@@ -155,18 +188,17 @@ $(function() {
 
 {% block content %}
 
-{% if form.errors %}
-        <p>{{ form.errors }}</p>
-{% endif %}
+<div class="clearfix"></div>
 
-<div id="successDiv" class="alert alert-success" hidden='true'>
-            </div>
-<div id="errorDiv" class="alert alert-danger" >
-           
+{%show_ajax_errors%}
+<div id="error2Div" class="alert alert-danger" {% if not errors and not form.errors %}hidden='true'{% endif %}>
 {% if errors %}
     {% for err in errors%}
         <p><strong>{% trans 'fail' %} | </strong>{% trans err %}</p>
     {% endfor %}
+{% endif %}
+{% if form.errors %}
+    <p>{{form.errors}}</p>
 {% endif %}
  </div>
 
@@ -175,36 +207,50 @@ $(function() {
 <div class="col-md-12 col-sm-12 col-xs-12">
   <div class="x_panel">
     <div class="x_title">
-      <h2>{% if  request.path == '/task/create'%}{% trans 'createTask' %}{% endif %}{% if  request.path == '/task/edit'%}{% trans 'editTask' %}{% endif %}</h2>
+      <h2>
+        {% if  request.path == '/task/create'%}
+            {% trans 'createTask' %}
+        {% else %}      
+            {% trans 'editTask' %}
+        {% endif %}
+        </h2>
       <div class="clearfix"></div>
     </div>
     <div class="x_content">
 
+    <div class="help-tooltip">
+        <p class="help-block">{% trans 'task_creation_help_1' %}</p>
+        <p class="help-block">{% trans 'task_creation_help_2' %}</p>
+        <p class="help-block">{% trans 'task_creation_help_3' %}</p>
+        <p class="help-block">{% trans 'task_creation_help_4' %}</p>
+    </div>
+
     <form id="register_form" method="POST" action="" class="form-horizontal" align="center">{% csrf_token %}
     <div class="form-group" >
-        <label class="control-label col-sm-4" for="id_{{ form.name.name }}">{% trans 'name' %}</label>
+        <label class="control-label col-sm-4" for="id_{{ form.name.name }}">{% trans 'name' %} *</label>
         <div class="col-sm-6">
             <input type="text" class="form-control col-md-6" name="{{ form.name.name }}" id="id_{{ form.name.name }}" value="{{ form.name.value }}" required>
         </div>
     </div>
 
     <div class="form-group" >
-        <label class="control-label col-sm-4" for="id_{{ form.description.name }}">{% trans 'description' %}</label>
+        <label class="control-label col-sm-4" for="id_{{ form.description.name }}">{% trans 'description' %} *</label>
         <div class="col-sm-6">
             <input type="text" class="form-control col-md-6" name="{{ form.description.name }}" id="id_{{ form.description.name }}" value="{{ form.description.value }}" required>
         </div>
     </div>
-
+{% if  request.path == '/task/create'%}
     <div class="form-group" >
-        <label class="control-label col-sm-4" for="id_{{ form.project_id.name }}">{% trans 'project' %}</label>
+        <label class="control-label col-sm-4" for="id_{{ form.project_id.name }}">{% trans 'project' %} *</label>
         <div class="col-sm-6">
         <select class="form-control" name="{{ form.project_id.name }}" id="id_{{ form.project_id.name }}" required>
-                {% if  form.task_id.value == '0' or form.project_id.value == '0' %}
-                    <option value="" {% if form.project_id.value is None %}selected{% endif %}>{% trans 'selectProject' %}</option>
-                {% endif %}
-                {% for project in projects %}
+                
+                <option value="" {% if form.project_id.value is None  %}selected{% endif %}>{% trans 'selectProject' %}</option>
+                
                 <!-- slugify pasa de int a string, porque value es un string e id es un int y no son iguales-->
-                <option value="{{ project.id }}" {% if form.project_id.value == project.id|slugify %}selected{% endif %}>
+                {% for project in projects %}
+                
+                <option value="{{ project.id }}" {% if form.project_id.value|slugify == project.id|slugify %}selected{% endif %}>
                 {{ project.name }}
                 </option>
 
@@ -215,7 +261,7 @@ $(function() {
     </div>
 
     <div class="form-group" >
-        <label class="control-label col-sm-4" for="id_{{ form.department_id.name }}">{% trans 'department' %}</label>
+        <label class="control-label col-sm-4" for="id_{{ form.department_id.name }}">{% trans 'department' %} *</label>
         <div class="col-sm-6">
             <select class="form-control" name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}" required>
             {% if  form.task_id.value == '0' %}
@@ -225,11 +271,17 @@ $(function() {
             </select>
         </div>
     </div>
+{% else %}
+<!-- For edit, we hide the select options-->
+   <input type="hidden" class="form-control col-md-6 " name="{{ form.project_id.name }}" id="id_{{ form.project_id.name }}" value="{{ form.project_id.value}}">
+      <input type="hidden" class="form-control col-md-6 " name="{{ form.department_id.name }}" id="id_{{ form.department_id.name }}" value="{{ form.department_id.value }}">
+{% endif %}
+    <hr/>
 
     <div class="form-group" >
         <label class="control-label col-sm-4" for="id_{{ form.production_goal.name }}">{% trans 'production_goal' %}</label>
         <div class="col-sm-6">
-            <input type="text" class="form-control col-md-6 precio" name="{{ form.production_goal.name }}" id="id_{{ form.production_goal.name }}" value="{{ form.production_goal.value }}">
+            <input type="text" class="form-control col-md-6 precio" name="{{ form.production_goal.name }}" id="id_{{ form.production_goal.name }}" value="{{ form.production_goal.value|floatformat:2 }}">
         </div>
     </div>
 
@@ -242,21 +294,26 @@ $(function() {
     <div class="form-group" >
         <label class="control-label col-sm-4" for="id_{{ form.price_per_unit.name }}">{% trans 'price_per_unit' %}</label>
         <div class="col-sm-6">
-            <input type="text" class="form-control col-md-6 precio" name="{{ form.price_per_unit.name }}" id="id_{{ form.price_per_unit.name }}" value="{{ form.price_per_unit.value }}">
+            <input type="text" class="form-control col-md-6 precio" name="{{ form.price_per_unit.name }}" id="id_{{ form.price_per_unit.name }}" value="{{ form.price_per_unit.value|floatformat:2 }}">
         </div>
     </div>
+
+    <hr/>
+
   <div class="form-group" >
         <label class="control-label col-sm-4" for="id_{{ form.price_per_hour.name }}">{% trans 'price_per_hour' %}</label>
         <div class="col-sm-6">
-            <input type="text" class="form-control col-md-6 precio" name="{{ form.price_per_hour.name }}" id="id_{{ form.price_per_hour.name }}" value="{{ form.price_per_hour.value }}">
+            <input type="text" class="form-control col-md-6 precio" name="{{ form.price_per_hour.name }}" id="id_{{ form.price_per_hour.name }}" value="{{ form.price_per_hour.value|floatformat:2 }}">
         </div>
     </div>
+
     <!--this is the hidden input for task id, do not remove!!! -->
     {{form.task_id}}
 
     </br>
     <div class="col-sm-4" ></div>
         <div class="col-sm-6" align="center" >
+        <a class="btn btn-danger" href="{% url 'task_list' %}">{% trans 'cancel' %}</a>
             {% if  form.task_id.value == '0' %}
             <button type="submit" class="btn btn-success submit-button" >{% trans 'confirm' %}</button>
                 <input type="button" class="btn btn-info submit-button" value="{% trans 'taskAdd' %}" onclick="ajax();" />

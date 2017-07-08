@@ -47,6 +47,8 @@ script:
   - python3 manage.py migrate --noinput
   - python3 manage.py compilemessages
   - python3 manage.py populate
+  - printf 'yes\n' | python3 manage.py flush
+  - python3 manage.py populaternd
   - coverage run --source=. manage.py test
   - mv .coverage ../
   - cd $TRAVIS_BUILD_DIR/

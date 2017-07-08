@@ -1,0 +1,11 @@
+{% extends "error/error.html" %}
+{% load i18n %}
+
+{% block error_number %}
+<h1 class="error-number">400</h1>
+<h2>{% trans 'bad_request' %}</h2>
+{% endblock %}
+
+{% block error_description %}
+<p id="error_msg">{% trans 'bad_request_description' %} </p>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% load i18n %}
+{% load l10n %}
+{% load custom_tags %}
+
+
+{% block content %}
+  
+
+  {% for department in departments %}
+  <tr>
+    <!-- searchable class for all those fields that requires highlighting-->
+    <td class="searchable">{{department.name}}</td>
+    <td>
+      <a href="{% url 'department_view' department.id %}" type="button" class="btn btn-success">
+        {% trans 'details' %}
+      </a>
+    </td>
+    {% if user.actor|checkAdmin or user.actor|checkExecutive %}
+    <td class="hidden-xs">
+      {% if user.actor|checkAdmin or user.actor|checkExecutive %}
+      <a href="{% url 'department_edit' department.id %}" type="button" class="btn btn-dark">
+          {% trans 'update' %}
+      </a>
+      {% endif %}
+    </td>
+    <td class="hidden-xs">
+      {% if user.actor|checkAdmin or user.actor|checkExecutive %}
+      <a href="#" class="btn btn-danger" data-href="{% url 'department_delete' department.id %}"
+        data-toggle="modal" data-target="#confirm-delete">{% trans 'delete' %}</a>
+      {% endif %}
+    </td>
+     {% endif %}
+  </tr>
+  {% endfor %}   
+{% endblock %}

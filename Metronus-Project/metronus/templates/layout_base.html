@@ -26,14 +26,19 @@
 
     <!-- css -->
     {% compress css %}
-		<link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
     <link href="/static/css/font-awesome.min.css" rel="stylesheet">
-		<link href="/static/css/nprogress.css" rel="stylesheet">
-		<link href="/static/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
-		<link href="/static/css/jqvmap.min.css" rel="stylesheet">
-		<link href="/static/css/daterangepicker.css" rel="stylesheet">
-		<link href="/static/css/custom.min.css" rel="stylesheet">
+    <link href="/static/css/nprogress.css" rel="stylesheet">
+    <link href="/static/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
+    <link href="/static/css/jqvmap.min.css" rel="stylesheet">
+    <link href="/static/css/daterangepicker.css" rel="stylesheet">
+    <link href="/static/css/custom.min.css" rel="stylesheet">
     <link href="/static/css/bootstrapvalidator.min.css" rel="stylesheet"/>
+    <link href="/static/css/animate.min.css" rel="stylesheet">
+    <link href="/static/css/fileinput.min.css" rel="stylesheet"/>
+    <link href="/static/css/green.css" rel="stylesheet"/>
+    <link href="/static/css/metronus.css" rel="stylesheet"/>
+    <link href="/static/css/galletas.css" rel="stylesheet">
     {% endcompress %}
   </head>
 
@@ -94,9 +99,11 @@
               <div class="menu_section">
                 <h3>{% trans 'dashControlPanel' %}</h3>
                 <ul class="nav side-menu">
-                  {% if actor_is_admin %}
+                  {% if actor_is_admin or actor_is_executive %}
                   <li><a href="/dashboard/view"><em class="fa fa-home"></em>{% trans 'dashIndex' %}</span></a>
                   </li>
+                  {% endif %}
+                  {% if actor_is_admin %}
                   <li><a href="/company/view"><em class="fa fa-briefcase"></em>{% trans 'dashCompany' %}</span></a>
                   </li>
                   {% endif %}
@@ -115,11 +122,11 @@
 
 
 
-                  {% if actor_is_admin or actor_is_executive or actor_is_projectManager or actor_is_coordinator or actor_is_teamManager %}
+                  {% if actor_is_admin or actor_is_executive or actor_is_projectManager or actor_is_coordinator   %}
                   <li><a><em class="fa fa-group"></em>{% trans 'dashDepartments' %}<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/department/list">{% trans 'dashDepartmentsList' %}</a></li>
-                      {% if actor_is_admin or actor_is_executive or actor_is_projectManager %}
+                      {% if actor_is_admin or actor_is_executive %}
                       <li><a href="/department/create">{% trans 'dashDepartmentCreate' %}</a></li>
                       {% endif %}
                     </ul>
@@ -130,14 +137,14 @@
                   <li><a><em class="fa fa-user"></em>{% trans 'dashEmployees' %}<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/employee/list">{% trans 'dashEmployeesList' %}</a></li>
-                      {% if actor_is_admin or actor_is_executive %}
+
                       <li><a href="/employee/create">{% trans 'dashEmployeesCreate' %}</a></li>
-                      {% endif%}
+
                     </ul>
                   </li>
                   {% endif %}
 
-                  {% if actor_is_admin or actor_is_executive or actor_is_projectManager or actor_is_teamManager or actor_is_coordinator %}
+                  {% if actor_is_admin or actor_is_executive or actor_is_projectManager or actor_is_coordinator %}
                   <li><a><em class="fa fa-tasks"></em>{% trans 'dashTasks' %}<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/task/list">{% trans 'dashTasksList' %}</a></li>
@@ -185,7 +192,7 @@
                     <span class=" fa fa-angle-down"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-usermenu pull-right">
-                    {% if actor_is_executive %}
+                    {% if actor_is_executive or actor_is_projectManager or actor_is_coordinator  %}
                       <li><a href="/employee/view/{{user.get_username}}/"><em class="fa fa-user pull-right"></em>{% trans 'profile' %}</a></li>
                     {% endif %}
                     <li><a href="/logout/"><em class="fa fa-sign-out pull-right"></em>{% trans 'dashLogout' %}</a></li>
@@ -205,271 +212,46 @@
       </div>
     </div>
 
+    <script>
+      var grafana_popup_msg = "{% trans 'grafana_popup_msg' %}";
+      var grafana_popup_link = "{% trans 'grafana_popup_link' %}";
+      var grafana_popup_ok = "{% trans 'grafana_popup_ok' %}";
+      var show_popup = {% if actor_is_admin or actor_is_executive %} true {% else %} false {% endif %};
+    </script>
+
     {% compress js %}
-		<script src="/static/js/jquery.min.js"></script>
-	  <script src="/static/js/bootstrap.min.js"></script>
+
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
     <script src="/static/js/fastclick.js"></script>
     <script src="/static/js/nprogress.js"></script>
-		<script src="/static/js/Chart.min.js"></script>
-		<script src="/static/js/gauge.min.js"></script>
-		<script src="/static/js/bootstrap-progressbar.min.js"></script>
-		<script src="/static/js/icheck.min.js"></script>
-		<script src="/static/js/skycons.js"></script>
-		<script src="/static/js/validator.js"></script>
+    <script src="/static/js/Chart.min.js"></script>
+  	<script src="/static/js/gauge.min.js"></script>
+  	<script src="/static/js/bootstrap-progressbar.min.js"></script>
+  	<script src="/static/js/icheck.min.js"></script>
+  	<script src="/static/js/skycons.js"></script>
+  	<script src="/static/js/validator.js"></script>
     <script src="/static/js/echarts.min.js"></script>
-		<script src="/static/js/fileinput.min.js"></script>
+    <script src="/static/js/fileinput.min.js"></script>
     <script src="/static/js/moment.min.js"></script>
     <script src="/static/js/daterangepicker.js"></script>
     <script src="/static/js/bootstrapvalidator.min.js"></script>
+    <script src="/static/js/metronus.js"></script>
+    <script src="/static/js/theme.js"></script>
+    <script src="/static/js/raptorize.js"></script>
+    <script src="/static/js/custom.min.js"></script>
+    <script src="/static/js/grafana_popup.js"></script>
+    <script src="/static/js/jquery.throt-deb.min.js"></script>
+    <script src="/static/landing/js/cookies.min.js"></script>
+    <script src="/static/landing/js/wow.min.js"></script>
+
+    <script>
+      const theme = getMetronusTheme();
+    </script>
     {% endcompress %}
 
-  <script>
-      var theme = {
-        color: [
-            '#26B99A', '#34495E', '#BDC3C7', '#3498DB',
-            '#9B59B6', '#8abb6f', '#759c6a', '#bfd3b7'
-        ],
-
-        title: {
-            itemGap: 8,
-            textStyle: {
-                fontWeight: 'normal',
-                color: '#408829'
-            }
-        },
-
-        dataRange: {
-            color: ['#1f610a', '#97b58d']
-        },
-
-        toolbox: {
-            color: ['#408829', '#408829', '#408829', '#408829']
-        },
-
-        tooltip: {
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            axisPointer: {
-                type: 'line',
-                lineStyle: {
-                    color: '#408829',
-                    type: 'dashed'
-                },
-                crossStyle: {
-                    color: '#408829'
-                },
-                shadowStyle: {
-                    color: 'rgba(200,200,200,0.3)'
-                }
-            }
-        },
-
-        dataZoom: {
-            dataBackgroundColor: '#eee',
-            fillerColor: 'rgba(64,136,41,0.2)',
-            handleColor: '#408829'
-        },
-        grid: {
-            borderWidth: 0
-        },
-
-        categoryAxis: {
-            axisLine: {
-                lineStyle: {
-                    color: '#408829'
-                }
-            },
-            splitLine: {
-                lineStyle: {
-                    color: ['#eee']
-                }
-            }
-        },
-
-        valueAxis: {
-            axisLine: {
-                lineStyle: {
-                    color: '#408829'
-                }
-            },
-            splitArea: {
-                show: true,
-                areaStyle: {
-                    color: ['rgba(250,250,250,0.1)', 'rgba(200,200,200,0.1)']
-                }
-            },
-            splitLine: {
-                lineStyle: {
-                    color: ['#eee']
-                }
-            }
-        },
-        timeline: {
-            lineStyle: {
-                color: '#408829'
-            },
-            controlStyle: {
-                normal: {
-                    color: '#408829'
-                },
-                emphasis: {
-                    color: '#408829'
-                }
-            }
-        },
-
-        k: {
-            itemStyle: {
-                normal: {
-                    color: '#68a54a',
-                    color0: '#a9cba2',
-                    lineStyle: {
-                        width: 1,
-                        color: '#408829',
-                        color0: '#86b379'
-                    }
-                }
-            }
-        },
-        map: {
-            itemStyle: {
-                normal: {
-                    areaStyle: {
-                        color: '#ddd'
-                    },
-                    label: {
-                        textStyle: {
-                            color: '#c12e34'
-                        }
-                    }
-                },
-                emphasis: {
-                    areaStyle: {
-                        color: '#99d2dd'
-                    },
-                    label: {
-                        textStyle: {
-                            color: '#c12e34'
-                        }
-                    }
-                }
-            }
-        },
-        force: {
-            itemStyle: {
-                normal: {
-                    linkStyle: {
-                        strokeColor: '#408829'
-                    }
-                }
-            }
-        },
-        chord: {
-            padding: 4,
-            itemStyle: {
-                normal: {
-                    lineStyle: {
-                        width: 1,
-                        color: 'rgba(128, 128, 128, 0.5)'
-                    },
-                    chordStyle: {
-                        lineStyle: {
-                            width: 1,
-                            color: 'rgba(128, 128, 128, 0.5)'
-                        }
-                    }
-                },
-                emphasis: {
-                    lineStyle: {
-                        width: 1,
-                        color: 'rgba(128, 128, 128, 0.5)'
-                    },
-                    chordStyle: {
-                        lineStyle: {
-                            width: 1,
-                            color: 'rgba(128, 128, 128, 0.5)'
-                        }
-                    }
-                }
-            }
-        },
-        gauge: {
-            startAngle: 225,
-            endAngle: -45,
-            axisLine: {
-                show: true,
-                lineStyle: {
-                    color: [
-                        [0.2, '#86b379'],
-                        [0.8, '#68a54a'],
-                        [1, '#408829']
-                    ],
-                    width: 8
-                }
-            },
-            axisTick: {
-                splitNumber: 10,
-                length: 12,
-                lineStyle: {
-                    color: 'auto'
-                }
-            },
-            axisLabel: {
-                textStyle: {
-                    color: 'auto'
-                }
-            },
-            splitLine: {
-                length: 18,
-                lineStyle: {
-                    color: 'auto'
-                }
-            },
-            pointer: {
-                length: '90%',
-                color: 'auto'
-            },
-            title: {
-                textStyle: {
-                    color: '#333'
-                }
-            },
-            detail: {
-                textStyle: {
-                    color: 'auto'
-                }
-            }
-        },
-        textStyle: {
-            fontFamily: 'Arial, Verdana, sans-serif'
-        }
-    };
-  </script>
     {% block javascript %}
 
     {% endblock %}
-    <script src="/static/js/custom.min.js"></script>
-
-    <!-- js -->
-    {% compress js %}
-    <script src="/static/landing/js/cookies.min.js"></script>
-    <script src="/static/landing/js/wow.min.js"></script>
-    {% endcompress %}
-
-    <script>
-      $( document ).ready(function() {
-        new WOW().init();
-
-        $("#flag_es").click(function() {
-          Cookies.set('lang', 'es-es', {domain: '.metronus.es'});
-          location.reload(true);
-        });
-
-        $("#flag_en").click(function() {
-          Cookies.set('lang', 'en-us', {domain: '.metronus.es'});
-          location.reload(true);
-        });
-      });
-    </script>
-
   </body>
 </html>

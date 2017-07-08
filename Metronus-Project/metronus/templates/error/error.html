@@ -1,0 +1,69 @@
+{% load compress %}
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Metronus | Error</title>
+
+    {% compress css %}
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/static/css/nprogress.css" rel="stylesheet">
+    <link href="/static/css/custom.min.css" rel="stylesheet">
+    {% endcompress %}
+
+    <style>
+      body {
+        color: #ddd;
+     }
+
+     #error_msg {
+        font-size: 200%;
+     }
+
+      #image_error {
+        padding-bottom: 15px;
+      }
+    </style>
+  </head>
+
+  <body class="nav-md">
+    <div class="container body">
+      <div class="main_container">
+        <!-- page content -->
+        <div class="col-md-12">
+          <div class="col-middle">
+            <div class="text-center text-center">
+              {% block error_number %}
+
+              {% endblock %}
+
+              <img id="image_error" class="img-responsive center-block" src="{{img}}" alt="Image error"/>
+
+              {% block error_description %}
+
+              {% endblock %}
+              <div class="mid_center">
+                <button  type="button" class="btn btn-warning submit" onclick="window.history.back()">{% trans 'return_to_landingpage' %}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /page content -->
+      </div>
+    </div>
+
+    {% compress js %}
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/fastclick.js"></script>
+    <script src="/static/js/nprogress.js"></script>
+    <script src="/static/js/custom.min.js"></script>
+    {% endcompress %}
+  </body>
+</html>

@@ -5,8 +5,11 @@ from metronus_app.model.project                       import Project
 from metronus_app.model.department                    import Department
 from django.contrib.auth.models                       import User
 from metronus_app.model.administrator                 import Administrator
+from metronus_app.model.actor                         import Actor
 from metronus_app.model.task                          import Task
 from metronus_app.model.timeLog                       import TimeLog
+from metronus_app.model.employeeLog                       import EmployeeLog
+from metronus_app.model.companyLog                       import CompanyLog
 from metronus_app.model.projectDepartment             import ProjectDepartment
 from metronus_app.model.goalEvolution             import GoalEvolution
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
@@ -74,11 +77,19 @@ class ModelStringTestCase(TestCase):
         )
         GoalEvolution.objects.create(
             task_id=task1,
-
             actor_id = emp1,
             production_goal=9.0,
             goal_description="kgs",
             price_per_unit=3.0
+            )
+        CompanyLog.objects.create(
+            cif = "A12345678",
+            company_name = "comp",
+            registryDate="2016-01-02 10:00+00:00",
+            )
+        EmployeeLog.objects.create(
+            employee_id = emp1,
+            price_per_hour = 20.0
             )
 
     def test_strings_ok(self):
@@ -102,3 +113,8 @@ class ModelStringTestCase(TestCase):
         do_test(Role,"EMPLOYEE")
         do_test(Task,"Hacer cosas")
         do_test(TimeLog,"Hacer cosas - 2017-01-02 10:00 - he currado mucho")
+
+        do_test(EmployeeLog,"{0} - A - {1}".format(Employee.objects.first(),
+            EmployeeLog.objects.first().event_date))
+        do_test(CompanyLog,"A12345678-comp")
+        do_test(Actor,"12345")

@@ -1,0 +1,9 @@
+{% load i18n %}
+{% load l10n %}
+
+<label class="control-label" for="searcher">{% trans 'filter' %}</label>
+<!-- searcher -->
+<input class="control-label" id="searcher"/>
+<!-- model es el tipo a buscar (project,department,task)-->
+<input id="searcher_model" type="hidden" value="{{model}}"/>
+<button  class="btn btn-success" id="search_button">{% trans 'search' %}</button>

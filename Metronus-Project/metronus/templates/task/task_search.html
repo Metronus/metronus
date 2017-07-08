@@ -1,0 +1,33 @@
+{% load i18n %}
+{% load l10n %}
+{% load custom_tags %}
+
+{% block content %}
+
+  
+    {% for task in tasks %}
+            <tr>
+              <td class="searchable">{{task.name}}</td>
+              <td>{{task.projectDepartment_id.project_id.name}} / {{task.projectDepartment_id.department_id.name}}</td>
+              <td>{{task.actor_id.user.first_name}} {{task.actor_id.user.last_name}}</td>
+              <td>{{task.registryDate}}</td>
+              <td>
+                <a href="{% url 'task_view' task.id %}" type="button" class="btn btn-success">
+                  {% trans 'details' %}
+                </a>
+              </td>
+              {% if user.actor|checkAdmin or user.actor|checkExecutive or user.actor|checkProjectManager or user.actor|checkCoordinator %}
+                <td class="hidden-xs">
+                  <a href="{% url 'task_edit' task.id %}" type="button" class="btn btn-dark">
+                    {% trans 'edit' %}
+                  </a>
+                </td>
+                <td class="hidden-xs">
+                  <a href="#" class="btn btn-danger" data-href="{% url 'task_delete' task.id %}"
+                    data-toggle="modal" data-target="#confirm-delete">{% trans 'delete' %}</a>
+                </td>
+              {% endif %}
+            </tr>
+            {% endfor %}
+
+{% endblock %}

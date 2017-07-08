@@ -7,7 +7,10 @@
 <div class="row">
     <div class="page-title">
         <div class="title_left">
-            <h3><strong>{% trans 'task' %}: </strong> {{ task.name }}</h3>
+            <h3><strong>{% trans 'task' %}: </strong> {{ task.name }}
+            {% if task.active == False %}
+              <i>({% trans "inactive" %})</i>
+            {% endif %}</h3>
         </div>
     </div>
 
@@ -87,7 +90,7 @@
             <div class="col-xs-12">
                 <div class="x_panel">
                     <div class="x_title">
-                        <h2>{% trans 'employeeList' %}</h2>
+                        <h2>{% trans 'employees_worked_task' %}</h2>
                         <div class="clearfix"></div>
                     </div>
 
@@ -98,8 +101,8 @@
                             <thead>
                                 <tr>
                                     <th>{% trans 'username' %}</th>
-                                    <th>{% trans 'identifier' %}</th>
-                                    <th>{% trans 'phone' %}</th>
+                                    <th class="hidden-xs">{% trans 'identifier' %}</th>
+                                    <th class="hidden-xs">{% trans 'phone' %}</th>
                                     <th class="hidden-xs">{% trans 'registryDate' %}</th>
                                     <th>{% trans 'actions' %}</th>
                                 </tr>
@@ -116,8 +119,8 @@
                                             {{employee.user}}
                                         </td>
 
-                                        <td>{{employee.identifier}}</td>
-                                        <td>{{employee.phone}}</td>
+                                        <td class="hidden-xs">{{employee.identifier}}</td>
+                                        <td class="hidden-xs">{{employee.phone}}</td>
                                         <td class="hidden-xs">{{employee.registryDate}}</td>
 
 
@@ -256,11 +259,28 @@
           data:['Expenses and income']
         },
         toolbox: {
-          show : true,
-          feature : {
-            saveAsImage : {show: true}
-          }
-        },
+                show: true,
+                feature: {
+                    magicType: {
+                        show: true,
+                        title: {
+                            line: '{% trans 'line' %}',
+                            bar: '{% trans 'bar' %}',
+                            stack: '{% trans  'stack' %}',
+                            tiled: '{% trans 'tiled' %}'
+                        },
+                        type: ['line', 'bar', 'stack', 'tiled']
+                    },
+                    restore: {
+                        show: false,
+                        title: '{% trans 'restore' %}'
+                    },
+                    saveAsImage: {
+                        show: true,
+                        title: '{% trans 'saveImage' %}'
+                    }
+                }
+            },
         calculable : true,
         xAxis : [
         {

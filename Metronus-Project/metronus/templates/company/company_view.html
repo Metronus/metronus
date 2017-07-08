@@ -4,86 +4,65 @@
 {% block title %}{% trans 'companyView' %}{% endblock %}
 
 {% block content %}
+<style>
+  ul.quick-list > li {
+    overflow: visible !important;
+  }
+</style>
+
 <h1><strong>{{company.company_name}} </strong>{{company.name}}</h1>
- <div class="clearfix">
-   <br>
- </div>
+<div class="clearfix"></div>
 
- <div class="row">
-    <div class="col-xs-12">
-        <div class="x_panel">
-            <div class="x_title">
-                <h2>{% trans 'company_info' %}</h2>
-                <div class="clearfix"></div>
-            </div>
-            <div class="x_content">
-
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th>{% trans 'company_name' %}</th>
-                            <th>{% trans 'cif' %}</th>
-                            <th>{% trans 'short_name' %}</th>
-                            <th>{% trans 'company_phone' %}</th>
-                            <th>{% trans 'company_email' %}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                            <tr>
-                                <td>{{company.company_name}}</td>
-                                <td>{{company.cif}}</td>
-                                <td>{{company.short_name}}</td>
-                                <td>{{company.phone}}</td>
-                                <td>{{company.email}}</td>
-                                <td><a href="/company/edit/" type="button" class="btn btn-dark">{% trans 'edit' %}</a></td>
-                            </tr>
-                    </tbody>
-                </table>
-            </div>
-         
-        </div>
+<div class="col-md-4 col-md-offset-2 col-sm-4 col-sm-offset-2 col-xs-12">
+  <div class="x_panel tile">
+    <div class="x_title">
+      <h2>{% trans 'company_info' %}</h2>
+      <div class="clearfix"></div>
     </div>
+
+    <div class="x_content">
+      <div class="dashboard-widget-content">
+        {% if company.logo %}
+          <img src="{{ MEDIA_URL }}{{company.logo}}" style="max-height: 120px; max-width: auto;" class="img-responsive center-block">
+        <hr>
+        {% endif %}
+        <ul class="quick-list">
+          <li><i class="glyphicon glyphicon-text-size"></i>{{company.company_name}}</li>
+          <li><i class="fa fa-briefcase"></i>{{company.cif}}</li>
+          <li><i class="fa fa-phone"></i>{{company.phone}}</li>
+          <li><i class="fa fa-at"></i>{{company.email}}</li>
+          <li></li>
+          <li><a href="/company/edit/" type="button" class="btn btn-dark">{% trans 'edit' %}</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
 </div>
 
-
-
- <div class="row">
-    <div class="col-xs-12">
-        <div class="x_panel">
-            <div class="x_title">
-                <h2>{% trans 'admin_info' %}</h2>
-                <div class="clearfix"></div>
-            </div>
-            <div class="x_content">
-
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th>{% trans 'username' %}</th>
-                            <th>{% trans 'email' %}</th>
-                            <th>{% trans 'identifier' %}</th>
-                            <th>{% trans 'phone' %}</th>
-                            <th>{% trans 'registryDate' %}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>{{admin.user.username}}</td>
-                            <td>{{admin.user.email}}</td>
-                            <td>{{admin.identifier}}</td>
-                            <td>{{admin.phone}}</td>
-                            <td>{{admin.registryDate}}</td>
-                            <td><a href="/administrator/edit/" type="button" class="btn btn-dark">{% trans 'edit' %}</a></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-         
-        </div>
+<div class="col-md-4 col-sm-4 col-xs-12">
+  <div class="x_panel tile">
+    <div class="x_title">
+      <h2>{% trans 'admin_info' %}</h2>
+      <div class="clearfix"></div>
     </div>
+
+    <div class="x_content">
+      <div class="dashboard-widget-content">
+        {% if admin.picture %}
+          <img src="{{ MEDIA_URL }}{{admin.picture}}" style="max-height: 120px; max-width: auto;" class="img-responsive center-block">
+        <hr>
+        {% endif %}
+        <ul class="quick-list">
+          <li><i class="fa fa-user"></i>{{admin.user.username}}</li>
+          <li><i class="fa fa-at"></i>{{admin.user.email}}</li>
+          <li><i class="fa fa-briefcase"></i>{{admin.identifier}}</li>
+          <li><i class="fa fa-phone"></i>{{admin.phone}}</li>
+          <li><i class="fa fa-calendar-o"></i>{{admin.registryDate}}</li>
+          <li></li>
+          <li><a href="/administrator/edit/" type="button" class="btn btn-dark">{% trans 'edit' %}</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
 </div>
-
-{% endblock %}
-
-{% block javascript %}
 {% endblock %}

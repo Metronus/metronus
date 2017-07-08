@@ -1,14 +1,12 @@
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponseRedirect, HttpResponseBadRequest, JsonResponse, HttpResponse
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
+from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum, F, FloatField
+from django.db.models import Sum, F, FloatField, Q
 from django.core import serializers
-from django.utils.dateparse import parse_datetime
 
 from metronus_app.forms.taskForm import TaskForm
 from metronus_app.model.task import Task
-from metronus_app.model.actor import Actor
 from metronus_app.model.project import Project
 from metronus_app.model.timeLog import TimeLog
 from metronus_app.model.employee import Employee
@@ -16,11 +14,12 @@ from metronus_app.model.department import Department
 from metronus_app.model.goalEvolution import GoalEvolution
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.projectDepartmentEmployeeRole import ProjectDepartmentEmployeeRole
+from metronus_app.common_utils import default_round,get_actor_or_403,same_company_or_403,is_executive, get_highest_role_tier
+
 
 from datetime import date, timedelta, datetime
 
 import re
-import calendar
 
 
 def create(request):
@@ -39,7 +38,7 @@ def create(request):
     task_form.html
     """
     # Check that the user is logged in
-    actor = check_task(None, request)
+    actor = check_task(request,None)
     errors = []
 
     # if this is a POST request we need to process the form data
@@ -55,24 +54,23 @@ def create(request):
             pname = form.cleaned_data['name']
             ppro = form.cleaned_data['project_id']
             pdep = form.cleaned_data['department_id']
-            pdtuple = find_tuple(ppro.id, pdep.id, actor)
+            pdtuple = find_tuple(ppro, pdep, actor)
+            if ppro.deleted:
+                errors.append('task_creation_project_inactive')
+            if not pdep.active:
+                errors.append('task_creation_department_inactive')
             if pdtuple is None:
                 errors.append('task_creation_project_department_not_related')
             else:
                 pro = find_name(pname,pdtuple)
-                if pro is not None and pro.active:
+                if pro is not None:
                     errors.append('task_creation_repeated_name')
-            
+
             if not errors:
-                if pro and not pro.active:
-                    check_task(pro, request)
-                    pro.active = True
-                    pro.save()
-                    return HttpResponseRedirect('/task/list')
-                else:
-                    actor = check_task(pro, request)
-                    create_task(form, pdtuple, actor)
-                    return HttpResponseRedirect('/task/list')
+                tid = create_task(form, pdtuple, actor)
+                return HttpResponseRedirect('/task/view/{0}/' .format( tid))
+            else:
+                errors.append('task_creation_error')
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -101,7 +99,7 @@ def create_async(request):
     task_form.html
     """
     # Check that the user is logged in
-    actor = check_task(None, request)
+    actor = check_task(request,None)
 
     errors = []
     data = {
@@ -120,24 +118,24 @@ def create_async(request):
             pname = form.cleaned_data['name']
             ppro = form.cleaned_data['project_id']
             pdep = form.cleaned_data['department_id']
-            pdtuple = find_tuple(ppro.id, pdep.id, actor)
+
+            pdtuple = find_tuple(ppro, pdep, actor)
+            if ppro.deleted:
+                errors.append('task_creation_project_inactive')
+            if not pdep.active:
+                errors.append('task_creation_department_inactive')
             if pdtuple is None:
                 errors.append('task_creation_project_department_not_related')
             else:
                 pro = find_name(pname, pdtuple)
-                if pro is not None and pro.active:
+                if pro is not None:
                     errors.append('task_creation_repeated_name')
 
             if not errors:
-                if pro and not pro.active:
-                    check_task(pro, request)
-                    pro.active = True
-                    pro.save()
-                    return JsonResponse(data)
-                else:
-                    actor = check_task(pro, request)
-                    create_task(form, pdtuple, actor)
-                    return JsonResponse(data)
+                create_task(form, pdtuple, actor)
+                return JsonResponse(data)
+        else:
+            errors.append('task_creation_error')
     # if a GET (or any other method) we'll create a blank form
     else:
         return HttpResponseRedirect('/department/create')
@@ -168,9 +166,29 @@ def list_tasks(request):
     task_list.html
     """
     # Check that the user is logged in
-    tasks = check_role_for_list(request)
-    return render(request, "task/task_list.html", {"tasks": tasks})
+    tasks = get_list_for_role(request)
+    active = tasks.filter(active=True)
+    inactive = tasks.filter(active=False)
+    return render(request, "task/task_list.html",
+            {"tasks": active, "inactive":inactive})
 
+def list_tasks_search(request,name):
+    """
+    returns:
+    tasks: lista de tareas del actor logeado
+
+    template:
+    task_list.html
+    """
+
+    # Check that the current user has permissions
+    tasks = get_list_for_role(request).filter(active=True)
+
+    if name != "all_true":
+        tasks = tasks.filter(name__icontains=name)
+
+    return render(request, "task/task_search.html",
+        {"tasks": tasks})
 
 def view(request, task_id):
     """
@@ -187,10 +205,13 @@ def view(request, task_id):
     """
 
     task = get_object_or_404(Task, pk=task_id)
-    check_task(task, request)
-    goal_evolution = GoalEvolution.objects.filter(task_id=task.id)
-    employees = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__task=task.id).distinct()
+    actor=check_task(request,task, for_view=True)
+    same_company_or_403(actor,task.actor_id)
 
+    goal_evolution = GoalEvolution.objects.filter(task_id=task.id)
+    #employees = Employee.objects.filter(projectdepartmentemployeerole__projectDepartment_id__task=task.id,
+    #    projectdepartmentemployeerole__role_id__tier__lte=20).distinct()
+    employees = Employee.objects.filter(timelog__task_id=task.id).distinct()
     return render(request, "task/task_view.html", {"task": task, "goal_evolution": goal_evolution, "employees": employees})
 
 
@@ -211,7 +232,9 @@ def edit(request, task_id):
     task_form.html
     """
     # Check that the user is logged in
-    actor = check_task(None, request)
+    task = get_object_or_404(Task, pk=task_id)
+    actor=check_task(request,task)
+    same_company_or_403(actor,task.actor_id)
 
     errors = []
 
@@ -223,14 +246,12 @@ def edit(request, task_id):
         if form.is_valid():
             # process the data in form.cleaned_data as required
             errors=process_task_form(form)
-            task = get_object_or_404(Task, pk=form.cleaned_data['task_id'])
-            check_task(task, request)
             # find tasks with the same name
             pro = Task.objects.filter(name=form.cleaned_data['name'],
                                       projectDepartment_id=task.projectDepartment_id).first()
 
             # pro does not exists or it's the same
-            if pro is not None and pro.id != task.id and pro.active:
+            if pro is not None and pro.id != task.id:
                 errors.append('task_creation_repeated_name')
 
             if not errors:
@@ -239,7 +260,6 @@ def edit(request, task_id):
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        task = get_object_or_404(Task, pk=task_id)
         form = TaskForm(initial={"name": task.name, "description": task.description,
                                  "task_id": task.id,
                                  "production_goal": task.production_goal if task.production_goal is not None else "",
@@ -249,9 +269,9 @@ def edit(request, task_id):
                                  "price_per_unit": task.price_per_unit if task.price_per_unit is not None else "",
                                  "price_per_hour": task.price_per_hour if task.price_per_hour is not None else ""})
     # The project
-    coll = find_collections(request)
+
     return render(request, 'task/task_form.html', {'form': form, "errors": errors,
-                                              "departments": coll["departments"], "projects": coll["projects"]})
+                                              "departments": [task.projectDepartment_id.department_id], "projects": [task.projectDepartment_id.project_id]})
 
 
 def delete(request, task_id):
@@ -267,8 +287,30 @@ def delete(request, task_id):
     """
     # Check that the user is logged in
     task = get_object_or_404(Task, pk=task_id, active=True)
-    check_task(task, request)
+    actor=check_task(request,task)
+    same_company_or_403(actor,task.actor_id)
+
     delete_task(task)
+
+    return HttpResponseRedirect('/task/list')
+
+def recover(request, task_id):
+    """
+    parameters:
+    task_id: the task id to recover
+
+    returns:
+    nothing
+
+    template:
+    task_list.html
+    """
+    # Check that the user is logged in
+    task = get_object_or_404(Task, pk=task_id, active=False)
+    actor=check_task(request,task)
+    same_company_or_403(actor,task.actor_id)
+
+    recover_task(task)
 
     return HttpResponseRedirect('/task/list')
 
@@ -292,17 +334,15 @@ def ajax_productivity_per_task(request):
     """
     # ------------------------- Cortesía de Agu ------------------------------
 
-    if not request.user.is_authenticated():
-        raise PermissionDenied
-    try:
-        Actor.objects.get(user=request.user)
-    except ObjectDoesNotExist:
-        raise PermissionDenied
+    actor=get_actor_or_403(request)
 
     if "task_id" not in request.GET:
-        return HttpResponseBadRequest()
+        raise SuspiciousOperation
 
     task_id = request.GET["task_id"]
+    task=get_object_or_404(Task, pk=task_id)
+    actor=check_task(request,task,for_view=True)
+    same_company_or_403(actor,task.actor_id)
 
     # Get and parse the dates and the offset
     start_date = request.GET.get("start_date", str(date.today() - timedelta(days=30)))
@@ -310,39 +350,72 @@ def ajax_productivity_per_task(request):
     date_regex = re.compile("^\d{4}-\d{2}-\d{2}$")
 
     if date_regex.match(start_date) is None or date_regex.match(end_date) is None:
-        return HttpResponseBadRequest("Start/end date are not valid")
+        raise SuspiciousOperation("Start/end date are not valid")
 
     offset = request.GET.get("offset", "+00:00")
     offset_regex = re.compile("^(\+|-)\d{2}:\d{2}$")
 
     if offset_regex.match(offset) is None:
-        return HttpResponseBadRequest("Time offset is not valid")
+        raise SuspiciousOperation("Time offset is not valid")
 
     # Append time offsets
     start_date += " 00:00" + offset
     end_date += " 00:00" + offset
 
     # --------------------------------------------------------------------------
-    data = {
-        'production': [],
-        'goal_evolution': [],
-        'days': []
-    }
-    production = TimeLog.objects.filter(task_id_id=task_id, workDate__range=[start_date, end_date]).order_by('workDate')
-    task = get_object_or_404(Task, pk=task_id, active=True)
-    z = 0
-    start_date_parse = parse_datetime(start_date)
-    for i in range(0, 31):
-        if production is not None and len(production) > z and abs((production[z].workDate-start_date_parse).days) == i:
-            data['production'].append(production[z].produced_units / (production[z].duration/60))
-            z += 1
+    dates = []
+    str_dates = []
+
+    d1 = datetime.strptime(start_date[0:19] + start_date[20:22], '%Y-%m-%d %H:%M%z')
+    d2 = datetime.strptime(end_date[0:19] + end_date[20:22], '%Y-%m-%d %H:%M%z')
+    delta = d2 - d1  # timedelta
+
+    for i in range(delta.days + 1):
+        str_dates.append((d1 + timedelta(days=i)).date().strftime("%Y-%m-%d"))
+        dates.append(d1 + timedelta(days=i))
+
+    data = {"days": str_dates, "production": [], "goal_evolution": []}
+    index = 0
+    # Save productivity for each  date
+    # for each date, we will find the asociated timelog
+    for log_date in dates:
+        log = TimeLog.objects.filter(task_id=task_id, workDate__year=log_date.year, workDate__month=log_date.month,
+                                     workDate__day=log_date.day).aggregate(
+            total_duration=Sum(  F("duration")/60.0, output_field=FloatField()),
+            total_produced_units=Sum(  F("produced_units"), output_field=FloatField()))
+        if log is None:
+            # Not work that day
+            total_productivity = 0
+            total_duration = 0
         else:
-            data['production'].append(0)
+            total_produced_units = log["total_produced_units"]
+            total_duration = log["total_duration"]
+            if total_duration == 0 or total_duration is None:
+                total_productivity = 0
+            else:
+                # If not produced but spent time, 0 productivity (you lazy guy...)
+                if total_produced_units is None:
+                    total_productivity = 0
+                else:
+                    total_productivity = total_produced_units/total_duration
 
-        data['goal_evolution'].append(task.production_goal)
+        # Find the registry date of production goal evolution which is closest to the date
+        expected_productivity = GoalEvolution.objects.filter(task_id_id=task_id,
+                                                             registryDate__gte=log_date).first()
 
-        prod_day = start_date_parse + timedelta(days=i)
-        data['days'].append(str(prod_day.day)+", "+str(calendar.month_name[prod_day.month]))
+        # If we do not find the goal or if the date is after the last task update, it may be the current task goal
+        if total_duration==0 or total_duration is None:
+            expected_productivity=0
+        else:
+            if expected_productivity is None or task.registryDate <= log_date:
+                expected_productivity = task.production_goal
+            else:
+                expected_productivity = expected_productivity.production_goal
+
+        data["production"].append(default_round(total_productivity))
+        data["goal_evolution"].append(default_round(expected_productivity))
+
+
     return JsonResponse(data)
 
 
@@ -369,6 +442,9 @@ def ajax_profit_per_date(request, task_id):
     "income": [0, 155861.848663544, 106596.060817813, 133996.946277026, 176182.618433908, 130780.529090679, 185712.238665422, 168691.006425482, 201528.027548702, 133961.680656505, 146130.652317868, 160978.773806858, 254646.651869028, 232419.619341417, 113043.655527752, 128847.7293944, 186411.255163309, 126824.943128807, 261600.084774754, 200811.161504088, 158938.293244699, 188362.131387002, 166524.276102895, 114811.676076952, 210347.838939301, 115268.666410966, 126145.268594169, 131910.452677469, 274896.663475654, 127528.492837469, 177974.319716889],
     "expenses": [0, 1457.18015695298, 1614.1458826106, 1367.62026485911, 2026.87328274918, 1446.83842607798, 1878.80598163726, 1823.8647251497, 1879.3977160153, 1607.99448986952, 1615.72129910026, 1609.49391115067, 2513.94326680278, 2112.07014158364, 1360.67562490714, 1368.60590722518, 1603.92947753372, 1473.68308776497, 2343.40799525207, 1704.64596258349, 1938.38239104717, 1403.70478335668, 1372.6250345277, 1076.44946125988, 2353.7065671626, 1516.12119421768, 1611.60427318295, 1338.82219760799, 2525.26576799895, 1422.68356444232, 1765.66996904502]}  "expected_productivity": [9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 4.0, 4.0, 2.0, 2.0, 2.0]}}
     """
+    task=get_object_or_404(Task, pk=task_id)
+    actor=check_task(request,task,for_view=True)
+    same_company_or_403(actor,task.actor_id)
 
     # Get and parse the dates
     start_date = request.GET.get("start_date", str(date.today() - timedelta(days=30)))
@@ -376,19 +452,18 @@ def ajax_profit_per_date(request, task_id):
     date_regex = re.compile("^\d{4}-\d{2}-\d{2}$")
 
     if date_regex.match(start_date) is None or date_regex.match(end_date) is None:
-        return HttpResponseBadRequest("Start/end date are not valid")
+        raise SuspiciousOperation("Start/end date are not valid")
 
     offset = request.GET.get("offset", "+00:00")
     offset_regex = re.compile("^(\+|-)\d{2}:\d{2}$")
 
     if offset_regex.match(offset) is None:
-        return HttpResponseBadRequest("Time offset is not valid")
+        raise SuspiciousOperation("Time offset is not valid")
 
     # Append time offsets
     start_date += " 00:00" + offset
     end_date += " 00:00" + offset
 
-    check_metrics_authorized_for_task(request.user, task_id)
     # Get all dates between start and end
     dates = []
     str_dates = []
@@ -417,14 +492,14 @@ def ajax_profit_per_date(request, task_id):
                                 )["total_income"]
         income = income if income is not None else 0
 
-        data['expenses'].append(expenses)
-        data['income'].append(income)
+        data['expenses'].append(default_round(expenses))
+        data['income'].append(default_round(income))
         if index == 0:
-            data['acumExpenses'].append(expenses)
-            data['acumIncome'].append(income)
+            data['acumExpenses'].append(default_round(expenses))
+            data['acumIncome'].append(default_round(income))
         else:
-            data['acumExpenses'].append(data['acumExpenses'][index - 1] + expenses)
-            data['acumIncome'].append(data['acumIncome'][index - 1] + income)
+            data['acumExpenses'].append(default_round(data['acumExpenses'][index - 1] + expenses))
+            data['acumIncome'].append(default_round(data['acumIncome'][index - 1] + income))
         index += 1
 
     return JsonResponse(data)
@@ -453,10 +528,12 @@ def create_task(form, project_department, actor):
     fperunit = form.cleaned_data['price_per_unit']
     fperhour = form.cleaned_data['price_per_hour']
 
-    Task.objects.create(name=fname, description=fdescription,
+    created_task = Task.objects.create(name=fname, description=fdescription,
                         projectDepartment_id=project_department, actor_id=actor,
                         production_goal=fgoal, goal_description=fgoaldescription,
                         price_per_unit=fperunit, price_per_hour=fperhour)
+
+    return created_task.id
 
 
 def update_task(task, form, actor):
@@ -515,64 +592,28 @@ def delete_task(task):
     task.active = False
     task.save()
 
+def recover_task(task):
+    """Recovers a task"""
+    task.active = True
+    task.save()
 
-def check_role_for_list(request):
+def get_list_for_role(request):
     """
-    returns the list depending on the actor
+    Gets the list of tasks according to the role tier of the logged user
     """
-    if not request.user.is_authenticated():
-        raise PermissionDenied
-    try:
-        actor = Actor.objects.get(user=request.user)
-    except ObjectDoesNotExist:
-        raise PermissionDenied
+    actor=get_actor_or_403(request)
+    highest=get_highest_role_tier(actor)
 
-    if actor.user_type != 'A':
-        # not an admin
-        is_team_manager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=30)
-        res = is_team_manager.count() > 0
-
-        if res:
-            # is manager
-            task = Task.objects.filter(actor_id__company_id=actor.company_id, active=True).distinct()
-        else:
-            # not a manager
-            task = Task.objects.filter(actor_id__company_id=actor.company_id,
-                                       projectDepartment_id__projectdepartmentemployeerole__employee_id=actor,
-                                       active=True).distinct()
+    if highest < 20:
+        raise PermissionDenied
+    elif highest>=50:
+        return Task.objects.filter(actor_id__company_id=actor.company_id).distinct().order_by("name")
     else:
-        # is admin
-        task = Task.objects.filter(actor_id__company_id=actor.company_id, active=True).distinct()
-    return task
-
-
-def check_task(task, request):
-    """
-    checks if the task belongs to the logged actor with appropiate roles
-    Admin, manager or dep/proj manager
-    """
-    if not request.user.is_authenticated():
-        raise PermissionDenied
-    try:
-        actor = Actor.objects.get(user=request.user)
-    except ObjectDoesNotExist:
-        raise PermissionDenied
-
-    # Check that the actor has permission to view the task
-    if task is not None and task.actor_id.company_id != actor.company_id:
-        raise PermissionDenied
-
-    if actor.user_type != 'A':
-        is_team_manager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=30)
-        res = is_team_manager.count() > 0
-
-        if not res:
-            roles = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__in=[50, 40, 20])
-            res = roles.count() > 0
-        if not res:
-            raise PermissionDenied
-
-    return actor
+        return Task.objects.filter(actor_id__company_id=actor.company_id,
+            projectDepartment_id__project_id__deleted=False,
+            projectDepartment_id__department_id__active=True,
+            projectDepartment_id__projectdepartmentemployeerole__role_id__tier__gte=20,
+            projectDepartment_id__projectdepartmentemployeerole__employee_id=actor).distinct()
 
 
 def find_name(pname, project_department):
@@ -582,15 +623,13 @@ def find_name(pname, project_department):
     return Task.objects.filter(name=pname, projectDepartment_id=project_department).first()
 
 
-def find_tuple(project_id, department_id, actor):
+def find_tuple(project, department, actor):
     """
     Returns a tuple project-department
     """
-    project = get_object_or_404(Project, pk=project_id)
-    department = get_object_or_404(Department, pk=department_id)
+    same_company_or_403(actor,project)
+    same_company_or_403(actor,department)
 
-    if project.company_id != department.company_id or project.company_id != actor.company_id:
-        raise PermissionDenied
     return ProjectDepartment.objects.filter(project_id=project, department_id=department).first()
 
 
@@ -598,102 +637,93 @@ def find_collections(request):
     """
     Gets the projects and departments the logged user can create tasks for, depending to their roles
     """
-    if not request.user.is_authenticated():
-        raise PermissionDenied
-    try:
-        actor = Actor.objects.get(user=request.user)
-    except ObjectDoesNotExist:
-        raise PermissionDenied
-
-    if actor.user_type != 'A':
-        # not an admin
-        is_team_manager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=30)
-        res = is_team_manager.count() > 0
-
-        if res:
-            # is manager
-            proyectos = Project.objects.filter(company_id=actor.company_id, deleted=False)
-            departamentos = Department.objects.filter(company_id=actor.company_id, active=True)
-        else:
-            # not a manager
-            roles_pro = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=40)
-            roles_dep = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=20)
-
-            if roles_pro.count() > 0 or roles_dep.count() > 0:
-                # you're a project manager. Loading your projects
-                proyectos = Project.objects.filter(
-                    company_id=actor.company_id, deleted=False,
-                    projectdepartment__projectdepartmentemployeerole__employee_id=actor).distinct()
-                departamentos = Department.objects.filter(
-                    company_id=actor.company_id, active=True,
-                    projectdepartment__projectdepartmentemployeerole__employee_id=actor).distinct()
-            else:
-                # not any of this? get outta here!!
-                raise PermissionDenied
-    else:
-        # is admin
+    actor=get_actor_or_403(request)
+    if actor.user_type == "A" or is_executive(actor):
         proyectos = Project.objects.filter(company_id=actor.company_id, deleted=False)
         departamentos = Department.objects.filter(company_id=actor.company_id, active=True)
-    return {"departments": departamentos, "projects": proyectos}
+    else:
+        # not an executive
+
+        roles_dep = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=20)
+
+        if roles_dep.count() > 0:
+            # you're a project manager. Loading your projects
+            proyectos = Project.objects.filter(
+                company_id=actor.company_id, deleted=False,
+                projectdepartment__projectdepartmentemployeerole__employee_id=actor)
+            departamentos = Department.objects.filter(
+                company_id=actor.company_id, active=True,
+                projectdepartment__projectdepartmentemployeerole__employee_id=actor)
+        else:
+            # not any of this? get outta here!!
+            raise PermissionDenied
+
+    return {"departments": departamentos.distinct(), "projects": proyectos.distinct()}
 
 
 def find_departments(request):
     """
     Gets the  departments the logged user can create tasks for a project, depending to their roles
     """
+    if "project_id" not in request.GET:
+        raise SuspiciousOperation
+
     project_id = request.GET.get("project_id")
-    if not request.user.is_authenticated():
-        raise PermissionDenied
-    try:
-        actor = Actor.objects.get(user=request.user)
-    except ObjectDoesNotExist:
-        raise PermissionDenied
 
-    if actor.user_type != 'A':
-        # not an admin
-        is_team_manager = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=30)
-        res = is_team_manager.count() > 0
-
-        if res:
-            # is manager
-            departamentos = Department.objects.filter(company_id=actor.company_id, active=True)
-        else:
-            # not a manager
-            roles_pro = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=40)
-            roles_dep = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier=20)
-
-            if roles_pro.count() > 0 or roles_dep.count() > 0:
-                # you're a project manager or a coordinator. Loading your projects
-                departamentos = Department.objects.filter(
-                    company_id=actor.company_id, active=True,
-                    projectdepartment__projectdepartmentemployeerole__employee_id=actor,
-                    projectdepartment__project_id_id=project_id).distinct()
-            else:
-                # not any of this? get outta here!!
-                raise PermissionDenied
+    actor=get_actor_or_403(request)
+    if actor.user_type == "A" or is_executive(actor):
+        departamentos = Department.objects.filter(projectdepartment__project_id_id=project_id,company_id=actor.company_id, active=True)
     else:
-        # is admin
 
-        departamentos = Department.objects.filter(company_id=actor.company_id, active=True)
-    return departamentos
+        # not an executive
+        roles_dep = ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor, role_id__tier__gte=20,
+            projectDepartment_id__project_id__deleted=False,projectDepartment_id__department_id__active=True)
 
-
-def check_metrics_authorized_for_task(user, task_id):
-    """Raises 403 if the current actor is not allowed to obtain metrics for the department"""
-    if not user.is_authenticated():
-        raise PermissionDenied
-
-    task = get_object_or_404(Task, active=True, id=task_id)
-    logged = user.actor
-
-    # Check that the companies match
-    if logged.company_id != task.projectDepartment_id.department_id.company_id:
-        raise PermissionDenied
-
-    if logged.user_type == 'E':
-        # If it's not an admin, check that it has role EXECUTIVE (50) or higher for the projdept tuple
-        try:
-            ProjectDepartmentEmployeeRole.objects.get(employee_id=logged, role_id__tier__gte=30,
-                                                      projectDepartment_id=task.projectDepartment_id)
-        except ObjectDoesNotExist:
+        if roles_dep.count() > 0:
+            # you're a project manager or a coordinator. Loading your departments for the selected project
+            departamentos = Department.objects.filter(
+                company_id=actor.company_id, active=True,
+                projectdepartment__projectdepartmentemployeerole__employee_id=actor,
+                projectdepartment__project_id_id=project_id)
+        else:
+            # not any of this? get outta here!!
             raise PermissionDenied
+    return departamentos.distinct()
+
+
+def check_task(request,task, for_view=False):
+    """
+    checks if the task belongs to the logged actor with appropiate roles
+    """
+    actor=get_actor_or_403(request)
+    highest=get_highest_role_tier(actor)
+
+    if highest>=50:
+        # Admins and executives can do everything
+        return actor
+    elif task:
+        if not task.active:
+            raise PermissionDenied
+        # If it's for view, project managers can see tasks in their projects but not their departments
+        elif for_view and highest>=20: 
+            if highest >= 40 and ProjectDepartmentEmployeeRole.objects.filter(
+                Q(employee_id=actor),
+                Q(role_id__tier__gte=40),
+                (Q(projectDepartment_id__department_id=task.projectDepartment_id.department_id) | Q(projectDepartment_id__project_id=task.projectDepartment_id.project_id))) \
+                    .exists():
+                return actor
+            elif ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+                projectDepartment_id=task.projectDepartment_id,
+                role_id__tier__gte=20).exists():
+                return actor
+        elif ProjectDepartmentEmployeeRole.objects.filter(employee_id=actor,
+            projectDepartment_id=task.projectDepartment_id,
+            role_id__tier__gte=20).exists():
+            # If it's for view, coordinators and greater can access too
+            return actor
+    elif highest>=20:
+        # If it's for creation, task is None
+        return actor
+
+    # Otherwise GTFO
+    raise PermissionDenied

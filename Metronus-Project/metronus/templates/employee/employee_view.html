@@ -4,99 +4,88 @@
 {% block title %}
 {{employee.user}}
 {% endblock %}
+{% load custom_tags %}
 
 {% block content %}
-<h1>{% trans 'profile' %}</h1>
+<h1>{% trans 'profile' %}
+  {% if not employee.user.is_active %}
+    <i>({% trans "inactive" %})</i>
+  {% endif %}</h1>
+<div class="row" >
 
-<div class="row" style="display: flex;">
-  <div class="col-md-3 col-xs-12 widget widget_tally_box">
+  <div class="clearfix"></div>
+
+  <!-- User information -->
+  <div class="col-lg-3 col-sm-4 col-xs-12">
     <div class="x_panel">
       <div class="x_content">
-
         <div class="flex">
-          <ul class="list-inline widget_profile_box">
+          <ul class="list-inline widget_tally">
             <li>
-              <a>
-                <em class="fa fa-linkedin"></em>
-              </a>
-            </li>
-            <li>
-                {% if employee.picture %}
-                    <img src="{{ MEDIA_URL }}{{employee.picture}}" class="img-circle profile_img" alt="employee">
-                {% else %}
-                    <img src="/static/avatar.png" class="img-circle profile_img" alt="employee">
-                {% endif %}
-            </li>
-            <li>
-              <a>
-                <em class="fa fa-github"></em>
-              </a>
+              {% if employee.picture %}
+              <img src="{{ MEDIA_URL }}{{employee.picture}}" class="img-circle profile_img" alt="employee">
+              {% else %}
+              <img src="/static/avatar.png" class="img-circle profile_img" alt="employee">
+              {% endif %}
             </li>
           </ul>
         </div>
-
         <div class="name">
-          <h3 class="name_title">{{employee.user}}</h3>
-          <p>{{employee.identifier}}</p>
+          <h3 class="name_title">{{employee.user.first_name}}</h3>
+          <p>{{employee.user.last_name}}</p>
         </div>
-
-
         <div class="divider"></div>
       </div>
-
       <div>
         <ul class="list-inline widget_tally">
-        <li>
-          <strong>{% trans 'name' %}</strong> <span class="pull-right">{{employee.user.first_name}}</span>
-        </li>
-        <li>
-          <strong>{% trans 'surname' %}</strong> <span class="pull-right">{{employee.user.last_name}}</span>
-        </li>
-        <li>
-          <strong>{% trans 'email' %}</strong> <span class="pull-right">{{employee.user.email}}</span>
-        </li>
-        <li>
-          <strong>{% trans 'phone' %}</strong> <span class="pull-right">{{employee.phone}}</span>
-        </li>
-        <li>
-          <strong>{% trans 'roles' %}</strong> <span class="pull-right">
-        {% if employee_roles %}
-           {{ employee_roles|length }}
-      {% else %}
-          0
-      {% endif %}
-          </span>
-        </li>
-        <li>
-          <strong>{% trans 'projects' %}</strong> <span class="pull-right">0</span>
-        </li>
-        <li>
-          <strong>{% trans 'departments' %}</strong> <span class="pull-right">0</span>
-        </li>
-        <li>
-            <strong>{% trans 'price_per_hour' %}</strong> <span class="pull-right">{{employee.price_per_hour}} &euro;</span>
-        </li>
-        <li style="text-align: center">
+          <li>
+            <strong>{% trans 'username' %}</strong> <span class="pull-right">{{employee.user}}</span>
+          </li>
+          <li>
+            <strong>{% trans 'identifier' %}</strong> <span class="pull-right">{{employee.identifier}}</span>
+          </li>
+          <li>
+            <strong>{% trans 'email' %}</strong> <span class="pull-right">{{employee.user.email}}</span>
+          </li>
+          <li>
+            <strong>{% trans 'phone' %}</strong> <span class="pull-right">{{employee.phone}}</span>
+          </li>
+          {% if actor_is_executive or actor_is_admin or actor_is_projectManager %}
+            <li>
+              <strong>{% trans 'price_per_hour' %}</strong> <span class="pull-right">{{employee.price_per_hour|floatformat:2}} &euro;</span>
+            </li>
+          {% endif %}
+          <li style="text-align: center">
 
-          <span>{% trans 'registryDate' %}: {{employee.registryDate}}</span>
-        </li>
-        <li style="text-align: center">
-        <span>
-            <a href="{% url 'employee_edit' employee.user.username %}" type="button" class="btn btn-primary">
-                                        {% trans 'update' %}</a>
-        <span>
-        </li>
-        </div>
+            <span>{% trans 'registryDate' %}: {{employee.registryDate}}</span>
+          </li>
+          {% if actor_is_executive or actor_is_admin %}
+            <li style="text-align: center">
+              <span>
+                <a href="{% url 'employee_edit' employee.user.username %}" type="button" class="btn btn-primary">{% trans 'update' %}</a>
+              </span>
+            </li>
+          {% endif %}
         </ul>
+      </div>
     </div>
   </div>
+  <!-- User information ends -->
 
+  <!-- Roles information -->
+  <div class="col-lg-9 col-sm-8 col-xs-12">
+    <div class="x_panel x_content">
 
-  <div style="flex: 1">
+      {% if actor_is_executive or actor_is_admin %}
+        <div class="help-tooltip" style="margin: 10px;">
+          <p>{% trans 'role_help_tooltip_info_1' %} <a href="/roles/info" target="_blank" style="text-decoration: underline">{% trans 'role_help_tooltip_info_2' %}</a> {% trans 'role_help_tooltip_info_3' %}</p>
+          {% if actor_is_executive %}
+            <p>{% trans 'role_help_tooltip_executives' %}</p>
+          {% endif %}
+        </div>
+      {% endif %}
 
-
-    <div class="x_panel">
-
+      <div class="clearfix"></div>
       <div>
         <h2 align="center">{% trans 'roles' %}</h2>
         {% if employee_roles %}
@@ -112,211 +101,255 @@
           <tbody>
             {% for rol in employee_roles %}
             <tr>
-              <td>{{rol.projectDepartment_id.project_id.name}}</td>
-              <td>{{rol.projectDepartment_id.department_id.name}}</td>
-              <td>{% trans rol.role_id.name %}</td>
-              <td><div align="right"><a align="right" class="btn btn-primary" href="/roles/manage?role_id={{rol.id}}">{% trans 'update' %}</a>
-                <a href="#" align="right" class="btn btn-danger" data-href="/roles/delete/{{rol.id}}" data-toggle="modal" data-target="#confirm-delete">{% trans 'delete' %}</a>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-          {% else %}
-          {% trans 'noRoles' %}
-          {% endif %}
-        </div>
-      </br>
-      <a align="center" class="btn btn-primary" href="/roles/manage?employee_id={{employee.id}}">{% trans 'addRole' %}</a>
+              <td align="center" >{{rol.projectDepartment_id.project_id.name}}</td>
+              <td align="center" >{{rol.projectDepartment_id.department_id.name}}</td>
+              <td align="center" >{% trans rol.role_id.name %}</td>
+              <td align="center" >
+                {% if actor_is_admin or actor_is_executive %}
+                {% if is_editable_role|getval:rol.id %}
+                  <div align="right">
+                    <a align="right" class="btn btn-primary" href="/roles/manage?role_id={{rol.id}}">{% trans 'update' %}</a>
+                    <a href="#" align="right" class="btn btn-danger" data-href="/roles/delete/{{rol.id}}" data-toggle="modal" data-target="#confirm-delete">{% trans 'delete' %}</a>
+                  </div>
+                {% endif %}
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        {% trans 'noRoles' %}
+        {% endif %}
+      </div>
+    </div>
+    <br>
 
-      <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              {% trans 'delete' %}
-            </div>
-            <div class="modal-body">
-              {% trans 'roleConfirm' %}
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'cancel' %}</button>
-              <a class="btn btn-danger btn-ok">{% trans 'delete' %}</a>
-            </div>
+    {% if actor_is_admin or actor_is_executive %}
+    <a align="center" class="btn btn-primary" href="/roles/manage?employee_id={{employee.id}}">{% trans 'addRoleButton' %}</a>
+    {% endif %}
+
+    {% comment %}
+      Esto está aquí en lugar de quitarlo cuando no es admin ni ejecutivo porque si no se descuadra todo por motivos desconocidos
+    {% endcomment %}
+    <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            {% trans 'delete' %}
+          </div>
+          <div class="modal-body">
+            {% trans 'roleConfirm' %}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'cancel' %}</button>
+            <a class="btn btn-danger btn-ok">{% trans 'delete' %}</a>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-</div>
-<h3> {% trans 'Productivity' %}</h3>
-{#here goes the date picker#}
-     <div class="row x_title">
-                        <div class="col-md-6">
-                            <h2>{% trans 'datePicker' %}</h2>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="pull-right">
-                                <fieldset>
-                                  <legend>{% trans 'datePicker' %}</legend>
-                                    <div class="control-group">
-                                        <div class="controls">
-                                            <div class="input-prepend input-group">
-                                                <span class="add-on input-group-addon"><em class="glyphicon glyphicon-calendar fa fa-calendar"></em></span>
-                                                <input type="text" style="width: 200px" name="task_chart" id="task_chart" class="form-control" value="" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </fieldset>
-                            </div>
-                            <div class="clearfix"></div>
-                        </div>
-                    </div>
- <div id="task_space">
-  {#   here go the tasks, with their total productivities, loads on document ready with an ajax call#}
+  <!-- Roles information ends -->
 
- </div>
+  <div class="clearfix"></div>
 
-  <div class="x_content row">
-   {#  by clicking on the tasks above, a graphic is displayed with the diary productivities #}
-    <div id="task" style="height:350px;"></div>
-  </div>
-
-  <!-- Here comes profit graphics-->
-  <h3> {% trans 'Profitability' %}</h3>
-  <div class="col-md-12 col-sm-12 col-xs-12">
+  {% if actor_is_executive or actor_is_admin or actor_is_projectManager %}
+  <!-- Productivity graphics starts -->
+  <div class="col-xs-12 col-md-12 col-lg-6">
     <div class="x_panel">
-      <div class="x_content">
 
-        <div id="welp3" style="height:350px;"></div>
+      <div class="x_title">
+        <h2>{% trans 'Productivity' %}</h2>
+        <div class="clearfix"></div>
+      </div>
 
-        <div style="display: flex;/*!  */justify-content: space-around;">
+      <div class="clearfix"></div>
+
+      <div class="x_content" >
+
+        <div id="task" style="height:350px;"></div>
+
+        <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
           <form class="form-horizontal">
             <fieldset>
               <legend>{% trans 'datePicker' %}</legend>
-              <div class="control-group">
-                <div class="controls">
-                  <div class="input-prepend input-group">
-                    <span class="add-on input-group-addon"><em class="glyphicon glyphicon-calendar fa fa-calendar"></em></span>
-                    <input type="text" style="width: 200px" name="employee_profit_chart" id="employee_profit_chart" class="form-control" value=""/>
-                  </div>
+              <div class="control-group controls">
+                <div class="input-prepend input-group">
+                  <span class="add-on input-group-addon"><em class="glyphicon glyphicon-calendar fa fa-calendar"></em></span>
+                  <input type="text" style="width: 200px" name="task_chart" id="task_chart" class="form-control" value=""/>
                 </div>
               </div>
             </fieldset>
           </form>
+
           <form class="form-horizontal">
             <fieldset>
-              <legend>{% trans 'data_output_to' %}</legend>
-              <div class="control-group">
-                <div class="controls">
-                  <div class="input-prepend input-group">
-                    <span class="add-on input-group-addon"><em class="glyphicon glyphicon-refresh fa fa-refresh"></em></span>
+              <div id="task_space" class="row x_title">
+                {#   here go the tasks, with their total productivities, loads on document ready with an ajax call#}
+              </div>
+            </fieldset>
+          </form>
+        </div>
 
-                    <div style="display: table-cell;border-radius: 0px 3px 3px 0px; min-width: 197px" id="switch-acum-button" type="text" class="btn btn-success">{% trans 'cumulative_values' %}</div>
-                  </div>
+      </div>
+    </div>
+  </div>
+  <!-- Productivity graphics ends -->
+
+  <!-- Profit graphics starts -->
+  <div class="col-xs-12 col-md-12 col-lg-6">
+    <div class="x_panel">
+
+      <div class="x_title">
+        <h2>{% trans 'Profitability' %}</h2>
+        <div class="clearfix"></div>
+      </div>
+
+      <div class="clearfix"></div>
+
+      <div class="x_content">
+
+        <div id="welp3" style="height:350px;"></div>
+
+        <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
+          <form class="form-horizontal">
+            <fieldset>
+              <legend>{% trans 'datePicker' %}</legend>
+              <div class="control-group">
+                <div class="clearfix"></div>
+                <div class="input-prepend input-group">
+                  <span class="add-on input-group-addon"><em class="glyphicon glyphicon-calendar fa fa-calendar"></em></span>
+                  <input type="text" style="width: 200px" name="employee_profit_chart" id="employee_profit_chart" class="form-control" value=""/>
                 </div>
               </div>
             </fieldset>
           </form>
         </div>
-        <br/>
+
+        <form class="form-horizontal">
+          <fieldset>
+            <legend>{% trans 'data_output_to' %}</legend>
+            <div class="control-group">
+              <div class="controls">
+                <div class="input-prepend input-group">
+                  <span class="add-on input-group-addon"><em class="glyphicon glyphicon-refresh fa fa-refresh"></em></span>
+
+                  <div style="display: table-cell;border-radius: 0px 3px 3px 0px; min-width: 197px" id="switch-acum-button" type="text" class="btn btn-success">{% trans 'cumulative_values' %}</div>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+        </form>
       </div>
     </div>
   </div>
- <!-- Here ends profit graphics-->
+  <!-- Profit graphics ends -->
+  {% endif %}
+
+</div>
+
 {% endblock %}
+
+
 {% block javascript %}
-
 <script>
-$('#confirm-delete').on('show.bs.modal', function(e) {
-    $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
-});
 
+  $('#confirm-delete').on(
+    'show.bs.modal', function(e) {
+      $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+    }
+    );
 
- function fromData (backendData) {
-  dates=backendData["dates"];
-  task=backendData["task"]
-  //en xAxis data pones lo que va en el eje X (en este caso las fechas)
-  //cada dato necesita una serie
-  //expected y real productivity, dos series, cada una con un campo data
+  function fromData (backendData) {
+    dates=backendData["dates"];
+    task=backendData["task"]
+    //en xAxis data pones lo que va en el eje X (en este caso las fechas)
+    //cada dato necesita una serie
+    //expected y real productivity, dos series, cada una con un campo data
 
     return {
-        title : {
-            text: '{% trans 'productivityGraphic' %}',
-            subtext: task["name"]
-        },
-        tooltip : {
-            trigger: 'axis'
-        },
-        legend: {
-            data:['Invested time']
-        },
-        toolbox: {
-            show : true,
-            feature : {
-                saveAsImage : {show: true}
-            }
-        },
-        calculable : true,
-        xAxis : [
-            {
-                type : 'category',
-                show : false,
-                data : dates
-            }
-        ],
-        yAxis : [
-            {
-                type : 'value'
-            }
-        ],
-        series : [
-            {
-                name:'{% trans 'expectedProductivity' %}',
-                type:'bar',
-                data: task["expected_productivity"],
-                markPoint : {
-                    data : [
-                        {type : 'max', name: 'Max'},
-                        {type : 'min', name: 'Min'}
-                    ]
-                },
-                markLine : {
-                    data : [
-                        {type : 'average', name: 'Avg'}
-                    ]
+      title : {
+        text: '{% trans 'productivityGraphic' %}',
+        subtext: task["name"]
+      },
+      tooltip : {
+        trigger: 'axis'
+      },
+      legend: {
+        data:['Invested time']
+      },
+      toolbox: {
+            show: true,
+              feature: {
+                saveAsImage: {
+                    show: true,
+                    title: '{% trans 'saveImage' %}'
                 }
-            },
-            {
-                name:'{% trans 'realProductivity' %}',
-                type:'bar',
-                data: task["real_productivity"],
-                markPoint : {
-                    data : [
-                        {type : 'max', name: 'Max'},
-                        {type : 'min', name: 'Min'}
-                    ]
-                },
-                markLine : {
-                    data : [
-                        {type : 'average', name: 'Avg'}
-                    ]
-                }
-            }
-        ]
+              }
+          },
+      calculable : true,
+      xAxis : [
+      {
+        type : 'category',
+        show : false,
+        data : dates
+      }
+      ],
+      yAxis : [
+      {
+        type : 'value'
+      }
+      ],
+      series : [
+      {
+        name:'{% trans 'expectedProductivity' %}',
+        type:'bar',
+        data: task["expected_productivity"],
+        markPoint : {
+          data : [
+          {type : 'max', name: 'Max'},
+          {type : 'min', name: 'Min'}
+          ]
+        },
+        markLine : {
+          data : [
+          {type : 'average', name: 'Avg'}
+          ]
+        }
+      },
+      {
+        name:'{% trans 'realProductivity' %}',
+        type:'bar',
+        data: task["real_productivity"],
+        markPoint : {
+          data : [
+          {type : 'max', name: 'Max'},
+          {type : 'min', name: 'Min'}
+          ]
+        },
+        markLine : {
+          data : [
+          {type : 'average', name: 'Avg'}
+          ]
+        }
+      }
+      ]
+    }
+  }
+
+  function fromProfitData (backendData,acum) {
+    dates=backendData["dates"];
+    expenses=backendData["expenses"]
+    income=backendData["income"]
+    subtext='{% trans 'notAcum' %}';
+
+    if(acum){
+      subtext='{% trans 'acum' %}';
+      expenses=backendData["acumExpenses"];
+      income=backendData["acumIncome"];
     }
 
-}
-
-    function fromProfitData (backendData,acum) {
-      dates=backendData["dates"];
-      expenses=backendData["expenses"]
-      income=backendData["income"]
-      subtext='{% trans 'notAcum' %}';
-      if(acum){
-        subtext='{% trans 'acum' %}';
-        expenses=backendData["acumExpenses"];
-        income=backendData["acumIncome"];
-      }
       //en xAxis data pones lo que va en el eje X (en este caso las fechas)
       //cada dato necesita una serie
       //incomes y expenses, dos series, cada una con un campo data
@@ -333,11 +366,14 @@ $('#confirm-delete').on('show.bs.modal', function(e) {
           data:['Expenses and income']
         },
         toolbox: {
-          show : true,
-          feature : {
-            saveAsImage : {show: true}
-          }
-        },
+            show: true,
+              feature: {
+                saveAsImage: {
+                    show: true,
+                    title: '{% trans 'saveImage' %}'
+                }
+              }
+          },
         calculable : true,
         xAxis : [
         {
@@ -386,50 +422,38 @@ $('#confirm-delete').on('show.bs.modal', function(e) {
         }
         ]
       }
+  }
 
+  //here we save the current task id for reloading purposes
+  var t_id=0
+  var echartLine = echarts.init(document.getElementById('task'), theme);
+  function ajax_productivity(id) {
+      //loads diary productivities for the specified task
+      //find the date picker
+      picker=$('input[name="task_chart"]').data('daterangepicker');
+      // $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+
+      $.get({
+        url: '/employee/ajax_productivity_per_task_and_date/{{employee.user.username}}',
+        data:{
+          task_id:id,
+          start_date:picker.startDate.format('YYYY-MM-DD'),
+          end_date:picker.endDate.format('YYYY-MM-DD')
+        },
+
+        success: function ( backendData )  {
+            // console.log(JSON.stringify( backendData ))
+            echartLine.setOption( fromData( backendData ) );
+            t_id=id;
+        }
+      }).fail(function () {
+            // Error
+        })
     }
 
-
-//here we save the current task id for reloading purposes
-var t_id=0
-function ajax_productivity(id) {
-  //loads diary productivities for the specified task
-  //find the date picker
-  picker=$('input[name="task_chart"]').data('daterangepicker');
-   // $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
-
-  $.get({
-    url: '/employee/ajax_productivity_per_task_and_date/{{employee.user.username}}',
-    data:{
-        task_id:id,
-        start_date:picker.startDate.format('YYYY-MM-DD'),
-        end_date:picker.endDate.format('YYYY-MM-DD')
-     },
-    success: function ( backendData )  {
-     // console.log(JSON.stringify( backendData ))
-      var echartLine = echarts.init(document.getElementById('task'), theme);
-      echartLine.setOption( fromData( backendData ) );
-      t_id=id;
-
-    /**
-     * Esto se encarga de hacer responsivo (más o menos) el chart
-     * */
-    $(window).on('resize', function(){
-        if(echartLine != null && echartLine != undefined){
-            echartLine.resize();
-        }
-        if(echartLine2 != null && echartLine2 != undefined){
-                echartLine2.resize();
-        }
-    });
-    }
-  }).fail(function () {
-      // Error
-  })
-
-}
-$(document).ready(function() {
     //loads all tasks for the employee, with total producitivity
+    $(document).ready(function() {
+
       $.get({
         url: "/employee/ajax_productivity_per_task/{{employee.user.username}}",
 
@@ -438,61 +462,67 @@ $(document).ready(function() {
           all=""
 
           for (var task in backendData ){
-              all+="<div>";
-              all+="<input type='button' class='btn btn-success submit-button' value='" +
-              backendData[task]["name"] + "' onclick='ajax_productivity("+task+");' />";
-              all+="<strong>{% trans 'graphExpected' %}:</strong> "+backendData[task]["expected_productivity"].toFixed(2)+" -- <strong>{% trans 'graphReal' %}:</strong> "+
-              backendData[task]["total_productivity"].toFixed(2);
-              all+="</div>";
-           }
-            space.innerHTML =all
+            all+="<div>";
+            all+="<input type='button' class='btn btn-success submit-button' value='" +
+            backendData[task]["name"] + "' onclick='ajax_productivity("+task+");' />";
+            all+="<strong>{% trans 'graphExpected' %}:</strong> "+backendData[task]["expected_productivity"].toFixed(2)+" -- <strong>{% trans 'graphReal' %}:</strong> "+
+            backendData[task]["total_productivity"].toFixed(2);
+            all+="</div>";
+          }
+          space.innerHTML =all
 
 
-        defaultRange = moment().startOf('month').format('MM/DD/YYYY') +' - '+ moment().endOf('month').format('MM/DD/YYYY')
-        $('input[name="task_chart"]').val(defaultRange)
+          defaultRange = moment().startOf('month').format('MM/DD/YYYY') +' - '+ moment().endOf('month').format('MM/DD/YYYY')
+          $('input[name="task_chart"]').val(defaultRange)
 
-        $('input[name="task_chart"]').daterangepicker({
+          $('input[name="task_chart"]').daterangepicker({
             autoUpdateInput: false,
             locale: {
-                cancelLabel: '{% trans 'default' %}',
-                applyLabel: '{% trans 'apply' %}'
+              cancelLabel: '{% trans 'default' %}',
+              applyLabel: '{% trans 'apply' %}'
             }
-        });
-  $('input[name="task_chart"]').on('apply.daterangepicker', function(ev, picker) {
+          });
+
+          $('input[name="task_chart"]').on('apply.daterangepicker', function(ev, picker) {
             $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
 
-      $.get({
-        url: '/employee/ajax_productivity_per_task_and_date/{{employee.user.username}}',
-        data:{
-            task_id:t_id,
-            start_date:picker.startDate.format('YYYY-MM-DD'),
-            end_date:picker.endDate.format('YYYY-MM-DD')
-         },
-        success: function ( backendData )  {
-         // console.log(JSON.stringify( backendData ))
-          var echartLine = echarts.init(document.getElementById('task'), theme);
-          echartLine.setOption( fromData( backendData ) );
+            $.get({
+
+              url: '/employee/ajax_productivity_per_task_and_date/{{employee.user.username}}',
+              data:{
+                task_id:t_id,
+                start_date:picker.startDate.format('YYYY-MM-DD'),
+                end_date:picker.endDate.format('YYYY-MM-DD')
+              },
+
+              success: function ( backendData )  {
+                 // console.log(JSON.stringify( backendData ))
+                 var echartLine = echarts.init(document.getElementById('task'), theme);
+                 echartLine.setOption( fromData( backendData ) );
+               }
+
+           }).fail(
+            //error
+            );
 
 
+           $('input[name="task_chart"]').on(
+             'cancel.daterangepicker', function(ev, picker) {
+               $(this).val(defaultRange);
+             }
+             );
+
+       })
         }
-      }).fail(function () {
-          // Error
       });
-        $('input[name="task_chart"]').on('cancel.daterangepicker', function(ev, picker) {
-            $(this).val(defaultRange);
-        });
-
-      })
-    }
-});
 
 
-            ///////////////////////////////////
+      ///////////////////////////////////
       // Gráfico de Gastos y Ganancias //
       ///////////////////////////////////
       var useAcum=false;
+      var defaultProfitBackendData = {'dates':[],'expenses':[],'income':[],'acumExpenses':[],'acumIncome':[]};
       var echartLine2 = echarts.init(document.getElementById('welp3'), theme);
-      var  defaultProfitBackendData = {'dates':[],'expenses':[],'income':[],'acumExpenses':[],'acumIncome':[]};
       $.get({
         url: "/employee/ajaxProfit/"+ {{employee.id}} +"/",
         success: function ( backendData )  {
@@ -500,6 +530,7 @@ $(document).ready(function() {
           echartLine2.setOption( fromProfitData( backendData,useAcum ) );
         }
       })
+
       //Date picker for profit
       defaultRange = moment().startOf('month').format('MM/DD/YYYY') +' - '+ moment().endOf('month').format('MM/DD/YYYY')
       $('input[name="employee_profit_chart"]').val(defaultRange)
@@ -512,25 +543,29 @@ $(document).ready(function() {
         }
       });
 
-      $('input[name="employee_profit_chart"]').on('apply.daterangepicker', function(ev, picker) {
-        $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
-        $.get({
-          url:"/employee/ajaxProfit/"+{{employee.id}}+"/",
-          data: {
-            start_date: picker.startDate.format('YYYY-MM-DD'),
-            end_date: picker.endDate.format('YYYY-MM-DD')
-          },
-          success: function ( backendData )  {
-            defaultProfitBackendData = backendData
-            echartLine2.setOption( fromProfitData( backendData ,useAcum) );
-          }
-        })
-      });
+      $('input[name="employee_profit_chart"]').on(
+        'apply.daterangepicker', function(ev, picker) {
+          $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+          $.get({
+            url:"/employee/ajaxProfit/"+{{employee.id}}+"/",
+            data: {
+              start_date: picker.startDate.format('YYYY-MM-DD'),
+              end_date: picker.endDate.format('YYYY-MM-DD')
+            },
+            success: function ( backendData ) {
+              defaultProfitBackendData = backendData
+              echartLine2.setOption( fromProfitData( backendData ,useAcum) );
+            }
+          })
+        }
+        );
 
-      $('input[name="employee_profit_chart"]').on('cancel.daterangepicker', function(ev, picker) {
-        $(this).val(defaultRange);
-        echartLine2.setOption( fromProfitData( defaultProfitBackendData,useAcum ) );
-      });
+      $('input[name="employee_profit_chart"]').on(
+        'cancel.daterangepicker', function(ev, picker) {
+          $(this).val(defaultRange);
+          echartLine2.setOption( fromProfitData( defaultProfitBackendData,useAcum ) );
+        }
+        );
 
       var switcher= $('#switch-acum-button');
       switcher.click(function(){
@@ -543,22 +578,19 @@ $(document).ready(function() {
           echartLine2.setOption( fromProfitData( defaultProfitBackendData ,useAcum) );
         }
       })
-        /**
-         * Esto se encarga de hacer responsivo (más o menos) el chart
-         * */
-        $(window).on('resize', function(){
-           if(echartLine != null && echartLine != undefined){
-                echartLine.resize();
-            }
-            if(echartLine2 != null && echartLine2 != undefined){
-                echartLine2.resize();
-            }
-        });
-
-});
 
 
-    </script>
+      //Responsiveness para todos
+      $(window).on(
+        'resize', () => {
+          [echartLine, echartLine2].forEach( e => {
+            e.resize()
+          })
+        }
+        )  
+
+    });
 
 
+</script>
 {% endblock %}

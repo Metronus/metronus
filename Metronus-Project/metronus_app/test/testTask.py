@@ -5,7 +5,7 @@ from metronus_app.model.project         import Project
 from metronus_app.model.goalEvolution   import GoalEvolution
 from populate_database                  import populate_database
 import json
-
+from django.urls import reverse
 
 class TaskTestCase(TestCase):
     """This class provides a test case for using and managing tasks"""
@@ -46,7 +46,7 @@ class TaskTestCase(TestCase):
 
         self.assertEquals(logs_before + 1, logs_after)
 
-    def test_create_task_positive_2(self):
+    def test_create_task_positive_async(self):
         """Logged in as an administrator, try to create a task"""
         c = Client()
         c.login(username="metronus", password="metronus")
@@ -159,6 +159,53 @@ class TaskTestCase(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertIn("task_creation_repeated_name",response.context["errors"])
         self.assertNotIn("task_creation_project_department_not_related",response.context["errors"])
+    def test_create_task_duplicate_async(self):
+        """
+        Logged in as an administrator, try to create an task with the name of an existing company
+        """
+        c = Client()
+        c.login(username="ddlsb", password="123456")
+
+        response = c.post("/task/createAsync", {
+            "task_id": "0",
+            "description":"alguno",
+            "name": "Hacer cosas",
+            "project_id":str(Project.objects.get(name="Metronus").id),
+            "department_id":str(Department.objects.get(name="Backend").id),
+            "price_per_hour":"1.0"
+        })
+
+        self.assertEquals(response.status_code, 200)
+        data=response.content.decode("utf-8")
+            #string to dict
+        data=json.loads(data)
+        self.assertIn("task_creation_repeated_name",data["errors"])
+        self.assertNotIn("task_creation_project_department_not_related",data["errors"])
+    
+    def test_create_task_project_department_not_related_async(self):
+        """
+        Logged in as an administrator, try to create an task with the name of an existing company
+        """
+        c = Client()
+        c.login(username="admin", password="admin")
+
+        response = c.post("/task/createAsync", {
+            "task_id": "0",
+            "description":"alguno",
+            "name": "Hacer cosas",
+            "project_id":str(Project.objects.get(name="Proust-Ligeti").id),
+            "department_id":str(Department.objects.get(name="dep3").id),
+            "price_per_hour":"3.0"
+        })
+        self.assertEquals(response.status_code, 200)
+        
+        data=response.content.decode("utf-8")
+            #string to dict
+        data=json.loads(data)
+            
+        self.assertNotIn("task_creation_repeated_name",data["errors"])
+        self.assertIn("task_creation_project_department_not_related",data["errors"])
+
 
     def test_create_task_project_department_not_related(self):
         """
@@ -197,6 +244,15 @@ class TaskTestCase(TestCase):
         response = c.get("/task/create")
         self.assertEquals(response.status_code, 403)
 
+    def test_list_tasks_positive_search(self):
+        """As an admin, search the tasks """
+        c = Client()
+        c.login(username="metronus", password="metronus")
+
+        response = c.get(reverse("task_search",args=("front",)))
+
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response.context["tasks"][0].name, "Hacer cosas de front")
 
     def test_list_tasks_positive(self):
         """
@@ -234,7 +290,7 @@ class TaskTestCase(TestCase):
             Get task creation form task  with proper roles (Backend department)
             """
             c = Client()
-            c.login(username="agubelu", password="123456")
+            c.login(username="ddlsb", password="123456")
             
             
             response = c.get("/task/create")
@@ -244,22 +300,48 @@ class TaskTestCase(TestCase):
             self.assertTrue(form is not None)
             self.assertTrue(response.context["projects"].count()>0)
     def test_form_task_find_departments(self):
-            """
-            Get task creation form task  with proper roles (Backend department)
-            """
-            c = Client()
-            c.login(username="agubelu", password="123456")
-            
-            
-            response = c.get("/task/getdepartments?project_id={0}".format(Project.objects.get(name="Metronus").id))
-            self.assertEquals(response.status_code, 200)
-            #response in bytes must be decode to string
-            data=response.content.decode("utf-8")
-            #string to dict
-            data=json.loads(data)
-            self.assertTrue(len(data)>0)
-            self.assertTrue(data[0]['model'],'metronus_app_department')
-            
+        """
+        Get task creation form task  with proper roles (Backend department)
+        """
+        c = Client()
+        c.login(username="agubelu", password="123456")
+        
+        
+        response = c.get("/task/getdepartments?project_id={0}".format(Project.objects.get(name="Metronus").id))
+        self.assertEquals(response.status_code, 200)
+        #response in bytes must be decode to string
+        data=response.content.decode("utf-8")
+        #string to dict
+        data=json.loads(data)
+        self.assertTrue(len(data)>0)
+        self.assertTrue(data[0]['model'],'metronus_app_department')
+
+    def test_form_task_find_departments_2(self):
+        """
+        Get task creation form task  with proper roles (Admin)
+        """
+        c = Client()
+        c.login(username="metronus", password="metronus")
+        
+        
+        response = c.get("/task/getdepartments?project_id={0}".format(Project.objects.get(name="Metronus").id))
+        self.assertEquals(response.status_code, 200)
+        #response in bytes must be decode to string
+        data=response.content.decode("utf-8")
+        #string to dict
+        data=json.loads(data)
+        self.assertTrue(len(data)>0)
+        self.assertTrue(data[0]['model'],'metronus_app_department')
+    def test_form_task_find_departments_negative(self):
+        """
+        Get task creation form task without project_id proper roles
+        """
+        c = Client()
+        c.login(username="admin", password="123456")
+        
+        response = c.get("/task/getdepartments")
+        self.assertEquals(response.status_code, 400)
+              
 
 
     def test_view_task_positive(self):
@@ -282,10 +364,13 @@ class TaskTestCase(TestCase):
         Try viewing details without proper roles (Backend employee-Backend task)
         """
         c = Client()
-        c.login(username="anddonram", password="123456")
+        c.login(username="agubelu", password="123456")
         response = c.get("/task/list")
+
         dep_id=response.context["tasks"][0].id
+        c.login(username="anddonram", password="123456")
         response = c.get("/task/view/"+str(dep_id)+"/")
+
         self.assertEquals(response.status_code, 403)
 
     def test_view_task_negative(self):
@@ -293,13 +378,14 @@ class TaskTestCase(TestCase):
         Try viewing details without proper roles (Frontend employee - Backend task)
         """
         c = Client()
-        c.login(username="anddonram", password="123456")
+        c.login(username="agubelu", password="123456")
         response = c.get("/task/list")
-        dep_id=response.context["tasks"][0].id
 
-        c.logout()
+        dep_id=response.context["tasks"][0].id
         c.login(username="andjimrio", password="123456")
         response = c.get("/task/view/"+str(dep_id)+"/")
+
+
         self.assertEquals(response.status_code, 403)
 
     def test_edit_task_get(self):
@@ -307,7 +393,7 @@ class TaskTestCase(TestCase):
         Get the task edit form with proper roles
         """
         c = Client()
-        c.login(username="agubelu", password="123456")
+        c.login(username="ddlsb", password="123456")
         response = c.get("/task/list")
         dep_id=response.context["tasks"][0].id
         response = c.get("/task/edit/"+str(dep_id)+"/")
@@ -552,7 +638,7 @@ class TaskTestCase(TestCase):
         Delete a task with proper roles
         """
         c = Client()
-        c.login(username="agubelu", password="123456")
+        c.login(username="ddlsb", password="123456")
 
         response = c.get("/task/list")
         dep_id=response.context["tasks"][0].id
@@ -582,3 +668,43 @@ class TaskTestCase(TestCase):
         dep_id=Task.objects.filter(active=False).first().id
         response = c.get("/task/delete/"+str(dep_id)+"/")
         self.assertEquals(response.status_code, 404)
+
+    def test_recover_task_positive(self):
+        """
+        Recover a task with proper roles
+        """
+        c = Client()
+        c.login(username="metronus", password="metronus")
+
+        response = c.get("/task/list")
+        dep_id=response.context["tasks"][0].id
+
+        response = c.get(reverse("task_delete",args=(dep_id,)))
+        self.assertRedirects(response, "/task/list", fetch_redirect_response=False)
+
+        self.assertFalse(Task.objects.get(pk=dep_id).active)
+
+
+        response = c.get(reverse("task_recover",args=(dep_id,)))
+        self.assertEquals(response.status_code, 302)
+        self.assertRedirects(response, "/task/list", fetch_redirect_response=False)
+
+        self.assertTrue(Task.objects.get(pk=dep_id).active)
+
+    def test_recover_task_negative(self):
+        """
+        Only admin or exec can recover
+        """
+        c = Client()
+        c.login(username="ddlsb", password="123456")
+
+        response = c.get("/task/list")
+        dep_id=response.context["tasks"][0].id
+
+        response = c.get(reverse("task_delete",args=(dep_id,)))
+        self.assertRedirects(response, "/task/list", fetch_redirect_response=False)
+
+        self.assertFalse(Task.objects.get(pk=dep_id).active)
+
+        response = c.get(reverse("task_recover",args=(dep_id,)))
+        self.assertEquals(response.status_code, 403)

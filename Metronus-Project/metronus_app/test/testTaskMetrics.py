@@ -9,7 +9,7 @@ from metronus_app.model.company import Company
 from metronus_app.model.role import Role
 from metronus_app.model.administrator import Administrator
 from metronus_app.model.department import Department
-
+from metronus_app.model.timeLog import TimeLog
 
 # ################################# Party hard a partir de aquí ##################################
 
@@ -69,6 +69,20 @@ class TaskMetricsTestCase(TestCase):
             last_name="Berto"
         )
 
+        employee3_user = User.objects.create_user(
+            username="emp3",
+            password="123456",
+            email="emp3@metronus.es",
+            first_name="Alberta",
+            last_name="Berta"
+        )
+        employee4_user = User.objects.create_user(
+            username="emp4",
+            password="123456",
+            email="emp4@metronus.es",
+            first_name="aAlberta",
+            last_name="Baerta"
+        )
         employee1 = Employee.objects.create(
             user=employee1_user,
             user_type="E",
@@ -84,7 +98,20 @@ class TaskMetricsTestCase(TestCase):
             phone="666555444",
             company_id=company1
         )
-
+        employee3 = Employee.objects.create(
+            user=employee3_user,
+            user_type="E",
+            identifier="emp03",
+            phone="666555445",
+            company_id=company1
+        )
+        employee4 = Employee.objects.create(
+            user=employee4_user,
+            user_type="E",
+            identifier="emp04",
+            phone="666555445",
+            company_id=company2
+        )
         # dep1
         Department.objects.create(
             name="Departamento1",
@@ -131,7 +158,7 @@ class TaskMetricsTestCase(TestCase):
         # role_co
         role_co = Role.objects.create(name="COORDINATOR", tier=20)
         # role_em
-        Role.objects.create(name="EMPLOYEE", tier=10)
+        role_emp=Role.objects.create(name="EMPLOYEE", tier=10)
 
         pro1 = Project.objects.create(name="pro1", deleted=False, company_id=company1)
         pro2 = Project.objects.create(name="pro2", deleted=False, company_id=company2)
@@ -166,9 +193,20 @@ class TaskMetricsTestCase(TestCase):
             role_id=role_ex,
             employee_id=employee2
         )
-
+        # pdrole4
+        ProjectDepartmentEmployeeRole.objects.create(
+            projectDepartment_id=pd,
+            role_id=role_emp,
+            employee_id=employee3
+        )
+        # pdrole4
+        ProjectDepartmentEmployeeRole.objects.create(
+            projectDepartment_id=pd3,
+            role_id=role_ex,
+            employee_id=employee4
+        )
         # task1
-        Task.objects.create(
+        task1=Task.objects.create(
             name="Hacer cosas",
             description="meda",
             actor_id=employee1,
@@ -184,15 +222,29 @@ class TaskMetricsTestCase(TestCase):
         )
 
         # task3
-        Task.objects.create(
+        task3=Task.objects.create(
             name="Hacer cosas de front",
             description="nada",
-            actor_id=employee2,
+            actor_id=employee4,
             projectDepartment_id=pd3,
             production_goal="2.0",
             goal_description="kgs"
         )
-
+        TimeLog.objects.create(
+        description = "he currado mucho",
+        workDate = "2017-01-02 10:00+00:00",
+        duration = 240,
+        task_id = task3,
+        employee_id = employee1,
+        produced_units=3
+        )
+        TimeLog.objects.create(
+        description = "he currado mucho",
+        workDate = "2017-01-02 10:00+00:00",
+        duration = 240,
+        task_id = task1,
+        employee_id = employee1
+        )
     def test_access_denied_not_logged_prod_task(self):
         """
         Without authentication, try getting the prod_per_task JSON
@@ -238,7 +290,7 @@ class TaskMetricsTestCase(TestCase):
         Without proper roles, try getting the profit JSON
         """
         c = Client()
-        c.login(username="emp1", password="123456")
+        c.login(username="emp3", password="123456")
 
         response = c.get("/task/ajaxProfit/{0}/" .format( Task.objects.get(name="Hacer cosas").id))
         self.assertEquals(response.status_code, 403)

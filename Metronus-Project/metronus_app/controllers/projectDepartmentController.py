@@ -1,14 +1,11 @@
 from django.shortcuts import render, get_object_or_404
-from django.core.exceptions import PermissionDenied
 from metronus_app.forms.projectDepartmentForm import ProjectDepartmentForm
 from metronus_app.model.projectDepartment import ProjectDepartment
 from metronus_app.model.project import Project
 from metronus_app.model.department import Department
-from metronus_app.controllers.projectController import check_company_project_session
-from metronus_app.controllers.departmentController import check_company_department_session
 
 from django.http import HttpResponseRedirect
-from metronus_app.common_utils import get_current_admin_or_403
+from metronus_app.common_utils import get_current_admin_or_403,same_company_or_403
 
 
 def create(request):
@@ -20,9 +17,8 @@ def create(request):
     template:
     projectdepartment_create.html
     """
-
     admin = get_current_admin_or_403(request)
-
+    
     if request.method == 'POST':
         form = ProjectDepartmentForm(data=request.POST, user=admin)
 
@@ -77,12 +73,12 @@ def list_project_department(request):
 
     if project_id is not None:
         project = get_object_or_404(Project, id=project_id)
-        check_company_project_session(project, admin)
+        same_company_or_403(admin,project)
         lista = ProjectDepartment.objects.filter(project_id=project)
 
     elif department_id is not None:
         department = get_object_or_404(Department, id=department_id)
-        check_company_department_session(department, admin)
+        same_company_or_403(admin,department)
         lista = ProjectDepartment.objects.filter(department_id=department)
 
     else:
@@ -98,35 +94,16 @@ def create_project_department(form, admin):
     project = form.cleaned_data['project_id']
     department = form.cleaned_data['department_id']
 
-    legal_form = check_company_project_session(project, admin) and check_company_department_session(department, admin)
-    if not legal_form:
-        raise PermissionDenied
+    same_company_or_403(admin,project) 
+    same_company_or_403(admin,department)
 
     return ProjectDepartment.objects.create(project_id=project, department_id=department)
 
 
 def delete_project_department(project_department, admin):
     """Deletes the relationship between a project and a department"""
-    if not check_company_project_department_session(project_department, admin):
-        raise PermissionDenied
+    same_company_or_403(admin,project_department.department_id)
+    same_company_or_403(admin,project_department.project_id)
 
     project_department.delete()
 
-
-# Utility methods, mostly checkers
-
-def check_company_project_department_session(project_department, admin):
-    """
-    checks if the projectDepartment belongs to the logged company, and neither project nor department are deleted
-    """
-    return check_company_project_department(project_department, admin)
-
-
-def check_company_project_department(project_department, admin):
-    """
-    checks if the projectDepartment belongs to the specified company, and neither project nor department are deleted
-    """
-    res = check_company_project_session(project_department.project_id, admin)
-    res = res and check_company_department_session(project_department.department_id, admin)
-
-    return res

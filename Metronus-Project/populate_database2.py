@@ -70,7 +70,7 @@ def create_employee_in_projdept(project, department, company):
     except ObjectDoesNotExist:
         pd = ProjectDepartment.objects.create(project_id=project, department_id=department)
 
-    role = Role.objects.get(tier=random.choice([10, 20, 30, 40, 50]))
+    role = Role.objects.get(tier=random.choice([10, 15, 20, 40, 50]))
     ProjectDepartmentEmployeeRole.objects.create(projectDepartment_id=pd, role_id=role, employee_id=employee)
 
     return employee
@@ -148,8 +148,19 @@ def create_timelog_in_task(task, duration, date, employee):
     """
     creates a timelog for an employee involving a task during a specific date
     """
+
+    # Check that there isn't a timelog for the same employee, task and day
+    if TimeLog.objects.filter(
+        workDate__year=date.year,
+        workDate__month=date.month,
+        workDate__day=date.day,
+        task_id=task,
+        employee_id=employee
+    ).exists():
+        return
+
     if task.production_goal is not None and task.production_goal != "":
-        punits = random.uniform(0.1, 0.5)*duration/60*task.production_goal
+        punits = random.uniform(0.5, 1.5)*duration/60*task.production_goal
     else:
         punits = None
     TimeLog.objects.create(
@@ -187,10 +198,10 @@ def random_load():
         phone="123456789",
         company_id=company)
     # create departments
-    for _ in range(random.randint(4, 8)):
+    for _ in range(random.randint(5, 8)):
         create_departments(company)
     # create projects
-    for _ in range(random.randint(3, 7)):
+    for _ in range(random.randint(5, 7)):
         create_projects(company)
 
     # get projects and departments
@@ -204,10 +215,8 @@ def random_load():
     for i in range(30):
         dates.append(d1 - timedelta(days=i))
 
-    for i in range(len(departments)-1):
-        dpmt = departments[i]
-        for j in range(len(projects)-1):
-            project = projects[j]
+    for dpmt in departments:
+        for project in projects:
             # Create between 2 and 7 employees for each department and project
             for _ in range(random.randint(2, 7)):
                 create_employee_in_projdept(project, dpmt, company)
@@ -235,9 +244,9 @@ def populate_roles():
     Role.objects.create(name="EXECUTIVE", tier=50)
     # El jefe de proyecto
     Role.objects.create(name="PROJECT_MANAGER", tier=40)
-    # El jefe de equipo
-    Role.objects.create(name="TEAM_MANAGER", tier=30)
     # El coordinador del departamento
     Role.objects.create(name="COORDINATOR", tier=20)
+    # El jefe de equipo
+    Role.objects.create(name="TEAM_MANAGER", tier=15)
     # El empleado
     Role.objects.create(name="EMPLOYEE", tier=10)
