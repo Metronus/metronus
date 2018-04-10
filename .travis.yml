@@ -14,7 +14,6 @@ addons:
     branches:
     - dev
     - master
-  postgresql: "9.5"
 env:
   global:
     - DJANGO=1.10.4
