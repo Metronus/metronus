@@ -29,7 +29,7 @@ SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = not production
 
-ALLOWED_HOSTS = [".metronus.es", "metronus.herokuapp.com", "localhost"]
+ALLOWED_HOSTS = [".metronus.es", "metronus.herokuapp.com", "localhost", "metronusapp.herokuapp.com"]
 
 LANGUAGES = (
     ('en', _('English')),
