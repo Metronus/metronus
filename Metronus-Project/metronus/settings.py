@@ -18,7 +18,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_PATH = os.path.dirname(os.path.realpath(__file__))
 
 production = "METRONUS_PRODUCTION" in os.environ
-heroku = os.environ["METRONUS_DB_NAME"] == 'dnuusjkalf041'
+heroku = os.environ["METRONUS_DB_NAME"] == 'd1m0u490goesdg'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
