@@ -8,6 +8,6 @@ requests==2.9.1
 six==1.10.0
 gunicorn==19.7.0
 whitenoise==3.3.0
-Pillow==4.0.0
+Pillow==8.1.1
 coveralls==1.1
 codecov==2.0.5
